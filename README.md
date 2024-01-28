@@ -30,4 +30,4 @@ No additional instructions required.
 
 Name | Email | Development OS/Toolchain
 -:|:-|-|
-John Doe | john@doe.com | 
+Ang Yong Liang | yongliangang@u.nus.edu | Windows, Visual Studio
