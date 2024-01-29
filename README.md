@@ -33,4 +33,3 @@ Name | Email | Development OS/Toolchain
 Ang Yong Liang | yongliangang@u.nus.edu | Windows, Visual Studio
 Ezekiel Toh | ezekiel@comp.nus.edu.sg |  Windows, Visual Studio
 Justin Lam Seng Onn | juslam1@gmail.com |  Windows, Visual Studio
-Won Ye Ji | yeggy027@gmail.com | MacOS, LLVM - Clang
