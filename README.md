@@ -31,3 +31,4 @@ No additional instructions required.
 Name | Email | Development OS/Toolchain
 -:|:-|-|
 Ezekiel Toh | ezekiel@comp.nus.edu.sg |  Windows, Visual Studio
+Justin Lam Seng Onn | juslam1@gmail.com |  Windows, Visual Studio
