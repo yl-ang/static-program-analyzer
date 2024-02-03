@@ -1,0 +1,56 @@
+@startuml
+
+class           QueryProcessingSubsystem
+class           QueryResultProjector
+
+' Evaluator definition
+class           QueryEvaluator
+class           ClauseEvaluator
+class           RequestBuilder
+class           SelectClause
+class           DeclarationClause
+class           PatternClause
+class           SuchThatClause
+
+' Preprocessor definition
+class           QueryPreprocessor
+class           Parser
+class           SelectParser
+class           DeclarationParser
+class           PatternParser
+class           SuchThatParser
+class           Tokenizer
+class           TokenInput
+class           Tokens
+
+QueryProcessingSubsystem           -->           QueryResultProjector
+QueryProcessingSubsystem           -->           QueryEvaluator
+QueryProcessingSubsystem           -->           QueryPreprocessor
+
+QueryEvaluator           <.right.           QueryPreprocessor           :           < inputs query
+QueryResultProjector           <.right.           QueryEvaluator           :           < sends result
+
+QueryEvaluator           -->           ClauseEvaluator
+QueryEvaluator           -->           RequestBuilder
+ClauseEvaluator           <.right.           RequestBuilder
+
+ClauseEvaluator           <|--           SelectClause
+ClauseEvaluator           <|--           DeclarationClause
+ClauseEvaluator           <|--           SuchThatClause
+ClauseEvaluator           <|--           PatternClause
+
+QueryPreprocessor           -->           Parser
+QueryPreprocessor           -->           Tokenizer
+
+Parser           <|--           SelectParser
+Parser           <|--           DeclarationParser
+Parser           <|--           SuchThatParser
+Parser           <|--           PatternParser
+
+Tokenizer           -->           TokenInput
+TokenInput           -->           Tokens
+
+hide empty fields
+hide empty methods
+
+@enduml
