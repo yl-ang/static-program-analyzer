@@ -19,6 +19,7 @@ jobs:
       fail-fast: true
 
     steps:
+      - uses: lukka/get-cmake@latest
       - uses: actions/checkout@v2
         with:
           architecture: 'x64'
