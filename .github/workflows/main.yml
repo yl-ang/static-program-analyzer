@@ -19,10 +19,7 @@ jobs:
       fail-fast: true
 
     steps:
-      - uses: lukka/get-cmake@latest
       - uses: actions/checkout@v2
-        with:
-          architecture: 'x64'
       - name: Build Project
         shell: bash
         run: |
@@ -64,21 +61,19 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/build
-        run: cmake Team09/Code09/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE/Team09/Code09/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build Project
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
-      - name: Unit Testing
+      - name: Run Unit Tests
         working-directory: ${{runner.workspace}}/build
-        shell: bash
         run: ./src/unit_testing/unit_testing
 
       # - name: Integration Testing
       #   working-directory: ${{runner.workspace}}/build
-      #   shell: bash
       #   run: ./src/integration_testing/integration_testing
 
       # TBC: System Testing

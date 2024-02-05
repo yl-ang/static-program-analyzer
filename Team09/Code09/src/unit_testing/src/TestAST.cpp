@@ -16,6 +16,6 @@ TEST_CASE("Wrong Test") {
     require(2 == 1);
 }
 
-TEST_CASE("Right Test") {
+TEST_CASE("Another Right Test") {
     require(3 == 3);
 }
