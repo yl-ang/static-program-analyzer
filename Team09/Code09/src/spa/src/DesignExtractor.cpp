@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace std; // NOLINT
 
 
 #include "PKB.h"
 
-int DesignExtractor () {
-	return 0;
+int DesignExtractor() {
+    return 0;
 }

@@ -3,12 +3,11 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using namespace std; // NOLINT
 
 #include "PKB.h"
 #include "TNode.h"
 
-int Parse () {
-
-	return 0;
+int Parse() {
+    return 0;
 }
