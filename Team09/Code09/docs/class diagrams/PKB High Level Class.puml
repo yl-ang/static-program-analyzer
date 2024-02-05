@@ -1,0 +1,27 @@
+@startuml
+class           PKBFacadeWriter
+class           PKBFacadeReader
+class           PKB
+class           FollowsStore
+class           ParentsStore
+class           UsesStore
+class           ModifiesStore
+class           StatementStore
+class           EntityStore
+class           IfStore
+class           WhileStore
+class           PatternStore
+class           CallStore
+PKBFacadeWriter           -->           PKB
+PKBFacadeReader           -->           PKB
+PKB           -->           FollowsStore
+PKB           -->           ParentsStore
+PKB           -->           UsesStore
+PKB           -->           ModifiesStore
+PKB           -->           StatementStore
+PKB           -->           EntityStore
+PKB           -->           IfStore
+PKB           -->           WhileStore
+PKB           -->           CallStore
+PKB           -->           PatternStore
+@enduml
