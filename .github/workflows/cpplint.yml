@@ -19,8 +19,8 @@ jobs:
     - run: pip install cpplint
 
     - name: Checking Src
-        shell: bash
-        run: cpplint --recursive --extensions=hpp,cpp,tpp --linelength=120 --filter="-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir" --quiet --includeorder=standardcfirst ./Team09/Code09/src/spa/src/
+      shell: bash
+      run: cpplint --recursive --extensions=hpp,cpp,tpp --linelength=120 --filter="-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir" --quiet --includeorder=standardcfirst ./Team09/Code09/src/spa/src/
 
     - name: Checking Integration Testing
       shell: bash
