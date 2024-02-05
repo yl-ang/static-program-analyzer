@@ -1,0 +1,49 @@
+name: Continous Integration for cMake Project - Windows
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          architecture: 'x64'
+      - name: Build Project
+        shell: bash
+        run: |
+          cd Team09/Code09
+          mkdir build
+          cd build
+          cmake -A x64 ..
+          cmake --build . --target unit_testing --config Release
+          cmake --build . --target integration_testing --config Release
+          cmake --build . --target autotester --config Release
+          cd ../../..
+
+      - name: Unit Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/unit_testing
+          ./unit_testing.exe
+
+      # - name: Integration Testing
+      #   shell: bash
+      #   run: |
+      #     cd Team09/Code09/build/src/integration_testing/Release
+      #     ./integration_testing.exe
+
+      # TBC: System Tests
