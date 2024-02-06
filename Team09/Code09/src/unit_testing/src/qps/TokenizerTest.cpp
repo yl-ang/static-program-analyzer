@@ -33,5 +33,4 @@ TEST_CASE("Tokenizer Test") {
 
     resultsList = Tokenizer.tokenize(inputString_MoreThanOneSemiColon);
     REQUIRE(expectedResultList_MoreThanOneSemiColon == resultsList);
-
 }
