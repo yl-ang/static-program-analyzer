@@ -1,0 +1,7 @@
+fail_fast: false
+repos:
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.3.5
+    hooks:
+      - id: cpplint
+        args: ["--recursive", "--extensions=hpp,cpp,tpp", "--linelength=120", '--filter=-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir', "--quiet", "--includeorder=standardcfirst", "./Team09/Code09/src/spa/src/"]
