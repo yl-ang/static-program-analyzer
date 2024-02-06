@@ -1,0 +1,79 @@
+name: Continuous Integration for Mac/Windows
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Project
+        shell: bash
+        run: |
+          cd Team09/Code09
+          mkdir build
+          cd build
+          cmake -A x64 ..
+          cmake --build . --target unit_testing --config Release
+          cmake --build . --target integration_testing --config Release
+          cmake --build . --target autotester --config Release
+          cd ../..
+
+      - name: Unit Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/unit_testing/Release
+          ./unit_testing.exe
+
+      # - name: Integration Testing
+      #   shell: bash
+      #   run: |
+      #     cd Team09/Code09/build/src/integration_testing/Release
+      #     ./integration_testing.exe
+
+      # - TBC: System Testing
+
+  build_macos:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{runner.workspace}}/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE/Team09/Code09/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build Project
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: cmake --build . --config $BUILD_TYPE
+
+      - name: Run Unit Tests
+        working-directory: ${{runner.workspace}}/build
+        run: ./src/unit_testing/unit_testing
+
+      # - name: Integration Testing
+      #   working-directory: ${{runner.workspace}}/build
+      #   run: ./src/integration_testing/integration_testing
+
+      # TBC: System Testing

@@ -1,0 +1,31 @@
+name: Linting Checks using cpplint
+
+on: 
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  cpplint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+          python-version: 3.x
+    - run: pip install cpplint
+
+    - name: Checking Src
+      shell: bash
+      run: cpplint --recursive --extensions=hpp,cpp,tpp --linelength=120 --filter="-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir" --quiet --includeorder=standardcfirst ./Team09/Code09/src/spa/src/
+
+    - name: Checking Integration Testing
+      shell: bash
+      run: cpplint --recursive --extensions=hpp,cpp,tpp --linelength=120 --filter="-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir" --quiet --includeorder=standardcfirst ./Team09/Code09/src/integration_testing/src
+      
+    - name: Checking Unit Testing
+      shell: bash
+      run: cpplint --recursive --extensions=hpp,cpp,tpp --linelength=120 --filter="-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir" --quiet --includeorder=standardcfirst ./Team09/Code09/src/unit_testing/src/
