@@ -1,8 +1,7 @@
 #include <string>
 #include <vector>
 
-class Tokenizer
-{
+class Tokenizer {
 public:
-	std::vector<std::string> tokenize(std::string);
+    std::vector<std::string> tokenize(std::string);
 };
