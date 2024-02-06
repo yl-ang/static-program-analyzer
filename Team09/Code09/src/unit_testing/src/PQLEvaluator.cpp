@@ -1,19 +1,14 @@
 
-#include "PQLEvaluator.h"
 
 #include "catch.hpp"
+#include <qps/evaluator/PQLEvaluator.h>
 using namespace std;
-void require(bool b) {
-	REQUIRE(b);
-}
 
-TEST_CASE("1st Test") {
+TEST_CASE("PQLEvaluator Test") {
 
 	PQLEvaluator pe;
 
-
-
-	require(1 == 1);
+	REQUIRE(1 == 1);
 }
 
 
