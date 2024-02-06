@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <optional>
-#include "PKB/Utils/PairHash.h"
 
 class FollowsStore {
 
