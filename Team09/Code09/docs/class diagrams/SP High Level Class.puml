@@ -1,0 +1,46 @@
+@startuml
+class SimpleProcessor
+class SourceLoader
+class UILoader
+
+class Tokenizer
+class Tokens
+class TokenInput
+
+
+class Parser
+class ASTBuilder
+class ASTValidator
+class ASTManager
+class Node
+
+
+class DesignExtractor
+class EntityExtractor
+class AbstractionExtractor
+
+
+SimpleProcessor --- Tokenizer
+SimpleProcessor --- Parser
+SimpleProcessor --- DesignExtractor
+SimpleProcessor --- SourceLoader
+
+SourceLoader ---|> UILoader
+
+
+Tokenizer --> TokenInput
+TokenInput ..> Tokens
+
+Parser --> ASTManager
+ASTManager --> ASTBuilder
+ASTManager --> ASTValidator
+ 
+
+
+ASTBuilder ..> Node
+ASTValidator ..> Node
+
+
+DesignExtractor --> EntityExtractor
+DesignExtractor --> AbstractionExtractor
+@enduml
