@@ -2,8 +2,6 @@
 
 #include "catch.hpp"
 
-#include <iostream>
-
 TEST_CASE("Grammar Utils") {
     // check ident
     REQUIRE(isIdent("Capitalize") == true);
@@ -12,7 +10,7 @@ TEST_CASE("Grammar Utils") {
     REQUIRE(isIdent("lower") == true);
     REQUIRE(isIdent("withNumbers091") == true);
     REQUIRE(isIdent("x") == true);
-    
+
     REQUIRE(isIdent("010startingWithNumbers") == false);
     REQUIRE(isIdent("with space") == false);
     REQUIRE(isIdent("with_underscore") == false);
