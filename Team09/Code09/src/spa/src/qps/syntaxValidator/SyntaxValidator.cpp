@@ -1,12 +1,7 @@
 #include "SyntaxValidator.h"
 
 #include <qps/GrammarUtils.h>
-
-#include <iostream>
-
-void print(std::string str) {
-    std::cout << str << std::endl;
-}
+#include <qps/ParserUtils.h>
 
 bool SyntaxValidator::isValidSelectStatement(std::string statement) {
     int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");

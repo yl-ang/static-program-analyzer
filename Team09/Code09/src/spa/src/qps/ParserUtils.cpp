@@ -1,6 +1,6 @@
 #include "ParserUtils.h"
 
-std::vector<std::string> splitByDelimiter(std::string& str, std::string& delimiter) {
+std::vector<std::string> splitByDelimiter(const std::string str, const std::string delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;
 
@@ -26,16 +26,17 @@ std::vector<std::string> splitByDelimiter(std::string& str, std::string& delimit
     return splitList;
 }
 
-std::string trim(std::string& str) {
+std::string trim(const std::string str) {
     size_t start = str.find_first_not_of(WHITESPACES);
+    std::string trimmedString;
     if (start != std::string::npos) {
-        str = str.substr(start);
+        trimmedString = str.substr(start);
     }
 
-    size_t end = str.find_last_not_of(WHITESPACES);
+    size_t end = trimmedString.find_last_not_of(WHITESPACES);
     if (end != std::string::npos) {
-        str = str.substr(0, end + 1);
+        trimmedString = trimmedString.substr(0, end + 1);
     }
 
-    return str;
+    return trimmedString;
 }
