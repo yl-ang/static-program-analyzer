@@ -30,4 +30,7 @@ TEST_CASE("Grammar Utils") {
     REQUIRE(isInteger("00912914") == false);
     REQUIRE(isInteger("984nn123") == false);
     REQUIRE(isInteger("0000") == false);
+
+    REQUIRE(isDeclarationStatement("stmt s;") == true);
+    REQUIRE(isDeclarationStatement("statement s;") == false);
 }
