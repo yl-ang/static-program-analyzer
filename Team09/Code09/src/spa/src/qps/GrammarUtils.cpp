@@ -1,4 +1,5 @@
 #include "GrammarUtils.h"
+#include <iostream>
 
 bool isIdent(std::string str) {
     return std::regex_match(str, std::regex("^[a-zA-Z][a-zA-Z0-9]*$"));
@@ -30,4 +31,13 @@ bool isStmtRef(std::string str) {
 
 bool isEntRef(std::string str) {
     return isSynonym(str) || isWildcard(str) || isQuotedIdent(str);
+}
+
+bool isSelectStatement(std::string str) {
+    return std::regex_match(str, std::regex("^Select"));
+}
+
+bool isDeclarationStatement(std::string str) {
+    std::string pattern = "^(" + DesignEntity::DESIGN_ENTITIES + ")";
+    return std::regex_search(str, std::regex(pattern));
 }
