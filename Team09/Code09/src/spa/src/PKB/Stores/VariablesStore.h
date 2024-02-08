@@ -1,16 +1,12 @@
 #pragma once
+#include "EntityStore.h"
+#include "PKB/Utils/DataTypes.h"
 
-#include <unordered_set>
-#include <string>
-#include <utility>
-#include "PKB/Utils/HashSpecialization.h"
-
-class VariablesStore {
-private:
-    std::unordered_set<std::string> variablesStore;
-
+// ai-gen start(gpt, 0, e)
+// prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
+class VariablesStore : public EntityStore<Variable> {
 public:
-    const std::unordered_set<std::string>& getVariablesStore() const;
-    void setVariables(const std::unordered_set<std::string>& inputVariables);
-    bool containsVariable(const std::string &variable) const;
+    bool containsVariable(const Variable &variable) const {
+        return hasEntity(variable);
+    }
 };

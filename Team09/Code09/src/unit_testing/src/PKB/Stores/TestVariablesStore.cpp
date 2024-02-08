@@ -8,7 +8,7 @@ TEST_CASE("VariablesStore - Base Test") {
 
     SECTION("Test setVariables and containsVariable") {
         std::unordered_set<std::string> variables = {"var1", "var2", "var3", "var4"};
-        variablesStore.setVariables(variables);
+        variablesStore.addEntities(variables);
 
         REQUIRE(variablesStore.containsVariable("var1"));
         REQUIRE(variablesStore.containsVariable("var2"));
@@ -20,9 +20,9 @@ TEST_CASE("VariablesStore - Base Test") {
 
     SECTION("Test getVariablesStore") {
         std::unordered_set<std::string> variables = {"var1", "var2", "var3", "var4"};
-        variablesStore.setVariables(variables);
+        variablesStore.addEntities(variables);
 
-        const std::unordered_set<std::string>& storedVariables = variablesStore.getVariablesStore();
+        const std::unordered_set<std::string>& storedVariables = variablesStore.getAllEntities();
 
         REQUIRE(storedVariables.size() == 4);
         REQUIRE(storedVariables.find("var1") != storedVariables.end());
