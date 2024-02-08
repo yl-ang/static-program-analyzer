@@ -1,11 +1,11 @@
 #include "PKB.h"
-#include "PKB/Stores/VariablesStore.h"
+#include "PKB/Stores/EntityStore.h"
 #include "PKB/Stores/StatementStore.h"
 
 PKB::PKB() noexcept {
-    variablesStore = std::make_shared<VariablesStore>();
-    constantStore = std::make_shared<ConstantStore>();
-    procedureStore = std::make_shared<ProcedureStore>();
+    variableStore = std::make_shared<EntityStore<Variable>>();
+    constantStore = std::make_shared<EntityStore<Constant>>();
+    procedureStore = std::make_shared<EntityStore<Procedure>>();
 
     stmtStore = std::make_shared<StatementStore>();
     followsStore = std::make_shared<FollowsStore>();

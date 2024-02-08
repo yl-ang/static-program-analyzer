@@ -16,6 +16,8 @@ public:
     // Setter for statement entity
     void setStmts(const std::unordered_set<Stmt> &inputStmts) const;
 
+    // TODO: Setter for Design Abstractions
+
 private:
     PKB *pkbReference = nullptr;
 };

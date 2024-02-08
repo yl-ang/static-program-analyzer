@@ -6,15 +6,15 @@ PKBFacadeWriter::PKBFacadeWriter(PKB& pkbReference) {
 }
 
 void PKBFacadeWriter::setVariables(const std::unordered_set<Variable> &inputVariables) const {
-    this->pkbReference->variablesStore->addEntities(inputVariables);
+    this->pkbReference->variableStore->addEntities(inputVariables);
 }
 
 void PKBFacadeWriter::setConstants(const std::unordered_set<Constant> &inputConstants) const {
-    this->pkbReference->variablesStore->addEntities(inputConstants);
+    this->pkbReference->constantStore->addEntities(inputConstants);
 }
 
 void PKBFacadeWriter::setProcedures(const std::unordered_set<Procedure> &inputProcedures) const {
-    this->pkbReference->variablesStore->addEntities(inputProcedures);
+    this->pkbReference->procedureStore->addEntities(inputProcedures);
 }
 
 void PKBFacadeWriter::setStmts(const std::unordered_set<Stmt> &inputStmts) const {

@@ -6,7 +6,7 @@ PKBFacadeReader::PKBFacadeReader(PKB& pkbReference) {
 }
 
 std::unordered_set<std::string> PKBFacadeReader::getVariables() const {
-    return pkbReference->variablesStore->getAllEntities();
+    return pkbReference->variableStore->getAllEntities();
 }
 
 std::unordered_set<Constant> PKBFacadeReader::getConstants() const {
@@ -15,6 +15,18 @@ std::unordered_set<Constant> PKBFacadeReader::getConstants() const {
 
 std::unordered_set<Procedure> PKBFacadeReader::getProcedures() const {
     return pkbReference->procedureStore->getAllEntities();
+}
+
+bool PKBFacadeReader::containsVariable(const Variable& variable) const {
+    return pkbReference->variableStore->hasEntity(variable);
+}
+
+bool PKBFacadeReader::containsConstant(const Constant& constant) const {
+    return pkbReference->constantStore->hasEntity(constant);
+}
+
+bool PKBFacadeReader::containsProcedure(const Procedure& procedure) const {
+    return pkbReference->procedureStore->hasEntity(procedure);
 }
 
 std::unordered_set<Stmt> PKBFacadeReader::getStmts() const {
@@ -28,5 +40,3 @@ Stmt *PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) const {
 std::vector<Stmt *> PKBFacadeReader::getStatementsByType(StatementType type) const {
     return pkbReference->stmtStore->getStatementsByType(type);
 }
-
-
