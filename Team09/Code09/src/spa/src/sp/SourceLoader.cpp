@@ -47,7 +47,6 @@ std::vector<std::string> SourceLoader::LoadSIMPLE(std::string simple_input) {
   }
 
   // if we still have something in word, add it to the parsed string
-  // TODO(ben): FIND A WAY TO REMOVE THIS STATEMENT
   if (word.length()) {
     parsedString.push_back(word);
   }
