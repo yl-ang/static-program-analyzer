@@ -21,13 +21,11 @@ std::vector<std::string> SourceLoader::LoadSIMPLE(std::string simple_input) {
   std::vector<std::string> parsedString;
   while (peekNextChar(stringStream) != EOF) {
     char currentChar = peekNextChar(stringStream);
-    std::cout << "character is: " << currentChar << "\n";
 
     // ignore white spaces
     while (std::isspace(peekNextChar(stringStream))) {
       // if we currently have a word, we add it
       if (word.length()) {
-        std::cout << "word is: " << word << "\n";
         parsedString.push_back(word);
         word = "";
       }
