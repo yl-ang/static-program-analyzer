@@ -3,19 +3,28 @@
 #include <unordered_map>
 
 typedef std::vector<std::string> UnparsedQuery;
-typedef std::unordered_map<std::string, std::vector<std::string>> Query;
 typedef std::string QueryEntity;
-struct Clause {
+
+struct QueryDeclaration {
+    std::string type;
+    QueryEntity arg;
+};
+
+struct QueryClause {
     std::string type;
     QueryEntity firstArg;
     QueryEntity secondArg;
 };
 
+typedef std::vector<std::vector<QueryDeclaration>, std::vector<QueryClause>> ParsedQuery;
+
 class PQLParser {
 public:
-    static Query parse(UnparsedQuery);
+    static ParsedQuery parse(UnparsedQuery);
 private:
-    static std::vector<QueryEntity> parseQueryEntities(UnparsedQuery);
-    static std::vector<Clause> parseQueryClauses(UnparsedQuery);
-    static Query combineResult(std::vector<QueryEntity>, std::vector<Clause>);
+    static std::string getQueryDeclarations(UnparsedQuery);
+    static std::string getQueryClauses(UnparsedQuery);
+    static std::vector<QueryDeclaration> parseQueryDeclarations(std::string);
+    static std::vector<QueryClause> parseQueryClauses(std::string);
+    static ParsedQuery combineResult(std::vector<QueryDeclaration>, std::vector<QueryClause>);
 };
