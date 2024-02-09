@@ -20,6 +20,6 @@ private:
 
 public:
     Table(std::vector<QueryEntity>, std::vector<Row>);
-    std::vector<std::string> Table::extractResults(const QueryEntity&);
+    std::vector<std::string> extractResults(const QueryEntity&);
     bool isEmpty() const;
 };

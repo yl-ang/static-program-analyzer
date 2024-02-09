@@ -10,7 +10,7 @@ private:
     std::unordered_set<std::string> constants;
     std::unordered_set<std::string> procedures;
 public:
-    PKBFacadeReader::PKBFacadeReader(
+    PKBFacadeReader(
         std::unordered_set<std::string> vars,
         std::unordered_set<std::string> consts,
         std::unordered_set<std::string>prods
