@@ -11,7 +11,7 @@ struct QueryClause {
     QueryEntity secondArg;
 };
 
-typedef std::vector<std::vector<QueryEntity>, std::vector<QueryClause>> ParsedQuery;
+typedef std::unordered_map<std::vector<QueryEntity>, std::vector<QueryClause>> ParsedQuery;
 
 class PQLParser {
 public:

@@ -56,16 +56,20 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntit
     return queryEntities;
 }
 
+// Parse clauses from UnparsedQuery (std::vector<std::string>)
+// Input should look something like "Select ... such that ... pattern ..."
+// Output should look something like ""
 std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClauses) {
-    // Parse clauses from UnparsedQuery (std::vector<std::string>)
-    // Input should look something like ""
-    // Output should look something like ""
+    
     return {};
 }
 
+// Just combines the two
+// into a unordered_map[variables] = clauses
 ParsedQuery PQLParser::combineResult(
     std::vector<QueryEntity> queryEntity, std::vector<QueryClause> queryClauses) {
-    // Just combines the two
-    // into a vector {variables, clauses}
-    return {};
+    
+    ParsedQuery parsedQuery;
+    parsedQuery[queryEntity] = queryClauses; 
+    return parsedQuery;
 }
