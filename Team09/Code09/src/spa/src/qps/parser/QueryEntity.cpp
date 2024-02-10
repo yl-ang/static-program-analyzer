@@ -1,3 +1,4 @@
+#include <cstring>
 #include "QueryEntity.h"
 
 QueryEntity::QueryEntity(const EntityType& t, const std::string& n) : type(t), name(n) {}
@@ -12,6 +13,18 @@ std::string QueryEntity::getName() const {
 
 bool QueryEntity::operator==(const QueryEntity& other) const {
     return type == other.type && name == other.name;
+}
+
+EntityType determineType(const std::string type) {
+    EntityType entityType;
+    if (type == "variable") {
+        entityType = EntityType::VARIABLE;
+    } else if (type == "constant") {
+        entityType = EntityType::CONSTANT;
+    } else { // procedure
+        entityType = EntityType::PROCEDURE;
+    }
+    return entityType;
 }
 
 QueryEntity QueryEntity::createVariable(const std::string& name) {

@@ -16,6 +16,7 @@ private:
 public:
     QueryEntity(const EntityType&, const std::string&);
 
+    static EntityType determineType(const std::string);
     static QueryEntity createVariable(const std::string&);
     static QueryEntity createConstant(const std::string&);
     static QueryEntity createProcedure(const std::string&);

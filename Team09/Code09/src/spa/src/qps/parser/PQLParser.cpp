@@ -1,12 +1,13 @@
 #include "../ParserUtils.h"
+#include "QueryEntity.h"
 #include "PQLParser.h"
 
 ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
-    std::string unparsedDeclarations = getQueryDeclarations(unparsedQuery);
+    std::string unparsedEntities = getQueryEntities(unparsedQuery);
     std::string unparsedClauses = getQueryClauses(unparsedQuery);
-    std::vector<QueryDeclaration> declarations = parseQueryDeclarations(unparsedDeclarations);
+    std::vector<QueryEntity> entities = parseQueryEntities(unparsedEntities);
     std::vector<QueryClause> clauses = parseQueryClauses(unparsedClauses);
-    ParsedQuery query = combineResult(declarations, clauses);
+    ParsedQuery query = combineResult(entities, clauses);
     return query;
 }
 
@@ -21,11 +22,11 @@ std::string getQueryClauses(UnparsedQuery unparsedQuery) {
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input should look something like "call cl, c2; assign a1; stmt s1, s2" at this point
 // Output should look something like ""
-std::vector<QueryDeclaration> PQLParser::parseQueryDeclarations(std::string unparsedDeclarations) {
-    std::vector<QueryDeclaration> queryDeclarations = {};
+std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntities) {
+    std::vector<QueryEntity> queryEntities = {};
 
     // Split up synonyms by types
-    std::vector<std::string> synonymTypesList = splitByDelimiter(unparsedDeclarations, ";");
+    std::vector<std::string> synonymTypesList = splitByDelimiter(unparsedEntities, ";");
     
 
     for (std::string synonymTypeList : synonymTypesList) {
@@ -37,20 +38,22 @@ std::vector<QueryDeclaration> PQLParser::parseQueryDeclarations(std::string unpa
 
         // first synonym and type
         std::string type = typeAndFirstSynonym[0];
-        QueryEntity firstArg = typeAndFirstSynonym[1];
-        QueryDeclaration firstQueryDeclaration = {type, firstArg};
-        queryDeclarations.push_back(firstQueryDeclaration);
+        std::string firstArg = typeAndFirstSynonym[1];
+
+        // Determine entity type and make appropriate QueryEntity --> STOPPED HERE
+        EntityType entityType = QueryEntity::determineType(type);
+        QueryEntity firstQueryDeclaration = QueryEntity::QueryEntity(entityType, firstArg);
+        queryEntities.push_back(firstQueryDeclaration);
 
         // skip first element for other synonyms
         std::vector<std::string> sublist(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
         for (std::string synonym : sublist) {
-            QueryEntity currArg = synonym;
-            QueryDeclaration currQueryDeclaration = {type, currArg};
-            queryDeclarations.push_back(currQueryDeclaration);
+            QueryEntity currQueryDeclaration = QueryEntity::QueryEntity(entityType, synonym);
+            queryEntities.push_back(currQueryDeclaration);
         }
     }
-    return queryDeclarations;
+    return queryEntities;
 }
 
 std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClauses) {
@@ -61,7 +64,7 @@ std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClause
 }
 
 ParsedQuery PQLParser::combineResult(
-    std::vector<QueryDeclaration> queryDeclarations, std::vector<QueryClause> queryClauses) {
+    std::vector<QueryEntity> queryEntity, std::vector<QueryClause> queryClauses) {
     // Just combines the two
     // into a vector {variables, clauses}
     return {};
