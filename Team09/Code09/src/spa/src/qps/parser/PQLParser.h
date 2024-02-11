@@ -3,8 +3,7 @@
 #include <tuple>
 #include <unordered_map>
 #include "QueryEntity.h"
-#include "QueryClause.h"
-#include "PQLParser.h"
+#include "QueryClause.cpp"
 #include "../ParserUtils.h"
 
 typedef std::vector<std::string> UnparsedQuery;

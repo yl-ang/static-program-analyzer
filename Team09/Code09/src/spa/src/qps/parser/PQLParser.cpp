@@ -1,5 +1,5 @@
 #include "QueryEntity.h"
-#include "QueryClause.h"
+#include "QueryClause.cpp"
 #include "PQLParser.h"
 #include "../ParserUtils.h"
 
@@ -89,6 +89,6 @@ std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClause
 // Just combines the two
 // into a unordered_map[variables] = clauses
 ParsedQuery PQLParser::combineResult(
-    const std::vector<QueryEntity> &queryEntities, const std::vector<QueryClause> &queryClauses) {
+    const std::vector<QueryEntity> queryEntities, const std::vector<QueryClause> queryClauses) {
     return std::make_tuple(queryEntities, queryClauses);
 }

@@ -1,12 +1,23 @@
-#include "QueryClause.h"
+#include <iostream>
+#include <vector>
+#include <string>
 
-// Implementation of SelectClause member functions
-SelectClause::SelectClause(const QueryEntity &entity) : entity(entity) {}
+class QueryClause {
+public:
+    virtual ~QueryClause() {}
+    virtual std::string getType() const = 0;
+    // You can add common functionality or data members here
+};
 
-std::string SelectClause::getType() const {
-    return "SELECT";
-}
-
-QueryEntity SelectClause::getEntity() const {
-    return entity;
-}
+class SelectClause : public QueryClause {
+public:
+    SelectClause(const std::string& variable) : variable(variable) {}
+    virtual std::string getType() const override {
+        return "SELECT";
+    }
+    std::string getVariable() const {
+        return variable;
+    }
+private:
+    std::string variable;
+};
