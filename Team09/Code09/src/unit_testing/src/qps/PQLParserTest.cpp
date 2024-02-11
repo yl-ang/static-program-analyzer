@@ -6,24 +6,10 @@
 
 // Testing Query Entity Parser
 
-std::string one_variable = "variable v1";
-std::string two_variables = "variable v1, v2";
-std::string one_call_assign_stmt = "call c1; assign a1; stmt s1";
-std::string various_call_assign_stmt = "call c1, c2; assign a1; stmt s1, s2";
+TEST_CASE("one_variable") {
+    std::string one_variable = "variable v1";
+    std::vector<QueryEntity> expected_one_variable = { QueryEntity::QueryEntity(EntityType::VARIABLE, "v1") };
 
-std::vector<QueryEntity> expected_one_variable = { QueryEntity::QueryEntity(EntityType::VARIABLE, "v1") };
-std::vector<QueryEntity> expected_two_variables = { QueryEntity::QueryEntity(EntityType::VARIABLE, "v1"), 
-                                                    QueryEntity::QueryEntity(EntityType::VARIABLE, "v2") };
-std::vector<QueryEntity> expected_one_call_assign_stmt = { QueryEntity::QueryEntity(EntityType::CALL, "c1"), 
-                                                            QueryEntity::QueryEntity(EntityType::ASSIGN, "a1"),
-                                                            QueryEntity::QueryEntity(EntityType::STMT, "s1")};
-std::vector<QueryEntity> expected_various_call_assign_stmt = { QueryEntity::QueryEntity(EntityType::CALL, "c1"), 
-                                                            QueryEntity::QueryEntity(EntityType::CALL, "c2"), 
-                                                            QueryEntity::QueryEntity(EntityType::ASSIGN, "a1"),
-                                                            QueryEntity::QueryEntity(EntityType::STMT, "s1"), 
-                                                            QueryEntity::QueryEntity(EntityType::STMT, "s2") };
-
-TEST_CASE("one_variable") { 
     std::vector<QueryEntity> actual_one_variable = PQLParser::parseQueryEntities(one_variable);
     for(QueryEntity qe : actual_one_variable) {
         qe.print();
@@ -33,6 +19,9 @@ TEST_CASE("one_variable") {
 }
 
 TEST_CASE("two_variables") { 
+    std::string two_variables = "variable v1, v2";
+    std::vector<QueryEntity> expected_two_variables = { QueryEntity::QueryEntity(EntityType::VARIABLE, "v1"), QueryEntity::QueryEntity(EntityType::VARIABLE, "v2") };
+
     std::vector<QueryEntity> actual_two_variables = PQLParser::parseQueryEntities(two_variables);
     for(QueryEntity qe : actual_two_variables) {
         qe.print();
@@ -43,6 +32,9 @@ TEST_CASE("two_variables") {
 }
 
 TEST_CASE("one_call_assign_stmt") { 
+    std::string one_call_assign_stmt = "call c1; assign a1; stmt s1";
+    std::vector<QueryEntity> expected_one_call_assign_stmt = { QueryEntity::QueryEntity(EntityType::CALL, "c1"), QueryEntity::QueryEntity(EntityType::ASSIGN, "a1"), QueryEntity::QueryEntity(EntityType::STMT, "s1")};
+
     std::vector<QueryEntity> actual_one_call_assign_stmt = PQLParser::parseQueryEntities(one_call_assign_stmt);
     for(QueryEntity qe : actual_one_call_assign_stmt) {
         qe.print();
@@ -57,6 +49,9 @@ TEST_CASE("one_call_assign_stmt") {
 }
 
 TEST_CASE("various_call_assign_stmt") { 
+    std::string various_call_assign_stmt = "call c1, c2; assign a1; stmt s1, s2";
+    std::vector<QueryEntity> expected_various_call_assign_stmt = { QueryEntity::QueryEntity(EntityType::CALL, "c1"), QueryEntity::QueryEntity(EntityType::CALL, "c2"), QueryEntity::QueryEntity(EntityType::ASSIGN, "a1"), QueryEntity::QueryEntity(EntityType::STMT, "s1"), QueryEntity::QueryEntity(EntityType::STMT, "s2") };
+
     std::vector<QueryEntity> actual_various_call_assign_stmt = PQLParser::parseQueryEntities(various_call_assign_stmt);
     for(QueryEntity qe : actual_various_call_assign_stmt) {
         qe.print();
@@ -80,7 +75,6 @@ std::string select_v = "Select v";
 TEST_CASE("select_v") {
     std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
     SelectClause expected_select_v = SelectClause::SelectClause("v");
-    
     REQUIRE(expected_select_v.equals(*actual_select_v[0]));
 }
 
@@ -92,13 +86,13 @@ TEST_CASE("Incorrect select_v") {
 
 // Testing Whole thing
 
-UnparsedQuery unparsedQuery = { "variable v1", "Select v1" };
-
 TEST_CASE("variable v1; Select v1") {
-    
+
+    UnparsedQuery unparsedQuery = { "variable v1", "Select v1" };
+
     // expected
     SelectClause expected_select_v = SelectClause::SelectClause("v1");
-    // expected_one_variable
+    std::vector<QueryEntity> expected_one_variable = { QueryEntity::QueryEntity(EntityType::VARIABLE, "v1") };
 
     // actual
     ParsedQuery parsedQuery = PQLParser::parse(unparsedQuery);
@@ -107,7 +101,7 @@ TEST_CASE("variable v1; Select v1") {
     tie(entities, clauses) = parsedQuery;
 
     int size = std::tuple_size<decltype(parsedQuery)>::value;
-    
+
     REQUIRE(size == 2);
     REQUIRE(entities[0] == expected_one_variable[0]);
     REQUIRE(expected_select_v.equals(*clauses[0]));
