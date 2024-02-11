@@ -24,6 +24,6 @@ private:
     static std::string getQueryClauses(UnparsedQuery);
     static std::vector<QueryEntity> parseQueryEntities(std::string);
     static std::vector<QueryClause> parseQueryClauses(std::string);
-    static std::unordered_map<ClauseType, std::vector<int>> getClauseStarts(std::vector<std::string> &wordList);
+    static std::unordered_map<ClauseType, std::vector<int>> getClauseStarts(std::vector<std::string>);
     static ParsedQuery combineResult(std::vector<QueryEntity>, std::vector<QueryClause>);
 };

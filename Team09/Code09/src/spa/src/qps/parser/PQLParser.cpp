@@ -13,7 +13,7 @@ ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
     return query;
 }
 
-std::string getQueryDeclarations(UnparsedQuery unparsedQuery) {
+std::string getQueryEntities(UnparsedQuery unparsedQuery) {
     return unparsedQuery[0];
 }
 
@@ -74,21 +74,21 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntit
 // Parse clauses from UnparsedQuery (std::vector<std::string>)
 // Input should look something like "Select ... such that ... pattern ..."
 // Output should look something like ""
-std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClauses) {
-    // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query string
-    // Identify starting positions of SELECT, SUCH THAT, PATTERN
+// std::vector<QueryClause> PQLParser::parseQueryClauses(std::string unparsedClauses) {
+//     // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query string
+//     // Identify starting positions of SELECT, SUCH THAT, PATTERN
     
-    std::vector<std::string> wordList = stringToWordList(unparsedClauses);
-    // std::unordered_map<ClauseType, std::vector<int>> clauseStarts = getClauseStarts(wordList);
-    // there will be a function to get the end of each clause, but for now, will hardcode for 'Select v' alone
-    SelectClause selectClause = SelectClause::SelectClause(wordList[1]);
+//     std::vector<std::string> wordList = stringToWordList(unparsedClauses);
+//     // std::unordered_map<ClauseType, std::vector<int>> clauseStarts = getClauseStarts(wordList);
+//     // there will be a function to get the end of each clause, but for now, will hardcode for 'Select v' alone
+//     SelectClause selectClause = SelectClause::SelectClause(wordList[1]);
 
-    return { selectClause };
-}
+//     return { selectClause };
+// }
 
-// Just combines the two
-// into a unordered_map[variables] = clauses
-ParsedQuery PQLParser::combineResult(
-    const std::vector<QueryEntity> queryEntities, const std::vector<QueryClause> queryClauses) {
-    return std::make_tuple(queryEntities, queryClauses);
-}
+// // Just combines the two
+// // into a unordered_map[variables] = clauses
+// ParsedQuery PQLParser::combineResult(
+//     const std::vector<QueryEntity> queryEntities, const std::vector<QueryClause> queryClauses) {
+//     return std::make_tuple(queryEntities, queryClauses);
+// }
