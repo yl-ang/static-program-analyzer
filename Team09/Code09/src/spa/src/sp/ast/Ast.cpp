@@ -1,5 +1,5 @@
-#include <Ast.h>
-#include <AstNode.h>
+#include <sp/ast/Ast.h>
+#include <sp/ast/AstNode.h>
 
 #include <stack>
 #include <string>
@@ -12,8 +12,6 @@ const std::unordered_map<std::string, std::string> KEYWORDS{
     {"then", "then"},      {"else", "else"}};
 
 const std::unordered_set<std::string> CURLY_BRACE{"{", "}"};
-
-const char SEMICOLON[] = ";";
 
 /*
 root node is fixed so we create that at the top first before traversing the

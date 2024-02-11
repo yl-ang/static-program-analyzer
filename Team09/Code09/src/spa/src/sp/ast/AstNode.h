@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "Token.h"
+#include "sp/Token.h"
 
 class ASTNode {
   std::vector<ASTNode> children;
@@ -15,5 +15,5 @@ class ASTNode {
                    std::vector<ASTNode> children = {})
       : value(value), type(type), children(children) {}
 
-    void add_child(ASTNode child) { children.push_back(child); }
+  void add_child(ASTNode child) { children.push_back(child); }
 };

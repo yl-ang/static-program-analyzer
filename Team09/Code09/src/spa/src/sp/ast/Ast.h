@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 
-#include "AstNode.h"
-#include "Token.h"
+#include "sp/Token.h"
+#include "sp/ast/AstNode.h"
 
 class AST {
  public:
