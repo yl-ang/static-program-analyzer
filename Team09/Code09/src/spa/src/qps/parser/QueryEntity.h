@@ -23,11 +23,10 @@ public:
     QueryEntity(const EntityType&, const std::string&);
 
     static EntityType determineType(const std::string);
-    static QueryEntity createVariable(const std::string&);
-    static QueryEntity createConstant(const std::string&);
-    static QueryEntity createProcedure(const std::string&);
 
     EntityType getType() const;
     std::string getName() const;
+    static std::string entityTypeToString(EntityType);
+    int print();
     bool operator==(const QueryEntity& other) const;
 };

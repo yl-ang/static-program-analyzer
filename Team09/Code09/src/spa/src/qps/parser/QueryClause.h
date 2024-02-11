@@ -1,21 +1,28 @@
-#ifndef QUERYCLAUSE_H
-#define QUERYCLAUSE_H
+#pragma once
 
 #include <string>
 #include "QueryEntity.h"
 
+enum class ClauseType {
+    SELECT,
+    SUCH_THAT,
+    PATTERN,
+    BASE
+};
+
 class QueryClause {
 public:
-    virtual ~QueryClause() {}
+    virtual ~QueryClause() {};
+    virtual ClauseType getType() const = 0;
+    virtual bool equals(const QueryClause& other) const = 0;
 };
 
 class SelectClause : public QueryClause {
-public:
-    SelectClause(const std::string &arg);
-    virtual std::string getType() const;
-    std::string getArgument() const;
 private:
     std::string arg;
+public:
+    SelectClause(const std::string& arg);
+    ClauseType getType() const override;
+    bool equals(const QueryClause& other) const override;
+    std::string getArgument() const;
 };
-
-#endif

@@ -1,22 +1,22 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "QueryClause.h"
 
-class QueryClause {
-public:
-    virtual ~QueryClause() {}
-    // You can add common functionality or data members here
-};
+SelectClause::SelectClause(const std::string& a) : arg(a) {}
 
-class SelectClause : public QueryClause {
-public:
-    SelectClause(const std::string& variable) : variable(variable) {}
-    virtual std::string getType() const {
-        return "SELECT";
+ClauseType SelectClause::getType() const {
+    return ClauseType::SELECT;
+}
+
+std::string SelectClause::getArgument() const {
+    return arg;
+}
+
+bool SelectClause::equals(const QueryClause& other) const {
+    if (const SelectClause* ptr = dynamic_cast<const SelectClause*>(&other)) {
+        return arg == ptr->arg;
     }
-    std::string getVariable() const {
-        return variable;
-    }
-private:
-    std::string variable;
-};
+    return false;
+    
+}
