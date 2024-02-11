@@ -3,8 +3,14 @@
 #include <string>
 
 enum class EntityType {
-    VARIABLE,
-    CONSTANT,
+    STMT,
+    READ,
+    CALL, 
+    WHILE, 
+    IF, 
+    ASSIGN, 
+    VARIABLE, 
+    CONSTANT, 
     PROCEDURE
 };
 

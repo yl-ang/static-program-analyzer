@@ -23,7 +23,7 @@ std::string getQueryClauses(UnparsedQuery unparsedQuery) {
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input should look something like "call cl, c2; assign a1; stmt s1, s2" at this point
-// Output should look something like ""
+// Output should look something like "std::vector<QueryEntity, QueryEntity, ... >"
 std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
     // Split up synonyms by types
