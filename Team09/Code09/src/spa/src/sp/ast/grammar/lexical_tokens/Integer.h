@@ -8,4 +8,7 @@
 class Integer : public LexicalTokenInterface {
  private:
   std::string name;
+
+ public:
+  bool validate() override { return true; }
 };

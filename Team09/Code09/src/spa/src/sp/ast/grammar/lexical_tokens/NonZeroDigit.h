@@ -5,4 +5,7 @@
 class NonZeroDigit : public LexicalTokenInterface {
  private:
   char NonZeroDigit;
+
+ public:
+  bool validate() override { return true; }
 };

@@ -6,4 +6,7 @@
 class Letter : public LexicalTokenInterface {
  private:
   char letter;
+
+ public:
+  bool validate() override { return true; }
 };
