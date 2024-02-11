@@ -20,7 +20,7 @@ private:
     std::string name;
 
 public:
-    QueryEntity(const EntityType&, const std::string&);
+    QueryEntity(const EntityType& t, const std::string& n);
 
     static EntityType determineType(const std::string);
 

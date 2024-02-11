@@ -54,7 +54,7 @@ EntityType QueryEntity::determineType(const std::string type) {
         entityType = EntityType::WHILE;
     } else if (type == "if") {
         entityType = EntityType::IF;
-    } else { // assign
+    } else {  // assign
         entityType = EntityType::ASSIGN;
     }
     return entityType;

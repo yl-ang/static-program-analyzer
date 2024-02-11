@@ -18,5 +18,4 @@ bool SelectClause::equals(const QueryClause& other) const {
         return arg == ptr->arg;
     }
     return false;
-    
 }
