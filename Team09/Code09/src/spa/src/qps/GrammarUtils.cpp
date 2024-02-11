@@ -41,3 +41,4 @@ bool isDeclarationStatement(std::string str) {
     std::string pattern = "^(" + DesignEntity::DESIGN_ENTITIES + ")";
     return std::regex_search(str, std::regex(pattern));
 }
+`
