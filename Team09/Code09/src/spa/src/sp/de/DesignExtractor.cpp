@@ -1,4 +1,3 @@
-#pragma once
 #include "DesignExtractor.h"
 
 std::unordered_set<ASTNode> DesignExtractor::extract(ASTNode* root) {
