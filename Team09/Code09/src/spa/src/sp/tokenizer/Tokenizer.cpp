@@ -9,6 +9,10 @@ std::vector<Token> Tokenizer::tokenize(std::vector<std::string> input) {
     return tokens;
 }
 
+/*
+Assign specific token types and statement numbers to each token. 
+Procedure definitions, else keywords on a line and close brackets are assigned statement number -1.
+*/
 std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken*> input) {
     std::vector<Token> tokens;
     for (size_t i = 0; i <input.size(); i++) {
