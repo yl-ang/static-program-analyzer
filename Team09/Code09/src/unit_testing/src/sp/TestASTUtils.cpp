@@ -97,9 +97,6 @@ TEST_CASE("AST Utils Tests") {
 
   SECTION("Splits multiple statements correctly") {
     std::vector<Token> inputTokenArray = {
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
-        Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-        Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::LETTER, "k", 1),
         Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
         Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 1),
@@ -108,7 +105,6 @@ TEST_CASE("AST Utils Tests") {
         Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
         Token(LEXICAL_TOKEN_TYPE::INTEGER, "2", 1),
         Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-        Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
     };
     std::vector<std::vector<std::string>> expectedResultList = {
         {"k", "=", "1"}, {"a", "=", "2"}};
@@ -120,14 +116,10 @@ TEST_CASE("AST Utils Tests") {
 
   SECTION("Splits single statement correctly") {
     std::vector<Token> inputTokenArray = {
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
-        Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-        Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::LETTER, "k", 1),
         Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
         Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 1),
         Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-        Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
     };
     std::vector<std::vector<std::string>> expectedResultList = {
         {"k", "=", "1"}};
