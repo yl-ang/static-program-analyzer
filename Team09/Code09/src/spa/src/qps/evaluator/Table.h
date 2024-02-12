@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include "QueryEntity.h"
+#include "qps/parser/QueryEntity.h"
 
 using Row = std::vector<std::string>;
 

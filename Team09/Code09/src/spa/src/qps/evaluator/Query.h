@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QueryEntity.h"
+#include "qps/parser/QueryEntity.h"
 #include "Table.h"
 #include <unordered_set>
 
