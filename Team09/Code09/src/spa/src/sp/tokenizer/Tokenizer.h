@@ -17,8 +17,8 @@ class Tokenizer {
 
     public:
         std::vector<Token> tokenize(std::vector<std::string>); 
-        std::vector<Token> assignTokens(std::vector<BasicToken> input);
-        Token assignKeyword(BasicToken bt);
-        Token assignSymbol(BasicToken bt);
+        std::vector<Token> assignTokens(std::vector<BasicToken*> input);
+        Token assignKeyword(BasicToken* bt);
+        Token assignSymbol(BasicToken* bt);
 
 };

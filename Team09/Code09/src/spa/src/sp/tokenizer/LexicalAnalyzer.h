@@ -14,9 +14,9 @@
  */
 class LexicalAnalyzer {
     public:
-        std::vector<BasicToken> preprocess(std::vector<std::string> strings);
-        static BasicToken assignType(std::string curr, std::string prev, std::string next);
-        static BasicToken disambiguate(std::string curr, std::string prev, std::string next);
+        std::vector<BasicToken*> preprocess(std::vector<std::string> strings);
+        static BasicToken* assignType(std::string curr, std::string prev, std::string next);
+        static BasicToken* disambiguate(std::string curr, std::string prev, std::string next);
         static bool isValidInteger(std::string value);
         static bool isValidName(std::string value);
         static bool isValidSymbol(std::string value);
