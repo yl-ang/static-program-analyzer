@@ -3,6 +3,8 @@
 #include <regex>
 #include <string>
 
+#include "ParserUtils.h"
+
 class DesignEntity {
 public:
     inline static const std::string STMT = "stmt";
@@ -32,3 +34,6 @@ bool isEntRef(std::string);
 
 bool isSelectStatement(std::string);
 bool isDeclarationStatement(std::string);
+
+bool isValidSelectStatement(std::string);
+bool isValidDeclarationStatement(std::string);
