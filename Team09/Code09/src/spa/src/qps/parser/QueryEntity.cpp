@@ -1,6 +1,8 @@
 #include <cstring>
 #include "QueryEntity.h"
 #include <iostream>
+#include <algorithm>
+#include <functional>
 
 QueryEntity::QueryEntity(const EntityType& t, const std::string& n) : type(t), name(n) {}
 
@@ -16,9 +18,8 @@ bool QueryEntity::operator==(const QueryEntity& other) const {
     return type == other.type && name == other.name;
 }
 
-int QueryEntity::print() {
+void QueryEntity::print() {
     std::cout << "type, name: " << QueryEntity::entityTypeToString(type) << ", " << name << "\n";
-    return 0;
 }
 
 std::string QueryEntity::entityTypeToString(EntityType type) {
@@ -38,24 +39,52 @@ std::string QueryEntity::entityTypeToString(EntityType type) {
 
 EntityType QueryEntity::determineType(const std::string type) {
     EntityType entityType;
-    if (type == "variable") {
-        entityType = EntityType::VARIABLE;
-    } else if (type == "constant") {
-        entityType = EntityType::CONSTANT;
-    } else if (type == "procedure") {
-        entityType = EntityType::PROCEDURE;
-    } else if (type == "stmt") {
-        entityType = EntityType::STMT;
-    } else if (type == "read") {
-        entityType = EntityType::READ;
-    } else if (type == "call") {
-        entityType = EntityType::CALL;
-    } else if (type == "while") {
-        entityType = EntityType::WHILE;
-    } else if (type == "if") {
-        entityType = EntityType::IF;
-    } else {  // assign
-        entityType = EntityType::ASSIGN;
+    
+    const static std::unordered_map<std::string,int> string_to_case{
+        {"variable", 1},
+        {"constant", 2},
+        {"procedure", 3},
+        {"stmt", 4},
+        {"read", 5},
+        {"call", 6},
+        {"while", 7},
+        {"if", 8},
+        {"assign", 9}
+    };
+
+    // Checks if in map, otherwise case 0
+    switch(string_to_case.count(type) ? string_to_case.at(type) : 0) {
+        case 1:
+            entityType = EntityType::VARIABLE;
+            break;
+        case 2:
+            entityType = EntityType::CONSTANT;
+            break;
+        case 3:
+            entityType = EntityType::PROCEDURE;
+            break;
+        case 4:
+            entityType = EntityType::STMT;
+            break;
+        case 5:
+            entityType = EntityType::READ;
+            break;
+        case 6: 
+            entityType = EntityType::CALL;
+            break;
+        case 7:
+            entityType = EntityType::WHILE;
+            break;
+        case 8:
+            entityType = EntityType::IF;
+            break;
+        case 9:
+            entityType = EntityType::ASSIGN;
+            break;
+        case 0:
+            std::cout << "EntityType is not found in valid types: -" << type << "-\n";
+            exit(1);
+            break;
     }
     return entityType;
 }

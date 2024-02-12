@@ -6,8 +6,7 @@
 enum class ClauseType {
     SELECT,
     SUCH_THAT,
-    PATTERN,
-    BASE
+    PATTERN
 };
 
 class QueryClause {

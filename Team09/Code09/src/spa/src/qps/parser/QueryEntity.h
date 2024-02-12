@@ -27,6 +27,6 @@ public:
     EntityType getType() const;
     std::string getName() const;
     static std::string entityTypeToString(EntityType);
-    int print();
+    void print();
     bool operator==(const QueryEntity& other) const;
 };
