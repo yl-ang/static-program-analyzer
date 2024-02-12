@@ -43,8 +43,9 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntit
         // skip first element for other synonyms
         std::vector<std::string> sublist(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
+        QueryEntity currQueryDeclaration;
         for (std::string synonym : sublist) {
-            QueryEntity currQueryDeclaration(entityType, synonym);
+            currQueryDeclaration = QueryEntity(entityType, synonym);
             queryEntities.push_back(currQueryDeclaration);
         }
     }
