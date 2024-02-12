@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
-#include "sp/Token.h"
 #include "sp/ast/AstNode.h"
+#include "sp/tokenizer/Token.h"
 
 class AST {
  public:
