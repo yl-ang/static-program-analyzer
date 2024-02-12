@@ -15,7 +15,7 @@ std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken> input) {
         BasicToken& curr = input[i];
         BasicToken* next = (i + 1 < input.size()) ? &input[i + 1] : nullptr;
         switch (curr.type) {
-            case BASIC_TOKEN_TYPE::INTEGER:
+            case BASIC_TOKEN_TYPE::_INTEGER:
                 tokens.push_back(Token(LEXICAL_TOKEN_TYPE::INTEGER, curr.value, stmtNum));
                 break;
             case BASIC_TOKEN_TYPE::KEYWORD:
@@ -23,7 +23,7 @@ std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken> input) {
                 tokens.push_back(assignKeyword(curr));
                 break;
 
-            case BASIC_TOKEN_TYPE::NAME:
+            case BASIC_TOKEN_TYPE::_NAME:
                 // For assign statements, check next token is "="
                 if (next->value == "=") {
                     stmtNum++;
@@ -40,7 +40,6 @@ std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken> input) {
                 // Assign specific symbol type
                 tokens.push_back(assignSymbol(curr));
                 break;
-
         }
     }
 }
@@ -118,7 +117,7 @@ Token Tokenizer::assignSymbol(BasicToken bt) {
 
     } else if (bt.value == "<=") {
         return Token(LEXICAL_TOKEN_TYPE::LESS_THAN_OR_EQUAL_TO, bt.value, stmtNum);
-   
+
     } else if (bt.value == ">") {
         return Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, bt.value, stmtNum);
 
@@ -150,5 +149,3 @@ Token Tokenizer::assignSymbol(BasicToken bt) {
         throw SyntaxError("Invalid symbol!");
     }
 }
-
-  

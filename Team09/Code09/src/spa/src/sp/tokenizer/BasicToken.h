@@ -5,8 +5,8 @@
 #include <unordered_set>
 
 enum BASIC_TOKEN_TYPE {
-    NAME,
-    INTEGER,
+    _NAME,
+    _INTEGER,
     SYMBOL,
     KEYWORD
 };

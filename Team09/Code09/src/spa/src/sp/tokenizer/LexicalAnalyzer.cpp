@@ -1,23 +1,23 @@
 #include "LexicalAnalyzer.h"
 
 std::vector<BasicToken> LexicalAnalyzer::preprocess(std::vector<std::string> strings) {
-    std::vector<BasicToken> bt; 
+    std::vector<BasicToken> bt;
     for (size_t i = 0; i < strings.size(); ++i) {
         std::string current = strings[i];
         std::string prev = (i > 0) ? strings[i - 1] : "";
         std::string next = (i < strings.size() - 1) ? strings[i + 1] : "";
         bt.push_back(assignType(current, prev, next));
-    } 
+    }
     return bt;
 }
 
 BasicToken LexicalAnalyzer::assignType(std::string curr, std::string prev, std::string next) {
     // Integer
-    if (std::all_of(curr.begin(), curr.end(), ::isdigit)) {     
+    if (std::all_of(curr.begin(), curr.end(), ::isdigit)) {
         if (!isValidInteger(curr)) {
             throw SyntaxError("Invalid integer!");
         }
-        return BasicToken(curr, BASIC_TOKEN_TYPE::INTEGER);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::_INTEGER);
 
     // Symbol
     } else if (std::all_of(curr.begin(), curr.end(), ::ispunct)) {
@@ -31,7 +31,7 @@ BasicToken LexicalAnalyzer::assignType(std::string curr, std::string prev, std::
         if (!isValidName(curr)) {
             throw SyntaxError("Invalid name!");
         }
-        return BasicToken(curr, BASIC_TOKEN_TYPE::NAME);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 
     // Keyword or Name
     } else if (std::all_of(curr.begin(), curr.end(), ::isalpha)) {
@@ -46,7 +46,7 @@ BasicToken LexicalAnalyzer::assignType(std::string curr, std::string prev, std::
     }
 }
 
-BasicToken LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std::string next) { 
+BasicToken LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std::string next) {
     if (KEYWORDS.find(curr) != KEYWORDS.end()) {
         // keyword match, disambiguate by checking neighbours
         if (curr == "if" || curr == "while") {
@@ -71,18 +71,18 @@ BasicToken LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std
         }
     } else {
         // keyword not matched, assign type NAME
-        return BasicToken(curr, BASIC_TOKEN_TYPE::NAME);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
     }
 }
 
 bool LexicalAnalyzer::isValidInteger(std::string value) {
-    // INTEGER : 0 | NZDIGIT ( DIGIT )* 
+    // INTEGER : 0 | NZDIGIT ( DIGIT )*
     std::regex integerRegex("(0|[1-9][0-9]*)");
     return std::regex_match(value, integerRegex);
 }
 
 bool LexicalAnalyzer::isValidName(std::string value) {
-    // NAME: LETTER (LETTER | DIGIT)* 
+    // NAME: LETTER (LETTER | DIGIT)*
     std::regex nameRegex("[a-zA-Z][a-zA-Z0-9]*");
     return std::regex_match(value, nameRegex);
 }
