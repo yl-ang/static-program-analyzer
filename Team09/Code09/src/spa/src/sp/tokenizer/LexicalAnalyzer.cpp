@@ -39,7 +39,7 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
             throw SyntaxError("Invalid name!");
         }
         return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
-    
+
     } else {
         throw SyntaxError("Invalid token!");
     }

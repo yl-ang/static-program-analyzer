@@ -26,20 +26,20 @@ const std::unordered_set<std::string> KEYWORDS = {
  * @brief Provides a intermediate representation of each string to disambiguate between strings that have the same value but different type
  * such as the keyword 'procedure' and the var_name 'procedure'. 
  */
-class BasicToken {        
-    public:
-        BASIC_TOKEN_TYPE type;
-        std::string value;
-        BasicToken(std::string value, BASIC_TOKEN_TYPE type);
+class BasicToken {
+ public:
+    BASIC_TOKEN_TYPE type;
+    std::string value;
+    BasicToken(std::string value, BASIC_TOKEN_TYPE type);
 
-        // Overloading the equality operator (==)
-        bool operator==(const BasicToken& other) const {
-            return (value == other.value && type == other.type);
-        }
+    // Overloading the equality operator (==)
+    bool operator==(const BasicToken& other) const {
+        return (value == other.value && type == other.type);
+    }
 
-        friend std::ostream& operator<<(std::ostream& os, const BasicToken& obj) {
-            os << "{ \"value\": \"" << obj.value << "\", "
-            << "\"type\": \"" << obj.type;
-            return os;
-        }
+    friend std::ostream& operator<<(std::ostream& os, const BasicToken& obj) {
+        os << "{ \"value\": \"" << obj.value << "\", "
+        << "\"type\": \"" << obj.type;
+        return os;
+    }
 };
