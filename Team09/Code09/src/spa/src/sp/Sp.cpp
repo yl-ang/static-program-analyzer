@@ -1,4 +1,4 @@
-#include "SP.h"
+#include "Sp.h"
 
 #include <fstream>
 #include <iostream>
