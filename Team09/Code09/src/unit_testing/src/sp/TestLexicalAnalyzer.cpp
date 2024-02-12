@@ -39,5 +39,4 @@ TEST_CASE("Lexical Analyzer Tests") {
     BasicToken* result = lexicalAnalyzer.disambiguate("procedure", "", "x");
     REQUIRE(*expectedResult == *result);
   }
-
 }
