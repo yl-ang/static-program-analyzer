@@ -9,7 +9,7 @@ class DesignExtractor {
  public:
     DesignExtractor() {}
 
-    std::unordered_set<ASTNode> extract(ASTNode* root);
+    void extract(ASTNode root);
 
     void writePKB();
 
