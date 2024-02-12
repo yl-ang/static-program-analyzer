@@ -30,6 +30,7 @@ std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken*> input) {
                 }
                 if (noStmtNumCountdown) {
                     // proc_name
+                    noStmtNumCountdown--;
                     tokens.push_back(Token(LEXICAL_TOKEN_TYPE::NAME, curr->value, NO_STMT_NUM));
                 } else {
                     tokens.push_back(Token(LEXICAL_TOKEN_TYPE::NAME, curr->value, stmtNum));
@@ -42,6 +43,7 @@ std::vector<Token> Tokenizer::assignTokens(std::vector<BasicToken*> input) {
                 break;
         }
     }
+    return tokens;
 }
 
 Token Tokenizer::assignKeyword(BasicToken* bt) {
@@ -85,6 +87,7 @@ Token Tokenizer::assignSymbol(BasicToken* bt) {
 
     } else if (bt->value == "{") {
         if (noStmtNumCountdown) {
+            noStmtNumCountdown--;
             return Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, bt->value, NO_STMT_NUM);
 
         } else {

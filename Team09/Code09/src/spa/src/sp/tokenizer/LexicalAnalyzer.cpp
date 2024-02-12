@@ -68,10 +68,9 @@ BasicToken* LexicalAnalyzer::disambiguate(std::string curr, std::string prev, st
             // Shouldn't reach here
             throw SyntaxError("Invalid token!");
         }
-    } else {
-        // keyword not matched, assign type NAME
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
     }
+    // keyword not matched, assign type NAME
+    return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 }
 
 bool LexicalAnalyzer::isValidInteger(std::string value) {

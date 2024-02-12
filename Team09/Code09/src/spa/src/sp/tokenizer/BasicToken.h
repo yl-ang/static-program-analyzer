@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <ostream>
 #include <unordered_set>
 
 enum BASIC_TOKEN_TYPE {
@@ -30,4 +31,15 @@ class BasicToken {
         BASIC_TOKEN_TYPE type;
         std::string value;
         BasicToken(std::string value, BASIC_TOKEN_TYPE type);
+
+        // Overloading the equality operator (==)
+        bool operator==(const BasicToken& other) const {
+            return (value == other.value && type == other.type);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const BasicToken& obj) {
+            os << "{ \"value\": \"" << obj.value << "\", "
+            << "\"type\": \"" << obj.type;
+            return os;
+        }
 };

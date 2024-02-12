@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <ostream>
 
 enum LEXICAL_TOKEN_TYPE {
   LETTER,
@@ -49,9 +50,17 @@ class Token {
       value = token_value;
       line_number = token_line_number;
     }
-    
+
     // Overloading the equality operator (==)
     bool operator==(const Token& other) const {
         return (value == other.value && type == other.type && line_number == other.line_number);
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Token& obj) {
+            os << "{ \"value\": \"" << obj.value << "\", \n"
+            << "\"type\": \"" << obj.type << "\", \n" 
+            << "{ \"line_number\": \"" << obj.line_number;
+            return os;
+    }
 };
+
