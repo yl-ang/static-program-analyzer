@@ -26,6 +26,16 @@ std::vector<std::string> splitByDelimiter(const std::string str, const std::stri
     return splitList;
 }
 
+std::vector<std::string> stringToWordList(std::string string) {
+    std::vector<std::string> wordList;
+    std::stringstream ss(string);
+    std::string word;
+    while (ss >> word) {
+        wordList.push_back(word);
+    }
+    return wordList;
+}
+
 std::string trim(const std::string str) {
     size_t start = str.find_first_not_of(WHITESPACES);
     std::string trimmedString;
