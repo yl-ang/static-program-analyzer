@@ -15,8 +15,8 @@ When we encounter a symbol/space:
   if its a space but we have a word to be added, we add the word and continue
 */
 
-std::vector<std::string> SourceLoader::LoadSIMPLE(std::string simple_input) {
-  std::stringstream stringStream(simple_input);
+std::vector<std::string> SourceLoader::loadSimple(
+    std::stringstream& stringStream) {
   std::string word = "";
   std::vector<std::string> parsedString;
   while (peekNextChar(stringStream) != EOF) {

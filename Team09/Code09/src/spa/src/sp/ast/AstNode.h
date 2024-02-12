@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "sp/Token.h"
+#include "sp/tokenizer/Token.h"
 
 class ASTNode {
   std::vector<ASTNode> children;
