@@ -33,6 +33,10 @@ class ASTNode {
     return value;
   }
 
+  std::vector<ASTNode> getChildren() const {
+    return children;
+  }
+
   friend std::ostream& operator<<(std::ostream& os, const ASTNode& obj) {
     os << "{ \"value\": \"" << obj.value << "\", "
        << "\"type\": \"" << obj.type << "\", "

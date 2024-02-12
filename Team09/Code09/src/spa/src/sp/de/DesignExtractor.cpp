@@ -1,10 +1,10 @@
 #include "DesignExtractor.h"
 
-std::unordered_set<ASTNode> DesignExtractor::extract(ASTNode* root) {
+void DesignExtractor::extract(ASTNode root) {
      if (!root) return;
 
     // DFS
-    for (ASTNode* child : root->getChildren()) {
+    for (ASTNode child : root->getChildren()) {
         extract(child);
     }
 
