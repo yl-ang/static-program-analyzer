@@ -15,5 +15,8 @@ void SP::processFile(std::string filepath) {
   std::vector<std::string> simpleProgramAsString =
       sourceLoader.loadSimple(buffer);
 
+  std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
+  ASTNode astRoot = ast.buildAST(tokens);
+
   // add other components
 }
