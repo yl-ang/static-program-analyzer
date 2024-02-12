@@ -16,9 +16,7 @@ public:
     // Setter for statement entity
     void setStmts(const std::unordered_set<Stmt> &inputStmts) const;
 
-    // Setters Basic Design Abstractions
-    void setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs) const;
-
+    // TODO: Setter for Design Abstractions
 
 private:
     PKB *pkbReference = nullptr;
