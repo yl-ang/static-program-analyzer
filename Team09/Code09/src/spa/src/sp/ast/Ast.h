@@ -8,8 +8,6 @@
 class AST {
  public:
   ASTNode buildAST(std::vector<Token> tokens);
-
- private:
   std::vector<std::vector<Token>> splitByProcedure(std::vector<Token> tokens);
   ASTNode buildProcedureAST(std::vector<Token> tokens);
   std::vector<std::vector<Token>> splitByStatements(std::vector<Token> tokens);

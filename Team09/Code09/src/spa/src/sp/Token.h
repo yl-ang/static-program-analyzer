@@ -34,6 +34,7 @@ enum LEXICAL_TOKEN_TYPE {
   MUL,
   DIV,
   MOD,
+  PROC,
 };
 
 class Token {

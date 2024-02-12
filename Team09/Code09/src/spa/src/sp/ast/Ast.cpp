@@ -1,6 +1,7 @@
 #include <sp/ast/Ast.h>
 #include <sp/ast/AstNode.h>
 
+#include <iostream>
 #include <stack>
 #include <string>
 #include <unordered_map>
@@ -46,8 +47,13 @@ std::vector<std::vector<Token>> AST::splitByProcedure(
     } else if (token.type == LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE &&
                stack.top().type == LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE) {
       stack.pop();
-    } else {
-      current_procedure.push_back(token);
+    }
+    current_procedure.push_back(token);
+    // if the current token we pushed is a proc type, or the prev token before
+    // this one is, we dont pop from the stack
+    // TODO(ben): handle nested procedures
+    if (token.type == PROC || current_procedure.end()[-2].type == PROC) {
+      continue;
     }
     // if the stack is empty, means that we have reached the end of the current
     // procedure. so we add the current procedure to the procedures vect and
