@@ -17,5 +17,6 @@ void SP::processFile(std::string filepath) {
 
   std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
   ASTNode astRoot = ast.buildAST(tokens);
-  // add other components
+  designExtractor.extract(astRoot);
+  designExtractor.writePKB();
 }

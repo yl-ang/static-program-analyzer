@@ -1,9 +1,9 @@
 #include <iostream>
 
 #include "catch.hpp"
-#include "sp/Token.h"
 #include "sp/ast/Ast.h"
 #include "sp/ast/AstNode.h"
+#include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
 
@@ -192,7 +192,7 @@ TEST_CASE("AST Build Tests") {
 
   SECTION("Build assignment procedure") {
     std::vector<Token> inputTokenArray = {
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
+        Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
         Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::NAME, "x", 1),

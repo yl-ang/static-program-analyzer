@@ -52,7 +52,8 @@ std::vector<std::vector<Token>> AST::splitByProcedure(
     // if the current token we pushed is a proc type, or the prev token before
     // this one is, we dont pop from the stack
     // TODO(ben): handle nested procedures
-    if (token.type == PROC || current_procedure.end()[-2].type == PROC) {
+    if (token.type == PROCEDURE ||
+        current_procedure.end()[-2].type == PROCEDURE) {
       continue;
     }
     // if the stack is empty, means that we have reached the end of the current

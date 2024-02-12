@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "catch.hpp"
-#include "sp/Token.h"
 #include "sp/ast/Ast.h"
+#include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
 
@@ -48,7 +48,7 @@ TEST_CASE("AST Utils Tests") {
     // we are not interested in the types here so we just use a dummy type
     // similarly for line number.
     std::vector<Token> inputTokenArray = {
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
+        Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
         Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::LETTER, "k", 1),
@@ -56,7 +56,7 @@ TEST_CASE("AST Utils Tests") {
         Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 1),
         Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
         Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
+        Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
         Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::LETTER, "c", 1),
@@ -77,7 +77,7 @@ TEST_CASE("AST Utils Tests") {
     // we are not interested in the types here so we just use a dummy type
     // similarly for line number.
     std::vector<Token> inputTokenArray = {
-        Token(LEXICAL_TOKEN_TYPE::PROC, "procedure", 0),
+        Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
         Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::LETTER, "k", 1),

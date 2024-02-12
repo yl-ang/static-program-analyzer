@@ -8,6 +8,7 @@
 
 #include "SourceLoader.h"
 #include "sp/ast/Ast.h"
+#include "sp/de/DesignExtractor.h"
 #include "sp/tokenizer/Tokenizer.h"
 
 /*
@@ -18,6 +19,7 @@ class SP {
   SourceLoader sourceLoader;
   Tokenizer tokenizer;
   AST ast;
+  DesignExtractor designExtractor;
 
  public:
   void processFile(std::string filepath);
