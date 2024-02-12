@@ -78,14 +78,14 @@ TEST_CASE("various_call_assign_stmt") {
 TEST_CASE("select_v") {
     std::string select_v = "Select v";
     std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
-    SelectClause expected_select_v = SelectClause::SelectClause("v");
+    SelectClause expected_select_v = SelectClause("v");
     REQUIRE(expected_select_v.equals(*actual_select_v[0]));
 }
 
 TEST_CASE("Incorrect select_v") {
     std::string select_v = "Select v";
     std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
-    SelectClause expected_select_v = SelectClause::SelectClause("g");
+    SelectClause expected_select_v = SelectClause("g");
     REQUIRE(!(expected_select_v.equals(*actual_select_v[0])));
 }
 
@@ -95,7 +95,7 @@ TEST_CASE("variable v1; Select v1") {
     UnparsedQuery unparsedQuery = { "variable v1", "Select v1" };
 
     // expected
-    SelectClause expected_select_v = SelectClause::SelectClause("v1");
+    SelectClause expected_select_v = SelectClause("v1");
     std::vector<QueryEntity> expected_one_variable = { QueryEntity(EntityType::VARIABLE, "v1") };
 
     // actual
