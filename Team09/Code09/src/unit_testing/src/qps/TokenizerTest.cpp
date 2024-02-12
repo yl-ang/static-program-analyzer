@@ -3,11 +3,11 @@
 #include "catch.hpp"
 
 TEST_CASE("Tokenizer Test") {
-    std::vector<std::string> expectedResultList_NormalQuery = { "variable v;", " Select v" };
+    std::vector<std::string> expectedResultList_NormalQuery = { "variable v;", "Select v" };
     std::vector<std::string> expectedResultList_NoSemiColon = { "variable v Select v" };
-    std::vector<std::string> expectedResultList_WithTabs = { "variable \tv;", " Sel\tect v" };
-    std::vector<std::string> expectedResultList_EndSemiColon = { "variable v;", " assign a;" };
-    std::vector<std::string> expectedResultList_MoreThanOneSemiColon = { "variable v;", " assign a;", " Select v" };
+    std::vector<std::string> expectedResultList_WithTabs = { "variable \tv;", "Sel\tect v" };
+    std::vector<std::string> expectedResultList_EndSemiColon = { "variable v;", "assign a;" };
+    std::vector<std::string> expectedResultList_MoreThanOneSemiColon = { "variable v;", "assign a;", "Select v" };
 
     std::string inputString_NormalQuery = "variable v; Select v";
     std::string inputString_NoSemiColon = "variable v Select v";
