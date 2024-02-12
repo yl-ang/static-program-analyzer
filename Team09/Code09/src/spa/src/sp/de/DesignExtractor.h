@@ -2,16 +2,18 @@
 
 #include <unordered_set>
 #include <string>
-#include "./ast/ASTNode.h"
+#include "sp/ast/AstNode.h"
 #include "././PKB/PKBClient/PKBFacadeWriter.h"
 
 class DesignExtractor {
  public:
     DesignExtractor() {}
 
-    void extract(ASTNode* root);
+    void extract(ASTNode root);
 
     void writePKB();
+
+    std::unordered_set<std::string> getVariables() const { return variables; }
 
  private:
     PKBFacadeWriter* PKBwriter;

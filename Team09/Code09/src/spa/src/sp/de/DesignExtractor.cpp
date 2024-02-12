@@ -1,14 +1,14 @@
 #include "DesignExtractor.h"
 
-void DesignExtractor::extract(ASTNode* root) {
+void DesignExtractor::extract(ASTNode root) {
     // DFS
-    for (ASTNode* child : root->getChildren()) {
+    for (ASTNode child : root.getChildren()) {
         extract(child);
     }
 
     // Check if the current node is of type "var"
-    if (root->getType() == "var") {
-        variables.insert(root->getValue());
+    if (root.getType() == "var") {
+        variables.insert(root.getValue());
     }
 }
 
