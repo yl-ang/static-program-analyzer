@@ -9,7 +9,7 @@ class DesignExtractor {
  public:
     DesignExtractor() {}
 
-    void extract(ASTNode root);
+    void extract(ASTNode* root);
 
     void writePKB();
 
