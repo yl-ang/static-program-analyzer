@@ -74,13 +74,9 @@ TODO: split by other types of statements
 */
 std::vector<std::vector<Token>> AST::splitByStatements(
     std::vector<Token> tokens) {
-  // need to remove the first 3 tokens (procedure XXXX {), and the last
-  // TODO(ben): find a better way to do this
-  std::vector<Token> statementTokens =
-      std::vector<Token>(tokens.begin() + 3, tokens.end() - 1);
   std::vector<std::vector<Token>> statements = {};
   std::vector<Token> current_statement = {};
-  for (auto token : statementTokens) {
+  for (auto token : tokens) {
     if (token.type == LEXICAL_TOKEN_TYPE::SEMICOLON) {
       statements.push_back(current_statement);
       current_statement = {};
@@ -98,13 +94,20 @@ first. Then we build the statement ast for each statement and add it to the
 statement list. Currently we assume that every statement is an assignment.
 */
 ASTNode AST::buildProcedureAST(std::vector<Token> tokens) {
-  ASTNode root = ASTNode("", "stmtList");
-  std::vector<std::vector<Token>> statements = splitByStatements(tokens);
+  ASTNode procedure = ASTNode(tokens[1].value, "proc");
+  ASTNode stmtList = ASTNode("", "stmtList");
+  // need to remove the first 3 tokens (procedure XXXX {), and the last
+  // TODO(ben): find a better way to do this  std::vector<Token>
+  std::vector<Token> statementListTokens =
+      std::vector<Token>(tokens.begin() + 3, tokens.end() - 1);
+  std::vector<std::vector<Token>> statements =
+      splitByStatements(statementListTokens);
   for (auto statement : statements) {
     ASTNode statementAST = buildAssignmentAST(statement);
-    root.add_child(statementAST);
+    stmtList.add_child(statementAST);
   }
-  return root;
+  procedure.add_child(stmtList);
+  return procedure;
 }
 
 /*
@@ -145,7 +148,7 @@ attempt to find a '+' or '-' otherwise, we know that its just a term. If its
 just a term, we build the term ast instead.
 */
 ASTNode AST::buildExpressionAST(std::vector<Token> tokens) {
-  for (int i = 0; i < tokens.size(); i++) {
+  for (int i = tokens.size() - 1; i > 0; i--) {
     Token current_token = tokens[i];
     if (current_token.type == ADD) {
       return buildBinaryExpressionAST(tokens, "add", i);
@@ -164,7 +167,7 @@ ASTNode AST::buildBinaryExpressionAST(std::vector<Token> tokens,
   std::vector<Token> expression_tokens =
       std::vector<Token>(tokens.begin(), tokens.begin() + operator_index);
   std::vector<Token> term_tokens =
-      std::vector<Token>(tokens.begin() + operator_index, tokens.end());
+      std::vector<Token>(tokens.begin() + operator_index + 1, tokens.end());
 
   ASTNode expression = buildExpressionAST(expression_tokens);
   ASTNode term = buildTermAST(term_tokens);
@@ -178,7 +181,7 @@ Similar idea to build expression, except now we split by different operators
 instead
 */
 ASTNode AST::buildTermAST(std::vector<Token> tokens) {
-  for (int i = 0; i < tokens.size(); i++) {
+  for (int i = tokens.size() - 1; i > 0; i--) {
     Token current_token = tokens[i];
     if (current_token.type == MUL) {
       return buildBinaryTermAST(tokens, "mul", i);
@@ -198,7 +201,7 @@ ASTNode AST::buildBinaryTermAST(std::vector<Token> tokens,
   std::vector<Token> term_tokens =
       std::vector<Token>(tokens.begin(), tokens.begin() + operator_index);
   std::vector<Token> factor_tokens =
-      std::vector<Token>(tokens.begin() + operator_index, tokens.end());
+      std::vector<Token>(tokens.begin() + operator_index + 1, tokens.end());
 
   ASTNode term = buildTermAST(term_tokens);
   ASTNode factor = buildFactorAST(factor_tokens);
