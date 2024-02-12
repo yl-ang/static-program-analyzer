@@ -6,7 +6,7 @@
 using namespace std; // NOLINT
 
 
-#include "PKB.h"
+#include "PKB/PKB.h"
 
 int DesignExtractor() {
     return 0;

@@ -5,7 +5,7 @@
 
 using namespace std; // NOLINT
 
-#include "PKB.h"
+#include "PKB/PKB.h"
 #include "TNode.h"
 
 int Parse() {
