@@ -26,13 +26,6 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
         }
         return new BasicToken(curr, BASIC_TOKEN_TYPE::SYMBOL);
 
-    // Name
-    } else if (std::all_of(curr.begin(), curr.end(), ::isalnum)) {
-        if (!isValidName(curr)) {
-            throw SyntaxError("Invalid name!");
-        }
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
-
     // Keyword or Name
     } else if (std::all_of(curr.begin(), curr.end(), ::isalpha)) {
         if (!isValidName(curr)) {
@@ -40,6 +33,13 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
         }
         return disambiguate(curr, prev, next);
 
+    // Name
+    } else if (std::all_of(curr.begin(), curr.end(), ::isalnum)) {
+        if (!isValidName(curr)) {
+            throw SyntaxError("Invalid name!");
+        }
+        return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
+    
     } else {
         throw SyntaxError("Invalid token!");
     }
