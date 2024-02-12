@@ -145,33 +145,29 @@ ASTNode AST::buildExpressionAST(std::vector<Token> tokens) {
   for (int i = 0; i < tokens.size(); i++) {
     Token current_token = tokens[i];
     if (current_token.type == ADD) {
-      ASTNode root = ASTNode("", "plus");
-      std::vector<Token> expression_tokens =
-          std::vector<Token>(tokens.begin(), tokens.begin() + i);
-      std::vector<Token> term_tokens =
-          std::vector<Token>(tokens.begin() + i, tokens.end());
-
-      ASTNode expression = buildExpressionAST(expression_tokens);
-      ASTNode term = buildTermAST(term_tokens);
-      root.add_child(expression);
-      root.add_child(term);
-      return root;
+      return buildBinaryExpressionAST(tokens, "add", i);
     } else if (current_token.type == SUB) {
-      ASTNode root = ASTNode("", "sub");
-      std::vector<Token> expression_tokens =
-          std::vector<Token>(tokens.begin(), tokens.begin() + i);
-      std::vector<Token> term_tokens =
-          std::vector<Token>(tokens.begin() + i, tokens.end());
-
-      ASTNode expression = buildExpressionAST(expression_tokens);
-      ASTNode term = buildTermAST(term_tokens);
-      root.add_child(expression);
-      root.add_child(term);
-      return root;
+      return buildBinaryExpressionAST(tokens, "sub", i);
     }
   }
 
   return buildTermAST(tokens);
+}
+
+ASTNode AST::buildBinaryExpressionAST(std::vector<Token> tokens,
+                                      std::string ast_node_type,
+                                      int operator_index) {
+  ASTNode root = ASTNode("", ast_node_type);
+  std::vector<Token> expression_tokens =
+      std::vector<Token>(tokens.begin(), tokens.begin() + operator_index);
+  std::vector<Token> term_tokens =
+      std::vector<Token>(tokens.begin() + operator_index, tokens.end());
+
+  ASTNode expression = buildExpressionAST(expression_tokens);
+  ASTNode term = buildTermAST(term_tokens);
+  root.add_child(expression);
+  root.add_child(term);
+  return root;
 }
 
 /*
@@ -182,45 +178,30 @@ ASTNode AST::buildTermAST(std::vector<Token> tokens) {
   for (int i = 0; i < tokens.size(); i++) {
     Token current_token = tokens[i];
     if (current_token.type == MUL) {
-      ASTNode root = ASTNode("", "mul");
-      std::vector<Token> term_tokens =
-          std::vector<Token>(tokens.begin(), tokens.begin() + i);
-      std::vector<Token> factor_tokens =
-          std::vector<Token>(tokens.begin() + i, tokens.end());
-
-      ASTNode term = buildTermAST(term_tokens);
-      ASTNode factor = buildFactorAST(factor_tokens);
-      root.add_child(term);
-      root.add_child(factor);
-      return root;
+      return buildBinaryTermAST(tokens, "mul", i);
     } else if (current_token.type == DIV) {
-      ASTNode root = ASTNode("", "div");
-      std::vector<Token> term_tokens =
-          std::vector<Token>(tokens.begin(), tokens.begin() + i);
-      std::vector<Token> factor_tokens =
-          std::vector<Token>(tokens.begin() + i, tokens.end());
-
-      ASTNode term = buildTermAST(term_tokens);
-      ASTNode factor = buildFactorAST(factor_tokens);
-      root.add_child(term);
-      root.add_child(factor);
-      return root;
+      return buildBinaryTermAST(tokens, "div", i);
     } else if (current_token.type == MOD) {
-      ASTNode root = ASTNode("", "mod");
-      std::vector<Token> term_tokens =
-          std::vector<Token>(tokens.begin(), tokens.begin() + i);
-      std::vector<Token> factor_tokens =
-          std::vector<Token>(tokens.begin() + i, tokens.end());
-
-      ASTNode term = buildTermAST(term_tokens);
-      ASTNode factor = buildFactorAST(factor_tokens);
-      root.add_child(term);
-      root.add_child(factor);
-      return root;
+      return buildBinaryTermAST(tokens, "mod", i);
     }
   }
 
   return buildFactorAST(tokens);
+}
+
+ASTNode AST::buildBinaryTermAST(std::vector<Token> tokens,
+                                std::string ast_node_type, int operator_index) {
+  ASTNode root = ASTNode("", ast_node_type);
+  std::vector<Token> term_tokens =
+      std::vector<Token>(tokens.begin(), tokens.begin() + operator_index);
+  std::vector<Token> factor_tokens =
+      std::vector<Token>(tokens.begin() + operator_index, tokens.end());
+
+  ASTNode term = buildTermAST(term_tokens);
+  ASTNode factor = buildFactorAST(factor_tokens);
+  root.add_child(term);
+  root.add_child(factor);
+  return root;
 }
 
 /*

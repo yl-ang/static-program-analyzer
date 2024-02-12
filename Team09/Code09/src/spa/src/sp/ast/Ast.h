@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <vector>
 
 #include "sp/Token.h"
@@ -18,4 +19,9 @@ class AST {
   ASTNode buildTermAST(std::vector<Token> tokens);
   ASTNode buildFactorAST(std::vector<Token> tokens);
   ASTNode buildConstAST(std::vector<Token> tokens);
+  ASTNode buildBinaryExpressionAST(std::vector<Token> tokens,
+                                   std::string ast_node_type,
+                                   int operator_index);
+  ASTNode buildBinaryTermAST(std::vector<Token> tokens,
+                             std::string ast_node_type, int operator_index);
 };
