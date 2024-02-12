@@ -11,9 +11,16 @@ TEST_CASE("Tokenizer Tests") {
     REQUIRE(tokenA == tokenB);
   }
 
-  SECTION("A") {
-    std::vector<Token> expectedResultList = {Token(NAME, "x", 1)};
-    std::vector<std::string> inputString = {"x"};
+  SECTION("tokenize") {
+    std::vector<Token> expectedResultList = {
+      Token(PROCEDURE, "procedure", -1),
+        Token(NAME, "example", -1),
+          Token(OPEN_CURLY_BRACE, "{", -1),
+            Token(NAME, "x", 1),
+              Token(EQUAL, "=", 1),
+                Token(INTEGER, "1", 1),
+                  Token(CLOSE_CURLY_BRACE, "}", -1)};
+    std::vector<std::string> inputString = {"procedure", "example", "{", "x", "=", "1", "}"};
     std::vector<Token> resultList = tokenizer.tokenize(inputString);
     REQUIRE(expectedResultList == resultList);
   }
