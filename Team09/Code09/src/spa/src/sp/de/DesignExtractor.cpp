@@ -1,8 +1,6 @@
 #include "DesignExtractor.h"
 
-void DesignExtractor::extract(ASTNode root) {
-     if (!root) return;
-
+void DesignExtractor::extract(ASTNode* root) {
     // DFS
     for (ASTNode child : root->getChildren()) {
         extract(child);
