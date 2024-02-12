@@ -68,15 +68,19 @@ std::vector<std::vector<Token>> AST::splitByProcedure(
 }
 
 /*
-Get all the statements by comparing on semicolon (this is only correct for some
-statements)
+Takes in some tokens from a given procedure. Get all the statements by comparing
+on semicolon (this is only correct for some statements)
 TODO: split by other types of statements
 */
 std::vector<std::vector<Token>> AST::splitByStatements(
     std::vector<Token> tokens) {
+  // need to remove the first 3 tokens (procedure XXXX {), and the last
+  // TODO(ben): find a better way to do this
+  std::vector<Token> statementTokens =
+      std::vector<Token>(tokens.begin() + 3, tokens.end() - 1);
   std::vector<std::vector<Token>> statements = {};
   std::vector<Token> current_statement = {};
-  for (auto token : tokens) {
+  for (auto token : statementTokens) {
     if (token.type == LEXICAL_TOKEN_TYPE::SEMICOLON) {
       statements.push_back(current_statement);
       current_statement = {};
