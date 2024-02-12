@@ -29,7 +29,7 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
     std::vector<QueryEntity> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
-        // splitting up synonyms individually 
+        // splitting up synonyms individually
         std::string synonymTypeList_clean = trimSemicolon(synonymTypeList);
         std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList_clean, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
