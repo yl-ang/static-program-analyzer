@@ -6,13 +6,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-const std::unordered_map<std::string, std::string> KEYWORDS{
-    {"procedure", "proc"}, {"read", "read"},   {"print", "print"},
-    {"call", "call"},      {"while", "while"}, {"if", "if"},
-    {"then", "then"},      {"else", "else"}};
-
-const std::unordered_set<std::string> CURLY_BRACE{"{", "}"};
-
 /*
 root node is fixed so we create that at the top first before traversing the
 token vector. now we process the procedures each procedure.  procedure
