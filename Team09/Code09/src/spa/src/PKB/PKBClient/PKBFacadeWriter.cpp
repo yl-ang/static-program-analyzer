@@ -20,3 +20,7 @@ void PKBFacadeWriter::setProcedures(const std::unordered_set<Procedure> &inputPr
 void PKBFacadeWriter::setStmts(const std::unordered_set<Stmt> &inputStmts) const {
     this->pkbReference->stmtStore->setStatements(inputStmts);
 }
+
+void PKBFacadeWriter::setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &followsPairs) const {
+    this->pkbReference->followsStore->setFollowsStore(followsPairs);
+}

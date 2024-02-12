@@ -39,3 +39,13 @@ namespace std {
         }
     };
 }
+
+namespace std {
+    template <>
+    struct hash<std::pair<int, int>> {
+        std::size_t operator()(const std::pair<int, int>& p) const {
+            // Combine the hash values of the pair's elements
+            return hash<int>()(p.first) ^ hash<int>()(p.second);
+        }
+    };
+}

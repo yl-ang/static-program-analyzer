@@ -40,3 +40,27 @@ Stmt *PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) const {
 std::vector<Stmt *> PKBFacadeReader::getStatementsByType(StatementType type) const {
     return pkbReference->stmtStore->getStatementsByType(type);
 }
+
+std::optional<StmtNum> PKBFacadeReader::getFollower(StmtNum s1) const {
+    return pkbReference->followsStore->getFollower(s1);
+}
+
+std::optional<StmtNum> PKBFacadeReader::getFollowee(StmtNum s2) const {
+    return pkbReference->followsStore->getFollowee(s2);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getFolloweesStar(StmtNum s) const {
+    return pkbReference->followsStore->getFolloweesStar(s);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getFollowersStar(StmtNum s) const {
+    return pkbReference->followsStore->getFollowersStar(s);
+}
+
+bool PKBFacadeReader::containsFollowRelationship(StmtNum s1, StmtNum s2) const {
+    return pkbReference->followsStore->containsFollowRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::containsFollowStarRelationship(StmtNum s1, StmtNum s2) const {
+    return pkbReference->followsStore->containsFollowStarRelationship(s1, s2);
+}

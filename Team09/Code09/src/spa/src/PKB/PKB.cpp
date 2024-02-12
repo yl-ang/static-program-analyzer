@@ -8,5 +8,6 @@ PKB::PKB() noexcept {
     procedureStore = std::make_shared<EntityStore<Procedure>>();
 
     stmtStore = std::make_shared<StatementStore>();
+
     followsStore = std::make_shared<FollowsStore>();
 }

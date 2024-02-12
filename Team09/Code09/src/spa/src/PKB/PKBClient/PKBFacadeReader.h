@@ -23,9 +23,14 @@ public:
     [[nodiscard]] Stmt* getStatementByStmtNum(StmtNum stmtNum) const;
     [[nodiscard]] std::vector<Stmt*> getStatementsByType(StatementType type) const;
 
-    // Contains
+    // Getters for Follows
+    [[nodiscard]] std::optional<StmtNum> getFollower(StmtNum s1) const;
+    [[nodiscard]] std::optional<StmtNum> getFollowee(StmtNum s2) const;
+    [[nodiscard]] std::unordered_set<StmtNum> getFolloweesStar(StmtNum s) const;
+    [[nodiscard]] std::unordered_set<StmtNum> getFollowersStar(StmtNum s) const;
+    [[nodiscard]] bool containsFollowRelationship(StmtNum s1, StmtNum s2) const;
+    [[nodiscard]] bool containsFollowStarRelationship(StmtNum s1, StmtNum s2) const;
 
-    // TODO: Check if contains Relationships
 
 private:
     PKB* pkbReference = nullptr;
