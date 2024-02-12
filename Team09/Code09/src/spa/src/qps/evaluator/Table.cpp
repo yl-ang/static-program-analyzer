@@ -6,17 +6,27 @@ Table::Table(std::vector<QueryEntity> headers, std::vector<Row> rows) : headers(
     }
 }
 
-std::vector<std::string> Table::extractResults(const QueryEntity& qe) {
+std::vector<std::string> Table::extractResults(const std::vector<QueryEntity>& entities) {
     if (isEmpty()) {
         return {};
     }
 
-    int columnIndex{ getHeaderIndex(qe) };
-    if (columnIndex == -1) {
-        return {};
+    std::vector<std::string> results{};
+
+    for (QueryEntity qe : entities) {
+        int columnIndex{ getHeaderIndex(qe) };
+        if (columnIndex == -1) {
+            continue;
+        }
+
+        std::vector<std::string> columnEntries{ rows[columnIndex] };
+
+        for (std::string row : columnEntries) {
+            results.push_back(row);
+        }
     }
 
-    return rows[columnIndex];
+    return results;
 }
 
 bool Table::isEmpty() const {

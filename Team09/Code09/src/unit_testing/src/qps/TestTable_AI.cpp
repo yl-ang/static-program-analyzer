@@ -26,7 +26,7 @@ TEST_CASE("Test Table extract results") {
     Table table(headers, rows);
 
     SECTION("Test extractResults") {
-        std::vector<std::string> results = table.extractResults(createVariable("v"));
+        std::vector<std::string> results = table.extractResults({ createVariable("v") });
         REQUIRE(results == std::vector<std::string>{"x", "y", "z"});
     }
 
@@ -47,7 +47,7 @@ TEST_CASE("Test Table extract results with non-existent query entity") {
     std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
     Table table(headers, rows);
 
-    std::vector<std::string> results = table.extractResults(createVariable("nonExistent"));
+    std::vector<std::string> results = table.extractResults({ createVariable("nonExistent") });
     REQUIRE(results == std::vector<std::string>{});
 }
 // ai-gen end

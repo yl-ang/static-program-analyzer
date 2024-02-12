@@ -12,8 +12,8 @@ TEST_CASE("Evaluate query with select statement with only 1 synonym and no other
     pfw.setVariables({ "v1", "v2" });
     PKBFacadeReader pkbReader{ pkb };
 
-    QueryEntity selectEntity{ EntityType::VARIABLE, "v" };
-    Query q{ selectEntity };
+    std::vector<QueryEntity> selectEntities{ { EntityType::VARIABLE, "v" } };
+    Query q{ selectEntities };
     std::vector<std::string> result = q.evaluate(pkbReader);
     std::sort(result.begin(), result.end());
 

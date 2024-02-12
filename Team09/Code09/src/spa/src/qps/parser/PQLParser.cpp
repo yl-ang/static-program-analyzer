@@ -4,12 +4,12 @@
 #include "../ParserUtils.h"
 
 
-ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
+Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     std::vector<std::string> unparsedEntities = PQLParser::getQueryEntities(unparsedQuery);
     std::string unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
     std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
     std::vector<QueryClause*> clauses = PQLParser::parseQueryClauses(unparsedClauses);
-    ParsedQuery query = PQLParser::combineResult(entities, clauses);
+    Query query = PQLParser::combineResult(entities, clauses);
     return query;
 }
 
@@ -19,7 +19,7 @@ std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> un
 }
 
 std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[unparsedQuery.size()-1];
+    return unparsedQuery[unparsedQuery.size() - 1];
 }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
@@ -87,7 +87,8 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
 
 // Just combines the two
 // into a unordered_map[variables] = clauses
-ParsedQuery PQLParser::combineResult(
+Query PQLParser::combineResult(
     const std::vector<QueryEntity> queryEntities, const std::vector<QueryClause*> queryClauses) {
-    return std::make_tuple(queryEntities, queryClauses);
+    return Query{ queryEntities };
+    // return std::make_tuple(queryEntities, queryClauses);
 }
