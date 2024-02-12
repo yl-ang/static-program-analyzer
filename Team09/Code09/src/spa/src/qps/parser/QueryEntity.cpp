@@ -39,8 +39,8 @@ std::string QueryEntity::entityTypeToString(EntityType type) {
 
 EntityType QueryEntity::determineType(const std::string type) {
     EntityType entityType;
-    
-    const static std::unordered_map<std::string,int> string_to_case{
+
+    static const std::unordered_map<std::string, int> string_to_case{
         {"variable", 1},
         {"constant", 2},
         {"procedure", 3},
@@ -53,7 +53,7 @@ EntityType QueryEntity::determineType(const std::string type) {
     };
 
     // Checks if in map, otherwise case 0
-    switch(string_to_case.count(type) ? string_to_case.at(type) : 0) {
+    switch (string_to_case.count(type) ? string_to_case.at(type) : 0) {
         case 1:
             entityType = EntityType::VARIABLE;
             break;
@@ -69,7 +69,7 @@ EntityType QueryEntity::determineType(const std::string type) {
         case 5:
             entityType = EntityType::READ;
             break;
-        case 6: 
+        case 6:
             entityType = EntityType::CALL;
             break;
         case 7:
