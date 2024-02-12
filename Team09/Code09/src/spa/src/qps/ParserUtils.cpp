@@ -50,3 +50,18 @@ std::string trim(const std::string str) {
 
     return trimmedString;
 }
+
+std::string trimSemicolon(const std::string str) {
+    size_t start = str.find_first_not_of(SEMICOLON);
+    std::string trimmedString;
+    if (start != std::string::npos) {
+        trimmedString = str.substr(start);
+    }
+
+    size_t end = trimmedString.find_last_not_of(SEMICOLON);
+    if (end != std::string::npos) {
+        trimmedString = trimmedString.substr(0, end + 1);
+    }
+
+    return trimmedString;
+}

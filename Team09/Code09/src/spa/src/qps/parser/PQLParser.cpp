@@ -5,7 +5,7 @@
 
 
 ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
-    std::string unparsedEntities = PQLParser::getQueryEntities(unparsedQuery);
+    std::vector<std::string> unparsedEntities = PQLParser::getQueryEntities(unparsedQuery);
     std::string unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
     std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
     std::vector<QueryClause*> clauses = PQLParser::parseQueryClauses(unparsedClauses);
@@ -13,29 +13,29 @@ ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
     return query;
 }
 
-std::string PQLParser::getQueryEntities(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[0];
+std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> unparsedQuery) {
+    std::vector<std::string> out = std::vector<std::string>(unparsedQuery.begin(), unparsedQuery.end() - 1);
+    return out;
 }
 
 std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[1];
+    return unparsedQuery[unparsedQuery.size()-1];
 }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
 // Output "std::vector<QueryEntity, QueryEntity, ... >"
-std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntities) {
+std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
-    // Split up synonyms by types
-    std::vector<std::string> synonymTypesList = splitByDelimiter(unparsedEntities, ";");
-    for (std::string synonymTypeList : synonymTypesList) {
-        // synonymTypeList should look something like "call cl, c2"
-        // splitting up synonyms individually after splitting by type
-        std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ", ");
+    for (std::string synonymTypeList : unparsedEntities) {
+        // synonymTypeList should look something like "call cl, c2;"
+        // splitting up synonyms individually 
+        std::string synonymTypeList_clean = trimSemicolon(synonymTypeList);
+        std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList_clean, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
         // first synonym and type
         std::string type = typeAndFirstSynonym[0];
-        std::string firstArg = typeAndFirstSynonym[1];
+        std::string firstArg = trim(typeAndFirstSynonym[1]);
         // Determine entity type and make appropriate QueryEntity
         EntityType entityType = QueryEntity::determineType(type);
         QueryEntity firstQueryDeclaration = QueryEntity(entityType, firstArg);
@@ -44,7 +44,7 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::string unparsedEntit
         std::vector<std::string> sublist = std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
         for (std::string synonym : sublist) {
-            QueryEntity currQueryDeclaration = QueryEntity(entityType, synonym);
+            QueryEntity currQueryDeclaration = QueryEntity(entityType, trim(synonym));
             queryEntities.push_back(currQueryDeclaration);
         }
     }
