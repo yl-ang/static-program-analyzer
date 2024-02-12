@@ -6,7 +6,7 @@ std::unordered_set<ASTNode> DesignExtractor::extract(ASTNode* root) {
 
     // DFS
     for (ASTNode* child : root->getChildren()) {
-        extractVariables(child);
+        extract(child);
     }
 
     // Check if the current node is of type "var"
