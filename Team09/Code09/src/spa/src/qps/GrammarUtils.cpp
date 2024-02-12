@@ -33,7 +33,7 @@ bool isEntRef(std::string str) {
 }
 
 bool isSelectStatement(std::string str) {
-    return std::regex_match(str, std::regex("^Select"));
+    return std::regex_search(str, std::regex("^Select"));
 }
 
 bool isDeclarationStatement(std::string str) {
