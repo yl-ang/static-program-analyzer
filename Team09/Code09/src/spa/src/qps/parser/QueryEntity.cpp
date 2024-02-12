@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <unordered_map>
 
 QueryEntity::QueryEntity(const EntityType& t, const std::string& n) : type(t), name(n) {}
 
