@@ -15,12 +15,12 @@ TEST_CASE("Design Extractor Tests") {
         ASTNode child5 = ASTNode("z", "var");
         ASTNode child6 = ASTNode("3", "const");
 
-        root.add_child(child1);
-        root.add_child(child2);
         child1.add_child(child3);
         child1.add_child(child4);
         child1.add_child(child5);
         child3.add_child(child6);
+        root.add_child(child1);
+        root.add_child(child2);
 
         designExtractor.extract(root);
 
