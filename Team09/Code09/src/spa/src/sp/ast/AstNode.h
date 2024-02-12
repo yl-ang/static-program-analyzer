@@ -18,10 +18,19 @@ class ASTNode {
       : value(value), type(type), children(children) {}
 
   void add_child(ASTNode child) { children.push_back(child); }
+
   // equality function override
   friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
     return lhs.value == rhs.value && lhs.type == rhs.type &&
            lhs.children == rhs.children;
+  }
+
+  std::string getType() const {
+    return type;
+  }
+
+  std::string getValue() const {
+    return value;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const ASTNode& obj) {
