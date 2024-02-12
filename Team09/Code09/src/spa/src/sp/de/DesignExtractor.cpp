@@ -2,7 +2,7 @@
 
 void DesignExtractor::extract(ASTNode* root) {
     // DFS
-    for (ASTNode child : root->getChildren()) {
+    for (ASTNode* child : root->getChildren()) {
         extract(child);
     }
 
