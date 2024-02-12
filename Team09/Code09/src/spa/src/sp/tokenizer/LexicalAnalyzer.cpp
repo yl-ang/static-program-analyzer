@@ -42,7 +42,6 @@ BasicToken LexicalAnalyzer::assignType(std::string curr, std::string prev, std::
 
     } else {
         throw SyntaxError("Invalid token!");
-
     }
 }
 
