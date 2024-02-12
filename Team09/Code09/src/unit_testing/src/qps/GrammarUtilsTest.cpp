@@ -31,6 +31,8 @@ TEST_CASE("Grammar Utils") {
 
     REQUIRE(isDeclarationStatement("stmt s;") == true);
     REQUIRE(isDeclarationStatement("statement s;") == false);
+
+    REQUIRE(isSelectStatement("Select v") == true);
 }
 
 TEST_CASE("Syntax Validator") {
