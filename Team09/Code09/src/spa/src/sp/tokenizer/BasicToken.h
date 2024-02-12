@@ -30,7 +30,11 @@ class BasicToken {
  public:
     BASIC_TOKEN_TYPE type;
     std::string value;
-    BasicToken(std::string value, BASIC_TOKEN_TYPE type);
+
+    BasicToken(std::string _value, BASIC_TOKEN_TYPE _type) {
+        type = _type;
+        value = _value;
+    }
 
     // Overloading the equality operator (==)
     bool operator==(const BasicToken& other) const {
@@ -42,4 +46,5 @@ class BasicToken {
         << "\"type\": \"" << obj.type;
         return os;
     }
+
 };
