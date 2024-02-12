@@ -11,7 +11,7 @@ class DesignExtractor {
 
     std::unordered_set<ASTNode> extract(ASTNode* root);
 
-    void writePKB(const std::unordered_set<ASTNode>& nodes);
+    void writePKB();
 
  private:
     PKBFacadeWriter* PKBwriter;
