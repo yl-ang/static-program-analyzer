@@ -7,11 +7,15 @@
 
 // include your other headers here
 #include "AbstractWrapper.h"
+#include "PKB/PKB.h"
+#include "Spa.h"
+#include "qps/QPS.h"
 #include "sp/Sp.h"
-
 class TestWrapper : public AbstractWrapper {
  private:
   SP sourceProcessor;
+  QPS queryProcessor;
+  PKB pkb;
 
  public:
   // default constructor

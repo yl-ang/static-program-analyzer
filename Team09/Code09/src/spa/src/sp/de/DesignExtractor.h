@@ -1,21 +1,22 @@
 #pragma once
 
-#include <unordered_set>
 #include <string>
-#include "sp/ast/AstNode.h"
+#include <unordered_set>
+
 #include "././PKB/PKBClient/PKBFacadeWriter.h"
+#include "sp/ast/AstNode.h"
 
 class DesignExtractor {
  public:
-    DesignExtractor() {}
+  DesignExtractor() {}
 
-    void extract(ASTNode root);
+  void extract(ASTNode root);
 
-    void writePKB();
+  void writePKB(PKBFacadeWriter);
 
-    std::unordered_set<std::string> getVariables() const { return variables; }
+  std::unordered_set<std::string> getVariables() const { return variables; }
 
  private:
-    PKBFacadeWriter* PKBwriter;
-    std::unordered_set<std::string> variables;
+  //  PKBFacadeWriter* PKBwriter;
+  std::unordered_set<std::string> variables;
 };

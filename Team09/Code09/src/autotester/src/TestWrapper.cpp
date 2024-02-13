@@ -1,5 +1,7 @@
 #include "TestWrapper.h"
 
+#include <vector>
+
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper* WrapperFactory::wrapper = 0;
 AbstractWrapper* WrapperFactory::createWrapper() {
@@ -19,14 +21,18 @@ TestWrapper::TestWrapper() {
 void TestWrapper::parse(std::string filename) {
   // call your parser to do the parsing
   // ...rest of your code...
-  sourceProcessor.processFile(filename);
+  SPA spa = SPA(pkb);
+  spa.parse(filename);
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   // call your evaluator to evaluate the query here
   // ...code to evaluate query...
-
+  std::vector<std::string> queryResults = queryProcessor.processQueries(query);
   // store the answers to the query in the results list (it is initially empty)
   // each result must be a string.
+  for (auto queryResult : queryResults) {
+    results.push_back(queryResult);
+  }
 }
