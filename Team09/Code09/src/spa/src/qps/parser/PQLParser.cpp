@@ -6,7 +6,7 @@
 #include "../exceptions/Exception.h"
 
 
-ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
+Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     std::vector<std::string> unparsedEntities = PQLParser::getQueryEntities(unparsedQuery);
     std::string unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
     std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
