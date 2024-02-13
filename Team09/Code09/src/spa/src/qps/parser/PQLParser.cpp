@@ -6,9 +6,18 @@
 #include "../exceptions/Exception.h"
 
 
-Query PQLParser::parse(UnparsedQuery unparsedQuery) {
-    std::vector<std::string> unparsedEntities = PQLParser::getQueryEntities(unparsedQuery);
-    std::string unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
+ParsedQuery PQLParser::parse(UnparsedQuery unparsedQuery) {
+    std::vector<std::string> unparsedEntities = {};
+    std::string unparsedClauses;
+    for (std::string queryStatement : unparsedQuery) {
+        if (isDeclarationStatement(queryStatement)) {
+            unparsedEntities.push_back(queryStatement);
+        } else if (isSelectStatement(queryStatement)) {
+            unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
+        } else {
+            throw Exception("Syntax Error");
+        }
+    }
     std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
     std::vector<QueryClause*> clauses = PQLParser::parseQueryClauses(unparsedClauses);
     Query query = PQLParser::combineResult(entities, clauses);
