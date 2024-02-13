@@ -12,7 +12,7 @@
 
 class SPA {
  public:
-  explicit SPA(PKB pkb)
+     explicit SPA()
       : pkbWriter(PKBFacadeWriter(pkb)), pkbReader(PKBFacadeReader(pkb)) {}
 
   inline void parse(std::string filename) const {
@@ -27,6 +27,7 @@ class SPA {
   }
 
  private:
+  PKB pkb;
   PKBFacadeWriter pkbWriter;
   PKBFacadeReader pkbReader;
 };

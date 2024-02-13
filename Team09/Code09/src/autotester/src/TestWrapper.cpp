@@ -21,7 +21,6 @@ TestWrapper::TestWrapper() {
 void TestWrapper::parse(std::string filename) {
     // call your parser to do the parsing
     // ...rest of your code...
-    SPA spa = SPA(pkb);
     spa.parse(filename);
 }
 
@@ -29,7 +28,6 @@ void TestWrapper::parse(std::string filename) {
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     // call your evaluator to evaluate the query here
     // ...code to evaluate query...
-    SPA spa = SPA(pkb);
     std::vector<std::string> queryResults = spa.evaluate(query);
     // store the answers to the query in the results list (it is initially empty)
     // each result must be a string.
