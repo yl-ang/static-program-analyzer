@@ -1,5 +1,4 @@
 #include "catch.hpp"
-#include <iostream>
 #include <tuple>
 #include <qps/parser/PQLParser.h>
 #include <qps/parser/QueryEntity.h>
@@ -12,9 +11,7 @@ TEST_CASE("one_variable") {
     std::vector<QueryEntity> expected_one_variable = { QueryEntity(EntityType::VARIABLE, "v1") };
 
     std::vector<QueryEntity> actual_one_variable = PQLParser::parseQueryEntities(one_variable);
-    for (QueryEntity qe : actual_one_variable) {
-        qe.print();
-    }
+
     REQUIRE(actual_one_variable.size() == expected_one_variable.size());
     REQUIRE(actual_one_variable[0] == expected_one_variable[0]);
 }
@@ -24,9 +21,7 @@ TEST_CASE("two_variables") {
     std::vector<QueryEntity> expected_two_variables = { QueryEntity(EntityType::VARIABLE, "v1"),
                                                         QueryEntity(EntityType::VARIABLE, "v2") };
     std::vector<QueryEntity> actual_two_variables = PQLParser::parseQueryEntities(two_variables);
-    for (QueryEntity qe : actual_two_variables) {
-        qe.print();
-    }
+
     REQUIRE(actual_two_variables.size() == expected_two_variables.size());
     REQUIRE(actual_two_variables[0] == expected_two_variables[0]);
     REQUIRE(actual_two_variables[1] == expected_two_variables[1]);
@@ -39,12 +34,7 @@ TEST_CASE("one_call_assign_stmt") {
                                                             QueryEntity(EntityType::STMT, "s1") };
 
     std::vector<QueryEntity> actual_one_call_assign_stmt = PQLParser::parseQueryEntities(one_call_assign_stmt);
-    for (QueryEntity qe : actual_one_call_assign_stmt) {
-        qe.print();
-    }
-    for (QueryEntity qe : expected_one_call_assign_stmt) {
-        qe.print();
-    }
+
     REQUIRE(actual_one_call_assign_stmt.size() == expected_one_call_assign_stmt.size());
     REQUIRE(actual_one_call_assign_stmt[0] == expected_one_call_assign_stmt[0]);
     REQUIRE(actual_one_call_assign_stmt[1] == expected_one_call_assign_stmt[1]);
@@ -60,12 +50,7 @@ TEST_CASE("various_call_assign_stmt") {
                                                                 QueryEntity(EntityType::STMT, "s2") };
 
     std::vector<QueryEntity> actual_various_call_assign_stmt = PQLParser::parseQueryEntities(various_call_assign_stmt);
-    for (QueryEntity qe : actual_various_call_assign_stmt) {
-        qe.print();
-    }
-    for (QueryEntity qe : expected_various_call_assign_stmt) {
-        qe.print();
-    }
+
     REQUIRE(actual_various_call_assign_stmt.size() == expected_various_call_assign_stmt.size());
     REQUIRE(actual_various_call_assign_stmt[0] == expected_various_call_assign_stmt[0]);
     REQUIRE(actual_various_call_assign_stmt[1] == expected_various_call_assign_stmt[1]);
@@ -81,7 +66,6 @@ TEST_CASE("select_v") {
     std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
     SelectClause expected_select_v = SelectClause("v");
     REQUIRE(expected_select_v.equals(*actual_select_v[0]));
-    std::cout << "1";
 }
 
 TEST_CASE("Incorrect select_v") {
@@ -89,7 +73,6 @@ TEST_CASE("Incorrect select_v") {
     std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
     SelectClause expected_select_v = SelectClause("g");
     REQUIRE(!(expected_select_v.equals(*actual_select_v[0])));
-    std::cout << "2";
 }
 
 // Testing Whole thing
