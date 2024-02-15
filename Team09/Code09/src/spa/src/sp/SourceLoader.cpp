@@ -30,15 +30,19 @@ std::vector<std::string> SourceLoader::loadSimple(
             getNextChar(stringStream);
         }
 
+        char currentChar = peekNextChar(stringStream);
         /* If the next character is a character symbol, add the current word to
         the result. Then we attempt to create the symbol string.
         */
-        if (isCharSymbol(peekNextChar(stringStream))) {
-            parsedString.push_back(word);
-            word = "";
+        if (isCharSymbol(currentChar)) {
+            if (word.length()) {
+                parsedString.push_back(word);
+                word = "";
+            }
+
             std::string symbolString = createSymbolString(stringStream);
             parsedString.push_back(symbolString);
-        } else if (peekNextChar(stringStream) != EOF) {
+        } else if (currentChar != EOF) {
             word += getNextChar(stringStream);
         }
     }
