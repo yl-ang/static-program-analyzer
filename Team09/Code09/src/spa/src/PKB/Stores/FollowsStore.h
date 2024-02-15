@@ -1,15 +1,18 @@
 #pragma once
 
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
-#include <optional>
+
 #include "PKB/Utils/DataTypes.h"
 
 // ai-gen start(gpt, 1, e)
-// prompt: https://platform.openai.com/playground/p/bAw35gvF9trwUeKVOgSPAObi?model=gpt-4&mode=chat
+// prompt:
+// https://platform.openai.com/playground/p/bAw35gvF9trwUeKVOgSPAObi?model=gpt-4&mode=chat
 class FollowsStore {
 public:
-    void setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs);
+    void setFollowsStore(
+        const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs);
 
     std::optional<StmtNum> getFollower(StmtNum s1);
     std::optional<StmtNum> getFollowee(StmtNum s2);
@@ -23,7 +26,8 @@ public:
 private:
     std::unordered_map<StmtNum, StmtNum> followsMap;
     std::unordered_map<StmtNum, StmtNum> followedByMap;
-    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> transitiveClosureMatrix;
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+        followsTransitiveClosure;
 
     void computeTransitiveClosure();
     void updateTransitiveClosure(StmtNum s1, StmtNum s2);
