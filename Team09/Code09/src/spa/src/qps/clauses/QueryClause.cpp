@@ -1,7 +1,8 @@
-#include <iostream>
-#include <vector>
-#include <string>
 #include "QueryClause.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 SelectClause::SelectClause(const std::string& a) : arg(a) {}
 
