@@ -9,14 +9,12 @@
 
 class Query {
 public:
-    Query(const std::vector<QueryEntity>&);  // TODO: Add suchthatclause and
-                                             // patternclause into arguments
+    Query(const std::vector<QueryEntity>&, const std::vector<QueryClause>&);
     std::vector<std::string> evaluate(const PKBFacadeReader&);
-
     std::vector<QueryEntity> getSelectEntities() const;
 
 private:
     std::vector<QueryEntity> selectEntities;
-
+    std::vector<QueryClause> clauses;
     Table buildSelectTable(const PKBFacadeReader&);
 };
