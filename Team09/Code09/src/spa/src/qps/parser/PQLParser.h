@@ -14,7 +14,7 @@ typedef std::tuple<std::vector<QueryEntity>, std::vector<QueryClause*>>
     ParsedQuery;
 
 class PQLParser {
-   public:
+public:
     static Query parse(UnparsedQuery);
 
     static std::vector<std::string> getQueryEntities(UnparsedQuery);
