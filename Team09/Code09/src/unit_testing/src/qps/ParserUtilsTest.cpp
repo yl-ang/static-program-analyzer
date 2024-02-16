@@ -1,8 +1,7 @@
+#include "catch.hpp"
 #include "qps/ParserUtils.h"
 
-#include "catch.hpp"
-
-TEST_CASE("Parser Utils") {
+TEST_CASE("Trim Test") {
     std::string expectedString = "Trim Test";
 
     std::string inputString_WithSpaces = " Trim Test ";
@@ -17,4 +16,25 @@ TEST_CASE("Parser Utils") {
     REQUIRE(trim(inputString_WithTab) == expectedString);
     REQUIRE(trim(inputString_WithMultipleSpaces) == expectedString);
     REQUIRE(trim(inputString_WithMixedWhitespaces) == expectedString);
+}
+
+// TEST_CASE("Substring By Delimiter") {
+//     std::string expectedString = "Substring";
+//
+//     std::string resultString;
+//     size_t index;
+//     substringByDelimiter("Substring Test", " ", resultString, index);
+//
+//     REQUIRE(resultString == expectedString);
+// }
+
+TEST_CASE("Removing Whitespace Characters") {
+    std::string expectedString =
+        "This is the perfect sentence without problems.";
+
+    std::string testString =
+        "This is\tthe \nperfect sentence   without \tproblems.";
+    replaceAllWhitespaces(testString);
+
+    REQUIRE(testString == expectedString);
 }

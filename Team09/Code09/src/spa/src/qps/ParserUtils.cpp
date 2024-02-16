@@ -1,6 +1,20 @@
 #include "ParserUtils.h"
 
-std::vector<std::string> splitByDelimiter(const std::string str, const std::string delimiter) {
+std::string replaceAllWhitespaces(std::string str) {
+    std::string replacedString;
+
+    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
+    std::regex consecutiveSpacePattern = std::regex(SPACE + "+");
+
+    replacedString = std::regex_replace(str, whitespacePattern, SPACE);
+    replacedString =
+        std::regex_replace(replacedString, consecutiveSpacePattern, SPACE);
+
+    return replacedString;
+}
+
+std::vector<std::string> splitByDelimiter(const std::string str,
+                                          const std::string delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;
 

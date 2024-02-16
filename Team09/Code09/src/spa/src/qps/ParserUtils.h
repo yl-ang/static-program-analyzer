@@ -1,11 +1,15 @@
 #pragma once
 
+#include <regex>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 const std::string WHITESPACES = " \n\r\t\b\f";
+const std::string SPACE = " ";
 
-std::vector<std::string> splitByDelimiter(const std::string string, const std::string delimiter);
-std::vector<std::string> stringToWordList(std::string string);
-std::string trim(const std::string string);
+std::string replaceAllWhitespaces(std::string str);
+std::vector<std::string> splitByDelimiter(const std::string str,
+                                          const std::string delimiter);
+std::vector<std::string> stringToWordList(std::string str);
+std::string trim(const std::string str);
