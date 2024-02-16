@@ -11,23 +11,23 @@
 #include "sp/Sp.h"
 
 class SPA {
- public:
-     explicit SPA()
-      : pkbWriter(PKBFacadeWriter(pkb)), pkbReader(PKBFacadeReader(pkb)) {}
+public:
+    explicit SPA()
+        : pkbWriter(PKBFacadeWriter(pkb)), pkbReader(PKBFacadeReader(pkb)) {}
 
-  inline void parse(std::string filename) const {
-    SP sp = SP(pkbWriter);
-    sp.processFile(filename);
-  }
+    inline void parse(std::string filename) const {
+        SP sp = SP(pkbWriter);
+        sp.processFile(filename);
+    }
 
-  inline std::vector<std::string> evaluate(const std::string& query) {
-    QPS qps = QPS(pkbReader);
-    std::vector<std::string> result = qps.processQueries(query);
-    return result;
-  }
+    inline std::vector<std::string> evaluate(const std::string& query) {
+        QPS qps = QPS(pkbReader);
+        std::vector<std::string> result = qps.processQueries(query);
+        return result;
+    }
 
- private:
-  PKB pkb;
-  PKBFacadeWriter pkbWriter;
-  PKBFacadeReader pkbReader;
+private:
+    PKB pkb;
+    PKBFacadeWriter pkbWriter;
+    PKBFacadeReader pkbReader;
 };
