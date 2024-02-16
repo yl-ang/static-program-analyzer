@@ -20,3 +20,8 @@ bool SelectClause::equals(const QueryClause& other) const {
     }
     return false;
 }
+
+Table SelectClause::evaluate(const PKBFacadeReader& reader) {
+    // TODO(Ezekiel): eventually deprecate selectClause because we don't need it
+    return {};
+}

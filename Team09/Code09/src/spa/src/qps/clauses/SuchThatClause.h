@@ -1,8 +1,6 @@
 #pragma once
 
-#include "../evaluator/Table.h"
 #include "../parser/QueryEntity.h"
-#include "PKB/PKBClient/PKBFacadeReader.h"
 #include "QueryClause.h"
 
 enum class SuchThatClauseType {
@@ -19,9 +17,9 @@ private:
     QueryEntity secondArg;
 
 public:
-    SuchThatClause(SuchThatClauseType, const QueryEntity&, const QueryEntity&);
+    SuchThatClause(const SuchThatClauseType&, const QueryEntity&,
+                   const QueryEntity&);
     ClauseType getType() const override;
-    bool equals(const QueryClause& other) const override;
-
-    Table evaluate(const PKBFacadeReader&);
+    bool equals(const QueryClause& other) const override Table
+        evaluate(const PKBFacadeReader&) override;
 };
