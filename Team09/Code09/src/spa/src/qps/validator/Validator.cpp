@@ -1,6 +1,6 @@
 #include "Validator.h"
 
-void Validator::validate(std::vector<std::string>) {}
+void Validator::validate(std::vector<std::string> clauseList) {}
 
 bool Validator::isValidSelectStatement(std::string) {
     int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");
