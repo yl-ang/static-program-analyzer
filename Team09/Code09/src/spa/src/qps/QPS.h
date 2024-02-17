@@ -5,12 +5,13 @@
 
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "QpsTokenizer.h"
-#include "exceptions/Exception.h"
 #include "parser/PQLParser.h"
+#include "validator/Validator.h"
 
 class QPS {
 private:
     QpsTokenizer tokenizer;
+    Validator validator;
     PQLParser parser;
     PKBFacadeReader pkbReader;
 

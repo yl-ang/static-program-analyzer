@@ -1,9 +1,10 @@
 #include <string>
 #include <vector>
 
-#include "../exceptions/*"
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
+#include "../exceptions/QPSSemanticError.h"
+#include "../exceptions/QPSSyntaxError.h"
 
 class Validator {
 public:

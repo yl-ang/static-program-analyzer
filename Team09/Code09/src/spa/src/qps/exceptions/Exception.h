@@ -1,3 +1,5 @@
+#pragma once
+
 #include <exception>
 #include <string>
 
@@ -6,7 +8,7 @@ protected:
     std::string errorMessage = "An exception has occurred";
 
 public:
-    Exception();
+    Exception() = default;
     Exception(std::string);
     std::string getMessage();
 };

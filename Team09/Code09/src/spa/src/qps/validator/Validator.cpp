@@ -7,7 +7,7 @@ void Validator::validate(std::vector<std::string> statementList) {
         } else if (isSelectStatement(statement)) {
             isValidSelectStatement(statement);
         } else {
-            throw SyntaxError("Syntax Error (QPS): Invalid statement");
+            throw QPSSyntaxError();
         }
     }
 }
