@@ -1,6 +1,16 @@
 #include "Validator.h"
 
-void Validator::validate(std::vector<std::string> clauseList) {}
+void Validator::validate(std::vector<std::string> statementList) {
+    for (std::string statement : statementList) {
+        if (isDeclarationStatement(statement)) {
+            isValidDeclarationStatement(statement);
+        } else if (isSelectStatement(statement)) {
+            isValidSelectStatement(statement);
+        } else {
+            throw SyntaxError("Syntax Error (QPS): Invalid statement");
+        }
+    }
+}
 
 bool Validator::isValidSelectStatement(std::string statement) {
     int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");

@@ -84,10 +84,10 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     std::string clause;
     for (int i = 0; i < allClausesIndices.size() - 1; i++) {
         clause = str.substr(allClausesIndices.at(i), allClausesIndices.at(i + 1));
-        clauses.push_back(clause);
+        clauses.push_back(trim(clause));
     }
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
-    clauses.push_back(clause);
+    clauses.push_back(trim(clause));
 
     return clauses;
 }
