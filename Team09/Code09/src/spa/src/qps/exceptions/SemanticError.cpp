@@ -1,4 +1,4 @@
-#include "SyntaxError.h"
+#include "SemanticError.h"
 
 SemanticError::SemanticError() {
     Exception("Semantic Error has occurred!");
