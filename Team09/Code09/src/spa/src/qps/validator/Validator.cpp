@@ -13,20 +13,35 @@ void Validator::validate(std::vector<std::string> statementList) {
 }
 
 bool Validator::isValidSelectStatement(std::string statement) {
-    int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");
+    int firstSpaceIndex = statement.find_first_of(WHITESPACES);
+
+    // No characters after "Select"
     if (firstSpaceIndex == std::string::npos) {
         return false;
+        throw QPSSyntaxError();
+    }
+    std::string selectWord = statement.substr(0, firstSpaceIndex);
+
+    std::string remainingStatement = trim(statement.substr(firstSpaceIndex, std::string::npos));
+    bool containsSuchThat = containsSuchThatClause(remainingStatement);
+    bool containsPattern = containsPatternClause(remainingStatement);
+
+    int secondSpaceIndex = statement.find_first_of(WHITESPACES, firstSpaceIndex + 1);
+    if (secondSpaceIndex == std::string::npos) {
+        return false;
+        throw QPSSyntaxError();
     }
 
-    if (statement.back() != ';') {
-        std::string firstWord = statement.substr(0, firstSpaceIndex + 1);
-        std::string remainingStatement = statement.substr(firstSpaceIndex + 1, std::string::npos);
-        bool containsSuchThat = containsSuchThatClause(remainingStatement);
-        bool containsPattern = containsPatternClause(remainingStatement);
-        if (!isSynonym(remainingStatement))
-            return false;
-        return true;
+    std::string returnSynonym = trim(statement.substr(firstSpaceIndex, secondSpaceIndex - firstSpaceIndex));
+    if (!isSynonym(returnSynonym)) {
+        return false;
+        throw QPSSyntaxError();
     }
+
+    std::vector<std::string> clauseList = getAllClauses(trim(statement.substr(secondSpaceIndex, std::string::npos)));
+
+    return true;
+
     return false;
 }
 
