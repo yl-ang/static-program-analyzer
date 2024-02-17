@@ -8,7 +8,7 @@ ClauseType PatternClause::getType() const {
     return ClauseType::PATTERN;
 }
 
-bool PatternClause::equals(const QueryClause&) const {
+bool PatternClause::equals(const QueryClause& other) const {
     if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
         return firstArg == ptr->firstArg && secondArg == ptr->secondArg &&
                assignSynonym == ptr->assignSynonym;
@@ -16,7 +16,7 @@ bool PatternClause::equals(const QueryClause&) const {
     return false;
 }
 
-Table PatternClause::evaluate(const PKBFacadeReader&) {
+Table PatternClause::evaluate(const PKBFacadeReader& pkb) {
     // TODO(Ezekiel): implement evaluate
 
     return Table();

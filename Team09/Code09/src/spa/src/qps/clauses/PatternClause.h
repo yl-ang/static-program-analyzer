@@ -14,4 +14,4 @@ public:
     ClauseType getType() const override;
     bool equals(const QueryClause&) const override;
     Table evaluate(const PKBFacadeReader&) override;
-}
+};

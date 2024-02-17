@@ -19,10 +19,11 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     }
     std::vector<QueryEntity> entities =
         PQLParser::parseQueryEntities(unparsedEntities);
-    std::vector<QueryClause*> clauses =
-        PQLParser::parseQueryClauses(unparsedClauses);
-    Query query = PQLParser::combineResult(entities, clauses);
-    return query;
+    std::vector<SuchThatClause> suchThatClauses =
+        PQLParser::findSuchThatClauses(unparsedClauses);
+    std::vector<PatternClause> patternClauses =
+        PQLParser::findPatternClauses(unparsedClauses);
+    return Query{entities, suchThatClauses, patternClauses};
 }
 
 std::vector<std::string> PQLParser::getQueryEntities(
@@ -73,6 +74,18 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(
     return queryEntities;
 }
 
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(
+    std::string unparsedClauses) {
+    // TODO(Parser Team): implement
+    return {};
+}
+
+std::vector<PatternClause> PQLParser::findPatternClauses(
+    std::string unparsedClauses) {
+    // TODO(Parser Team): implement
+    return {};
+}
+
 // splits the select, such that, and pattern clauses,
 // ASSUMPTION: only have at most one of each type of clause - OUTDATED! ***
 // Only works for select now
@@ -115,12 +128,4 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(
     parsedClauses.push_back(new SelectClause(wordList[1]));
 
     return parsedClauses;
-}
-
-// Just combines the two
-// into a unordered_map[variables] = clauses
-Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
-                               const std::vector<QueryClause*> queryClauses) {
-    return Query{queryEntities};
-    // return std::make_tuple(queryEntities, queryClauses);
 }

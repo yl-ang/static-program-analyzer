@@ -1,8 +1,9 @@
 #include "Query.h"
 
 Query::Query(const std::vector<QueryEntity>& se,
-             const std::vector<QueryClause>& cls)
-    : selectEntities(se), clauses(cls) {}
+             const std::vector<SuchThatClause>& stc,
+             const std::vector<PatternClause>& pc)
+    : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
 std::vector<std::string> Query::evaluate(const PKBFacadeReader& pkb) {
     // TODO(Ezekiel): Run evaluate on clauses

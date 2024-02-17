@@ -22,6 +22,10 @@ public:
     static std::vector<QueryEntity> parseQueryEntities(
         std::vector<std::string>);
     static std::vector<QueryClause*> parseQueryClauses(std::string);
+    static std::vector<SuchThatClause> PQLParser::findSuchThatClauses(
+        std::string);
+    static std::vector<PatternClause> PQLParser::findPatternClauses(
+        std::string);
     // static std::unordered_map<ClauseType, std::vector<int>>
     // getClauseStarts(std::vector<std::string>);
     static Query combineResult(std::vector<QueryEntity>,
