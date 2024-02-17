@@ -17,19 +17,14 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
             throw Exception("Syntax Error");
         }
     }
-    std::vector<QueryEntity> entities =
-        PQLParser::parseQueryEntities(unparsedEntities);
-    std::vector<SuchThatClause> suchThatClauses =
-        PQLParser::findSuchThatClauses(unparsedClauses);
-    std::vector<PatternClause> patternClauses =
-        PQLParser::findPatternClauses(unparsedClauses);
+    std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(unparsedClauses);
+    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(unparsedClauses);
     return Query{entities, suchThatClauses, patternClauses};
 }
 
-std::vector<std::string> PQLParser::getQueryEntities(
-    std::vector<std::string> unparsedQuery) {
-    std::vector<std::string> out = std::vector<std::string>(
-        unparsedQuery.begin(), unparsedQuery.end() - 1);
+std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> unparsedQuery) {
+    std::vector<std::string> out = std::vector<std::string>(unparsedQuery.begin(), unparsedQuery.end() - 1);
     return out;
 }
 
@@ -40,8 +35,7 @@ std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
 // Output "std::vector<QueryEntity, QueryEntity, ... >"
-std::vector<QueryEntity> PQLParser::parseQueryEntities(
-    std::vector<std::string> unparsedEntities) {
+std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
@@ -50,10 +44,8 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(
             throw Exception("Syntax Error: Invalid declaration statement!");
         }
         synonymTypeList.pop_back();
-        std::vector<std::string> typeAndSynonyms =
-            splitByDelimiter(synonymTypeList, ",");
-        std::vector<std::string> typeAndFirstSynonym =
-            splitByDelimiter(typeAndSynonyms[0], " ");
+        std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
+        std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
         // first synonym and type
         std::string type = typeAndFirstSynonym[0];
         std::string firstArg = trim(typeAndFirstSynonym[1]);
@@ -62,26 +54,22 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(
         QueryEntity firstQueryDeclaration = QueryEntity(entityType, firstArg);
         queryEntities.push_back(firstQueryDeclaration);
         // skip first element for other synonyms
-        std::vector<std::string> sublist =
-            std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
+        std::vector<std::string> sublist = std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
         for (std::string synonym : sublist) {
-            QueryEntity currQueryDeclaration =
-                QueryEntity(entityType, trim(synonym));
+            QueryEntity currQueryDeclaration = QueryEntity(entityType, trim(synonym));
             queryEntities.push_back(currQueryDeclaration);
         }
     }
     return queryEntities;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(
-    std::string unparsedClauses) {
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::string unparsedClauses) {
     // TODO(Parser Team): implement
     return {};
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(
-    std::string unparsedClauses) {
+std::vector<PatternClause> PQLParser::findPatternClauses(std::string unparsedClauses) {
     // TODO(Parser Team): implement
     return {};
 }
@@ -113,8 +101,7 @@ std::vector<PatternClause> PQLParser::findPatternClauses(
 // Parse clauses from UnparsedQuery (std::vector<std::string>)
 // Input should look something like "Select ... such that ... pattern ..."
 // Output should look something like ""
-std::vector<QueryClause*> PQLParser::parseQueryClauses(
-    std::string unparsedClauses) {
+std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClauses) {
     // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query
     // string Identify starting positions of SELECT, SUCH THAT, PATTERN
     std::vector<QueryClause*> parsedClauses;
