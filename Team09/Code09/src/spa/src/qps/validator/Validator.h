@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 
+#include "../exceptions/*"
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 
