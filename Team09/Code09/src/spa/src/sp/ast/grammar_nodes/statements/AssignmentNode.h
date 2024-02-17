@@ -1,5 +1,7 @@
 #include "AstNode.h"
+#include "StatementNode.h"
 
-class AssignmentNode : public ASTNode {
-    explicit AssignmentNode() : ASTNode("", "assign") {}
+class AssignmentNode : public StatementNode {
+public:
+    AssignmentNode();
 };
