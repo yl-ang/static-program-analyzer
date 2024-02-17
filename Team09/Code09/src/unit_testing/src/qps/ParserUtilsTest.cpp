@@ -46,8 +46,8 @@ TEST_CASE("getAllClauses") {
 
     std::vector<std::string> expectedList_Empty = {};
     std::vector<std::string> expectedList_OneSuchThat = {"such that Follows(1, 2)"};
-    std::vector<std::string> expectedList_TwoSuchThat = {"such that Follows(1, 2) ", "such that Follows(2, 3)"};
-    std::vector<std::string> expectedList_OneSuchThatOnePattern = {"such that Follows(1, 2) ", "pattern a(a, \"_\")"};
+    std::vector<std::string> expectedList_TwoSuchThat = {"such that Follows(1, 2)", "such that Follows(2, 3)"};
+    std::vector<std::string> expectedList_OneSuchThatOnePattern = {"such that Follows(1, 2)", "pattern a(a, \"_\")"};
     std::vector<std::string> expectedList_OnePattern = {"pattern a(a, \"_\")"};
 
     REQUIRE(getAllClauses(inputString_Empty) == expectedList_Empty);
