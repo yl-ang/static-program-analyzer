@@ -2,7 +2,7 @@
 
 void Validator::validate(std::vector<std::string> clauseList) {}
 
-bool Validator::isValidSelectStatement(std::string) {
+bool Validator::isValidSelectStatement(std::string statement) {
     int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");
     if (firstSpaceIndex == std::string::npos) {
         return false;
@@ -20,7 +20,7 @@ bool Validator::isValidSelectStatement(std::string) {
     return false;
 }
 
-bool Validator::isValidDeclarationStatement(std::string) {
+bool Validator::isValidDeclarationStatement(std::string statement) {
     if (statement.back() != ';') {
         return false;
     }
@@ -47,7 +47,7 @@ bool Validator::isValidDeclarationStatement(std::string) {
     return true;
 }
 
-bool Validator::isValidSuchThatClause(std::string) {
+bool Validator::isValidSuchThatClause(std::string suchThatClause) {
     bool startsWithSuchThat = std::regex_search(suchThatClause, std::regex("such that"));
     if (!startsWithSuchThat) {
         return false;
@@ -58,7 +58,7 @@ bool Validator::isValidSuchThatClause(std::string) {
     return true;
 }
 
-bool Validator::isValidPatternClause(std::string) {
+bool Validator::isValidPatternClause(std::string patternClause) {
     bool startsWithPattern = std::regex_search(patternClause, std::regex("pattern"));
     if (!startsWithPattern) {
         return false;
