@@ -9,6 +9,8 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(FATAL_ERROR "In-source builds are forbidden.")
 endif()
 
+option(SPA_CODE_COVERAGE "Enable code coverage" OFF)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -26,6 +28,11 @@ set(AUTOTESTER_ROOT "${CMAKE_CURRENT_LIST_DIR}/lib/autotester/${CMAKE_SYSTEM_PRO
 list(APPEND CMAKE_PREFIX_PATH "${AUTOTESTER_ROOT}")
 find_package(autotester REQUIRED)
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")#include catch.hpp
+
+if (SPA_CODE_COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+endif ()
 
 add_subdirectory(src/spa)
 add_subdirectory(src/autotester)

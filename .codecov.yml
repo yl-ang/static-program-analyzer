@@ -1,0 +1,3 @@
+ignore:
+  - "Team09/Code09/src/autotester"
+  - "Team09/Code09/src/integration_testing"
