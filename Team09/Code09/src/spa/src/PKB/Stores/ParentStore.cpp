@@ -12,6 +12,62 @@ void ParentStore::setParentStore(
     computeTransitiveClosure();
 }
 
+// TODO(yl-ang): BUGGY
+void ParentStore::computeTransitiveClosure() {
+    parentStarMap.clear();
+    childStarMap.clear();
+
+    // Initialize the matrices
+    for (const auto& entry : parentMap) {
+        StmtNum parent = entry.second;
+        StmtNum child = entry.first;
+
+        // Ensure that the direct parent is not included in the transitive
+        // closure set
+        if (!parentStarMap.count(child)) {
+            parentStarMap[child] = std::unordered_set<StmtNum>();
+        }
+
+        // Initialize the child matrix
+        if (!childStarMap.count(parent)) {
+            childStarMap[parent] = std::unordered_set<StmtNum>();
+        }
+
+        // Initialize the direct parent-child relationships
+        parentStarMap[child].insert(parent);
+        childStarMap[parent].insert(child);
+    }
+
+    // Update the matrices with transitive closure
+    for (const auto& entry : parentStarMap) {
+        StmtNum child = entry.first;
+        for (const auto& parent : entry.second) {
+            updateTransitiveClosure(parent, child);
+        }
+    }
+}
+
+// TODO(yl-ang): BUGGY
+void ParentStore::updateTransitiveClosure(StmtNum parent, StmtNum child) {
+    if (parentStarMap.count(child)) {
+        for (const auto& grandparent : parentStarMap[child]) {
+            parentStarMap[parent].insert(grandparent);
+
+            // Also update the child matrix
+            childStarMap[grandparent].insert(child);
+        }
+    }
+
+    if (childStarMap.count(parent)) {
+        for (const auto& grandchild : childStarMap[parent]) {
+            childStarMap[child].insert(grandchild);
+
+            // Also update the parent matrix
+            parentStarMap[grandchild].insert(parent);
+        }
+    }
+}
+
 std::optional<StmtNum> ParentStore::getParent(StmtNum child) {
     auto it = parentMap.find(child);
     if (it != parentMap.end()) {
@@ -32,16 +88,6 @@ std::unordered_set<StmtNum> ParentStore::getChildrenStar(StmtNum parent) {
                                       : std::unordered_set<StmtNum>();
 }
 
-std::vector<StmtNum> ParentStore::getParents(StmtNum child) {
-    std::vector<StmtNum> parents;
-    auto it = parentMap.find(child);
-    while (it != parentMap.end()) {
-        parents.push_back(it->second);
-        it = parentMap.find(it->second);
-    }
-    return parents;
-}
-
 std::unordered_set<StmtNum> ParentStore::getParentsStar(StmtNum child) {
     return parentStarMap.count(child) ? parentStarMap[child]
                                       : std::unordered_set<StmtNum>();
@@ -55,48 +101,4 @@ bool ParentStore::containsParentRelationship(StmtNum parent, StmtNum child) {
 bool ParentStore::containsParentStarRelationship(StmtNum parent,
                                                  StmtNum child) {
     return parentStarMap.count(child) && parentStarMap[child].count(parent);
-}
-
-void ParentStore::computeTransitiveClosure() {
-    parentStarMap.clear();
-    childStarMap.clear();
-
-    for (const auto& entry : parentMap) {
-        StmtNum parent = entry.second;
-        StmtNum child = entry.first;
-
-        if (!parentStarMap.count(child)) {
-            parentStarMap[child] = std::unordered_set<StmtNum>();
-        }
-
-        parentStarMap[child].insert(parent);
-
-        if (!childStarMap.count(parent)) {
-            childStarMap[parent] = std::unordered_set<StmtNum>();
-        }
-
-        childStarMap[parent].insert(child);
-
-        for (const auto& grandparent : parentStarMap[parent]) {
-            updateTransitiveClosure(grandparent, child);
-        }
-
-        for (const auto& grandchild : childStarMap[child]) {
-            updateTransitiveClosure(parent, grandchild);
-        }
-    }
-}
-
-void ParentStore::updateTransitiveClosure(StmtNum parent, StmtNum child) {
-    if (parentStarMap.count(child)) {
-        for (const auto& grandparent : parentStarMap[child]) {
-            parentStarMap[parent].insert(grandparent);
-        }
-    }
-
-    if (childStarMap.count(parent)) {
-        for (const auto& grandchild : childStarMap[parent]) {
-            childStarMap[child].insert(grandchild);
-        }
-    }
 }

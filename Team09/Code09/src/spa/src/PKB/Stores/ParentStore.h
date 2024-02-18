@@ -16,7 +16,6 @@ public:
     std::unordered_set<StmtNum> getChildren(StmtNum parent);
     std::unordered_set<StmtNum> getChildrenStar(StmtNum parent);
 
-    std::vector<StmtNum> getParents(StmtNum child);
     std::unordered_set<StmtNum> getParentsStar(StmtNum child);
 
     bool containsParentRelationship(StmtNum parent, StmtNum child);
