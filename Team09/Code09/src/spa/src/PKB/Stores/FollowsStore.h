@@ -6,9 +6,6 @@
 
 #include "PKB/Utils/DataTypes.h"
 
-// ai-gen start(gpt, 1, e)
-// prompt:
-// https://platform.openai.com/playground/p/bAw35gvF9trwUeKVOgSPAObi?model=gpt-4&mode=chat
 class FollowsStore {
 public:
     void setFollowsStore(
@@ -24,10 +21,10 @@ public:
     bool containsFollowStarRelationship(StmtNum s1, StmtNum s2);
 
 private:
-    std::unordered_map<StmtNum, StmtNum> followsMap;
-    std::unordered_map<StmtNum, StmtNum> followedByMap;
-    std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
-        followsTransitiveClosure;
+    std::unordered_map<StmtNum, StmtNum> followerMap;
+    std::unordered_map<StmtNum, StmtNum> followerByMap;
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> followerStarMap;
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> followeeStarMap;
 
     void computeTransitiveClosure();
     void updateTransitiveClosure(StmtNum s1, StmtNum s2);
