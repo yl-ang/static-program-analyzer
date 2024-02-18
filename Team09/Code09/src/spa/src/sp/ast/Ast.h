@@ -1,5 +1,6 @@
 #pragma once
 #include <deque>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -23,21 +24,24 @@
 class AST {
 public:
     ProgramNode buildAST(std::vector<Token> tokens);
-    ProcedureNode buildProcedureAST(std::deque<Token> tokens);
-    StatementListNode buildStatementListAST(std::deque<Token> tokens);
-    StatementNode buildStatementAST(std::deque<Token> tokens);
-    AssignmentNode buildAssignmentAST(std::deque<Token> tokens);
-    ExpressionNode buildExpressionAST(std::deque<Token> tokens);
-    ExpressionNode buildBinaryExpressionAST(std::deque<Token> tokens,
-                                            std::deque<Token> term,
+    ProcedureNode buildProcedureAST(std::deque<Token>& tokens);
+    StatementListNode buildStatementListAST(std::deque<Token>& tokens);
+    StatementNode buildStatementAST(std::deque<Token>& tokens);
+    AssignmentNode buildAssignmentAST(std::deque<Token>& tokens);
+    ExpressionNode buildExpressionAST(std::deque<Token>& tokens);
+    ExpressionNode buildBinaryExpressionAST(std::deque<Token>& tokens,
+                                            std::deque<Token>& term,
                                             LEXICAL_TOKEN_TYPE type);
-    TermNode buildTermAST(std::deque<Token> tokens);
-    TermNode buildBinaryTermAST(std::deque<Token> tokens,
-                                std::deque<Token> factor,
+    ExpressionNode buildSubExpressionAST(std::deque<Token>& tokens,
+                                         ExpressionNode* node);
+    TermNode buildTermAST(std::deque<Token>& tokens);
+    TermNode buildSubTermAST(std::deque<Token>& tokens, TermNode* node);
+    TermNode buildBinaryTermAST(std::deque<Token>& tokens,
+                                std::deque<Token>& factor,
                                 LEXICAL_TOKEN_TYPE type);
-    FactorNode buildFactorAST(std::deque<Token> tokens);
+    FactorNode buildFactorAST(std::deque<Token>& tokens);
 
     void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
     void checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                           std::deque<Token> tokens);
+                           std::deque<Token>& tokens);
 };
