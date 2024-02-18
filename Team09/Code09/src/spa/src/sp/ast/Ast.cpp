@@ -1,8 +1,7 @@
 #include <sp/ast/Ast.h>
-#include <sp/ast/AstNode.h>
 
+#include <deque>
 #include <iostream>
-#include <queue>
 #include <stack>
 #include <string>
 #include <unordered_map>
@@ -22,14 +21,13 @@ Assumptions:
 */
 ProgramNode AST::buildAST(std::vector<Token> tokens) {
     ProgramNode root = ProgramNode();
-    // create a queue so its easier to work with, to pop the front
-    std::queue<Token> token_queue;
+    std::deque<Token> token_deque;
     for (auto token : tokens) {
-        token_queue.push(token);
+        token_deque.push_back(token);
     }
 
-    while (token_queue.size()) {
-        ProcedureNode procedure = buildProcedureAST(token_queue);
+    while (token_deque.size()) {
+        ProcedureNode procedure = buildProcedureAST(token_deque);
         root.add_child(procedure);
     }
 
@@ -38,14 +36,14 @@ ProgramNode AST::buildAST(std::vector<Token> tokens) {
 /*
 Grammar: 'procedure' proc_name { stmtList }
 The first word should be procedure, so we check for that by looking at the first
-element of the queue. Otherwise, we throw a syntax error. Then we look at the
+element of the deque. Otherwise, we throw a syntax error. Then we look at the
 next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
-ProcedureNode AST::buildProcedureAST(std::queue<Token> tokens) {
+ProcedureNode AST::buildProcedureAST(std::deque<Token> tokens) {
     Token procedureKeyword = tokens.front();
     checkSyntax(PROCEDURE, procedureKeyword.type);
-    tokens.pop();
+    tokens.pop_front();
     Token procName = tokens.front();
     checkSyntax(NAME, procName.type);
     // if everything is valid, we can create the node
@@ -61,22 +59,22 @@ stmt list passes here includes the curly braces, so we can check for that as
 well.
 
 */
-StatementListNode AST::buildStatementListAST(std::queue<Token> tokens) {
+StatementListNode AST::buildStatementListAST(std::deque<Token> tokens) {
     Token openCurly = tokens.front();
     checkSyntax(OPEN_CURLY_BRACE, openCurly.type);
-    tokens.pop();
+    tokens.pop_front();
 
     StatementListNode statementList = StatementListNode();
     std::vector<StatementNode> statements = {};
     while (tokens.size() && tokens.front().type != CLOSE_CURLY_BRACE) {
         StatementNode statement = buildStatementAST(tokens);
-        statements.push_back(statement);
+        statementList.add_child(statement);
     }
 
     checkMissingToken(CLOSE_CURLY_BRACE, tokens);
     Token closeCurly = tokens.front();
     checkSyntax(CLOSE_CURLY_BRACE, closeCurly.type);
-    tokens.pop();
+    tokens.pop_front();
     return statementList;
 }
 
@@ -85,18 +83,21 @@ There are 5 kinds of statements, with assignment having no keyword.
 So we check whether the first token is a var_name. This will tell us that it is
 an assignment. Otherwise, we just check the other nodes accordingly.
 */
-StatementNode AST::buildStatementAST(std::queue<Token> tokens) {
+StatementNode AST::buildStatementAST(std::deque<Token> tokens) {
     Token first_token = tokens.front();
+    StatementNode statement = StatementNode();
     if (first_token.type == NAME) {
-        return buildAssignmentAST(tokens);
+        AssignmentNode assignment = buildAssignmentAST(tokens);
+        statement.add_child(assignment);
+        return statement;
     }
     throw UnrecognisedTokenError(first_token.type);
 }
 
-AssignmentNode AST::buildAssignmentAST(std::queue<Token> tokens) {
+AssignmentNode AST::buildAssignmentAST(std::deque<Token> tokens) {
     Token varName = tokens.front();
     NameNode nameNode = NameNode(varName.value);
-    tokens.pop();
+    tokens.pop_front();
     Token equality = tokens.front();
     checkSyntax(EQUAL, equality.type);
     AssignmentNode node = AssignmentNode();
@@ -109,8 +110,93 @@ AssignmentNode AST::buildAssignmentAST(std::queue<Token> tokens) {
     return node;
 }
 
+/*
+We pop things from the right of the deque until we hit either a  '+' or a '-'.
+Once we have hit a symbol, the remaining elements of the deque will be passed
+back to expr. The initial elements would be stored in another deque that will be
+passed to term for processing.
+*/
+ExpressionNode AST::buildExpressionAST(std::deque<Token> tokens) {
+    std::deque<Token> term_deque = {};
+    LEXICAL_TOKEN_TYPE type;
+    while (tokens.size()) {
+        Token lastToken = tokens.back();
+        if (lastToken.type == ADD || lastToken.type == SUB) {
+            type = lastToken.type;
+            break;
+        }
+        tokens.pop_back();
+        term_deque.push_back(lastToken);
+    }
+    // if there are no more tokens, that means that we found a term instead
+    if (tokens.size() == 0) {
+        return buildTermAST(term_deque);
+    }
+
+    return buildBinaryExpressionAST(tokens, term_deque, type);
+}
+
+ExpressionNode AST::buildBinaryExpressionAST(std::deque<Token> tokens,
+                                             std::deque<Token> term,
+                                             LEXICAL_TOKEN_TYPE type) {
+    ExpressionNode binaryExpressionNode = ExpressionNode(type);
+    ExpressionNode expressionNode = buildExpressionAST(tokens);
+    TermNode termNode = buildTermAST(term);
+    binaryExpressionNode.add_child(expressionNode);
+    binaryExpressionNode.add_child(termNode);
+    return binaryExpressionNode;
+}
+
+TermNode AST::buildTermAST(std::deque<Token> tokens) {
+    LEXICAL_TOKEN_TYPE type;
+    std::deque<Token> factorDeque = {};
+    while (tokens.size()) {
+        Token lastToken = tokens.back();
+        if (lastToken.type == MUL || lastToken.type == DIV ||
+            lastToken.type == MOD) {
+            type = lastToken.type;
+            break;
+        }
+        factorDeque.push_back(lastToken);
+    }
+
+    if (tokens.size() == 0) {
+        return buildFactorAST(factorDeque);
+    }
+
+    return buildBinaryTermAST(tokens, factorDeque, type);
+}
+
+TermNode AST::buildBinaryTermAST(std::deque<Token> tokens,
+                                 std::deque<Token> factor,
+                                 LEXICAL_TOKEN_TYPE type) {
+    TermNode binaryTermNode = TermNode(type);
+    TermNode termNode = buildTermAST(tokens);
+    FactorNode factorNode = buildFactorAST(factor);
+    binaryTermNode.add_child(termNode);
+    binaryTermNode.add_child(factorNode);
+    return binaryTermNode;
+}
+
+// For now just assume theres no bracketed expressions
+FactorNode AST::buildFactorAST(std::deque<Token> tokens) {
+    Token token = tokens.front();
+    if (token.type == NAME) {
+        return NameNode(token.value);
+    }
+    return IntegerNode(token.value);
+}
+
+/*
+------------------------------------------
+
+Syntax Error methods
+
+------------------------------------------
+*/
+
 void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                            std::queue<Token> tokens) {
+                            std::deque<Token> tokens) {
     if (tokens.size() != 0) {
         return;
     }
@@ -128,8 +214,8 @@ void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected,
 // /*
 // Finds a procedure by comparing closing curly braces.
 // The algorithm uses a stack to do so. Open curly braces are always pushed onto
-// the stack. If there are closes curly braces, we pop from the stack if the
-// last element is an open curly brace. Once the stack is empty, we are done
+// the stack. If there are closes curly braces, we pop_front from the stack if
+// the last element is an open curly brace. Once the stack is empty, we are done
 // with the currnt procedure. So we add it into our resulting array.
 // */
 // std::vector<std::vector<Token>> AST::splitByProcedure(
@@ -143,11 +229,11 @@ void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected,
 
 //     } else if (token.type == LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE &&
 //                stack.top().type == LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE) {
-//       stack.pop();
+//       stack.pop_front();
 //     }
 //     current_procedure.push_back(token);
 //     // if the current token we pushed is a proc type, or the prev token
-//     // before this one is, we dont pop from the stack
+//     // before this one is, we dont pop_front from the stack
 //     // TODO(ben): handle nested procedures
 //     if (token.type == PROCEDURE ||
 //         current_procedure.end()[-2].type == PROCEDURE) {
@@ -191,7 +277,7 @@ void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected,
 // first. Then we build the statement ast for each statement and add it to the
 // statement list. Currently we assume that every statement is an assignment.
 // */
-// ASTNode AST::buildProcedureAST(std::queue<Token> tokens) {
+// ASTNode AST::buildProcedureAST(std::deque<Token> tokens) {
 
 //   ASTNode procedure = ASTNode(tokens[1].value, "proc");
 //   ASTNode stmtList = ASTNode("", "stmtList");
