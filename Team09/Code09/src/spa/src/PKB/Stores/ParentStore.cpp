@@ -5,8 +5,8 @@ void ParentStore::setParentStore(
     for (const auto& pair : parentPairs) {
         StmtNum parent = pair.first;
         StmtNum child = pair.second;
-
         parentMap[child] = parent;
+        parentToChildrenMap[parent].insert(child);
     }
 
     computeTransitiveClosure();
@@ -21,13 +21,10 @@ std::optional<StmtNum> ParentStore::getParent(StmtNum child) {
 }
 
 std::unordered_set<StmtNum> ParentStore::getChildren(StmtNum parent) {
-    std::unordered_set<StmtNum> children;
-    for (const auto& entry : parentMap) {
-        if (entry.second == parent) {
-            children.insert(entry.first);
-        }
+    if (parentToChildrenMap.count(parent)) {
+        return parentToChildrenMap[parent];
     }
-    return children;
+    return {};
 }
 
 std::unordered_set<StmtNum> ParentStore::getChildrenStar(StmtNum parent) {

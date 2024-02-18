@@ -24,6 +24,8 @@ public:
 
 private:
     std::unordered_map<StmtNum, StmtNum> parentMap;
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+        parentToChildrenMap;
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> parentStarMap;
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> childStarMap;
 
