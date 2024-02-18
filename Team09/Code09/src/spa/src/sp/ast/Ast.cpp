@@ -1,8 +1,8 @@
 #include <sp/ast/Ast.h>
 
-#include <deque>
 #include <iostream>
 #include <memory>
+#include <queue>
 #include <stack>
 #include <string>
 #include <unordered_map>
@@ -23,10 +23,13 @@ Assumptions:
 
 ProgramNode AST::buildAST(std::vector<Token> tokens) {
     ProgramNode root = ProgramNode();
-    std::deque<Token> token_deque(tokens.begin(), tokens.end());
+    std::queue<Token> token_queue = {};
+    for (auto token : tokens) {
+        token_queue.push(token);
+    }
 
-    while (token_deque.size()) {
-        ProcedureNode procedure = buildProcedureAST(token_deque);
+    while (token_queue.size()) {
+        ProcedureNode procedure = buildProcedureAST(token_queue);
         root.add_child(procedure);
     }
 
@@ -35,19 +38,19 @@ ProgramNode AST::buildAST(std::vector<Token> tokens) {
 /*
 Grammar: 'procedure' proc_name { stmtList }
 The first word should be procedure, so we check for that by looking at the first
-element of the deque. Otherwise, we throw a syntax error. Then we look at the
+element of the queue. Otherwise, we throw a syntax error. Then we look at the
 next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
-ProcedureNode AST::buildProcedureAST(std::deque<Token>& tokens) {
+ProcedureNode AST::buildProcedureAST(std::queue<Token>& tokens) {
     Token procedureKeyword = tokens.front();
     checkSyntax(PROCEDURE, procedureKeyword.type);
-    tokens.pop_front();
+    tokens.pop();
     Token procName = tokens.front();
     checkSyntax(NAME, procName.type);
     // if everything is valid, we can create the node
     ProcedureNode node = ProcedureNode(procName.value);
-    tokens.pop_front();
+    tokens.pop();
 
     StatementListNode statementList = buildStatementListAST(tokens);
     node.add_child(statementList);
@@ -59,10 +62,10 @@ stmt list passes here includes the curly braces, so we can check for that as
 well.
 
 */
-StatementListNode AST::buildStatementListAST(std::deque<Token>& tokens) {
+StatementListNode AST::buildStatementListAST(std::queue<Token>& tokens) {
     Token openCurly = tokens.front();
     checkSyntax(OPEN_CURLY_BRACE, openCurly.type);
-    tokens.pop_front();
+    tokens.pop();
 
     StatementListNode statementList = StatementListNode();
     std::vector<StatementNode> statements = {};
@@ -74,11 +77,11 @@ StatementListNode AST::buildStatementListAST(std::deque<Token>& tokens) {
     checkMissingToken(CLOSE_CURLY_BRACE, tokens);
     Token closeCurly = tokens.front();
     checkSyntax(CLOSE_CURLY_BRACE, closeCurly.type);
-    tokens.pop_front();
+    tokens.pop();
     return statementList;
 }
 
-StatementNode AST::buildStatementAST(std::deque<Token>& tokens) {
+StatementNode AST::buildStatementAST(std::queue<Token>& tokens) {
     Token first_token = tokens.front();
     if (first_token.type == NAME) {
         return buildAssignmentAST(tokens);
@@ -86,18 +89,18 @@ StatementNode AST::buildStatementAST(std::deque<Token>& tokens) {
     throw UnrecognisedTokenError(first_token.type);
 }
 
-AssignmentNode AST::buildAssignmentAST(std::deque<Token>& tokens) {
+AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
     NameNode nameNode = NameNode(varName.value);
-    tokens.pop_front();
+    tokens.pop();
     Token equality = tokens.front();
     checkSyntax(EQUAL, equality.type);
     AssignmentNode node = AssignmentNode();
-    tokens.pop_front();
+    tokens.pop();
     ExpressionNode expression = buildExpressionAST(tokens);
     Token semiColon = tokens.front();
     checkSyntax(SEMICOLON, semiColon.type);
-    tokens.pop_front();
+    tokens.pop();
 
     node.add_child(nameNode);
     node.add_child(expression);
@@ -126,16 +129,16 @@ A': '+' BA' | '-' BA' | e
 More info can be found here: https://en.wikipedia.org/wiki/Left_recursion
 
 */
-ExpressionNode AST::buildExpressionAST(std::deque<Token>& tokens) {
+ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
     TermNode term = buildTermAST(tokens);
     return buildSubExpressionAST(tokens, &term);
 }
 
-ExpressionNode AST::buildSubExpressionAST(std::deque<Token>& tokens,
+ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens,
                                           ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
-        tokens.pop_front();
+        tokens.pop();
         TermNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
         expressionNode.add_child(*node);
@@ -156,15 +159,15 @@ to the following 2 rules:
 A : BA'
 A' : '*' BA' | '/' BA' | '%' BA' | e
 */
-TermNode AST::buildTermAST(std::deque<Token>& tokens) {
+TermNode AST::buildTermAST(std::queue<Token>& tokens) {
     FactorNode factorNode = buildFactorAST(tokens);
     return buildSubTermAST(tokens, &factorNode);
 }
 
-TermNode AST::buildSubTermAST(std::deque<Token>& tokens, TermNode* node) {
+TermNode AST::buildSubTermAST(std::queue<Token>& tokens, TermNode* node) {
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
-        tokens.pop_front();
+        tokens.pop();
         FactorNode factorNode = buildFactorAST(tokens);
         TermNode termNode = TermNode(front.type);
         termNode.add_child(*node);
@@ -177,9 +180,9 @@ TermNode AST::buildSubTermAST(std::deque<Token>& tokens, TermNode* node) {
 }
 
 // For now just assume theres no bracketed expressions
-FactorNode AST::buildFactorAST(std::deque<Token>& tokens) {
+FactorNode AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
-    tokens.pop_front();
+    tokens.pop();
     if (token.type == NAME) {
         return NameNode(token.value);
     }
@@ -195,7 +198,7 @@ Syntax Error methods
 */
 
 void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                            std::deque<Token>& tokens) {
+                            std::queue<Token>& tokens) {
     if (tokens.size() != 0) {
         return;
     }

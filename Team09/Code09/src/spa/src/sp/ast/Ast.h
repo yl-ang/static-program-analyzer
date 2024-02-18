@@ -1,6 +1,6 @@
 #pragma once
-#include <deque>
 #include <memory>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -24,24 +24,24 @@
 class AST {
 public:
     ProgramNode buildAST(std::vector<Token> tokens);
-    ProcedureNode buildProcedureAST(std::deque<Token>& tokens);
-    StatementListNode buildStatementListAST(std::deque<Token>& tokens);
-    StatementNode buildStatementAST(std::deque<Token>& tokens);
-    AssignmentNode buildAssignmentAST(std::deque<Token>& tokens);
-    ExpressionNode buildExpressionAST(std::deque<Token>& tokens);
-    ExpressionNode buildBinaryExpressionAST(std::deque<Token>& tokens,
-                                            std::deque<Token>& term,
+    ProcedureNode buildProcedureAST(std::queue<Token>& tokens);
+    StatementListNode buildStatementListAST(std::queue<Token>& tokens);
+    StatementNode buildStatementAST(std::queue<Token>& tokens);
+    AssignmentNode buildAssignmentAST(std::queue<Token>& tokens);
+    ExpressionNode buildExpressionAST(std::queue<Token>& tokens);
+    ExpressionNode buildBinaryExpressionAST(std::queue<Token>& tokens,
+                                            std::queue<Token>& term,
                                             LEXICAL_TOKEN_TYPE type);
-    ExpressionNode buildSubExpressionAST(std::deque<Token>& tokens,
+    ExpressionNode buildSubExpressionAST(std::queue<Token>& tokens,
                                          ExpressionNode* node);
-    TermNode buildTermAST(std::deque<Token>& tokens);
-    TermNode buildSubTermAST(std::deque<Token>& tokens, TermNode* node);
-    TermNode buildBinaryTermAST(std::deque<Token>& tokens,
-                                std::deque<Token>& factor,
+    TermNode buildTermAST(std::queue<Token>& tokens);
+    TermNode buildSubTermAST(std::queue<Token>& tokens, TermNode* node);
+    TermNode buildBinaryTermAST(std::queue<Token>& tokens,
+                                std::queue<Token>& factor,
                                 LEXICAL_TOKEN_TYPE type);
-    FactorNode buildFactorAST(std::deque<Token>& tokens);
+    FactorNode buildFactorAST(std::queue<Token>& tokens);
 
     void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
     void checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                           std::deque<Token>& tokens);
+                           std::queue<Token>& tokens);
 };
