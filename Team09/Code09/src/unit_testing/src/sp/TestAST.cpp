@@ -11,28 +11,6 @@ using namespace std;  // NOLINT
 TEST_CASE("AST Build Tests") {
     AST ast;
 
-    SECTION("Build variable node correctly") {
-        // we are not interested in the types here so we just use a dummy type
-        // similarly for line number.
-        std::deque<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0)};
-        ASTNode expectedNode = ASTNode("a", "var");
-
-        ASTNode result = ast.buildFactorAST(inputTokenArray);
-        REQUIRE(expectedNode == result);
-    }
-
-    SECTION("Build constant node correctly") {
-        // we are not interested in the types here so we just use a dummy type
-        // similarly for line number.
-        std::deque<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
-        ASTNode expectedNode = ASTNode("1", "const");
-
-        ASTNode result = ast.buildFactorAST(inputTokenArray);
-        REQUIRE(expectedNode == result);
-    }
-
     SECTION("Build const factor ast correctly") {
         std::deque<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
@@ -55,7 +33,9 @@ TEST_CASE("AST Build Tests") {
         std::deque<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
             Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+        };
 
         ASTNode expectedNode = ASTNode("", "assign");
         ASTNode nameNode = ASTNode("a", "var");
@@ -72,7 +52,8 @@ TEST_CASE("AST Build Tests") {
         std::deque<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
             Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0)};
+            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1)};
 
         ASTNode expectedNode = ASTNode("", "assign");
         ASTNode nameNode = ASTNode("a", "var");
@@ -139,7 +120,7 @@ TEST_CASE("AST Build Tests") {
         mulNode.add_child(xtNode);
         mulNode.add_child(yNode);
 
-        ASTNode result = ast.buildExpressionAST(inputTokenArray);
+        ASTNode result = ast.buildTermAST(inputTokenArray);
         REQUIRE(mulNode == result);
     }
 
