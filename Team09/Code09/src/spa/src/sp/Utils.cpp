@@ -63,15 +63,15 @@ std::string getLexicalEnumString(LEXICAL_TOKEN_TYPE type) {
         case NOT_EQUAL_CHECK:
             return "'!='";
         case ADD:
-            return "'+'";
+            return "add";
         case SUB:
-            return "'-'";
+            return "sub";
         case MUL:
-            return "'*'";
+            return "mul";
         case DIV:
-            return "'/'";
+            return "div";
         case MOD:
-            return "'%'";
+            return "mod";
         default:
             return "unknown";
     }

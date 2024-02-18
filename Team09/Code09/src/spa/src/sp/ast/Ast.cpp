@@ -80,11 +80,8 @@ StatementListNode AST::buildStatementListAST(std::deque<Token>& tokens) {
 
 StatementNode AST::buildStatementAST(std::deque<Token>& tokens) {
     Token first_token = tokens.front();
-    StatementNode statement = StatementNode();
     if (first_token.type == NAME) {
-        AssignmentNode assignment = buildAssignmentAST(tokens);
-        statement.add_child(assignment);
-        return statement;
+        return buildAssignmentAST(tokens);
     }
     throw UnrecognisedTokenError(first_token.type);
 }
@@ -138,8 +135,8 @@ ExpressionNode AST::buildSubExpressionAST(std::deque<Token>& tokens,
                                           ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
-        TermNode term = buildTermAST(tokens);
         tokens.pop_front();
+        TermNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
         expressionNode.add_child(*node);
         expressionNode.add_child(term);
@@ -167,8 +164,8 @@ TermNode AST::buildTermAST(std::deque<Token>& tokens) {
 TermNode AST::buildSubTermAST(std::deque<Token>& tokens, TermNode* node) {
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
-        FactorNode factorNode = buildFactorAST(tokens);
         tokens.pop_front();
+        FactorNode factorNode = buildFactorAST(tokens);
         TermNode termNode = TermNode(front.type);
         termNode.add_child(*node);
         termNode.add_child(factorNode);
