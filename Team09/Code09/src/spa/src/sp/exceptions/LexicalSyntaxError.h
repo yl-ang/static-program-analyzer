@@ -1,7 +1,8 @@
+#pragma once
 #include <string>
 
 #include "SyntaxError.h"
-#include "Utils.h"
+#include "sp/Utils.h"
 #include "sp/tokenizer/Token.h"
 
 class LexicalSyntaxError : public SyntaxError {

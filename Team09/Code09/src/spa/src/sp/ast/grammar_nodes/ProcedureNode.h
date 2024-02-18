@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "AstNode.h"
+#include "sp/ast/AstNode.h"
 
 class ProcedureNode : public ASTNode {
 public:
