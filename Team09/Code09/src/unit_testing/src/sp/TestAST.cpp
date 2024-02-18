@@ -18,7 +18,7 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0)};
         ASTNode expectedNode = ASTNode("a", "var");
 
-        ASTNode result = ast.buildVariableNameAST(inputTokenArray);
+        ASTNode result = ast.buildFactorAST(inputTokenArray);
         REQUIRE(expectedNode == result);
     }
 
@@ -29,7 +29,7 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
         ASTNode expectedNode = ASTNode("1", "const");
 
-        ASTNode result = ast.buildConstAST(inputTokenArray);
+        ASTNode result = ast.buildFactorAST(inputTokenArray);
         REQUIRE(expectedNode == result);
     }
 
