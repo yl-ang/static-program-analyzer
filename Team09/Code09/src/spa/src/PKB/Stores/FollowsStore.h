@@ -6,6 +6,9 @@
 
 #include "PKB/Utils/DataTypes.h"
 
+// ai-gen start(gpt, 1, e)
+// prompt:
+// https://platform.openai.com/playground/p/bAw35gvF9trwUeKVOgSPAObi?model=gpt-4&mode=chat
 class FollowsStore {
 public:
     void setFollowsStore(
@@ -25,9 +28,7 @@ private:
     std::unordered_map<StmtNum, StmtNum> followedByMap;
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
         followsTransitiveClosure;
-    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> followersMap;
 
     void computeTransitiveClosure();
     void updateTransitiveClosure(StmtNum s1, StmtNum s2);
-    void updateFollowersMap(StmtNum s1, StmtNum s2);
 };
