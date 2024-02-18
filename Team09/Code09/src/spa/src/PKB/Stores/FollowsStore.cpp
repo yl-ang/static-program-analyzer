@@ -9,6 +9,9 @@ void FollowsStore::setFollowsStore(
 
         followsMap[s1] = s2;
         followedByMap[s2] = s1;
+
+        // Update the followersMap
+        updateFollowersMap(s1, s2);
     }
 
     // Compute and store the transitive closure matrix
@@ -69,13 +72,10 @@ std::unordered_set<StmtNum> FollowsStore::getFolloweesStar(StmtNum s) {
 }
 
 std::unordered_set<StmtNum> FollowsStore::getFollowersStar(StmtNum s) {
-    std::unordered_set<StmtNum> followersStar;
-    for (const auto& entry : followsTransitiveClosure) {
-        if (entry.second.count(s)) {
-            followersStar.insert(entry.first);
-        }
+    if (followersMap.count(s)) {
+        return followersMap[s];
     }
-    return followersStar;
+    return {};
 }
 
 bool FollowsStore::containsFollowRelationship(StmtNum s1, StmtNum s2) {
@@ -91,4 +91,8 @@ bool FollowsStore::containsFollowStarRelationship(StmtNum s1, StmtNum s2) {
         return followsTransitiveClosure[s1].count(s2);
     }
     return false;
+}
+
+void FollowsStore::updateFollowersMap(StmtNum s1, StmtNum s2) {
+    followersMap[s2].insert(s1);
 }
