@@ -18,16 +18,8 @@ private:
     static PatternClause PQLParser::toPatternClause(std::vector<QueryEntity>, std::string);
 public:
     static Query parse(UnparsedQuery);
-
-    // static std::vector<std::string> getQueryEntities(UnparsedQuery);
     static std::string getQueryClauses(UnparsedQuery);
     static std::vector<QueryEntity> parseQueryEntities(std::vector<std::string>);
-    // static std::vector<QueryClause*> parseQueryClauses(std::string);
     static std::vector<SuchThatClause> findSuchThatClauses(std::vector<QueryEntity>, std::string);
     static std::vector<PatternClause> findPatternClauses(std::vector<QueryEntity>, std::string);
-    // static std::unordered_map<ClauseType, std::vector<int>>
-    // getClauseStarts(std::vector<std::string>);
-    // static Query combineResult(const std::vector<QueryEntity>,
-    //                            const std::vector<SuchThatClause>&,
-    //                            const std::vector<PatternClause>&);
 };
