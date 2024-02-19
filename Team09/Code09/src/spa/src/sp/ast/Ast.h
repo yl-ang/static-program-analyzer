@@ -14,6 +14,7 @@
 #include "sp/ast/grammar_nodes/ProgramNode.h"
 #include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/ReadNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
 #include "sp/exceptions/LexicalSyntaxError.h"
@@ -46,4 +47,5 @@ public:
                            std::queue<Token>& tokens);
     NameNode buildVarNameAST(Token token);
     IntegerNode buildIntAST(Token token);
+    ReadNode AST::buildReadAST(std::queue<Token>& tokens);
 };
