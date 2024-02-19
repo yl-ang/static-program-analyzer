@@ -47,5 +47,5 @@ public:
                            std::queue<Token>& tokens);
     NameNode buildVarNameAST(Token token);
     IntegerNode buildIntAST(Token token);
-    ReadNode AST::buildReadAST(std::queue<Token>& tokens);
+    ReadNode buildReadAST(std::queue<Token>& tokens);
 };
