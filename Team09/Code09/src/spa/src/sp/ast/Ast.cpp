@@ -184,8 +184,16 @@ FactorNode AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
     tokens.pop();
     if (token.type == NAME) {
-        return NameNode(token.value);
+        return buildVarNameAST(token);
     }
+    return buildIntAST(token);
+}
+
+NameNode AST::buildVarNameAST(Token token) {
+    return NameNode(token.value);
+}
+
+IntegerNode AST::buildIntAST(Token token) {
     return IntegerNode(token.value);
 }
 
