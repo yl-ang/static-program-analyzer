@@ -24,5 +24,7 @@ public:
     static std::vector<PatternClause> findPatternClauses(std::string);
     // static std::unordered_map<ClauseType, std::vector<int>>
     // getClauseStarts(std::vector<std::string>);
-    static Query combineResult(std::vector<QueryEntity>, std::vector<SuchThatClause*>, std::vector<PatternClause*>);
+    static Query combineResult(const std::vector<QueryEntity>,
+                               const std::vector<SuchThatClause>&,
+                               const std::vector<PatternClause>&);
 };
