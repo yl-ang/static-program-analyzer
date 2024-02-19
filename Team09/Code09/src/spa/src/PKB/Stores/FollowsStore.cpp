@@ -35,22 +35,15 @@ void FollowsStore::computeTransitiveClosure() {
         followeeStarMap[s2].insert(s1);
     }
 
-    // Update the matrices with transitive closure
-    for (const auto& entry : followerStarMap) {
-        StmtNum s1 = entry.first;
-        for (const auto& s2 : entry.second) {
-            updateTransitiveClosure(s1, s2);
-        }
-    }
+    // Update the matrices with transitive closure using the utility class
+    TransitiveClosureUtility::computeTransitiveClosure(followerStarMap);
+    TransitiveClosureUtility::computeTransitiveClosure(followeeStarMap);
 }
 
 void FollowsStore::updateTransitiveClosure(StmtNum s1, StmtNum s2) {
-    if (followerStarMap.count(s2)) {
-        for (const auto& s3 : followerStarMap[s2]) {
-            followerStarMap[s1].insert(s3);
-            followeeStarMap[s3].insert(s1);
-        }
-    }
+    // Update the transitive closure using the utility class
+    TransitiveClosureUtility::updateTransitiveClosure(s1, s2, followerStarMap);
+    TransitiveClosureUtility::updateTransitiveClosure(s2, s1, followeeStarMap);
 }
 
 std::optional<StmtNum> FollowsStore::getFollower(StmtNum s1) {
