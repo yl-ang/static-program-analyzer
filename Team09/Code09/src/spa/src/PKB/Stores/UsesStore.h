@@ -23,6 +23,6 @@ public:
 private:
     std::unordered_map<StmtNum, std::unordered_set<Variable>>
         stmtToUsedVariables;
-    std::unordered_map<VarName, std::unordered_set<StmtNum>>
+    std::unordered_map<Variable, std::unordered_set<StmtNum>>
         variableToUsingStatements;
 };
