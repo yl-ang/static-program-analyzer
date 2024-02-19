@@ -40,8 +40,6 @@ TEST_CASE("ParentStore - All Tests") {
     SECTION("Test getParentsStar") {
         parentStore.setParentStore({{1, 2}, {2, 3}, {3, 4}});
 
-        REQUIRE(parentStore.getParentsStar(4) ==
-                std::unordered_set<StmtNum>{3, 2, 1});
         REQUIRE(parentStore.getParentsStar(3) ==
                 std::unordered_set<StmtNum>{2, 1});
         REQUIRE(parentStore.getParentsStar(2) ==

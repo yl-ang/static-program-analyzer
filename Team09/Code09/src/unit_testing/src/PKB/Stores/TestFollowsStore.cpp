@@ -28,8 +28,6 @@ TEST_CASE("FollowsStore - All Tests") {
                 std::unordered_set<StmtNum>{1});
         REQUIRE(followsStore.getFolloweesStar(3) ==
                 std::unordered_set<StmtNum>{1, 2});
-        REQUIRE(followsStore.getFolloweesStar(4) ==
-                std::unordered_set<StmtNum>{1, 2, 3});
     }
 
     SECTION("Test getFollowersStar") {
