@@ -218,4 +218,45 @@ TEST_CASE("AST Build Tests") {
         ASTNode result = ast.buildProcedureAST(queue);
         REQUIRE(procedure == result);
     }
+
+    SECTION("Build read statement ast correctly") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::READ, "read", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+        };
+
+        ASTNode expectedNode = ASTNode("", "read");
+        ASTNode nameNode = ASTNode("a", "var");
+
+        expectedNode.add_child(nameNode);
+        auto queue = makeTokenQueue(inputTokenArray);
+        ASTNode result = ast.buildReadAST(queue);
+        REQUIRE(expectedNode == result);
+    }
+    SECTION("Build read procedure correctly") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::READ, "read", 1),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 1),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+        };
+
+        ASTNode procedure = ASTNode("a", "proc");
+        ASTNode stmtList = ASTNode("", "stmtList");
+        ASTNode readNode = ASTNode("", "read");
+        ASTNode nameNode = ASTNode("y", "var");
+
+        readNode.add_child(nameNode);
+
+        stmtList.add_child(readNode);
+        procedure.add_child(stmtList);
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildProcedureAST(queue);
+        REQUIRE(procedure == result);
+    }
 }
