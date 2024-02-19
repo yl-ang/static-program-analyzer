@@ -3,6 +3,7 @@
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 #include "../exceptions/Exception.h"
+#include <iostream>
 
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
 
@@ -141,6 +142,10 @@ SuchThatClause PQLParser::toSTClause(std::vector<QueryEntity> entities, std::str
             }
         }
         return SuchThatClause(SuchThatClause::determineType(type), entityVector[0], entityVector[1]);
+
+    } else {
+        std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
+        exit(1);
     }
 }
 
@@ -173,5 +178,9 @@ PatternClause PQLParser::toPatternClause(std::vector<QueryEntity> entities, std:
         }
 
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
+
+    } else {
+        std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
+        exit(1);
     }
 }
