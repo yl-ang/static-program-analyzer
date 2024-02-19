@@ -2,12 +2,10 @@
 
 #include <utility>
 
-Exception::Exception() = default;
-
 Exception::Exception(std::string message) {
-    errorMessage = message;
+    this->errorMessage = message;
 }
 
 std::string Exception::getMessage() {
-    return errorMessage;
+    return this->errorMessage;
 }

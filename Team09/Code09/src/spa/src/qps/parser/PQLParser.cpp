@@ -28,9 +28,7 @@ std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> un
     return out;
 }
 
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[unparsedQuery.size() - 1];
-}
+std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { return unparsedQuery[unparsedQuery.size() - 1]; }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
@@ -40,10 +38,7 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
-        if (!isValidDeclarationStatement(synonymTypeList)) {
-            throw Exception("Syntax Error: Invalid declaration statement!");
-        }
-        synonymTypeList.pop_back();
+        synonymTypeList.pop_back();  // remove semi-colon
         std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
         // first synonym and type
@@ -105,9 +100,6 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
     // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query
     // string Identify starting positions of SELECT, SUCH THAT, PATTERN
     std::vector<QueryClause*> parsedClauses;
-    if (!isValidSelectStatement(unparsedClauses)) {
-        throw new Exception("Syntax Error: Invalid Select syntax!");
-    }
     std::vector<std::string> wordList = stringToWordList(unparsedClauses);
     // std::unordered_map<ClauseType, std::vector<int>> clauseStarts =
     // getClauseStarts(wordList); there will be a function to get the end of
@@ -115,4 +107,12 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
     parsedClauses.push_back(new SelectClause(wordList[1]));
 
     return parsedClauses;
+}
+
+// Just combines the two
+// into a unordered_map[variables] = clauses
+Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
+                               const std::vector<QueryClause*> queryClauses) {
+    return Query{queryEntities};
+    // return std::make_tuple(queryEntities, queryClauses);
 }

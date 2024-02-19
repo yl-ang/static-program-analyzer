@@ -19,7 +19,8 @@ public:
     inline static const std::string PROCEDURE = "procedure";
 
     inline static const std::string DESIGN_ENTITIES = STMT + '|' + READ + '|' + PRINT + '|' + CALL + '|' + WHILE + '|' +
-                                                      IF + '|' + ASSIGN + '|' + VARIABLE + '|' + CONSTANT + '|' + PROCEDURE;
+                                                      IF + '|' + ASSIGN + '|' + VARIABLE + '|' + CONSTANT + '|' +
+                                                      PROCEDURE;
 };
 
 bool isIdent(std::string);
@@ -35,5 +36,5 @@ bool isEntRef(std::string);
 bool isSelectStatement(std::string);
 bool isDeclarationStatement(std::string);
 
-bool isValidSelectStatement(std::string);
-bool isValidDeclarationStatement(std::string);
+bool containsSuchThatClause(std::string);
+bool containsPatternClause(std::string);
