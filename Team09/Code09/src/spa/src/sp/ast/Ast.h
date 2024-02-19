@@ -44,4 +44,6 @@ public:
     void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
     void checkMissingToken(LEXICAL_TOKEN_TYPE expected,
                            std::queue<Token>& tokens);
+    NameNode buildVarNameAST(Token token);
+    IntegerNode buildIntAST(Token token);
 };
