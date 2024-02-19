@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "PKB/Utils/DataTypes.h"
+#include "PKB/Utils/TransitiveClosureUtility.h"
 
 class ParentStore {
 public:
@@ -29,5 +30,4 @@ private:
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> childStarMap;
 
     void computeTransitiveClosure();
-    void updateTransitiveClosure(StmtNum parent, StmtNum child);
 };

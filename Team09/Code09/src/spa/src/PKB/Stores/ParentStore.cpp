@@ -12,7 +12,6 @@ void ParentStore::setParentStore(
     computeTransitiveClosure();
 }
 
-// TODO(yl-ang): BUGGY
 void ParentStore::computeTransitiveClosure() {
     parentStarMap.clear();
     childStarMap.clear();
@@ -38,34 +37,10 @@ void ParentStore::computeTransitiveClosure() {
         childStarMap[parent].insert(child);
     }
 
-    // Update the matrices with transitive closure
-    for (const auto& entry : parentStarMap) {
-        StmtNum child = entry.first;
-        for (const auto& parent : entry.second) {
-            updateTransitiveClosure(parent, child);
-        }
-    }
-}
-
-// TODO(yl-ang): BUGGY
-void ParentStore::updateTransitiveClosure(StmtNum parent, StmtNum child) {
-    if (parentStarMap.count(child)) {
-        for (const auto& grandparent : parentStarMap[child]) {
-            parentStarMap[parent].insert(grandparent);
-
-            // Also update the child matrix
-            childStarMap[grandparent].insert(child);
-        }
-    }
-
-    if (childStarMap.count(parent)) {
-        for (const auto& grandchild : childStarMap[parent]) {
-            childStarMap[child].insert(grandchild);
-
-            // Also update the parent matrix
-            parentStarMap[grandchild].insert(parent);
-        }
-    }
+    // Use TransitiveClosureUtility to update the matrices with transitive
+    // closure
+    TransitiveClosureUtility::computeTransitiveClosure(parentStarMap);
+    TransitiveClosureUtility::computeTransitiveClosure(childStarMap);
 }
 
 std::optional<StmtNum> ParentStore::getParent(StmtNum child) {
