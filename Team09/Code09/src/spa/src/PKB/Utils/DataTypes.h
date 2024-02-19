@@ -52,3 +52,13 @@ struct hash<std::pair<StmtNum, StmtNum>> {
     }
 };
 }  // namespace std
+
+namespace std {
+template <>
+struct hash<std::pair<StmtNum, Variable>> {
+    std::size_t operator()(const std::pair<StmtNum, Variable>& p) const {
+        // Combine the hash values of StmtNum and Variable
+        return hash<StmtNum>()(p.first) ^ hash<Variable>()(p.second);
+    }
+};
+}  // namespace std
