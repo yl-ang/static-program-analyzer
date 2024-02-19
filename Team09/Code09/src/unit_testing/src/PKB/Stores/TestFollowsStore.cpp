@@ -1,3 +1,5 @@
+#include <unordered_set>
+
 #include "PKB/Stores/FollowsStore.h"
 #include "catch.hpp"
 
@@ -24,24 +26,37 @@ TEST_CASE("FollowsStore - All Tests") {
         followsStore.setFollowsStore({{1, 2}, {2, 3}, {3, 4}});
 
         REQUIRE(followsStore.getFolloweesStar(1).empty());
-        REQUIRE(followsStore.getFolloweesStar(2) ==
-                std::unordered_set<StmtNum>{1});
-        REQUIRE(followsStore.getFolloweesStar(3) ==
-                std::unordered_set<StmtNum>{1, 2});
-        REQUIRE(followsStore.getFolloweesStar(4) ==
-                std::unordered_set<StmtNum>{1, 2, 3});
+        auto result2 = followsStore.getFolloweesStar(2);
+        std::unordered_set<StmtNum> expected2 = {1};
+        REQUIRE(result2 == expected2);
+
+        auto result3 = followsStore.getFolloweesStar(3);
+        std::unordered_set<StmtNum> expected3 = {1, 2};
+        REQUIRE(result3 == expected3);
+
+        auto result4 = followsStore.getFolloweesStar(4);
+        std::unordered_set<StmtNum> expected4 = {1, 2, 3};
+        REQUIRE(result4 == expected4);
     }
 
     SECTION("Test getFollowersStar") {
         followsStore.setFollowsStore({{1, 2}, {2, 3}, {3, 4}});
 
-        REQUIRE(followsStore.getFollowersStar(1) ==
-                std::unordered_set<StmtNum>{2, 3, 4});
-        REQUIRE(followsStore.getFollowersStar(2) ==
-                std::unordered_set<StmtNum>{3, 4});
-        REQUIRE(followsStore.getFollowersStar(3) ==
-                std::unordered_set<StmtNum>{4});
-        REQUIRE(followsStore.getFollowersStar(4).empty());
+        auto result1 = followsStore.getFollowersStar(1);
+        std::unordered_set<StmtNum> expected1 = {2, 3, 4};
+        REQUIRE(result1 == expected1);
+
+        auto result2 = followsStore.getFollowersStar(2);
+        std::unordered_set<StmtNum> expected2 = {3, 4};
+        REQUIRE(result2 == expected2);
+
+        auto result3 = followsStore.getFollowersStar(3);
+        std::unordered_set<StmtNum> expected3 = {4};
+        REQUIRE(result3 == expected3);
+
+        auto result4 = followsStore.getFollowersStar(4);
+        std::unordered_set<StmtNum> expected4;
+        REQUIRE(result4 == expected4);
     }
 
     SECTION("Test containsFollowRelationship") {

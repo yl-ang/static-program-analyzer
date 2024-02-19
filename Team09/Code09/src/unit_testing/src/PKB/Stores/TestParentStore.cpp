@@ -13,20 +13,28 @@ TEST_CASE("ParentStore - All Tests") {
 
     SECTION("Test getChildren") {
         parentStore.setParentStore({{1, 2}, {1, 3}, {1, 4}});
-        REQUIRE(parentStore.getChildren(1) ==
-                std::unordered_set<StmtNum>{2, 3, 4});
+        auto result = parentStore.getChildren(1);
+        REQUIRE(std::vector<StmtNum>(result.begin(), result.end()) ==
+                std::vector<StmtNum>{2, 3, 4});
     }
 
     SECTION("Test getChildrenStar") {
         parentStore.setParentStore({{1, 2}, {2, 3}, {3, 4}});
 
-        REQUIRE(parentStore.getChildrenStar(1) ==
-                std::unordered_set<StmtNum>{2, 3, 4});
-        REQUIRE(parentStore.getChildrenStar(2) ==
-                std::unordered_set<StmtNum>{3, 4});
-        REQUIRE(parentStore.getChildrenStar(3) ==
-                std::unordered_set<StmtNum>{4});
-        REQUIRE(parentStore.getChildrenStar(4).empty());
+        auto result1 = parentStore.getChildrenStar(1);
+        REQUIRE(std::vector<StmtNum>(result1.begin(), result1.end()) ==
+                std::vector<StmtNum>{2, 3, 4});
+
+        auto result2 = parentStore.getChildrenStar(2);
+        REQUIRE(std::vector<StmtNum>(result2.begin(), result2.end()) ==
+                std::vector<StmtNum>{3, 4});
+
+        auto result3 = parentStore.getChildrenStar(3);
+        REQUIRE(std::vector<StmtNum>(result3.begin(), result3.end()) ==
+                std::vector<StmtNum>{4});
+
+        auto result4 = parentStore.getChildrenStar(4);
+        REQUIRE(result4.empty());
     }
 
     SECTION("Test getParents") {
@@ -40,13 +48,20 @@ TEST_CASE("ParentStore - All Tests") {
     SECTION("Test getParentsStar") {
         parentStore.setParentStore({{1, 2}, {2, 3}, {3, 4}});
 
-        REQUIRE(parentStore.getParentsStar(4) ==
-                std::unordered_set<StmtNum>{3, 2, 1});
-        REQUIRE(parentStore.getParentsStar(3) ==
-                std::unordered_set<StmtNum>{2, 1});
-        REQUIRE(parentStore.getParentsStar(2) ==
-                std::unordered_set<StmtNum>{1});
-        REQUIRE(parentStore.getParentsStar(1).empty());
+        auto result4 = parentStore.getParentsStar(4);
+        REQUIRE(std::vector<StmtNum>(result4.begin(), result4.end()) ==
+                std::vector<StmtNum>{3, 2, 1});
+
+        auto result3 = parentStore.getParentsStar(3);
+        REQUIRE(std::vector<StmtNum>(result3.begin(), result3.end()) ==
+                std::vector<StmtNum>{2, 1});
+
+        auto result2 = parentStore.getParentsStar(2);
+        REQUIRE(std::vector<StmtNum>(result2.begin(), result2.end()) ==
+                std::vector<StmtNum>{1});
+
+        auto result1 = parentStore.getParentsStar(1);
+        REQUIRE(result1.empty());
     }
 
     SECTION("Test containsParentRelationship") {
@@ -60,6 +75,7 @@ TEST_CASE("ParentStore - All Tests") {
         REQUIRE_FALSE(parentStore.containsParentRelationship(4, 3));
         REQUIRE_FALSE(parentStore.containsParentRelationship(6, 5));
     }
+
     SECTION("Test containsParentStarRelationship") {
         parentStore.setParentStore({{1, 2}, {3, 4}, {4, 5}, {5, 6}});
 
