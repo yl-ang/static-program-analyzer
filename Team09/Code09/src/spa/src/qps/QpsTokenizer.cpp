@@ -3,28 +3,30 @@
 #include "ParserUtils.h"
 
 std::vector<std::string> QpsTokenizer::tokenize(std::string inputQueryString) {
-  std::vector<std::string> inputQueryTokens = {};
-  std::string delimiter = ";";
+    std::string cleanInputString = replaceAllWhitespaces(inputQueryString);
 
-  size_t nextDelimiterIndex = inputQueryString.find(delimiter);
-  size_t offset = 0;
-  size_t substringSize;
-  std::string newString;
+    std::vector<std::string> inputQueryTokens = {};
+    std::string delimiter = ";";
 
-  while (nextDelimiterIndex != std::string::npos) {
-    substringSize = nextDelimiterIndex - offset + 1;
-    newString = inputQueryString.substr(offset, substringSize);
-    inputQueryTokens.push_back(trim(newString));
+    size_t nextDelimiterIndex = cleanInputString.find(delimiter);
+    size_t offset = 0;
+    size_t substringSize;
+    std::string newString;
 
-    offset = nextDelimiterIndex + 1;
-    nextDelimiterIndex = inputQueryString.find(delimiter, offset);
-  }
+    while (nextDelimiterIndex != std::string::npos) {
+        substringSize = nextDelimiterIndex - offset + 1;
+        newString = cleanInputString.substr(offset, substringSize);
+        inputQueryTokens.push_back(trim(newString));
 
-  if (offset != inputQueryString.length()) {
-    substringSize = inputQueryString.length() - offset + 1;
-    newString = inputQueryString.substr(offset, substringSize);
-    inputQueryTokens.push_back(trim(newString));
-  }
+        offset = nextDelimiterIndex + 1;
+        nextDelimiterIndex = cleanInputString.find(delimiter, offset);
+    }
 
-  return inputQueryTokens;
+    if (offset != cleanInputString.length()) {
+        substringSize = cleanInputString.length() - offset + 1;
+        newString = cleanInputString.substr(offset, substringSize);
+        inputQueryTokens.push_back(trim(newString));
+    }
+
+    return inputQueryTokens;
 }

@@ -1,10 +1,10 @@
-#include "QueryEntity.h"
-#include "QueryClause.h"
 #include "PQLParser.h"
+
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 #include "../exceptions/Exception.h"
-
+#include "QueryClause.h"
+#include "QueryEntity.h"
 
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     std::vector<std::string> unparsedEntities = {};
@@ -29,9 +29,7 @@ std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> un
     return out;
 }
 
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[unparsedQuery.size() - 1];
-}
+std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { return unparsedQuery[unparsedQuery.size() - 1]; }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
@@ -41,10 +39,7 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
-        if (!isValidDeclarationStatement(synonymTypeList)) {
-            throw Exception("Syntax Error: Invalid declaration statement!");
-        }
-        synonymTypeList.pop_back();
+        synonymTypeList.pop_back();  // remove semi-colon
         std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
         // first synonym and type
@@ -64,7 +59,6 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
     }
     return queryEntities;
 }
-
 
 // splits the select, such that, and pattern clauses,
 // ASSUMPTION: only have at most one of each type of clause - OUTDATED! ***
@@ -91,9 +85,6 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
     // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query string
     // Identify starting positions of SELECT, SUCH THAT, PATTERN
     std::vector<QueryClause*> parsedClauses;
-    if (!isValidSelectStatement(unparsedClauses)) {
-        throw new Exception("Syntax Error: Invalid Select syntax!");
-    }
     std::vector<std::string> wordList = stringToWordList(unparsedClauses);
     // std::unordered_map<ClauseType, std::vector<int>> clauseStarts = getClauseStarts(wordList);
     // there will be a function to get the end of each clause, but for now, will hardcode for 'Select v' alone
@@ -104,8 +95,8 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
 
 // Just combines the two
 // into a unordered_map[variables] = clauses
-Query PQLParser::combineResult(
-    const std::vector<QueryEntity> queryEntities, const std::vector<QueryClause*> queryClauses) {
-    return Query{ queryEntities };
+Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
+                               const std::vector<QueryClause*> queryClauses) {
+    return Query{queryEntities};
     // return std::make_tuple(queryEntities, queryClauses);
 }
