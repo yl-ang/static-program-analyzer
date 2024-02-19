@@ -6,8 +6,10 @@
 #include "QueryEntity.h"
 
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
+
     std::vector<std::string> unparsedEntities = {};
     std::string unparsedClauses;
+
     for (std::string queryStatement : unparsedQuery) {
         if (isDeclarationStatement(queryStatement)) {
             unparsedEntities.push_back(queryStatement);
@@ -18,21 +20,36 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
         }
     }
     std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
-    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(unparsedClauses);
-    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(unparsedClauses);
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(entities, unparsedClauses);
+    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(entities, unparsedClauses);
     return Query{entities, suchThatClauses, patternClauses};
 }
 
-std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> unparsedQuery) {
-    std::vector<std::string> out = std::vector<std::string>(unparsedQuery.begin(), unparsedQuery.end() - 1);
-    return out;
+// Used functions:
+/**
+ * isDeclarationStatement
+ * isSelectStatement
+ * 
+ * getQueryClauses
+ * parseQueryEntities
+ * findSuchThatClauses
+ * findPatternClauses
+*/
+
+// std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> unparsedQuery) {
+//     std::vector<std::string> out = std::vector<std::string>(unparsedQuery.begin(), unparsedQuery.end() - 1);
+//     return out;
+// }
+
+std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { 
+    return unparsedQuery[unparsedQuery.size() - 1]; 
 }
 
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { return unparsedQuery[unparsedQuery.size() - 1]; }
-
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
+
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
 // Output "std::vector<QueryEntity, QueryEntity, ... >"
+
 std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
@@ -59,14 +76,97 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
     return queryEntities;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::string unparsedClauses) {
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
     // TODO(Parser Team): implement
-    return {};
+
+    // AI-START
+    std::vector<SuchThatClause> result;
+    std::regex stPattern("such that\\s(\\w+\\*?\\(.*?\\))");
+    std::smatch match;
+    
+    std::string::const_iterator searchStart(unparsedClauses.cbegin());
+    // AI-END
+    while (std::regex_search(searchStart, unparsedClauses.cend(), match, stPattern)) {
+        SuchThatClause st = toSTClause(entities, match.str(1));
+        result.push_back(st);
+        searchStart = match.suffix().first;
+    }
+    
+    return result;
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::string unparsedClauses) {
+SuchThatClause PQLParser::toSTClause(std::vector<QueryEntity> entities, std::string str) {
+    std::regex stArguments("\\b(\\w+\\*?)\\((.*?)\\)");
+    std::smatch argMatch;
+    if (std::regex_search(str, argMatch, stArguments)) {
+        std::string type = argMatch[1];
+        std::string parameters = argMatch[2];
+
+        std::istringstream iss(parameters);
+        std::string parameter;
+
+        std::vector<QueryEntity> entityVector;
+
+        while (std::getline(iss, parameter, ',')) {
+            parameter = trim(parameter);
+            for (const QueryEntity& entity : entities) {
+                if (entity.getName() == parameter) {
+                    entityVector.push_back(entity);
+                }
+            }
+        }
+        return SuchThatClause(SuchThatClause::determineType(type), entityVector[0], entityVector[1]);
+    }
+}
+
+PatternClause PQLParser::toPatternClause(std::vector<QueryEntity> entities, std::string str) {
+    std::regex ptClause("\\b(\\w+)\\((.*?)\\)");
+    std::smatch argMatch;
+    if (std::regex_search(str, argMatch, ptClause)) {
+        std::string assignSynonym = argMatch[1];
+        std::string parameters = argMatch[2];
+
+        std::istringstream iss(parameters);
+        std::string parameter;
+
+        std::vector<QueryEntity> entityVector;
+
+        for (const QueryEntity& entity : entities) {
+            if (entity.getName() == assignSynonym) {
+                entityVector.push_back(entity);
+            }
+        }
+
+        while (std::getline(iss, parameter, ',')) {
+            parameter = trim(parameter);
+            for (const QueryEntity& entity : entities) {
+                if (entity.getName() == parameter) {
+                    entityVector.push_back(entity);
+                }
+            }
+        }
+
+        return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
+    }
+}
+
+std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
     // TODO(Parser Team): implement
-    return {};
+
+    // AI-START
+    std::vector<PatternClause> result;
+    std::regex pattern("pattern\\s(\\w+\\(.*?\\))");
+    std::smatch match;
+    
+    std::string::const_iterator searchStart(unparsedClauses.cbegin());
+    while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
+    // AI-END
+        PatternClause pt = toPatternClause(entities, match.str(1));
+        result.push_back(pt);
+        searchStart = match.suffix().first;
+    }
+    
+    return result;
 }
 
 // splits the select, such that, and pattern clauses,
@@ -96,24 +196,24 @@ std::vector<PatternClause> PQLParser::findPatternClauses(std::string unparsedCla
 // Parse clauses from UnparsedQuery (std::vector<std::string>)
 // Input should look something like "Select ... such that ... pattern ..."
 // Output should look something like ""
-std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClauses) {
-    // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query
-    // string Identify starting positions of SELECT, SUCH THAT, PATTERN
-    std::vector<QueryClause*> parsedClauses;
-    std::vector<std::string> wordList = stringToWordList(unparsedClauses);
-    // std::unordered_map<ClauseType, std::vector<int>> clauseStarts =
-    // getClauseStarts(wordList); there will be a function to get the end of
-    // each clause, but for now, will hardcode for 'Select v' alone
-    parsedClauses.push_back(new SelectClause(wordList[1]));
+// std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClauses) {
+//     // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query
+//     // string Identify starting positions of SELECT, SUCH THAT, PATTERN
+//     std::vector<QueryClause*> parsedClauses;
+//     std::vector<std::string> wordList = stringToWordList(unparsedClauses);
+//     // std::unordered_map<ClauseType, std::vector<int>> clauseStarts =
+//     // getClauseStarts(wordList); there will be a function to get the end of
+//     // each clause, but for now, will hardcode for 'Select v' alone
+//     parsedClauses.push_back(new SelectClause(wordList[1]));
 
-    return parsedClauses;
-}
+//     return parsedClauses;
+// }
 
-// Just combines the two
-// into a unordered_map[variables] = clauses
-Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
-                               const std::vector<SuchThatClause>& stc,
-                               const std::vector<PatternClause>& pc) {
-    return Query(queryEntities, stc, pc);
-    // return std::make_tuple(queryEntities, queryClauses);
-}
+// // Just combines the two
+// // into a unordered_map[variables] = clauses
+// Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
+//                                const std::vector<SuchThatClause>& stc,
+//                                const std::vector<PatternClause>& pc) {
+//     return Query(queryEntities, stc, pc);
+//     // return std::make_tuple(queryEntities, queryClauses);
+// }

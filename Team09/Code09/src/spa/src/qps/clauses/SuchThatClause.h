@@ -18,6 +18,7 @@ private:
 
 public:
     SuchThatClause(const SuchThatClauseType&, const QueryEntity&, const QueryEntity&);
+    static SuchThatClauseType determineType(const std::string);
     ClauseType getType() const override;
     bool equals(const QueryClause& other) const override;
     Table evaluate(const PKBFacadeReader&) override;
