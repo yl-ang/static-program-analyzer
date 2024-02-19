@@ -12,7 +12,6 @@ public:
     void setFollowsStore(
         const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs);
     void computeTransitiveClosure();
-    void updateTransitiveClosure(StmtNum s1, StmtNum s2);
 
     std::optional<StmtNum> getFollower(StmtNum s1);
     std::optional<StmtNum> getFollowee(StmtNum s2);

@@ -40,12 +40,6 @@ void FollowsStore::computeTransitiveClosure() {
     TransitiveClosureUtility::computeTransitiveClosure(followeeStarMap);
 }
 
-void FollowsStore::updateTransitiveClosure(StmtNum s1, StmtNum s2) {
-    // Update the transitive closure using the utility class
-    TransitiveClosureUtility::updateTransitiveClosure(s1, s2, followerStarMap);
-    TransitiveClosureUtility::updateTransitiveClosure(s2, s1, followeeStarMap);
-}
-
 std::optional<StmtNum> FollowsStore::getFollower(StmtNum s1) {
     auto it = followerMap.find(s1);
     if (it != followerMap.end()) {
