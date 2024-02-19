@@ -112,7 +112,8 @@ std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClaus
 // Just combines the two
 // into a unordered_map[variables] = clauses
 Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
-                               const std::vector<QueryClause*> queryClauses) {
-    return Query{queryEntities};
+                               const std::vector<SuchThatClause>& stc,
+                               const std::vector<PatternClause>& pc) {
+    return Query(queryEntities, stc, pc);
     // return std::make_tuple(queryEntities, queryClauses);
 }
