@@ -16,8 +16,8 @@ public:
     std::optional<StmtNum> getFollowee(StmtNum s2);
     std::unordered_set<StmtNum> getFollowersStar(StmtNum s);
     std::unordered_set<StmtNum> getFolloweesStar(StmtNum s);
-    bool containsFollowRelationship(StmtNum s1, StmtNum s2);
-    bool containsFollowStarRelationship(StmtNum s1, StmtNum s2);
+    bool hasFollowRelationship(StmtNum s1, StmtNum s2);
+    bool hasFollowStarRelationship(StmtNum s1, StmtNum s2);
 
 private:
     std::unordered_map<StmtNum, StmtNum> followerMap;

@@ -42,24 +42,24 @@ TEST_CASE("FollowsStore - All Tests") {
         REQUIRE(followsStore.getFollowersStar(4).empty());
     }
 
-    SECTION("Test containsFollowRelationship") {
+    SECTION("Test hasFollowRelationship") {
         followsStore.setFollowsStore({{1, 2}, {3, 4}, {5, 6}});
 
-        REQUIRE(followsStore.containsFollowRelationship(1, 2));
-        REQUIRE(followsStore.containsFollowRelationship(3, 4));
-        REQUIRE(followsStore.containsFollowRelationship(5, 6));
+        REQUIRE(followsStore.hasFollowRelationship(1, 2));
+        REQUIRE(followsStore.hasFollowRelationship(3, 4));
+        REQUIRE(followsStore.hasFollowRelationship(5, 6));
 
-        REQUIRE_FALSE(followsStore.containsFollowRelationship(2, 1));
-        REQUIRE_FALSE(followsStore.containsFollowRelationship(4, 3));
-        REQUIRE_FALSE(followsStore.containsFollowRelationship(6, 5));
+        REQUIRE_FALSE(followsStore.hasFollowRelationship(2, 1));
+        REQUIRE_FALSE(followsStore.hasFollowRelationship(4, 3));
+        REQUIRE_FALSE(followsStore.hasFollowRelationship(6, 5));
     }
 
-    SECTION("Test containsFollowStarRelationship") {
+    SECTION("Test hasFollowStarRelationship") {
         followsStore.setFollowsStore({{1, 2}, {3, 4}, {4, 5}, {5, 6}});
 
-        REQUIRE(followsStore.containsFollowStarRelationship(1, 2));
-        REQUIRE(followsStore.containsFollowStarRelationship(3, 5));
-        REQUIRE_FALSE(followsStore.containsFollowStarRelationship(1, 4));
-        REQUIRE_FALSE(followsStore.containsFollowStarRelationship(2, 1));
+        REQUIRE(followsStore.hasFollowStarRelationship(1, 2));
+        REQUIRE(followsStore.hasFollowStarRelationship(3, 5));
+        REQUIRE_FALSE(followsStore.hasFollowStarRelationship(1, 4));
+        REQUIRE_FALSE(followsStore.hasFollowStarRelationship(2, 1));
     }
 }

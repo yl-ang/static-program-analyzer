@@ -70,7 +70,7 @@ std::unordered_set<StmtNum> FollowsStore::getFolloweesStar(StmtNum s) {
     return {};
 }
 
-bool FollowsStore::containsFollowRelationship(StmtNum s1, StmtNum s2) {
+bool FollowsStore::hasFollowRelationship(StmtNum s1, StmtNum s2) {
     auto it = followerMap.find(s1);
     if (it != followerMap.end()) {
         return it->second == s2;
@@ -78,7 +78,7 @@ bool FollowsStore::containsFollowRelationship(StmtNum s1, StmtNum s2) {
     return false;
 }
 
-bool FollowsStore::containsFollowStarRelationship(StmtNum s1, StmtNum s2) {
+bool FollowsStore::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
     if (followerStarMap.count(s1)) {
         return followerStarMap[s1].count(s2);
     }
