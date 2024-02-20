@@ -28,6 +28,7 @@ struct Stmt {
         return stmtNum == other.stmtNum && type == other.type;
     }
 };
+// ai-gen end
 
 // ai-gen start(gpt, 0, e)
 // prompt:
@@ -42,6 +43,7 @@ struct hash<Stmt> {
     }
 };
 }  // namespace std
+// ai-gen end
 
 namespace std {
 template <>
