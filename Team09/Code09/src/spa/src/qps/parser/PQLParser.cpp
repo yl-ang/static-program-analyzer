@@ -5,6 +5,10 @@
 #include "../exceptions/Exception.h"
 #include <iostream>
 
+// checked with lecturer, this is acceptable format for PQL:
+// Select v1 such that Parent(v1,v2) pattern a(v1,v2)
+// can >=0 spaces at existing spaces, and between commas and in front of brackets
+
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
 
     std::vector<std::string> unparsedEntities = {};
