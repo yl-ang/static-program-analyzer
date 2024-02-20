@@ -1,4 +1,5 @@
 #include "PKB.h"
+
 #include "PKB/Stores/EntityStore.h"
 #include "PKB/Stores/StatementStore.h"
 
@@ -9,4 +10,7 @@ PKB::PKB() noexcept {
 
     stmtStore = std::make_shared<StatementStore>();
     followsStore = std::make_shared<FollowsStore>();
+    parentStore = std::make_shared<ParentStore>();
+    usesStore = std::make_shared<UsesStore>();
+    modifiesStore = std::make_shared<ModifiesStore>();
 }
