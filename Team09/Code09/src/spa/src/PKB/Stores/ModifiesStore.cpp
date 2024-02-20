@@ -1,8 +1,8 @@
 #include "ModifiesStore.h"
 
 void ModifiesStore::setModifiesStore(
-    const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
-    for (const auto& use : usesSet) {
+    const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesSet) {
+    for (const auto& modify : modifiesSet) {
         StmtNum stmt = use.first;
         Variable variable = use.second;
 

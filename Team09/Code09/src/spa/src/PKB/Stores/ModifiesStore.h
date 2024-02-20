@@ -10,7 +10,7 @@
 class ModifiesStore {
 public:
     void setModifiesStore(
-        const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet);
+        const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesSet);
 
     bool hasStatementVariableModifiesRelationship(
         StmtNum stmt, const Variable& variable) const;
