@@ -8,15 +8,15 @@ TEST_CASE("ModifiesStore - All Tests") {
         modifiesStore.setModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
 
         REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(1, "x"));
-        REQUIRE(modifiesStore.hasStatementVariableUseRelationship(2, "y"));
-        REQUIRE(modifiesStore.hasStatementVariableUseRelationship(3, "x"));
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(2, "y"));
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(3, "x"));
 
         REQUIRE_FALSE(
-            modifiesStore.hasStatementVariableUseRelationship(1, "y"));
+            modifiesStore.hasStatementVariableModifiesRelationship(1, "y"));
         REQUIRE_FALSE(
-            modifiesStore.hasStatementVariableUseRelationship(2, "x"));
+            modifiesStore.hasStatementVariableModifiesRelationship(2, "x"));
         REQUIRE_FALSE(
-            modifiesStore.hasStatementVariableUseRelationship(3, "y"));
+            modifiesStore.hasStatementVariableModifiesRelationship(3, "y"));
     }
 
     SECTION("Test getVariablesByStatement") {
