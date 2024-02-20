@@ -3,8 +3,8 @@
 void ModifiesStore::setModifiesStore(
     const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesSet) {
     for (const auto& modify : modifiesSet) {
-        StmtNum stmt = use.first;
-        Variable variable = use.second;
+        StmtNum stmt = modify.first;
+        Variable variable = modify.second;
 
         stmtToModifiedVariables[stmt].insert(variable);
         variableToModifyingStatements[variable].insert(stmt);
