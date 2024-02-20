@@ -1,6 +1,4 @@
-// #include <qps/clauses/QueryClause.h>
 #include <qps/parser/PQLParser.h>
-#include <qps/parser/QueryEntity.h>
 
 #include <tuple>
 
@@ -8,7 +6,7 @@
 
 // Testing Query Entity Parser
 
-// Functions in PQLParser
+// Functions in PQLParser (for reference)
 /**
  * public:
  *  static Query parse(UnparsedQuery);
