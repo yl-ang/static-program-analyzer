@@ -8,7 +8,7 @@ enum class SuchThatClauseType {
     FOLLOWS_STAR,
     PARENT,
     PARENT_STAR,
-};
+}; // update here
 
 class SuchThatClause : public QueryClause {
 private:
@@ -18,7 +18,7 @@ private:
 
 public:
     SuchThatClause(const SuchThatClauseType&, const QueryEntity&, const QueryEntity&);
-    static SuchThatClauseType determineType(const std::string);
+    static SuchThatClauseType determineType(const std::string); // update here
     ClauseType getType() const override;
     bool equals(const QueryClause& other) const override;
     Table evaluate(const PKBFacadeReader&) override;

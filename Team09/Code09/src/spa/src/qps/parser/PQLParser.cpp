@@ -68,7 +68,8 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
 }
 
 std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
-    std::regex pattern("Select\\s+(\\w+)\\b");
+    std::regex pattern("Select\\s*(\\w+)\\s*"); 
+    // Select{>=0 whitespaces}{capturing group}{>=0 whitespaces}
 
     std::smatch match;
     std::string selectEntity;
@@ -87,13 +88,16 @@ std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> e
 }
 
 std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
-    // AI-START
+    // ai-gen start(chatgpt, 2, e)
+    // prompt: 
     std::vector<SuchThatClause> result = {}; // if there is none
-    std::regex stPattern("such that\\s(\\w+\\*?\\(.*?\\))");
+    std::regex stPattern("such\\s*that\\s*(\\w+\\*?\\s*\\(.*?\\))");
+    // such{>=0 whitespaces}that{>=0 whitespaces}{capturing group} 
+    // capturing group format -> {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
     std::smatch match;
     
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
-    // AI-END
+    
     while (std::regex_search(searchStart, unparsedClauses.cend(), match, stPattern)) {
         SuchThatClause st = toSTClause(entities, match.str(1));
         result.push_back(st);
@@ -101,28 +105,34 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEnti
     }
     
     return result;
+    // ai-gen end 
 }
 
 std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
-    // AI-START
+    // ai-gen start(chatgpt, 2, e)
+    // prompt: 
     std::vector<PatternClause> result = {}; // if there is none
-    std::regex pattern("pattern\\s(\\w+\\(.*?\\))");
+    std::regex pattern("pattern\\s*(\\w+\\s*\\(.*?\\))");
+    // pattern{>=0 whitespaces}{capturing group} 
+    // capturing group format -> {letters/digits}{>=0 whitespaces}{bracketed non-greedy}
     std::smatch match;
     
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
     while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
-    // AI-END
+    
         PatternClause pt = toPatternClause(entities, match.str(1));
         result.push_back(pt);
         searchStart = match.suffix().first;
     }
     
     return result;
+    // ai-gen end
 }
 
 // Helper function to findSuchThatClauses
 SuchThatClause PQLParser::toSTClause(std::vector<QueryEntity> entities, std::string str) {
-    std::regex stArguments("\\b(\\w+\\*?)\\((.*?)\\)");
+    std::regex stArguments("\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
+    // {>=0 whitespaces}<{letters/digits}{optional *}>{>=0 whitespaces}<{bracketed non-greedy}>{>=0 whitespaces}
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, stArguments)) {
         std::string type = argMatch[1];
@@ -151,7 +161,8 @@ SuchThatClause PQLParser::toSTClause(std::vector<QueryEntity> entities, std::str
 
 // Helper function to findPatternClauses
 PatternClause PQLParser::toPatternClause(std::vector<QueryEntity> entities, std::string str) {
-    std::regex ptClause("\\b(\\w+)\\((.*?)\\)");
+    std::regex ptClause("\\s*(\\w+)\\s*\\((.*?)\\)\\s*");
+    // {>=0 whitespaces}<{letters/digits}>{>=0 whitespaces}<{bracketed non-greedy}>{>=0 whitespaces}
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, ptClause)) {
         std::string assignSynonym = argMatch[1];
