@@ -4,6 +4,21 @@
 TEST_CASE("ModifiesStore - All Tests") {
     ModifiesStore modifiesStore;
 
+    SECTION("Test hasStatementVariableModifiesRelationship") {
+        modifiesStore.setModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
+
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(1, "x"));
+        REQUIRE(modifiesStore.hasStatementVariableUseRelationship(2, "y"));
+        REQUIRE(modifiesStore.hasStatementVariableUseRelationship(3, "x"));
+
+        REQUIRE_FALSE(
+            modifiesStore.hasStatementVariableUseRelationship(1, "y"));
+        REQUIRE_FALSE(
+            modifiesStore.hasStatementVariableUseRelationship(2, "x"));
+        REQUIRE_FALSE(
+            modifiesStore.hasStatementVariableUseRelationship(3, "y"));
+    }
+
     SECTION("Test getVariablesByStatement") {
         modifiesStore.setModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
 
@@ -14,5 +29,15 @@ TEST_CASE("ModifiesStore - All Tests") {
         REQUIRE(modifiesStore.getVariablesByStatement(3) ==
                 std::unordered_set<Variable>{"x"});
         REQUIRE(modifiesStore.getVariablesByStatement(4).empty());
+    }
+
+    SECTION("Test getStatementsByVariable") {
+        modifiesStore.setModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
+
+        REQUIRE(modifiesStore.getStatementsByVariable("x") ==
+                std::unordered_set<StmtNum>{1, 3});
+        REQUIRE(modifiesStore.getStatementsByVariable("y") ==
+                std::unordered_set<StmtNum>{2});
+        REQUIRE(modifiesStore.getStatementsByVariable("z").empty());
     }
 }
