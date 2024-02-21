@@ -56,7 +56,7 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
         std::string firstArg = trim(typeAndFirstSynonym[1]);
 
         // Determine entity type and make appropriate QueryEntity
-        EntityType entityType = QueryEntity::determineType(type);
+        DesignEntityType entityType = QueryEntity::determineType(type);
         QueryEntity firstQueryDeclaration = QueryEntity(entityType, firstArg);
         queryEntities.push_back(firstQueryDeclaration);
 

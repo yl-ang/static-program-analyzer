@@ -15,12 +15,12 @@
  *  static std::vector<QueryEntity> findSelectClauses(std::vector<QueryEntity>,  std::string);
  *  static std::vector<SuchThatClause> findSuchThatClauses(std::vector<QueryEntity>, std::string);
  *  static std::vector<PatternClause> findPatternClauses(std::vector<QueryEntity>, std::string);
-*/
+ */
 
 // parseQueryEntities
 TEST_CASE("one_variable") {
     std::vector<std::string> one_variable = {"variable v1;"};
-    std::vector<QueryEntity> expected_one_variable = {QueryEntity(EntityType::VARIABLE, "v1")};
+    std::vector<QueryEntity> expected_one_variable = {QueryEntity(DesignEntityType::VARIABLE, "v1")};
 
     std::vector<QueryEntity> actual_one_variable = PQLParser::parseQueryEntities(one_variable);
 
@@ -30,8 +30,8 @@ TEST_CASE("one_variable") {
 
 TEST_CASE("two_variables") {
     std::vector<std::string> two_variables = {"variable v1, v2;"};
-    std::vector<QueryEntity> expected_two_variables = {QueryEntity(EntityType::VARIABLE, "v1"),
-                                                       QueryEntity(EntityType::VARIABLE, "v2")};
+    std::vector<QueryEntity> expected_two_variables = {QueryEntity(DesignEntityType::VARIABLE, "v1"),
+                                                       QueryEntity(DesignEntityType::VARIABLE, "v2")};
     std::vector<QueryEntity> actual_two_variables = PQLParser::parseQueryEntities(two_variables);
 
     REQUIRE(actual_two_variables.size() == expected_two_variables.size());
@@ -41,9 +41,9 @@ TEST_CASE("two_variables") {
 
 TEST_CASE("one_call_assign_stmt") {
     std::vector<std::string> one_call_assign_stmt = {"call c1;", "assign a1;", "stmt s1;"};
-    std::vector<QueryEntity> expected_one_call_assign_stmt = {QueryEntity(EntityType::CALL, "c1"),
-                                                              QueryEntity(EntityType::ASSIGN, "a1"),
-                                                              QueryEntity(EntityType::STMT, "s1")};
+    std::vector<QueryEntity> expected_one_call_assign_stmt = {QueryEntity(DesignEntityType::CALL, "c1"),
+                                                              QueryEntity(DesignEntityType::ASSIGN, "a1"),
+                                                              QueryEntity(DesignEntityType::STMT, "s1")};
 
     std::vector<QueryEntity> actual_one_call_assign_stmt = PQLParser::parseQueryEntities(one_call_assign_stmt);
 
@@ -56,8 +56,9 @@ TEST_CASE("one_call_assign_stmt") {
 TEST_CASE("various_call_assign_stmt") {
     std::vector<std::string> various_call_assign_stmt = {"call c1, c2;", "assign a1;", "stmt s1, s2;"};
     std::vector<QueryEntity> expected_various_call_assign_stmt = {
-        QueryEntity(EntityType::CALL, "c1"), QueryEntity(EntityType::CALL, "c2"), QueryEntity(EntityType::ASSIGN, "a1"),
-        QueryEntity(EntityType::STMT, "s1"), QueryEntity(EntityType::STMT, "s2")};
+        QueryEntity(DesignEntityType::CALL, "c1"), QueryEntity(DesignEntityType::CALL, "c2"),
+        QueryEntity(DesignEntityType::ASSIGN, "a1"), QueryEntity(DesignEntityType::STMT, "s1"),
+        QueryEntity(DesignEntityType::STMT, "s2")};
 
     std::vector<QueryEntity> actual_various_call_assign_stmt = PQLParser::parseQueryEntities(various_call_assign_stmt);
 
@@ -69,16 +70,12 @@ TEST_CASE("various_call_assign_stmt") {
     REQUIRE(actual_various_call_assign_stmt[4] == expected_various_call_assign_stmt[4]);
 }
 
-
 // Testing Find Queries functions
 
 std::vector<QueryEntity> entities = {
-        QueryEntity(EntityType::VARIABLE, "v1"),
-        QueryEntity(EntityType::VARIABLE, "v2"),
-        QueryEntity(EntityType::ASSIGN, "a1"),
-        QueryEntity(EntityType::ASSIGN, "a2"),
-        QueryEntity(EntityType::STMT, "s1"),
-        QueryEntity(EntityType::STMT, "s2")};
+    QueryEntity(DesignEntityType::VARIABLE, "v1"), QueryEntity(DesignEntityType::VARIABLE, "v2"),
+    QueryEntity(DesignEntityType::ASSIGN, "a1"),   QueryEntity(DesignEntityType::ASSIGN, "a2"),
+    QueryEntity(DesignEntityType::STMT, "s1"),     QueryEntity(DesignEntityType::STMT, "s2")};
 
 // // Test cases
 // // Select
@@ -116,9 +113,9 @@ TEST_CASE("PQLParser for Select ...") {
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_2);
 
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_1[0]);
+    REQUIRE(QueryEntity(DesignEntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(result_1.size() == 1);
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_2[0]);
+    REQUIRE(QueryEntity(DesignEntityType::VARIABLE, "v1") == result_2[0]);
     REQUIRE(result_2.size() == 1);
 
     REQUIRE(result_3.size() == 0);
@@ -150,21 +147,19 @@ TEST_CASE("PQLParser for Select ... st Parent(*)/Follows(*)") {
     std::vector<PatternClause> result_23 = PQLParser::findPatternClauses(entities, select_st_star_1);
     std::vector<PatternClause> result_24 = PQLParser::findPatternClauses(entities, select_st_star_2);
 
-    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_01[0]);
+    REQUIRE(QueryEntity(DesignEntityType::STMT, "s1") == result_01[0]);
     REQUIRE(result_01.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_02[0]);
+    REQUIRE(QueryEntity(DesignEntityType::STMT, "s1") == result_02[0]);
     REQUIRE(result_02.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_03[0]);
+    REQUIRE(QueryEntity(DesignEntityType::STMT, "s1") == result_03[0]);
     REQUIRE(result_03.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_04[0]);
+    REQUIRE(QueryEntity(DesignEntityType::STMT, "s1") == result_04[0]);
     REQUIRE(result_04.size() == 1);
 
-    SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::PARENT,
-                            QueryEntity(EntityType::STMT, "s1"),
-                            QueryEntity(EntityType::STMT, "s2"));
-    SuchThatClause ans2 = SuchThatClause(SuchThatClauseType::PARENT_STAR,
-                            QueryEntity(EntityType::STMT, "s1"),
-                            QueryEntity(EntityType::STMT, "s2"));
+    SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::PARENT, QueryEntity(DesignEntityType::STMT, "s1"),
+                                         QueryEntity(DesignEntityType::STMT, "s2"));
+    SuchThatClause ans2 = SuchThatClause(SuchThatClauseType::PARENT_STAR, QueryEntity(DesignEntityType::STMT, "s1"),
+                                         QueryEntity(DesignEntityType::STMT, "s2"));
     REQUIRE(ans1.equals(result_11[0]));
     REQUIRE(result_11.size() == 1);
     REQUIRE(ans1.equals(result_12[0]));
@@ -192,17 +187,17 @@ TEST_CASE("PQLParser for Select ... pattern") {
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_pt_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_pt_2);
 
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_1[0]);
+    REQUIRE(QueryEntity(DesignEntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(result_1.size() == 1);
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_2[0]);
+    REQUIRE(QueryEntity(DesignEntityType::VARIABLE, "v1") == result_2[0]);
     REQUIRE(result_2.size() == 1);
 
     REQUIRE(result_3.size() == 0);
     REQUIRE(result_4.size() == 0);
 
-    PatternClause ans1 = PatternClause(QueryEntity(EntityType::ASSIGN, "a1"),
-                                        QueryEntity(EntityType::VARIABLE, "v1"),
-                                        QueryEntity(EntityType::VARIABLE, "v2"));
+    PatternClause ans1 =
+        PatternClause(QueryEntity(DesignEntityType::ASSIGN, "a1"), QueryEntity(DesignEntityType::VARIABLE, "v1"),
+                      QueryEntity(DesignEntityType::VARIABLE, "v2"));
     REQUIRE(ans1.equals(result_5[0]));
     REQUIRE(result_5.size() == 1);
     REQUIRE(ans1.equals(result_6[0]));
@@ -221,14 +216,13 @@ TEST_CASE("PQLParser for Select ... st ... pattern") {
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_stp_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_stp_2);
 
-    REQUIRE(result_1[0] == QueryEntity(EntityType::STMT, "s1"));
+    REQUIRE(result_1[0] == QueryEntity(DesignEntityType::STMT, "s1"));
     REQUIRE(result_1.size() == 1);
-    REQUIRE(result_2[0] == QueryEntity(EntityType::STMT, "s1"));
+    REQUIRE(result_2[0] == QueryEntity(DesignEntityType::STMT, "s1"));
     REQUIRE(result_2.size() == 1);
 
-    SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::FOLLOWS,
-                            QueryEntity(EntityType::STMT, "s1"),
-                            QueryEntity(EntityType::STMT, "s2"));
+    SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::FOLLOWS, QueryEntity(DesignEntityType::STMT, "s1"),
+                                         QueryEntity(DesignEntityType::STMT, "s2"));
     REQUIRE(ans1.equals(result_3[0]));
     REQUIRE(result_3.size() == 1);
     REQUIRE(ans1.equals(result_4[0]));
@@ -236,9 +230,9 @@ TEST_CASE("PQLParser for Select ... st ... pattern") {
 
     // Didn't test FOLLOWS_STAR as should be same as Follows + Going to change many things anyway.
 
-    PatternClause ans2 = PatternClause(QueryEntity(EntityType::ASSIGN, "a1"),
-                                        QueryEntity(EntityType::VARIABLE, "v1"),
-                                        QueryEntity(EntityType::VARIABLE, "v2"));
+    PatternClause ans2 =
+        PatternClause(QueryEntity(DesignEntityType::ASSIGN, "a1"), QueryEntity(DesignEntityType::VARIABLE, "v1"),
+                      QueryEntity(DesignEntityType::VARIABLE, "v2"));
     REQUIRE(ans2.equals(result_5[0]));
     REQUIRE(result_5.size() == 1);
     REQUIRE(ans2.equals(result_6[0]));

@@ -21,17 +21,17 @@ Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
         Row row{};
 
         switch (entity.getType()) {
-        case EntityType::VARIABLE:
+        case DesignEntityType::VARIABLE:
             for (std::string var : pkb.getVariables()) {
                 row.push_back(var);
             }
             break;
-        case EntityType::CONSTANT:
+        case DesignEntityType::CONSTANT:
             for (std::string con : pkb.getConstants()) {
                 row.push_back(con);
             }
             break;
-        case EntityType::PROCEDURE:
+        case DesignEntityType::PROCEDURE:
             for (std::string prod : pkb.getProcedures()) {
                 row.push_back(prod);
             }

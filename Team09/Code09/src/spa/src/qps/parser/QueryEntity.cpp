@@ -1,13 +1,14 @@
-#include <cstring>
 #include "QueryEntity.h"
-#include <iostream>
+
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <iostream>
 #include <unordered_map>
 
-QueryEntity::QueryEntity(const EntityType& t, const std::string& n) : type(t), name(n) {}
+QueryEntity::QueryEntity(const DesignEntityType& t, const std::string& n) : type(t), name(n) {}
 
-EntityType QueryEntity::getType() const {
+DesignEntityType QueryEntity::getType() const {
     return type;
 }
 
@@ -23,41 +24,51 @@ void QueryEntity::print() {
     std::cout << "type, name: " << QueryEntity::entityTypeToString(type) << ", " << name << "\n";
 }
 
-std::string QueryEntity::entityTypeToString(EntityType type) {
+std::string QueryEntity::entityTypeToString(DesignEntityType type) {
     switch (type) {
-        case EntityType::STMT:      return "STMT";
-        case EntityType::READ:      return "READ";
-        case EntityType::CALL:      return "CALL";
-        case EntityType::WHILE:     return "WHILE";
-        case EntityType::IF:        return "IF";
-        case EntityType::ASSIGN:    return "ASSIGN";
-        case EntityType::VARIABLE:  return "VARIABLE";
-        case EntityType::CONSTANT:  return "CONSTANT";
-        case EntityType::PROCEDURE: return "PROCEDURE";
-        default:                    return "UNKNOWN";
+    case DesignEntityType::STMT:
+        return "STMT";
+    case DesignEntityType::READ:
+        return "READ";
+    case DesignEntityType::CALL:
+        return "CALL";
+    case DesignEntityType::WHILE:
+        return "WHILE";
+    case DesignEntityType::IF:
+        return "IF";
+    case DesignEntityType::ASSIGN:
+        return "ASSIGN";
+    case DesignEntityType::VARIABLE:
+        return "VARIABLE";
+    case DesignEntityType::CONSTANT:
+        return "CONSTANT";
+    case DesignEntityType::PROCEDURE:
+        return "PROCEDURE";
+    default:
+        return "UNKNOWN";
     }
 }
 
-EntityType QueryEntity::determineType(const std::string type) {
-    EntityType entityType;
+DesignEntityType QueryEntity::determineType(const std::string type) {
+    DesignEntityType entityType;
     if (type == "variable") {
-        entityType = EntityType::VARIABLE;
+        entityType = DesignEntityType::VARIABLE;
     } else if (type == "constant") {
-        entityType = EntityType::CONSTANT;
+        entityType = DesignEntityType::CONSTANT;
     } else if (type == "procedure") {
-        entityType = EntityType::PROCEDURE;
+        entityType = DesignEntityType::PROCEDURE;
     } else if (type == "stmt") {
-        entityType = EntityType::STMT;
+        entityType = DesignEntityType::STMT;
     } else if (type == "read") {
-        entityType = EntityType::READ;
+        entityType = DesignEntityType::READ;
     } else if (type == "call") {
-        entityType = EntityType::CALL;
+        entityType = DesignEntityType::CALL;
     } else if (type == "while") {
-        entityType = EntityType::WHILE;
+        entityType = DesignEntityType::WHILE;
     } else if (type == "if") {
-        entityType = EntityType::IF;
+        entityType = DesignEntityType::IF;
     } else if (type == "assign") {
-        entityType = EntityType::ASSIGN;
+        entityType = DesignEntityType::ASSIGN;
     } else {
         std::cout << "EntityType is not found in valid types: " << type << "\n";
         exit(1);
