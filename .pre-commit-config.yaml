@@ -4,6 +4,6 @@ repos:
     rev: v1.3.5
     hooks:
       - id: clang-format
-        args: [--style=file, -i]
+        args: [--style=file, -i, -Wclang-tidy=-path=C:\Python311\Lib\site-packages\clang_format]
       - id: cpplint
         args: ["--recursive", "--extensions=hpp,cpp,tpp", "--linelength=120", '--filter=-legal/copyright,-whitespace/forcolon,-build/include_order,-build/include_subdir', "--quiet", "--includeorder=standardcfirst", "./Team09/Code09/src/spa/src/"]

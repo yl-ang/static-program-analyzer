@@ -73,14 +73,14 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
 
 std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
     std::regex pattern("\\s*Select\\s+(\\w+)\\s*"); 
-    // Select{>=1 whitespaces}{capturing group}
+    // Select{>=1 whitespaces}{capturing group} 
 
     std::smatch match;
     std::string selectEntity;
     std::vector<QueryEntity> result = {}; // if there is none
 
     if (std::regex_search(unparsedClauses, match, pattern)) {
-        selectEntity = match[1];
+        selectEntity = match[1]; 
         for (const QueryEntity& entity : entities) {
             if (entity.getName() == selectEntity) {
                 result.push_back(entity);
