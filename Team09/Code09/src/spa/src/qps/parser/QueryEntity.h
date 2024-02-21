@@ -2,7 +2,7 @@
 
 #include <string>
 
-enum class EntityType {
+enum class DesignEntityType {
     STMT,
     READ,
     CALL,
@@ -16,17 +16,17 @@ enum class EntityType {
 
 class QueryEntity {
 private:
-    EntityType type;
+    DesignEntityType type;
     std::string name;
 
 public:
-    QueryEntity(const EntityType& t, const std::string& n);
+    QueryEntity(const DesignEntityType& t, const std::string& n);
 
-    static EntityType determineType(const std::string);
+    static DesignEntityType determineType(const std::string);
 
-    EntityType getType() const;
+    DesignEntityType getType() const;
     std::string getName() const;
-    static std::string entityTypeToString(EntityType);
+    static std::string entityTypeToString(DesignEntityType);
     void print();
     bool operator==(const QueryEntity& other) const;
 };

@@ -3,15 +3,15 @@
 
 // helper functions
 static QueryEntity createVariable(const std::string& name) {
-    return { EntityType::VARIABLE, name };
+    return {DesignEntityType::VARIABLE, name};
 }
 
 static QueryEntity createProcedure(const std::string& name) {
-    return { EntityType::PROCEDURE, name };
+    return {DesignEntityType::PROCEDURE, name};
 }
 
 static QueryEntity createConstant(const std::string& name) {
-    return { EntityType::CONSTANT, name };
+    return {DesignEntityType::CONSTANT, name};
 }
 
 // ai-gen start(copilot, 2, e)
@@ -22,11 +22,11 @@ TEST_CASE("Test Table extract results") {
         createConstant("c"),
         createProcedure("p"),
     };
-    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
+    std::vector<Row> rows = {{"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"}};
     Table table(headers, rows);
 
     SECTION("Test extractResults") {
-        std::vector<std::string> results = table.extractResults({ createVariable("v") });
+        std::vector<std::string> results = table.extractResults({createVariable("v")});
         REQUIRE(results == std::vector<std::string>{"x", "y", "z"});
     }
 
@@ -40,14 +40,14 @@ TEST_CASE("Test Table extract results") {
 // prompt: try to extract a non-existent query entity. it should return an empty vector
 TEST_CASE("Test Table extract results with non-existent query entity") {
     std::vector<QueryEntity> headers = {
-       createVariable("v"),
-       createConstant("c"),
-       createProcedure("p"),
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
     };
-    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
+    std::vector<Row> rows = {{"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"}};
     Table table(headers, rows);
 
-    std::vector<std::string> results = table.extractResults({ createVariable("nonExistent") });
+    std::vector<std::string> results = table.extractResults({createVariable("nonExistent")});
     REQUIRE(results == std::vector<std::string>{});
 }
 // ai-gen end
