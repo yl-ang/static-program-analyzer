@@ -1,6 +1,6 @@
 #include "ParserUtils.h"
 
-std::string replaceAllWhitespaces(std::string str) {
+std::string replaceAllExtraWhitespaces(const std::string& str) {
     std::string replacedString;
 
     std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
@@ -9,10 +9,10 @@ std::string replaceAllWhitespaces(std::string str) {
     replacedString = std::regex_replace(str, whitespacePattern, SPACE);
     replacedString = std::regex_replace(replacedString, consecutiveSpacePattern, SPACE);
 
-    return replacedString;
+    return trim(replacedString);
 }
 
-std::vector<std::string> splitByDelimiter(const std::string str, const std::string delimiter) {
+std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;
 
@@ -38,7 +38,19 @@ std::vector<std::string> splitByDelimiter(const std::string str, const std::stri
     return splitList;
 }
 
-std::vector<std::string> stringToWordList(std::string string) {
+std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string delimiter) {
+    size_t nextDelimiterIndex = str.find(delimiter);
+
+    if (nextDelimiterIndex == std::string::npos) {
+        return std::make_tuple(str, "");
+    } else {
+        std::string substring = str.substr(0, nextDelimiterIndex);
+        std::string remainingString = str.substr(nextDelimiterIndex + 1, std::string::npos);
+        return std::make_tuple(substring, remainingString);
+    }
+}
+
+std::vector<std::string> stringToWordList(const std::string& string) {
     std::vector<std::string> wordList;
     std::stringstream ss(string);
     std::string word;
@@ -48,7 +60,7 @@ std::vector<std::string> stringToWordList(std::string string) {
     return wordList;
 }
 
-std::string trim(const std::string str) {
+std::string trim(const std::string& str) {
     size_t start = str.find_first_not_of(WHITESPACES);
     std::string trimmedString;
     if (start != std::string::npos) {
@@ -92,7 +104,7 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     return clauses;
 }
 
-std::vector<size_t> getClauseIndices(const std::string& str, std::string clause) {
+std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
     size_t offset = 0;
     size_t clauseIndex = str.find(clause, offset);
 
