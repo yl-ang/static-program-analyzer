@@ -32,8 +32,8 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { 
-    return unparsedQuery[unparsedQuery.size() - 1]; 
+std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
+    return unparsedQuery[unparsedQuery.size() - 1];
 }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
@@ -44,22 +44,22 @@ std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
 std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
-        
+
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
         synonymTypeList.pop_back();  // remove semi-colon
         std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
-        
+
         // first synonym and type
         std::string type = typeAndFirstSynonym[0];
         std::string firstArg = trim(typeAndFirstSynonym[1]);
-        
+
         // Determine entity type and make appropriate QueryEntity
         EntityType entityType = QueryEntity::determineType(type);
         QueryEntity firstQueryDeclaration = QueryEntity(entityType, firstArg);
         queryEntities.push_back(firstQueryDeclaration);
-        
+
         // skip first element for other synonyms
         std::vector<std::string> sublist = std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
@@ -72,12 +72,12 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
 }
 
 std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
-    std::regex pattern("\\s*Select\\s+(\\w+)\\s*"); 
+    std::regex pattern("\\s*Select\\s+(\\w+)\\s*");
     // Select{>=1 whitespaces}{capturing group} 
 
     std::smatch match;
     std::string selectEntity;
-    std::vector<QueryEntity> result = {}; // if there is none
+    std::vector<QueryEntity> result = {};  // if there is none
 
     if (std::regex_search(unparsedClauses, match, pattern)) {
         selectEntity = match[1]; 
@@ -91,44 +91,46 @@ std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> e
     return result;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities, 
+                                                            std::string unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
-    // prompt: 
-    std::vector<SuchThatClause> result = {}; // if there is none
+    // prompt:
+    std::vector<SuchThatClause> result = {};  // if there is none
     std::regex stPattern("\\s+such\\s+that\\s+(\\w+\\*?\\s*\\(.*?\\))\\s*");
-    // {>=1 whitespaces}such{>=1 whitespaces}that{>=1 whitespaces}{capturing group} 
+    // {>=1 whitespaces}such{>=1 whitespaces}that{>=1 whitespaces}{capturing group}
     // capturing group format -> {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
     std::smatch match;
-    
+
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
-    
+
     while (std::regex_search(searchStart, unparsedClauses.cend(), match, stPattern)) {
         SuchThatClause st = toSTClause(entities, match.str(1));
         result.push_back(st);
         searchStart = match.suffix().first;
     }
-    
+
     return result;
-    // ai-gen end 
+    // ai-gen end
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
+std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities, 
+                                                        std::string unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
-    // prompt: 
-    std::vector<PatternClause> result = {}; // if there is none
+    // prompt:
+    std::vector<PatternClause> result = {};  // if there is none
     std::regex pattern("\\s+pattern\\s+(\\w+\\s*\\(.*?\\))\\s*");
-    // {>=1 whitespaces}pattern{>=1 whitespaces}{capturing group} 
+    // {>=1 whitespaces}pattern{>=1 whitespaces}{capturing group}
     // capturing group format -> {letters/digits}{>=0 whitespaces}{bracketed non-greedy}
     std::smatch match;
-    
+
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
     while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
-    
+
         PatternClause pt = toPatternClause(entities, match.str(1));
         result.push_back(pt);
         searchStart = match.suffix().first;
     }
-    
+
     return result;
     // ai-gen end
 }
