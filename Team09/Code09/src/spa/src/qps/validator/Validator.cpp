@@ -121,7 +121,7 @@ bool Validator::isValidSuchThatClause(std::string suchThatClause) {
         throw QPSSyntaxError();
     }
 
-    // TO DO: Semantic Error QPS Grammar other rules 4 & 5.
+    // TODO(Han Qin): Semantic Error QPS Grammar other rules 4 & 5.
     bool hasCorrectRefFormat = false;
     if (relRefString == "Follows" || relRefString == "Follows*" || relRefString == "Parent" ||
         relRefString == "Parent*") {
