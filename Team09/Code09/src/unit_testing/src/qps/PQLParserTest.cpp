@@ -127,17 +127,17 @@ std::vector<QueryEntity> entities = {
 TEST_CASE("PQLParser for Select ...") {
     std::string select_1 = "Select v1";
     std::string select_2 = "  Select    v1  ";
-    
+
     std::vector<QueryEntity> result_1 = PQLParser::findSelectClauses(entities, select_1);
     std::vector<QueryEntity> result_2 = PQLParser::findSelectClauses(entities, select_2);
     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(entities, select_1);
     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(entities, select_2);
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_2);
-    
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1")==result_1[0]);
+
+    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(result_1.size() == 1);
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1")==result_2[0]);
+    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_2[0]);
     REQUIRE(result_2.size() == 1);
 
     REQUIRE(result_3.size() == 0);
@@ -153,7 +153,7 @@ TEST_CASE("PQLParser for Select ... st Parent(*)/Follows(*)") {
     std::string select_st_2 = "  Select s1  such  that Parent  ( s1,  s2 ) ";
     std::string select_st_star_1 = "Select s1 such that Parent*(s1,s2)";
     std::string select_st_star_2 = "   Select s1  such  that Parent*  (s1,  s2)   ";
-    
+
     std::vector<QueryEntity> result_01 = PQLParser::findSelectClauses(entities, select_st_1);
     std::vector<QueryEntity> result_02 = PQLParser::findSelectClauses(entities, select_st_2);
     std::vector<QueryEntity> result_03 = PQLParser::findSelectClauses(entities, select_st_star_1);
@@ -168,14 +168,14 @@ TEST_CASE("PQLParser for Select ... st Parent(*)/Follows(*)") {
     std::vector<PatternClause> result_22 = PQLParser::findPatternClauses(entities, select_st_2);
     std::vector<PatternClause> result_23 = PQLParser::findPatternClauses(entities, select_st_star_1);
     std::vector<PatternClause> result_24 = PQLParser::findPatternClauses(entities, select_st_star_2);
-    
-    REQUIRE(QueryEntity(EntityType::STMT, "s1")==result_01[0]);
+
+    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_01[0]);
     REQUIRE(result_01.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1")==result_02[0]);
+    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_02[0]);
     REQUIRE(result_02.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1")==result_03[0]);
+    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_03[0]);
     REQUIRE(result_03.size() == 1);
-    REQUIRE(QueryEntity(EntityType::STMT, "s1")==result_04[0]);
+    REQUIRE(QueryEntity(EntityType::STMT, "s1") == result_04[0]);
     REQUIRE(result_04.size() == 1);
 
     SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::PARENT,
@@ -203,17 +203,17 @@ TEST_CASE("PQLParser for Select ... st Parent(*)/Follows(*)") {
 TEST_CASE("PQLParser for Select ... pattern") {
     std::string select_pt_1 = "Select v1 pattern a1(v1,v2)";
     std::string select_pt_2 = "   Select v1   pattern  a1  (v1,v2)   ";
-    
+
     std::vector<QueryEntity> result_1 = PQLParser::findSelectClauses(entities, select_pt_1);
     std::vector<QueryEntity> result_2 = PQLParser::findSelectClauses(entities, select_pt_2);
     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(entities, select_pt_1);
     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(entities, select_pt_2);
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_pt_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_pt_2);
-    
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1")==result_1[0]);
+
+    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(result_1.size() == 1);
-    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1")==result_2[0]);
+    REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_2[0]);
     REQUIRE(result_2.size() == 1);
 
     REQUIRE(result_3.size() == 0);
@@ -232,14 +232,14 @@ TEST_CASE("PQLParser for Select ... pattern") {
 TEST_CASE("PQLParser for Select ... st ... pattern") {
     std::string select_stp_1 = "Select s1 such that Follows(s1,s2) pattern a1(v1,v2)";
     std::string select_stp_2 = "   Select s1 such   that Follows  (s1,  s2) pattern a1  (v1,  v2)   ";
-    
+
     std::vector<QueryEntity> result_1 = PQLParser::findSelectClauses(entities, select_stp_1);
     std::vector<QueryEntity> result_2 = PQLParser::findSelectClauses(entities, select_stp_2);
     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(entities, select_stp_1);
     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(entities, select_stp_2);
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_stp_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_stp_2);
-    
+
     REQUIRE(result_1[0] == QueryEntity(EntityType::STMT, "s1"));
     REQUIRE(result_1.size() == 1);
     REQUIRE(result_2[0] == QueryEntity(EntityType::STMT, "s1"));
