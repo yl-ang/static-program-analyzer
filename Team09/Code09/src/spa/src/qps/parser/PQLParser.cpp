@@ -10,7 +10,6 @@
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
 
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
-
     std::vector<std::string> unparsedEntities = {};
     std::string unparsedClauses;
 
@@ -44,7 +43,6 @@ std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
 std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
     std::vector<QueryEntity> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
-
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
         synonymTypeList.pop_back();  // remove semi-colon
@@ -73,14 +71,14 @@ std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> 
 
 std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> entities, std::string unparsedClauses) {
     std::regex pattern("\\s*Select\\s+(\\w+)\\s*");
-    // Select{>=1 whitespaces}{capturing group} 
+    // Select{>=1 whitespaces}{capturing group}
 
     std::smatch match;
     std::string selectEntity;
     std::vector<QueryEntity> result = {};  // if there is none
 
     if (std::regex_search(unparsedClauses, match, pattern)) {
-        selectEntity = match[1]; 
+        selectEntity = match[1];
         for (const QueryEntity& entity : entities) {
             if (entity.getName() == selectEntity) {
                 result.push_back(entity);
@@ -91,7 +89,7 @@ std::vector<QueryEntity> PQLParser::findSelectClauses(std::vector<QueryEntity> e
     return result;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities, 
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEntity> entities,
                                                             std::string unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
     // prompt:
@@ -113,7 +111,7 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<QueryEnti
     // ai-gen end
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities, 
+std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity> entities,
                                                         std::string unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
     // prompt:
@@ -125,7 +123,6 @@ std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity
 
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
     while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
-
         PatternClause pt = toPatternClause(entities, match.str(1));
         result.push_back(pt);
         searchStart = match.suffix().first;
