@@ -3,8 +3,8 @@
 std::vector<Token> SpTokenizer::tokenize(std::vector<std::string> input) {
     std::vector<BasicToken*> basicTokens = lexicalAnalyzer.preprocess(input);
     std::vector<Token> tokens = assignTokens(basicTokens);
-    std::vector<Token> validatedTokens = syntaxValidator.validateSyntax(tokens);
-    return validatedTokens;
+    syntaxValidator.validateSyntax(tokens);
+    return tokens;
 }
 
 std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken*> input) {
@@ -14,8 +14,7 @@ std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken*> input) {
         BasicToken* next = (i + 1 < input.size()) ? input[i + 1] : nullptr;
         switch (curr->type) {
             case BASIC_TOKEN_TYPE::_INTEGER:
-                tokens.push_back(
-                    Token(LEXICAL_TOKEN_TYPE::INTEGER, curr->value, stmtNum));
+                tokens.push_back(Token(LEXICAL_TOKEN_TYPE::INTEGER, curr->value, stmtNum));
                 break;
             case BASIC_TOKEN_TYPE::KEYWORD:
                 // Assign specific keyword type
@@ -28,16 +27,14 @@ std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken*> input) {
             case BASIC_TOKEN_TYPE::_NAME:
                 if (notStmt) {  // 'proc_name's have no statement number
                     notStmt--;
-                    tokens.push_back(Token(LEXICAL_TOKEN_TYPE::NAME,
-                                           curr->value, NO_STMT_NUM));
+                    tokens.push_back(Token(LEXICAL_TOKEN_TYPE::NAME, curr->value, NO_STMT_NUM));
                     break;
                 }
                 // For assign statements, check next token is "="
                 if (next != nullptr && next->value == "=") {
                     stmtNum++;
                 }
-                tokens.push_back(
-                    Token(LEXICAL_TOKEN_TYPE::NAME, curr->value, stmtNum));
+                tokens.push_back(Token(LEXICAL_TOKEN_TYPE::NAME, curr->value, stmtNum));
                 break;
         }
     }
@@ -87,15 +84,13 @@ Token SpTokenizer::assignSymbol(BasicToken* bt) {
     } else if (bt->value == "{") {
         if (notStmt) {  // { after 'else' or 'proc_name'
             notStmt--;
-            return Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, bt->value,
-                         NO_STMT_NUM);
+            return Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, bt->value, NO_STMT_NUM);
         }
         return Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, bt->value, stmtNum);
 
     } else if (bt->value == "}") {
         // All '}'s have no statement number
-        return Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, bt->value,
-                     NO_STMT_NUM);
+        return Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, bt->value, NO_STMT_NUM);
 
     } else if (bt->value == "(") {
         return Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, bt->value, stmtNum);
@@ -119,15 +114,13 @@ Token SpTokenizer::assignSymbol(BasicToken* bt) {
         return Token(LEXICAL_TOKEN_TYPE::LESS_THAN, bt->value, stmtNum);
 
     } else if (bt->value == "<=") {
-        return Token(LEXICAL_TOKEN_TYPE::LESS_THAN_OR_EQUAL_TO, bt->value,
-                     stmtNum);
+        return Token(LEXICAL_TOKEN_TYPE::LESS_THAN_OR_EQUAL_TO, bt->value, stmtNum);
 
     } else if (bt->value == ">") {
         return Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, bt->value, stmtNum);
 
     } else if (bt->value == ">=") {
-        return Token(LEXICAL_TOKEN_TYPE::GREATER_THAN_OR_EQUAL_TO, bt->value,
-                     stmtNum);
+        return Token(LEXICAL_TOKEN_TYPE::GREATER_THAN_OR_EQUAL_TO, bt->value, stmtNum);
 
     } else if (bt->value == "==") {
         return Token(LEXICAL_TOKEN_TYPE::EQUAL_CHECK, bt->value, stmtNum);
