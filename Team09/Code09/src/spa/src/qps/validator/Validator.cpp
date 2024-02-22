@@ -32,20 +32,36 @@ bool Validator::isValidSelectStatement(std::string statement) {
     bool containsPattern = containsPatternClause(remainingStatement);
 
     int secondSpaceIndex = statement.find_first_of(WHITESPACES, firstSpaceIndex + 1);
+    std::string synonymToReturn;
+    std::string remainingClausesStatement = "";
     if (secondSpaceIndex == std::string::npos) {
-        return false;
-        throw QPSSyntaxError();
+        synonymToReturn = trim(statement.substr(firstSpaceIndex, std::string::npos));
+        if (synonymToReturn == "") {
+            return false;
+            throw QPSSyntaxError();
+        }
+    } else {
+        synonymToReturn = trim(statement.substr(firstSpaceIndex, secondSpaceIndex - firstSpaceIndex));
+        remainingClausesStatement = trim(statement.substr(secondSpaceIndex, std::string::npos));
     }
 
-    std::string synonymToReturn = trim(statement.substr(firstSpaceIndex, secondSpaceIndex - firstSpaceIndex));
     if (!isSynonym(synonymToReturn)) {
         return false;
         throw QPSSyntaxError();
     }
 
     // Ensure that the synonym is in the variable store
+    bool hasSynonym = synonymStore.containsSynonymName(synonymToReturn);
+    if (!hasSynonym) {
+        return false;
+        throw QPSSemanticError();
+    }
 
-    std::vector<std::string> clauseList = getAllClauses(trim(statement.substr(secondSpaceIndex, std::string::npos)));
+    std::vector<std::string> clauseList = getAllClauses(remainingClausesStatement);
+    if (clauseList.size() == 0) {
+        return true;
+    }
+
     for (std::string clause : clauseList) {
         if (containsSuchThatClause(clause)) {
             isValidSuchThatClause(clause);

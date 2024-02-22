@@ -16,6 +16,10 @@ TEST_CASE("Trim Test") {
     REQUIRE(trim(inputString_WithTab) == expectedString);
     REQUIRE(trim(inputString_WithMultipleSpaces) == expectedString);
     REQUIRE(trim(inputString_WithMixedWhitespaces) == expectedString);
+
+    std::string inputString_JustSpace = "  ";
+    std::string expectedString_JustSpace = "";
+    REQUIRE(trim(inputString_JustSpace) == expectedString_JustSpace);
 }
 
 TEST_CASE("SubstringUntilDelimiter") {
