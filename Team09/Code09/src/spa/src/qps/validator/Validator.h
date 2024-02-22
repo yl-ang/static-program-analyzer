@@ -1,28 +1,18 @@
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 #include "../exceptions/QPSSemanticError.h"
 #include "../exceptions/QPSSyntaxError.h"
-
-class VariableStore {
-    std::unordered_map<std::string, std::string> storage = {};
-
-public:
-    void storeSynonym(const std::string& synName, const std::string& synType);
-    bool containsSynonym(const std::string& synName, const std::string& synType);
-    bool containsSynonymName(const std::string& synName);
-};
+#include "SynonymStore.h"
 
 class Validator {
 public:
     void validate(std::vector<std::string>);
 
-private:
-    // tuple<variable_type, variable_name>
-    VariableStore variableStore = {};
+protected:
+    SynonymStore synonymStore = {};
 
     bool isValidSelectStatement(std::string);
     bool isValidDeclarationStatement(std::string);

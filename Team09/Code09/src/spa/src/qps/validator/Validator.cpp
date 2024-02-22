@@ -7,7 +7,7 @@ void Validator::validate(std::vector<std::string> statementList) {
                 std::vector<std::string> wordList = stringToWordList(statement);
                 std::string variableType = wordList[0];
                 std::string variableName = wordList[1];
-                variableStore.storeSynonym(variableName, variableType);
+                synonymStore.storeSynonym(variableName, variableType);
             }
         } else if (isSelectStatement(statement)) {
             isValidSelectStatement(statement);
@@ -134,7 +134,7 @@ bool Validator::isValidSuchThatClause(std::string suchThatClause) {
     bool hasVariable = true;
     for (const std::string& ref : refs) {
         if (isSynonym(ref)) {
-            hasVariable = hasVariable && variableStore.containsSynonymName(ref);
+            hasVariable = hasVariable && synonymStore.containsSynonymName(ref);
         }
     }
 
@@ -173,7 +173,7 @@ bool Validator::isValidPatternClause(std::string patternClause) {
     }
 
     // Semantic Error: QPS Grammar other rules 3
-    bool isSynAssign = variableStore.containsSynonym(synString, "assign");
+    bool isSynAssign = synonymStore.containsSynonym(synString, "assign");
     if (!isSynAssign) {
         return false;
         throw QPSSemanticError();
@@ -199,7 +199,7 @@ bool Validator::isValidPatternClause(std::string patternClause) {
     // Semantic Error: QPS Grammar other rules 6
     bool isVariableSynonym = true;
     if (isSynonym(refs[0])) {
-        isVariableSynonym = variableStore.containsSynonym(refs[0], "variable");
+        isVariableSynonym = synonymStore.containsSynonym(refs[0], "variable");
     }
 
     if (!isVariableSynonym) {
@@ -208,29 +208,4 @@ bool Validator::isValidPatternClause(std::string patternClause) {
     }
 
     return true;
-}
-
-void VariableStore::storeSynonym(const std::string& synName, const std::string& synType) {
-    auto variable = storage.find(synName);
-
-    // Semantic Error: QPS Grammar other rules 1
-    if (variable == storage.end()) {
-        storage.insert({synName, synType});
-    } else {
-        throw QPSSemanticError();
-    }
-}
-
-bool VariableStore::containsSynonym(const std::string& synName, const std::string& synType) {
-    auto variable = storage.find(synName);
-    if (variable == storage.end()) {
-        return false;
-    }
-
-    return variable->second == synType;
-}
-
-bool VariableStore::containsSynonymName(const std::string& synName) {
-    auto variable = storage.find(synName);
-    return !(variable == storage.end());
 }
