@@ -115,12 +115,11 @@ std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<QueryEntity
     }
 
     return result;
-    // ai-gen end
 }
 
 std::vector<std::string> PQLParser::searchClause(const std::regex& pattern, const std::string& unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
-    // prompt:
+    // prompt: https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat
     std::vector<std::string> result = {};
     std::smatch match;
     std::string::const_iterator searchStart(unparsedClauses.cbegin());
