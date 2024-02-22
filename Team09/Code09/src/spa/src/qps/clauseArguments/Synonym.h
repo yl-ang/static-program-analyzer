@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "ClauseArgument.h"
+
 enum class DesignEntityType {
     STMT,
     READ,
@@ -14,7 +16,7 @@ enum class DesignEntityType {
     PROCEDURE,
 };
 
-class Synonym {
+class Synonym : public ClauseArgument {
 private:
     DesignEntityType type;
     std::string name;
