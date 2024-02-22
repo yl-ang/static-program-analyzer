@@ -1,4 +1,4 @@
-#include "QueryEntity.h"
+#include "Synonym.h"
 
 #include <algorithm>
 #include <cstring>
@@ -6,25 +6,25 @@
 #include <iostream>
 #include <unordered_map>
 
-QueryEntity::QueryEntity(const DesignEntityType& t, const std::string& n) : type(t), name(n) {}
+Synonym::Synonym(const DesignEntityType& t, const std::string& n) : type(t), name(n) {}
 
-DesignEntityType QueryEntity::getType() const {
+DesignEntityType Synonym::getType() const {
     return type;
 }
 
-std::string QueryEntity::getName() const {
+std::string Synonym::getName() const {
     return name;
 }
 
-bool QueryEntity::operator==(const QueryEntity& other) const {
+bool Synonym::operator==(const Synonym& other) const {
     return type == other.type && name == other.name;
 }
 
-void QueryEntity::print() {
-    std::cout << "type, name: " << QueryEntity::entityTypeToString(type) << ", " << name << "\n";
+void Synonym::print() {
+    std::cout << "type, name: " << Synonym::entityTypeToString(type) << ", " << name << "\n";
 }
 
-std::string QueryEntity::entityTypeToString(DesignEntityType type) {
+std::string Synonym::entityTypeToString(DesignEntityType type) {
     switch (type) {
     case DesignEntityType::STMT:
         return "STMT";
@@ -49,7 +49,7 @@ std::string QueryEntity::entityTypeToString(DesignEntityType type) {
     }
 }
 
-DesignEntityType QueryEntity::determineType(const std::string type) {
+DesignEntityType Synonym::determineType(const std::string type) {
     DesignEntityType entityType;
     if (type == "variable") {
         entityType = DesignEntityType::VARIABLE;

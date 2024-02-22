@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "qps/parser/QueryEntity.h"
+#include "qps/clauseArguments/Synonym.h"
 
 using Row = std::vector<std::string>;
 
@@ -15,14 +15,14 @@ using Row = std::vector<std::string>;
  **/
 class Table {
 private:
-    std::vector<QueryEntity> headers;
+    std::vector<Synonym> headers;
     std::vector<std::vector<std::string>> rows;
 
-    int getHeaderIndex(const QueryEntity&);
+    int getHeaderIndex(const Synonym&);
 
 public:
     Table();
-    Table(std::vector<QueryEntity>, std::vector<Row>);
-    std::vector<std::string> extractResults(const std::vector<QueryEntity>&);
+    Table(std::vector<Synonym>, std::vector<Row>);
+    std::vector<std::string> extractResults(const std::vector<Synonym>&);
     bool isEmpty() const;
 };
