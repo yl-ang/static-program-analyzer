@@ -21,19 +21,19 @@ static Synonym createConstant(const std::string& name) {
 TEST_CASE("Creates QueryEntity for type variable1") {
     Synonym qe{createVariable("v")};
     REQUIRE(qe.getType() == DesignEntityType::VARIABLE);
-    REQUIRE(qe.getName() == "v");
+    REQUIRE(qe.getValue() == "v");
 }
 
 TEST_CASE("Creates QueryEntity for type procedure") {
     Synonym qe{createProcedure("p")};
     REQUIRE(qe.getType() == DesignEntityType::PROCEDURE);
-    REQUIRE(qe.getName() == "p");
+    REQUIRE(qe.getValue() == "p");
 }
 
 TEST_CASE("Creates QueryEntity for type constant") {
     Synonym qe{createConstant("c")};
     REQUIRE(qe.getType() == DesignEntityType::CONSTANT);
-    REQUIRE(qe.getName() == "c");
+    REQUIRE(qe.getValue() == "c");
 }
 
 // ai-gen end

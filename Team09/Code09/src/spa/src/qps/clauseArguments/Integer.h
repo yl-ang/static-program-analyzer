@@ -4,10 +4,11 @@
 
 class Integer : public ClauseArgument {
 private:
-    int value;
+    std::string value;
 
 public:
-    Integer(const int& v);
-    int getValue() const;
+    Integer(const std::string& v);
+    std::string getValue() const override;
+    bool isInteger() const override;
     bool operator==(const Integer& other) const;
 };

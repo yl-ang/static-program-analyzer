@@ -12,7 +12,7 @@ DesignEntityType Synonym::getType() const {
     return type;
 }
 
-std::string Synonym::getName() const {
+std::string Synonym::getValue() const {
     return name;
 }
 
@@ -22,6 +22,10 @@ bool Synonym::operator==(const Synonym& other) const {
 
 void Synonym::print() {
     std::cout << "type, name: " << Synonym::entityTypeToString(type) << ", " << name << "\n";
+}
+
+bool Synonym::isSynonym() const {
+    return true;
 }
 
 std::string Synonym::entityTypeToString(DesignEntityType type) {

@@ -26,8 +26,9 @@ public:
 
     static DesignEntityType determineType(const std::string);
 
+    bool isSynonym() const override;
     DesignEntityType getType() const;
-    std::string getName() const;
+    std::string getValue() const override;
     static std::string entityTypeToString(DesignEntityType);
     void print();
     bool operator==(const Synonym& other) const;

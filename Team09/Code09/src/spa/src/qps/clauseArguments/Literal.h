@@ -8,6 +8,7 @@ private:
 
 public:
     Literal(const std::string& v);
-    std::string getValue() const;
+    std::string getValue() const override;
+    bool isLiteral() const override;
     bool operator==(const Literal& other) const;
 };
