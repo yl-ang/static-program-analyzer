@@ -2,22 +2,22 @@
 #include "qps/evaluator/Table.h"
 
 // helper functions
-static QueryEntity createVariable(const std::string& name) {
+static Synonym createVariable(const std::string& name) {
     return {DesignEntityType::VARIABLE, name};
 }
 
-static QueryEntity createProcedure(const std::string& name) {
+static Synonym createProcedure(const std::string& name) {
     return {DesignEntityType::PROCEDURE, name};
 }
 
-static QueryEntity createConstant(const std::string& name) {
+static Synonym createConstant(const std::string& name) {
     return {DesignEntityType::CONSTANT, name};
 }
 
 // ai-gen start(copilot, 2, e)
 // prompt: Test Table class
 TEST_CASE("Test Table extract results") {
-    std::vector<QueryEntity> headers = {
+    std::vector<Synonym> headers = {
         createVariable("v"),
         createConstant("c"),
         createProcedure("p"),
@@ -39,7 +39,7 @@ TEST_CASE("Test Table extract results") {
 // ai-gen start(copilot, 2, e)
 // prompt: try to extract a non-existent query entity. it should return an empty vector
 TEST_CASE("Test Table extract results with non-existent query entity") {
-    std::vector<QueryEntity> headers = {
+    std::vector<Synonym> headers = {
         createVariable("v"),
         createConstant("c"),
         createProcedure("p"),

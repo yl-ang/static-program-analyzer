@@ -15,7 +15,7 @@ TEST_CASE(
     pfw.setVariables({"v1", "v2"});
     PKBFacadeReader pkbReader{pkb};
 
-    std::vector<QueryEntity> selectEntities{{DesignEntityType::VARIABLE, "v"}};
+    std::vector<Synonym> selectEntities{{DesignEntityType::VARIABLE, "v"}};
     Query q{selectEntities, {}, {}};
     std::vector<std::string> result = q.evaluate(pkbReader);
     std::sort(result.begin(), result.end());

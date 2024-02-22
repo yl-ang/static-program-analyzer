@@ -14,13 +14,13 @@ enum class DesignEntityType {
     PROCEDURE,
 };
 
-class QueryEntity {
+class Synonym {
 private:
     DesignEntityType type;
     std::string name;
 
 public:
-    QueryEntity(const DesignEntityType& t, const std::string& n);
+    Synonym(const DesignEntityType& t, const std::string& n);
 
     static DesignEntityType determineType(const std::string);
 
@@ -28,5 +28,5 @@ public:
     std::string getName() const;
     static std::string entityTypeToString(DesignEntityType);
     void print();
-    bool operator==(const QueryEntity& other) const;
+    bool operator==(const Synonym& other) const;
 };

@@ -1,8 +1,9 @@
 #include "SuchThatClause.h"
+
 #include <iostream>
 
 // TODO(Ezekiel): add validations for arguments
-SuchThatClause::SuchThatClause(const SuchThatClauseType& t, const QueryEntity& f, const QueryEntity& s)
+SuchThatClause::SuchThatClause(const SuchThatClauseType& t, const Synonym& f, const Synonym& s)
     : type(t), firstArg(f), secondArg(s) {}
 
 ClauseType SuchThatClause::getType() const {

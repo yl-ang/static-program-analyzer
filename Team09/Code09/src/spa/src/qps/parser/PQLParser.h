@@ -6,27 +6,27 @@
 #include "../ParserUtils.h"
 #include "../clauses/QueryClause.h"
 #include "../evaluator/Query.h"
-#include "QueryEntity.h"
+#include "qps/clauseArguments/Synonym.h"
 
 typedef std::vector<std::string> UnparsedQuery;
 
-typedef std::tuple<std::vector<QueryEntity>, std::vector<QueryClause*>> ParsedQuery;
+typedef std::tuple<std::vector<Synonym>, std::vector<QueryClause*>> ParsedQuery;
 
 class PQLParser {
 private:
-    static SuchThatClause toSTClause(std::vector<QueryEntity>, std::string);
-    static PatternClause toPatternClause(std::vector<QueryEntity>, std::string);
+    static SuchThatClause toSTClause(std::vector<Synonym>, std::string);
+    static PatternClause toPatternClause(std::vector<Synonym>, std::string);
 
     static std::vector<std::string> searchClause(const std::regex&, const std::string&);
-    static std::vector<QueryEntity> matchParameterToQueryEntity(const std::vector<QueryEntity>&,
-                                                                const std::vector<std::string>&);
+    static std::vector<Synonym> matchParameterToQueryEntity(const std::vector<Synonym>&,
+                                                            const std::vector<std::string>&);
     static std::vector<std::string> cleanParameters(const std::string&);
 
 public:
     static Query parse(UnparsedQuery);
     static std::string getQueryClauses(UnparsedQuery);
-    static std::vector<QueryEntity> parseQueryEntities(std::vector<std::string>);
-    static std::vector<QueryEntity> findSelectClauses(std::vector<QueryEntity>, std::string);
-    static std::vector<SuchThatClause> findSuchThatClauses(std::vector<QueryEntity>, std::string);
-    static std::vector<PatternClause> findPatternClauses(std::vector<QueryEntity>, std::string);
+    static std::vector<Synonym> parseQueryEntities(std::vector<std::string>);
+    static std::vector<Synonym> findSelectClauses(std::vector<Synonym>, std::string);
+    static std::vector<SuchThatClause> findSuchThatClauses(std::vector<Synonym>, std::string);
+    static std::vector<PatternClause> findPatternClauses(std::vector<Synonym>, std::string);
 };
