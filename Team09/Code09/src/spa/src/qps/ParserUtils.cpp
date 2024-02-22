@@ -38,7 +38,7 @@ std::vector<std::string> splitByDelimiter(const std::string& str, const std::str
     return splitList;
 }
 
-std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string delimiter) {
+std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
 
     if (nextDelimiterIndex == std::string::npos) {
