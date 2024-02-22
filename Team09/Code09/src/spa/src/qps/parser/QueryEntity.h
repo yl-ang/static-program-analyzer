@@ -5,13 +5,13 @@
 enum class EntityType {
     STMT,
     READ,
-    CALL, 
-    WHILE, 
-    IF, 
-    ASSIGN, 
-    VARIABLE, 
-    CONSTANT, 
-    PROCEDURE
+    CALL,
+    WHILE,
+    IF,
+    ASSIGN,
+    VARIABLE,
+    CONSTANT,
+    PROCEDURE,
 };
 
 class QueryEntity {

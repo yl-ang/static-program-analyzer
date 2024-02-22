@@ -1,8 +1,11 @@
 #include "Query.h"
 
-Query::Query(const std::vector<QueryEntity>& se) : selectEntities(se) {}
+Query::Query(const std::vector<QueryEntity>& se, const std::vector<SuchThatClause>& stc,
+             const std::vector<PatternClause>& pc)
+    : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
 std::vector<std::string> Query::evaluate(const PKBFacadeReader& pkb) {
+    // TODO(Ezekiel): Run evaluate on clauses
     return buildSelectTable(pkb).extractResults(selectEntities);
 }
 
@@ -11,7 +14,7 @@ std::vector<QueryEntity> Query::getSelectEntities() const {
 }
 
 Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
-    std::vector<QueryEntity> header{ selectEntities };
+    std::vector<QueryEntity> header{selectEntities};
     std::vector<Row> rows{};
 
     for (QueryEntity entity : selectEntities) {
@@ -37,5 +40,5 @@ Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
         rows.push_back(row);
     }
 
-    return Table{ header, rows };
+    return Table{header, rows};
 }
