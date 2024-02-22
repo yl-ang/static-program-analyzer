@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 class TestValidator : public Validator {
-public:
+public:  // NOLINT
     TestValidator() {}
 
     explicit TestValidator(const SynonymStore& storage) {
