@@ -114,7 +114,7 @@ std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<Synonym> en
 
 /**
  * Helper function to findSuchThatClauses, findPatternClauses
-*/
+ */
 std::vector<std::string> PQLParser::searchClause(const std::regex& pattern, const std::string& unparsedClauses) {
     // ai-gen start(chatgpt, 2, e)
     // prompt: https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat
@@ -131,7 +131,7 @@ std::vector<std::string> PQLParser::searchClause(const std::regex& pattern, cons
 
 /**
  * Helper function to findSuchThatClauses
-*/
+ */
 SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string str) {
     std::regex stArguments("\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
     // <{letters/digits}{optional *}>{>=0 whitespaces}<{bracketed non-greedy}>
@@ -142,7 +142,6 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
         std::vector<ClauseArgument*> entityVector{buildSTParameters(entities, parameterStringsToParse)};
-
         return SuchThatClause(SuchThatClause::determineRelationshipType(type), entityVector[0], entityVector[1]);
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
@@ -151,7 +150,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
 
 /**
  * Helper function to findPatternClauses
-*/
+ */
 PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::string str) {
     std::regex ptClause("\\s*(\\w+)\\s*\\((.*?)\\)\\s*");
     // <{letters/digits}>{>=0 whitespaces}<{bracketed non-greedy}>
@@ -174,7 +173,7 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
 
 /**
  * Helper function to toSTClause, toPatternClause
-*/
+ */
 std::vector<std::string> PQLParser::cleanParameters(const std::string& parametersString) {
     std::vector<std::string> result{};
     std::istringstream iss(parametersString);
@@ -188,12 +187,12 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
 
 /**
  * Helper function to toSTClause
- * 
+ *
  * Determine if parameters are:
  * literal, wildcard, integer, synonym
-*/
+ */
 std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Synonym>& entities,
-                                                        const std::vector<std::string>& strings) {
+                                                          const std::vector<std::string>& strings) {
     std::vector<ClauseArgument*> results{};
     for (const std::string& str : strings) {
         if (isQuotedIdent(str)) {
@@ -213,14 +212,14 @@ std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Syno
 
 /**
  * Helper function to toPatternClause
- * 
+ *
  * For pattern parameters:
  * first parameter is always synonym
  * second parameter is always entRef
  * third parameter is always expressionSpec
-*/
+ */
 std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector<Synonym>& entities,
-                                                            const std::vector<std::string>& strings) {
+                                                               const std::vector<std::string>& strings) {
     std::vector<ClauseArgument*> results{};
 
     std::string ptSynonym = strings[0];
@@ -248,8 +247,8 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
 
 /**
  * Helper function to buildSTParameters, buildPatternParameters
-*/
-Synonym * PQLParser::buildSynonym(const std::vector<Synonym>& entities, const std::string& str) {
+ */
+Synonym* PQLParser::buildSynonym(const std::vector<Synonym>& entities, const std::string& str) {
     for (const Synonym& entity : entities) {
         if (entity.getValue() == str) {
             return new Synonym(entity.getType(), entity.getValue());

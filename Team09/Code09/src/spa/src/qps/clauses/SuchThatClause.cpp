@@ -6,13 +6,9 @@
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
-    {"Follows", RelationshipType::FOLLOWS},
-    {"Follows*", RelationshipType::FOLLOWS_STAR},
-    {"Parent", RelationshipType::PARENT},
-    {"Parent*", RelationshipType::PARENT_STAR},
-    {"Uses", RelationshipType::USES},
-    {"Modifies", RelationshipType::MODIFIES}
-};  // update here
+    {"Follows", RelationshipType::FOLLOWS}, {"Follows*", RelationshipType::FOLLOWS_STAR},
+    {"Parent", RelationshipType::PARENT},   {"Parent*", RelationshipType::PARENT_STAR},
+    {"Uses", RelationshipType::USES},       {"Modifies", RelationshipType::MODIFIES}};  // update here
 }
 
 SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument* f, ClauseArgument* s)
