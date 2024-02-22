@@ -70,7 +70,6 @@ TEST_CASE("various_call_assign_stmt") {
 }
 
 
-<<<<<<< HEAD
 // Testing Find Queries functions
 
 std::vector<QueryEntity> entities = {
@@ -179,20 +178,6 @@ TEST_CASE("PQLParser for Select ... st Parent(*)/Follows(*)") {
     REQUIRE(result_22.size() == 0);
     REQUIRE(result_23.size() == 0);
     REQUIRE(result_24.size() == 0);
-=======
-TEST_CASE("select_v") {
-    std::string select_v = "Select v";
-    std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
-    SelectClause expected_select_v = SelectClause("v");
-    REQUIRE(expected_select_v.equals(*actual_select_v[0]));
-}
-
-TEST_CASE("Incorrect select_v") {
-    std::string select_v = "Select v";
-    std::vector<QueryClause*> actual_select_v = PQLParser::parseQueryClauses(select_v);
-    SelectClause expected_select_v = SelectClause("g");
-    REQUIRE(!(expected_select_v.equals(*actual_select_v[0])));
->>>>>>> 7521e885bd148c2ac1af8dcaccd8fcde3a2836ac
 }
 
 // Select pattern
@@ -207,16 +192,10 @@ TEST_CASE("PQLParser for Select ... pattern") {
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_pt_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_pt_2);
 
-<<<<<<< HEAD
     REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(result_1.size() == 1);
     REQUIRE(QueryEntity(EntityType::VARIABLE, "v1") == result_2[0]);
     REQUIRE(result_2.size() == 1);
-=======
-    // expected
-    SelectClause expected_select_v = SelectClause("v1");
-    std::vector<QueryEntity> expected_one_variable = {QueryEntity(EntityType::VARIABLE, "v1")};
->>>>>>> 7521e885bd148c2ac1af8dcaccd8fcde3a2836ac
 
     REQUIRE(result_3.size() == 0);
     REQUIRE(result_4.size() == 0);
