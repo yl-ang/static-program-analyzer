@@ -1,7 +1,8 @@
-#include <iostream>
-#include <vector>
-#include <string>
 #include "QueryClause.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 SelectClause::SelectClause(const std::string& a) : arg(a) {}
 
@@ -18,4 +19,9 @@ bool SelectClause::equals(const QueryClause& other) const {
         return arg == ptr->arg;
     }
     return false;
+}
+
+Table SelectClause::evaluate(const PKBFacadeReader& reader) {
+    // TODO(Ezekiel): eventually deprecate selectClause because we don't need it
+    return {};
 }
