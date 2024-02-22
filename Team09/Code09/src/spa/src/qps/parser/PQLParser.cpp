@@ -82,7 +82,7 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::vector<Synonym> entities,
     if (std::regex_search(unparsedClauses, match, pattern)) {
         selectEntity = match[1];
         for (const Synonym& entity : entities) {
-            if (entity.getName() == selectEntity) {
+            if (entity.getValue() == selectEntity) {
                 result.push_back(entity);
             }
         }
@@ -187,7 +187,7 @@ std::vector<Synonym> PQLParser::matchParameterToQueryEntity(const std::vector<Sy
 
     for (const std::string& str : strings) {
         for (const Synonym& entity : entities) {
-            if (entity.getName() == str) {
+            if (entity.getValue() == str) {
                 results.push_back(entity);
                 break;  // We have already matched an entity, no need to continue searching
             }

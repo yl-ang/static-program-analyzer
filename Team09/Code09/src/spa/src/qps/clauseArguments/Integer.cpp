@@ -1,9 +1,13 @@
 #include "Integer.h"
 
-Integer::Integer(const int& v) : value(v) {}
+Integer::Integer(const std::string& v) : value(v) {}
 
-int Integer::getValue() const {
+std::string Integer::getValue() const {
     return value;
+}
+
+bool Integer::isInteger() const {
+    return true;
 }
 
 bool Integer::operator==(const Integer& other) const {

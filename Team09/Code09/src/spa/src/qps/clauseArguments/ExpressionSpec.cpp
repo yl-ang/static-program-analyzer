@@ -6,6 +6,10 @@ std::string ExpressionSpec::getValue() const {
     return value;
 }
 
+bool ExpressionSpec::isExpressionSpec() const {
+    return true;
+}
+
 bool ExpressionSpec::operator==(const ExpressionSpec& other) const {
     return value == other.value;
 }

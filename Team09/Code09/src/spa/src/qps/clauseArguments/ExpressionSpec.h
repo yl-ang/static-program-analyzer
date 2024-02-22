@@ -10,6 +10,8 @@ private:
 
 public:
     ExpressionSpec(const std::string& v);
-    std::string getValue() const;
     bool operator==(const ExpressionSpec& other) const;
+
+    std::string getValue() const override;
+    bool isExpressionSpec() const override;
 };
