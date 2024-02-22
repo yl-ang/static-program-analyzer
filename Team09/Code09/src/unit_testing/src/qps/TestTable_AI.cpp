@@ -37,6 +37,38 @@ TEST_CASE("Test Table extract results") {
 }
 // ai-gen end
 
+// ai-gen start (copilot, 0, e)
+// prompt: test case for empty table
+TEST_CASE("Test Table extract results with empty table") {
+    std::vector<Synonym> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
+    };
+    std::vector<ColumnData> columns = {};
+    Table table(headers, columns);
+
+    std::vector<std::string> results = table.extractResults({createVariable("v")});
+    REQUIRE(results == std::vector<std::string>{});
+}
+// ai-gen end
+
+// ai-gen start (copilot, 1, e)
+// test case for empty rows
+TEST_CASE("Test Table extract results with empty rows") {
+    std::vector<Synonym> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
+    };
+    std::vector<Row> rows = {};
+    Table table(headers, rows);
+
+    std::vector<std::string> results = table.extractResults({createVariable("v")});
+    REQUIRE(results == std::vector<std::string>{});
+}
+// ai-gen end
+
 // ai-gen start(copilot, 2, e)
 // prompt: try to extract a non-existent query entity. it should return an empty vector
 TEST_CASE("Test Table extract results with non-existent query entity") {
@@ -132,5 +164,29 @@ TEST_CASE("Test Table join with common headers but not all rows have the same va
     REQUIRE(joinedTable.extractResults({createVariable("v")}) == expectedTable.extractResults({createVariable("v")}));
     REQUIRE(joinedTable.extractResults({createConstant("c")}) == expectedTable.extractResults({createConstant("c")}));
     REQUIRE(joinedTable.extractResults({createConstant("p")}) == expectedTable.extractResults({createConstant("p")}));
+}
+// ai-gen end
+
+// ai-gen start(copilot, 1, e)
+// prompt: test joining 1 empty table with a non-empty table
+TEST_CASE("Test Table join with 1 empty table") {
+    std::vector<Synonym> headers1 = {createVariable("v"), createConstant("c")};
+    std::vector<ColumnData> columns1 = {};
+    Table emptyTable(headers1, columns1);
+
+    std::vector<Synonym> headers2 = {createVariable("v"), createProcedure("p")};
+    std::vector<ColumnData> columns2 = {{"x", "y", "z"}, {"Yishun", "Punggol", "Singapore"}};
+    Table nonEmptyTable(headers2, columns2);
+
+    Table joinedTable = emptyTable.join(nonEmptyTable);
+
+    std::vector<Synonym> expectedHeaders = {createVariable("v"), createConstant("c"), createProcedure("p")};
+    std::vector<ColumnData> expectedColumns = {};
+    Table expectedTable(expectedHeaders, expectedColumns);
+
+    REQUIRE(joinedTable.getHeaders() == expectedHeaders);
+    REQUIRE(joinedTable.extractResults({createVariable("v")}) == expectedTable.extractResults({createVariable("v")}));
+    REQUIRE(joinedTable.extractResults({createConstant("c")}) == expectedTable.extractResults({createConstant("c")}));
+    REQUIRE(joinedTable.extractResults({createProcedure("p")}) == expectedTable.extractResults({createProcedure("p")}));
 }
 // ai-gen end

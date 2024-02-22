@@ -20,6 +20,14 @@ private:
     std::vector<Row> rows;
 
     /**
+     * Merges 2 headers. Duplicates are ignored.
+     * @param firstHeaders first set of headers to merge
+     * @param secondHeaders second set of headers to merge
+     * @return the merged headers
+     */
+    static std::vector<Synonym> mergeHeaders(const std::vector<Synonym>&, const std::vector<Synonym>&);
+
+    /**
      * Returns the common headers between this table and another table.
      * @param other the other table to compare with
      * @return the common headers

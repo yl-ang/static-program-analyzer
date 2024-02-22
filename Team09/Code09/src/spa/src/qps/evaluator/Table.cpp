@@ -5,6 +5,10 @@
 Table::Table() {}
 
 Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : headers(headers) {
+    if (columns.size() == 0) {
+        return;
+    }
+
     if (headers.size() != columns.size()) {
         throw "Number of columns and headers are not equal.";
     }
@@ -58,47 +62,20 @@ std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synon
     return result;
 }
 
-// ai-gen start(copilot, 0, e)
-// prompt: create cross product of two tables
-Table Table::crossProduct(const Table& other) {
-    std::vector<Synonym> newHeaders{headers};
-    for (Synonym header : other.headers) {
-        if (!containsHeader(header)) {
-            newHeaders.push_back(header);
-        }
-    }
-
-    std::vector<Row> newRows{};
-    for (Row row : rows) {
-        for (Row otherRow : other.rows) {
-            Row newRow{row};
-            for (Synonym header : other.headers) {
-                SynonymValue headerValue = header.getValue();
-                newRow[headerValue] = otherRow.at(headerValue);
-            }
-            newRows.push_back(newRow);
-        }
-    }
-
-    return Table{newHeaders, newRows};
-}
-// ai-gen end
-
 Table Table::join(const Table& other) {
+    if (isEmpty() || other.isEmpty()) {
+        std::vector<Row> emptyRows{};
+        return Table{mergeHeaders(headers, other.headers), emptyRows};  // return empty table
+    }
+
     // ai-gen start(copilot, 0, e)
     // prompt: get common headers the new table should be the union of the headers
     std::vector<Synonym> commonHeaders{getCommonHeaders(other)};
-
     if (commonHeaders.size() == 0) {
         return crossProduct(other);
     }
 
-    std::vector<Synonym> newHeaders{headers};
-    for (Synonym header : other.headers) {
-        if (!containsHeader(header)) {
-            newHeaders.push_back(header);
-        }
-    }
+    std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
     // ai-gen end
 
     // ai-gen start(copilot, 1, e)
@@ -129,6 +106,27 @@ Table Table::join(const Table& other) {
 }
 
 // ai-gen start(copilot, 0, e)
+// prompt: create cross product of two tables
+Table Table::crossProduct(const Table& other) {
+    std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
+
+    std::vector<Row> newRows{};
+    for (Row row : rows) {
+        for (Row otherRow : other.rows) {
+            Row newRow{row};
+            for (Synonym header : other.headers) {
+                SynonymValue headerValue = header.getValue();
+                newRow[headerValue] = otherRow.at(headerValue);
+            }
+            newRows.push_back(newRow);
+        }
+    }
+
+    return Table{newHeaders, newRows};
+}
+// ai-gen end
+
+// ai-gen start(copilot, 0, e)
 // prompt: using copilot
 std::vector<Synonym> Table::getCommonHeaders(const Table& other) const {
     std::vector<Synonym> commonHeaders{};
@@ -139,7 +137,28 @@ std::vector<Synonym> Table::getCommonHeaders(const Table& other) const {
     }
     return commonHeaders;
 }
+// ai-gen end
 
+std::vector<Synonym> Table::mergeHeaders(const std::vector<Synonym>& firstHeaders,
+                                         const std::vector<Synonym>& secondHeaders) {
+    std::vector<Synonym> newHeaders{firstHeaders};
+    std::unordered_set<SynonymValue> seen{};
+
+    for (Synonym header : firstHeaders) {
+        seen.insert(header.getValue());
+    }
+
+    for (Synonym header : secondHeaders) {
+        if (seen.find(header.getValue()) == seen.end()) {
+            newHeaders.push_back(header);
+            seen.insert(header.getValue());
+        }
+    }
+    return newHeaders;
+}
+
+// ai-gen start(copilot, 0, e)
+// prompt: using copilot
 bool Table::containsHeader(const Synonym& qe) const {
     for (Synonym header : headers) {
         if (header == qe) {
