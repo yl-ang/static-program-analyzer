@@ -9,25 +9,28 @@ const std::unordered_set<Stmt>& StatementStore::getStatements() const {
 
 void StatementStore::setStatements(const std::unordered_set<Stmt>& inputStmts) {
     statementSet.insert(inputStmts.begin(), inputStmts.end());
+
+    // Update statementTypeMap
+    for (const auto& stmt : inputStmts) {
+        statementNumMap[stmt.stmtNum] = const_cast<Stmt*>(&stmt);
+        statementTypeMap[stmt.type].insert(const_cast<Stmt*>(&stmt));
+    }
 }
 
 Stmt* StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
-    for (const auto& stmt : statementSet) {
-        if (stmt.stmtNum == stmtNum) {
-            return const_cast<Stmt*>(&stmt);
-        }
+    auto it = statementNumMap.find(stmtNum);
+    if (it != statementNumMap.end()) {
+        return it->second;
     }
     return nullptr;
 }
 
-std::vector<Stmt*> StatementStore::getStatementsByType(
+std::unordered_set<Stmt*> StatementStore::getStatementsByType(
     StatementType type) const {
-    std::vector<Stmt*> stmts;
-    for (const auto& stmt : statementSet) {
-        if (stmt.type == type) {
-            stmts.push_back(const_cast<Stmt*>(&stmt));
-        }
+    auto it = statementTypeMap.find(type);
+    if (it != statementTypeMap.end()) {
+        return it->second;
     }
-    return stmts;
+    return {};
 }
 // ai-gen end
