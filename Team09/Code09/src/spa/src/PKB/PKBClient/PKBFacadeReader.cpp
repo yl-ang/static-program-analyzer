@@ -38,7 +38,38 @@ Stmt* PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) const {
     return pkbReference->stmtStore->getStatementByStmtNum(stmtNum);
 }
 
-std::unordered_set<Stmt*> PKBFacadeReader::getStatementsByType(
-    StatementType type) const {
+std::unordered_set<Stmt*> PKBFacadeReader::getStatementsByType(StatementType type) const {
     return pkbReference->stmtStore->getStatementsByType(type);
+}
+
+std::optional<StmtNum> PKBFacadeReader::getFollower(StmtNum s1) {
+    return pkbReference->followsStore->getFollower(s1);
+}
+
+std::optional<StmtNum> PKBFacadeReader::getFollowee(StmtNum s2) {
+    return pkbReference->followsStore->getFollowee(s2);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getFollowersStar(StmtNum s) {
+    return pkbReference->followsStore->getFollowersStar(s);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getFolloweesStar(StmtNum s) {
+    return pkbReference->followsStore->getFolloweesStar(s);
+}
+
+bool PKBFacadeReader::hasFollowRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->followsStore->hasFollowRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->followsStore->hasFollowStarRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasFollowRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    return pkbReference->followsStore->hasFollowStarRelationship(arg1, arg2);
+}
+
+bool PKBFacadeReader::hasFollowStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    return pkbReference->followsStore->hasFollowStarRelationship(arg1, arg2);
 }
