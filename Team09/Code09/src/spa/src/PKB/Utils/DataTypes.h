@@ -37,9 +37,7 @@ namespace std {
 template <>
 struct hash<Stmt> {
     std::size_t operator()(const Stmt& stmt) const {
-        return ((hash<int>()(stmt.stmtNum) ^
-                 (hash<int>()(static_cast<int>(stmt.type)) << 1)) >>
-                1);
+        return ((hash<int>()(stmt.stmtNum) ^ (hash<int>()(static_cast<int>(stmt.type)) << 1)) >> 1);
     }
 };
 }  // namespace std
@@ -63,4 +61,25 @@ struct hash<std::pair<StmtNum, Variable>> {
         return hash<StmtNum>()(p.first) ^ hash<Variable>()(p.second);
     }
 };
+}  // namespace std
+
+namespace std {
+
+template <>
+struct hash<std::pair<std::string, std::string>> {
+    size_t operator()(const std::pair<std::string, std::string>& p) const {
+        // Combine the hashes of the two strings
+        return hash<std::string>()(p.first) ^ (hash<std::string>()(p.second) << 1);
+    }
+};
+
+template <>
+struct equal_to<std::pair<std::string, std::string>> {
+    bool operator()(const std::pair<std::string, std::string>& lhs,
+                    const std::pair<std::string, std::string>& rhs) const {
+        // Compare the two pairs for equality
+        return lhs.first == rhs.first && lhs.second == rhs.second;
+    }
+};
+
 }  // namespace std
