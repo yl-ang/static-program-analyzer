@@ -5,8 +5,25 @@ Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& 
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
 std::vector<std::string> Query::evaluate(const PKBFacadeReader& pkb) {
-    // TODO(Ezekiel): Run evaluate on clauses
-    return buildSelectTable(pkb).extractResults(selectEntities);
+    std::vector<Table> clauseTables{};
+    for (SuchThatClause stc : suchThatClauses) {
+        clauseTables.push_back(stc.evaluate(pkb));
+    }
+
+    for (PatternClause pc : patternClauses) {
+        clauseTables.push_back(pc.evaluate(pkb));
+    }
+
+    if (clauseTables.empty()) {
+        return buildSelectTable(pkb).extractResults(selectEntities);
+    }
+
+    Table result = clauseTables[0];
+    for (size_t i = 1; i < clauseTables.size(); i++) {
+        result = result.join(clauseTables[i]);
+    }
+
+    return result.extractResults(selectEntities);
 }
 
 std::vector<Synonym> Query::getSelectEntities() const {
