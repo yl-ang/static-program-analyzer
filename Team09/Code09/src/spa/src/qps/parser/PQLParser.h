@@ -23,8 +23,7 @@ private:
     static std::vector<ClauseArgument> buildPatternParameters(const std::vector<Synonym>&,
                                                             const std::vector<std::string>&);                                                          
     static std::vector<std::string> cleanParameters(const std::string&);
-    static ClauseArgument* buildEntRef(const std::vector<Synonym>& entities,const std::string& str);
-    static Synonym* buildSynonym(const std::vector<Synonym>& entities,const std::string& str);
+    static Synonym buildSynonym(const std::vector<Synonym>& entities,const std::string& str);
     static Synonym buildExpression(const std::string& str);
 public:
     static Query parse(UnparsedQuery);
