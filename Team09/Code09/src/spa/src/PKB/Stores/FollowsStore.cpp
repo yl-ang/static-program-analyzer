@@ -1,7 +1,6 @@
 #include "FollowsStore.h"
 
-void FollowsStore::setFollowsStore(
-    const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs) {
+void FollowsStore::setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& followsPairs) {
     for (const auto& pair : followsPairs) {
         StmtNum s1 = pair.first;
         StmtNum s2 = pair.second;
@@ -85,42 +84,40 @@ bool FollowsStore::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
     return false;
 }
 
-// bool FollowsStore::hasFollowRelationship(ClauseArgument arg1, ClauseArgument
-// arg2) {
-//     if (arg1.isWildcard() && arg2.isWildcard()) {
-//         return !followerMap.empty() && !followerByMap.empty();
-//
-//         // return all the pairs
-//     }
-//
-//     if (arg1.isWildcard()) {
-//         return followerByMap.count(arg2.getValue()) > 0;
-//
-//         // return getFollower(arg2) : form a pair return as a unordered_set
-//     }
-//
-//     if (arg2.isWildcard()) {
-//         return followerMap.count(arg1.getValue()) > 0;
-//
-//         // return getFollower(arg1) : form a pair return as a unordered_set
-//     }
-//
-//     return hasFollowRelationship(arg1.getValue(), arg2.getValue());
-// }
-//
-// bool FollowsStore::hasFollowStarRelationship(ClauseArgument arg1,
-//                                          ClauseArgument arg2) {
-//     if (arg1.isWildcard() && arg2.isWildcard()) {
-//         return !followerStarMap.empty() && !followeeStarMap.empty();
-//     }
-//
-//     if (arg1.isWildcard()) {
-//         return followerStarMap.count(arg2.getValue()) > 0;
-//     }
-//
-//     if (arg2.isWildcard()) {
-//         return followeeStarMap.count(arg1.getValue()) > 0;
-//     }
-//
-//     return hasFollowStarRelationship(arg1.getValue(), arg2.getValue());
-// }
+bool FollowsStore::hasFollowRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    // Both are wildcards, just check if followerMap is not empty
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !followerMap.empty();
+    }
+
+    // If arg1 is wildcard, look at arg2 to find out if it is following a statement
+    if (arg1.isWildcard()) {
+        return getFollowee(std::stoi(arg2.getValue())).has_value();
+    }
+
+    // if arg2 is wildcard, look at arg1 to find out if it has a follower
+    if (arg2.isWildcard()) {
+        return getFollower(std::stoi(arg1.getValue())).has_value();
+    }
+
+    return hasFollowRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
+}
+
+bool FollowsStore::hasFollowStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    // Both are wildcards, just check if the followerStarMap is not empty
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !followerStarMap.empty();
+    }
+
+    // if arg1 is wildcard, then look at arg2 to check if it is following other statements
+    if (arg1.isWildcard()) {
+        return !getFolloweesStar(std::stoi(arg2.getValue())).empty();
+    }
+
+    // if arg2 is wildcard, then look at arg1 to check if it has followers
+    if (arg2.isWildcard()) {
+        return !getFollowersStar(std::stoi(arg1.getValue())).empty();
+    }
+
+    return hasFollowStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
+}

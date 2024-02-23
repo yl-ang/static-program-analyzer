@@ -1,7 +1,6 @@
 #include "ParentStore.h"
 
-void ParentStore::setParentStore(
-    const std::unordered_set<std::pair<StmtNum, StmtNum>>& parentPairs) {
+void ParentStore::setParentStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& parentPairs) {
     for (const auto& pair : parentPairs) {
         StmtNum parent = pair.first;
         StmtNum child = pair.second;
@@ -59,21 +58,55 @@ std::unordered_set<StmtNum> ParentStore::getChildren(StmtNum parent) {
 }
 
 std::unordered_set<StmtNum> ParentStore::getChildrenStar(StmtNum parent) {
-    return childStarMap.count(parent) ? childStarMap[parent]
-                                      : std::unordered_set<StmtNum>();
+    return childStarMap.count(parent) ? childStarMap[parent] : std::unordered_set<StmtNum>();
 }
 
 std::unordered_set<StmtNum> ParentStore::getParentsStar(StmtNum child) {
-    return parentStarMap.count(child) ? parentStarMap[child]
-                                      : std::unordered_set<StmtNum>();
+    return parentStarMap.count(child) ? parentStarMap[child] : std::unordered_set<StmtNum>();
 }
 
-bool ParentStore::containsParentRelationship(StmtNum parent, StmtNum child) {
+bool ParentStore::hasParentRelationship(StmtNum parent, StmtNum child) {
     auto it = parentMap.find(child);
     return it != parentMap.end() && it->second == parent;
 }
 
-bool ParentStore::containsParentStarRelationship(StmtNum parent,
-                                                 StmtNum child) {
+bool ParentStore::hasParentStarRelationship(StmtNum parent, StmtNum child) {
     return parentStarMap.count(child) && parentStarMap[child].count(parent);
+}
+
+bool ParentStore::hasParentRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    // Both are wildcards, just check if the parentMap is not empty
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !parentMap.empty();
+    }
+
+    // if the arg 1 is wildcard, check if arg2 has a parent
+    if (arg1.isWildcard()) {
+        return getParent(std::stoi(arg2.getValue())).has_value();
+    }
+
+    // if arg2 is a wildcard, check if arg1 is a parent by looking up if it has children
+    if (arg2.isWildcard()) {
+        return !getChildren(std::stoi(arg1.getValue())).empty();
+    }
+
+    return hasParentRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
+}
+
+bool ParentStore::hasParentStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !parentStarMap.empty();
+    }
+
+    // if arg1 is wildcard, check if arg2 has parents
+    if (arg1.isWildcard()) {
+        return !getParentsStar(std::stoi(arg2.getValue())).empty();
+    }
+
+    // if arg2 is wildcard, check if arg1 has children star
+    if (arg2.isWildcard()) {
+        return !getChildrenStar(std::stoi(arg1.getValue())).empty();
+    }
+
+    return hasParentStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
 }
