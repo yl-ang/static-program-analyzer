@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qps/clauseArguments/ClauseArgument.h>
+
 #include <optional>
 #include <unordered_map>
 #include <unordered_set>
@@ -18,6 +20,8 @@ public:
     std::unordered_set<StmtNum> getFolloweesStar(StmtNum s);
     bool hasFollowRelationship(StmtNum s1, StmtNum s2);
     bool hasFollowStarRelationship(StmtNum s1, StmtNum s2);
+    // bool hasFollowRelationship(ClauseArgument arg1, ClauseArgument arg2);
+    // bool hasFollowStarRelationship(ClauseArgument arg1, ClauseArgument arg2);
 
 private:
     std::unordered_map<StmtNum, StmtNum> followerMap;

@@ -84,3 +84,43 @@ bool FollowsStore::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
     }
     return false;
 }
+
+// bool FollowsStore::hasFollowRelationship(ClauseArgument arg1, ClauseArgument
+// arg2) {
+//     if (arg1.isWildcard() && arg2.isWildcard()) {
+//         return !followerMap.empty() && !followerByMap.empty();
+//
+//         // return all the pairs
+//     }
+//
+//     if (arg1.isWildcard()) {
+//         return followerByMap.count(arg2.getValue()) > 0;
+//
+//         // return getFollower(arg2) : form a pair return as a unordered_set
+//     }
+//
+//     if (arg2.isWildcard()) {
+//         return followerMap.count(arg1.getValue()) > 0;
+//
+//         // return getFollower(arg1) : form a pair return as a unordered_set
+//     }
+//
+//     return hasFollowRelationship(arg1.getValue(), arg2.getValue());
+// }
+//
+// bool FollowsStore::hasFollowStarRelationship(ClauseArgument arg1,
+//                                          ClauseArgument arg2) {
+//     if (arg1.isWildcard() && arg2.isWildcard()) {
+//         return !followerStarMap.empty() && !followeeStarMap.empty();
+//     }
+//
+//     if (arg1.isWildcard()) {
+//         return followerStarMap.count(arg2.getValue()) > 0;
+//     }
+//
+//     if (arg2.isWildcard()) {
+//         return followeeStarMap.count(arg1.getValue()) > 0;
+//     }
+//
+//     return hasFollowStarRelationship(arg1.getValue(), arg2.getValue());
+// }
