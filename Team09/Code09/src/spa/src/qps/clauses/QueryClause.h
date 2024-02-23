@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../evaluator/Table.h"
-#include "../parser/QueryEntity.h"
+#include "qps/clauseArguments/Synonym.h"
 
 enum class ClauseType { SELECT, SUCH_THAT, PATTERN };
 
