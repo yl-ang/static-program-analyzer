@@ -1,7 +1,6 @@
 #include "UsesStore.h"
 
-void UsesStore::setUsesStore(
-    const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
+void UsesStore::setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
     for (const auto& use : usesSet) {
         StmtNum stmt = use.first;
         Variable variable = use.second;
@@ -11,8 +10,7 @@ void UsesStore::setUsesStore(
     }
 }
 
-bool UsesStore::hasStatementVariableUseRelationship(
-    StmtNum stmt, const Variable& variable) const {
+bool UsesStore::hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const {
     auto stmtIt = stmtToUsedVariables.find(stmt);
     if (stmtIt != stmtToUsedVariables.end()) {
         return stmtIt->second.count(variable) > 0;
@@ -20,8 +18,7 @@ bool UsesStore::hasStatementVariableUseRelationship(
     return false;
 }
 
-std::unordered_set<Variable> UsesStore::getVariablesByStatement(
-    StmtNum stmt) const {
+std::unordered_set<Variable> UsesStore::getVariablesByStatement(StmtNum stmt) const {
     auto stmtIt = stmtToUsedVariables.find(stmt);
     if (stmtIt != stmtToUsedVariables.end()) {
         return stmtIt->second;
@@ -29,11 +26,28 @@ std::unordered_set<Variable> UsesStore::getVariablesByStatement(
     return {};
 }
 
-std::unordered_set<StmtNum> UsesStore::getStatementsByVariable(
-    const Variable& variable) const {
+std::unordered_set<StmtNum> UsesStore::getStatementsByVariable(const Variable& variable) const {
     auto variableIt = variableToUsingStatements.find(variable);
     if (variableIt != variableToUsingStatements.end()) {
         return variableIt->second;
     }
     return {};
+}
+
+bool UsesStore::hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !stmtToUsedVariables.empty();
+    }
+
+    // if arg1 is wildcard, find out if arg2 is used by statement(s)
+    if (arg1.isWildcard()) {
+        return !getStatementsByVariable(arg2.getValue()).empty();
+    }
+
+    // if arg2 is wildcard, find out if arg1 uses any variables
+    if (arg2.isWildcard()) {
+        return !getVariablesByStatement(std::stoi(arg1.getValue())).empty();
+    }
+
+    return hasStatementVariableUseRelationship(std::stoi(arg1.getValue()), arg2.getValue());
 }
