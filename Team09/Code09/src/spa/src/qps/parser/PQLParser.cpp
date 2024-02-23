@@ -1,14 +1,20 @@
 #include "PQLParser.h"
 
+#include <iostream>
+
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 #include "../exceptions/Exception.h"
-#include "QueryClause.h"
-#include "QueryEntity.h"
+#include "qps/clauseArguments/Synonym.h"
+
+// checked with lecturer, this is acceptable format for PQL:
+// Select v1 such that Parent(v1,v2) pattern a(v1,v2)
+// can >=0 spaces at existing spaces, and between commas and in front of brackets
 
 Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     std::vector<std::string> unparsedEntities = {};
     std::string unparsedClauses;
+
     for (std::string queryStatement : unparsedQuery) {
         if (isDeclarationStatement(queryStatement)) {
             unparsedEntities.push_back(queryStatement);
@@ -18,85 +24,174 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
             throw Exception("Syntax Error");
         }
     }
-    std::vector<QueryEntity> entities = PQLParser::parseQueryEntities(unparsedEntities);
-    std::vector<QueryClause*> clauses = PQLParser::parseQueryClauses(unparsedClauses);
-    Query query = PQLParser::combineResult(entities, clauses);
-    return query;
+    // ALL entities declared
+    std::vector<Synonym> entities = PQLParser::parseQueryEntities(unparsedEntities);
+    // Select entities in select clause
+    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(entities, unparsedClauses);
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(entities, unparsedClauses);
+    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(entities, unparsedClauses);
+    return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
-std::vector<std::string> PQLParser::getQueryEntities(std::vector<std::string> unparsedQuery) {
-    std::vector<std::string> out = std::vector<std::string>(unparsedQuery.begin(), unparsedQuery.end() - 1);
-    return out;
+std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
+    return unparsedQuery[unparsedQuery.size() - 1];
 }
-
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) { return unparsedQuery[unparsedQuery.size() - 1]; }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
+
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
 // Output "std::vector<QueryEntity, QueryEntity, ... >"
-std::vector<QueryEntity> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
-    std::vector<QueryEntity> queryEntities = {};
+
+std::vector<Synonym> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
+    std::vector<Synonym> queryEntities = {};
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
         synonymTypeList.pop_back();  // remove semi-colon
         std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
         std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
+
         // first synonym and type
         std::string type = typeAndFirstSynonym[0];
         std::string firstArg = trim(typeAndFirstSynonym[1]);
+
         // Determine entity type and make appropriate QueryEntity
-        EntityType entityType = QueryEntity::determineType(type);
-        QueryEntity firstQueryDeclaration = QueryEntity(entityType, firstArg);
+        DesignEntityType entityType = Synonym::determineType(type);
+        Synonym firstQueryDeclaration = Synonym(entityType, firstArg);
         queryEntities.push_back(firstQueryDeclaration);
+
         // skip first element for other synonyms
         std::vector<std::string> sublist = std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
 
         for (std::string synonym : sublist) {
-            QueryEntity currQueryDeclaration = QueryEntity(entityType, trim(synonym));
+            Synonym currQueryDeclaration = Synonym(entityType, trim(synonym));
             queryEntities.push_back(currQueryDeclaration);
         }
     }
     return queryEntities;
 }
 
-// splits the select, such that, and pattern clauses,
-// ASSUMPTION: only have at most one of each type of clause - OUTDATED! ***
-// Only works for select now
+std::vector<Synonym> PQLParser::findSelectClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+    std::regex pattern("\\s*Select\\s+(\\w+)\\s*");
+    // Select{>=1 whitespaces}{capturing group}
 
-// Need to implement findPattern(wordList)
-// Need to implement findSuchThat(wordList)
+    std::smatch match;
+    std::string selectEntity;
+    std::vector<Synonym> result = {};  // if there is none
 
-// std::unordered_map<ClauseType, std::vector<int>> PQLParser::getClauseStarts(std::vector<std::string> &wordList) {
-//     // std::vector<int> suchThatStart = findSuchThat(wordList);
-//     // std::vector<int> patternStart = findPattern(wordList);
-//     std::vector<int> selectStart{0};
+    if (std::regex_search(unparsedClauses, match, pattern)) {
+        selectEntity = match[1];
+        for (const Synonym& entity : entities) {
+            if (entity.getValue() == selectEntity) {
+                result.push_back(entity);
+            }
+        }
+    }
 
-//     std::unordered_map<ClauseType, std::vector<int>> res{{ClauseType::SELECT, selectStart}};
-//                                                         // {ClauseType::SUCH_THAT, suchThatStart},
-//                                                         // {ClauseType::PATTERN, patternStart}};
-//     return res;
-// }
-
-// Parse clauses from UnparsedQuery (std::vector<std::string>)
-// Input should look something like "Select ... such that ... pattern ..."
-// Output should look something like ""
-std::vector<QueryClause*> PQLParser::parseQueryClauses(std::string unparsedClauses) {
-    // Identify and parse SELECT, SUCH THAT, PATTERN clauses within the query string
-    // Identify starting positions of SELECT, SUCH THAT, PATTERN
-    std::vector<QueryClause*> parsedClauses;
-    std::vector<std::string> wordList = stringToWordList(unparsedClauses);
-    // std::unordered_map<ClauseType, std::vector<int>> clauseStarts = getClauseStarts(wordList);
-    // there will be a function to get the end of each clause, but for now, will hardcode for 'Select v' alone
-    parsedClauses.push_back(new SelectClause(wordList[1]));
-
-    return parsedClauses;
+    return result;
 }
 
-// Just combines the two
-// into a unordered_map[variables] = clauses
-Query PQLParser::combineResult(const std::vector<QueryEntity> queryEntities,
-                               const std::vector<QueryClause*> queryClauses) {
-    return Query{queryEntities};
-    // return std::make_tuple(queryEntities, queryClauses);
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+    std::vector<SuchThatClause> result = {};  // if there is none
+    std::regex stPattern("\\s+such\\s+that\\s+(\\w+\\*?\\s*\\(.*?\\))\\s*");
+    // {>=1 whitespaces}such{>=1 whitespaces}that{>=1 whitespaces}{capturing group}
+    // capturing group format -> {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
+    for (std::string clauseString : searchClause(stPattern, unparsedClauses)) {
+        SuchThatClause st = toSTClause(entities, clauseString);
+        result.push_back(st);
+    }
+    return result;
+}
+
+std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+    std::vector<PatternClause> result = {};  // if there is none
+    std::regex pattern("\\s+pattern\\s+(\\w+\\s*\\(.*?\\))\\s*");
+
+    for (std::string clauseString : searchClause(pattern, unparsedClauses)) {
+        PatternClause st = toPatternClause(entities, clauseString);
+        result.push_back(st);
+    }
+
+    return result;
+}
+
+std::vector<std::string> PQLParser::searchClause(const std::regex& pattern, const std::string& unparsedClauses) {
+    // ai-gen start(chatgpt, 2, e)
+    // prompt: https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat
+    std::vector<std::string> result = {};
+    std::smatch match;
+    std::string::const_iterator searchStart(unparsedClauses.cbegin());
+    while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
+        result.push_back(match.str(1));
+        searchStart = match.suffix().first;
+    }
+
+    return result;
+    // ai-gen end
+}
+
+// Helper function to findSuchThatClauses
+SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string str) {
+    std::regex stArguments("\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
+    // <{letters/digits}{optional *}>{>=0 whitespaces}<{bracketed non-greedy}>
+    std::smatch argMatch;
+    if (std::regex_search(str, argMatch, stArguments)) {
+        std::string type = argMatch[1];
+        std::string parameters = argMatch[2];
+
+        std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
+        std::vector<Synonym> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        return SuchThatClause(SuchThatClause::determineType(type), entityVector[0], entityVector[1]);
+    } else {
+        std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
+        exit(1);
+    }
+}
+
+// Helper function to findPatternClauses
+PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::string str) {
+    std::regex ptClause("\\s*(\\w+)\\s*\\((.*?)\\)\\s*");
+    // <{letters/digits}>{>=0 whitespaces}<{bracketed non-greedy}>
+    std::smatch argMatch;
+    if (std::regex_search(str, argMatch, ptClause)) {
+        std::string assignSynonym = argMatch[1];
+        std::string parameters = argMatch[2];
+
+        std::vector<std::string> parameterStringsToParse{assignSynonym};
+        std::vector<std::string> cleanedParameters{cleanParameters(parameters)};
+        parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
+                                       cleanedParameters.end());
+
+        std::vector<Synonym> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
+    } else {
+        std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
+        exit(1);
+    }
+}
+
+std::vector<std::string> PQLParser::cleanParameters(const std::string& parametersString) {
+    std::vector<std::string> result{};
+    std::istringstream iss(parametersString);
+    std::string parameter;
+    while (std::getline(iss, parameter, ',')) {
+        parameter = trim(parameter);
+        result.push_back(parameter);
+    }
+    return result;
+}
+
+std::vector<Synonym> PQLParser::matchParameterToQueryEntity(const std::vector<Synonym>& entities,
+                                                            const std::vector<std::string>& strings) {
+    std::vector<Synonym> results{};
+
+    for (const std::string& str : strings) {
+        for (const Synonym& entity : entities) {
+            if (entity.getValue() == str) {
+                results.push_back(entity);
+                break;  // We have already matched an entity, no need to continue searching
+            }
+        }
+    }
+    return results;
 }

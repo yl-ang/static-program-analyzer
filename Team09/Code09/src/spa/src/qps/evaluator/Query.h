@@ -2,20 +2,22 @@
 
 #include <unordered_set>
 
-#include "Table.h"
 #include "PKB/PKBClient/PKBFacadeReader.h"
-#include "qps/parser/QueryClause.h"
-#include "qps/parser/QueryEntity.h"
-
+#include "Table.h"
+#include "qps/clauseArguments/Synonym.h"
+#include "qps/clauses/PatternClause.h"
+#include "qps/clauses/SuchThatClause.h"
 
 class Query {
 public:
-    Query(const std::vector<QueryEntity>&); // TODO: Add suchthatclause and patternclause into arguments
+    Query(const std::vector<Synonym>&, const std::vector<SuchThatClause>&, const std::vector<PatternClause>&);
     std::vector<std::string> evaluate(const PKBFacadeReader&);
+    std::vector<Synonym> getSelectEntities() const;
 
-    std::vector<QueryEntity> getSelectEntities() const;
 private:
-    std::vector<QueryEntity> selectEntities;
+    std::vector<Synonym> selectEntities;
+    std::vector<SuchThatClause> suchThatClauses;
+    std::vector<PatternClause> patternClauses;
 
     Table buildSelectTable(const PKBFacadeReader&);
 };
