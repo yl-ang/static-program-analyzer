@@ -27,6 +27,10 @@ SuchThatClauseType SuchThatClause::determineType(const std::string type) {
         suchThatClauseType = SuchThatClauseType::PARENT;
     } else if (type == "Parent*") {
         suchThatClauseType = SuchThatClauseType::PARENT_STAR;
+    } else if (type == "Uses") {
+        suchThatClauseType = SuchThatClauseType::USES;
+    } else if (type == "Modifies") {
+        suchThatClauseType = SuchThatClauseType::MODIFIES;
     } else {
         std::cout << "suchThatClauseType is not found in valid types: " << type << "\n";
         exit(1);

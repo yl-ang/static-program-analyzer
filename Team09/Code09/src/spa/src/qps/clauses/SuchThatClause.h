@@ -8,6 +8,8 @@ enum class SuchThatClauseType {
     FOLLOWS_STAR,
     PARENT,
     PARENT_STAR,
+    USES,
+    MODIFIES
 };  // update here
 
 class SuchThatClause : public QueryClause {
