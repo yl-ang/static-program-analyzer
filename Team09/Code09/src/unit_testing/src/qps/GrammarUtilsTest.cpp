@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "qps/GrammarUtils.h"
 
+// TODO(Han Qin): Test for all utils functions.
 TEST_CASE("Grammar Utils") {
     // check ident
     REQUIRE(isIdent("Capitalize") == true);

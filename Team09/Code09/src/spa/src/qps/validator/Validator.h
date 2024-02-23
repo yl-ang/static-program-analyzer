@@ -14,9 +14,9 @@ public:
 protected:
     SynonymStore synonymStore = {};
 
-    bool isValidSelectStatement(std::string);
-    bool isValidDeclarationStatement(std::string);
+    void validateSelectStatement(const std::string& statement);
+    void validateDeclarationStatement(const std::string& statement);
 
-    bool isValidSuchThatClause(std::string);
-    bool isValidPatternClause(std::string);
+    void validateSuchThatClause(const std::string& suchThatClause);
+    void validatePatternClause(const std::string& patternClause);
 };
