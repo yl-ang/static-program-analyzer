@@ -148,16 +148,43 @@ TEST_CASE("validatePatternClause") {
     REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID));
 }
 
-TEST_CASE("validateSelectStatement") {
-    using Statements = std::vector<std::string>;
-
+TEST_CASE("validateSelectStatement_STPattern_VALID") {
     TestValidator validator;
 
-    Statements inputStatements_VALID = {"assign a;", "variable v;",
-                                        "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
-    Statements inputStatements_MissingVariable_INVALID = {"assign a;", "variable v;",
-                                                          "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
+    std::vector<std::string> inputStatements = {"assign a;", "variable v;",
+                                                "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
+    REQUIRE(validator.testValidate(inputStatements));
+}
 
-    REQUIRE(validator.testValidate(inputStatements_VALID));
-    REQUIRE_FALSE(validator.testValidate(inputStatements_MissingVariable_INVALID));
+TEST_CASE("validateSelectStatement_PatternST_VALID") {
+    TestValidator validator;
+
+    std::vector<std::string> inputStatements = {"assign a;", "variable v;",
+                                                "Select v pattern a(v,_\"2\"_) such that Follows(1,2)"};
+    REQUIRE(validator.testValidate(inputStatements));
+}
+
+TEST_CASE("validateSelectStatement_UndeclaredSynonym_INVALID") {
+    TestValidator validator;
+    std::vector<std::string> inputStatements = {"assign a;", "variable v;",
+                                                "Select v such that Follows(1,2) pattern a(v1,_\"2\"_)"};
+    REQUIRE_FALSE(validator.testValidate(inputStatements));
+}
+
+TEST_CASE("validateSelectStatement_DuplicateSynonym_INVALID") {
+    TestValidator validator;
+    std::vector<std::string> inputStatements = {"assign a;", "variable v, v;",
+                                                "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
+    REQUIRE_FALSE(validator.testValidate(inputStatements));
+}
+
+// Order of Select and declaration is not checked.
+// However, it doesn't have to be since if it is a valid Select statement,
+// it would not be able to retrieve the synonyms, resulting in Semantic Error
+// Wrong error will be thrown (Semantic instead of Syntax).
+TEST_CASE("validateSelectStatement_INVALID") {
+    TestValidator validator;
+    std::vector<std::string> inputStatements = {"Select v such that Follows(1,2) pattern a(v,_\"2\"_)", "assign a;",
+                                                "variable v, v;"};
+    REQUIRE_FALSE(validator.testValidate(inputStatements));
 }
