@@ -1,6 +1,6 @@
 #include "PatternClause.h"
 
-PatternClause::PatternClause(const ClauseArgument& assign, const ClauseArgument& f, const ClauseArgument& s)
+PatternClause::PatternClause(const ClauseArgument* assign, const ClauseArgument* f, const ClauseArgument* s)
     : assignSynonym(assign), firstArg(f), secondArg(s) {}
 
 ClauseType PatternClause::getType() {
@@ -9,7 +9,9 @@ ClauseType PatternClause::getType() {
 
 bool PatternClause::equals(const QueryClause& other) {
     if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
-        return firstArg == ptr->firstArg && secondArg == ptr->secondArg && assignSynonym == ptr->assignSynonym;
+        return *(firstArg) == *(ptr->firstArg) 
+            && *(secondArg) == *(ptr->secondArg) 
+            && *(assignSynonym) == *(ptr->assignSynonym);
     }
     return false;
 }

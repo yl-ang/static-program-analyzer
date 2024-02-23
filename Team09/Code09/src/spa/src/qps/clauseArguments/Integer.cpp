@@ -11,8 +11,8 @@ bool Integer::isInteger() const {
 }
 
 bool Integer::operator==(const ClauseArgument& other) const {
-    if (!other.isInteger()) {
-        return false;
+    if (const Integer* ptr = dynamic_cast<const Integer*>(&other)) {
+        return this->getValue() == other.getValue();
     }
-    return this->getValue() == other.getValue();
+    return false;
 }

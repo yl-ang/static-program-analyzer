@@ -15,7 +15,7 @@ static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE
 };  // update here
 }
 
-SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument& f, ClauseArgument& s)
+SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument* f, ClauseArgument* s)
     : type(t), firstArg(f), secondArg(s) {}
 
 ClauseType SuchThatClause::getType() {
@@ -23,7 +23,7 @@ ClauseType SuchThatClause::getType() {
 }
 bool SuchThatClause::equals(const QueryClause& other) {
     if (const SuchThatClause* ptr = dynamic_cast<const SuchThatClause*>(&other)) {
-        return type == ptr->type && firstArg == ptr->firstArg && secondArg == ptr->secondArg;
+        return type == ptr->type && *(firstArg) == *(ptr->firstArg) && *(secondArg) == *(ptr->secondArg);
     }
     return false;
 }

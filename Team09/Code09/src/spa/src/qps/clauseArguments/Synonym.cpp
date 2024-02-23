@@ -19,11 +19,10 @@ std::string Synonym::getValue() const {
 }
 
 bool Synonym::operator==(const ClauseArgument& other) const {
-    if (!other.isSynonym()) {
-        return false;
+    if (const Synonym* ptr = dynamic_cast<const Synonym*>(&other)) {
+        return this->getValue() == other.getValue();
     }
-
-    return this->getValue() == other.getValue();
+    return false;
 }
 
 void Synonym::print() {

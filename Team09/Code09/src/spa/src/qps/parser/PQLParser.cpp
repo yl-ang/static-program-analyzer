@@ -141,7 +141,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
         std::string parameters = argMatch[2];
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
-        std::vector<ClauseArgument> entityVector{buildSTParameters(entities, parameterStringsToParse)};
+        std::vector<ClauseArgument*> entityVector{buildSTParameters(entities, parameterStringsToParse)};
 
         return SuchThatClause(SuchThatClause::determineRelationshipType(type), entityVector[0], entityVector[1]);
     } else {
@@ -165,7 +165,7 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
 
         parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
                                        cleanedParameters.end());
-        std::vector<ClauseArgument> entityVector{buildPatternParameters(entities, parameterStringsToParse)};
+        std::vector<ClauseArgument*> entityVector{buildPatternParameters(entities, parameterStringsToParse)};
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
@@ -192,16 +192,16 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
  * Determine if parameters are:
  * literal, wildcard, integer, synonym
 */
-std::vector<ClauseArgument> PQLParser::buildSTParameters(const std::vector<Synonym>& entities, 
+std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Synonym>& entities, 
                                                         const std::vector<std::string>& strings) {
-    std::vector<ClauseArgument> results{};
+    std::vector<ClauseArgument*> results{};
     for (const std::string& str : strings) {
         if (isQuotedIdent(str)) {
-            results.push_back(Literal(str));
+            results.push_back(new Literal(str));
         } else if (isWildcard(str)) {
-            results.push_back(Wildcard());
+            results.push_back(new Wildcard());
         } else if (isInteger(str)) {
-            results.push_back(Integer(str));
+            results.push_back(new Integer(str));
         } else if (isSynonym(str)) {
             results.push_back(buildSynonym(entities, str));
         } else {
@@ -219,9 +219,9 @@ std::vector<ClauseArgument> PQLParser::buildSTParameters(const std::vector<Synon
  * second parameter is always entRef
  * third parameter is always expressionSpec
 */
-std::vector<ClauseArgument> PQLParser::buildPatternParameters(const std::vector<Synonym>& entities,
+std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector<Synonym>& entities,
                                                             const std::vector<std::string>& strings) {
-    std::vector<ClauseArgument> results{};
+    std::vector<ClauseArgument*> results{};
 
     std::string ptSynonym = strings[0];
     std::string ptEntRef = strings[1];
@@ -232,9 +232,9 @@ std::vector<ClauseArgument> PQLParser::buildPatternParameters(const std::vector<
 
     // second argument is ent-ref
     if (isQuotedIdent(ptEntRef)) {
-        results.push_back(Literal(removeAllWhitespaces(ptEntRef)));
+        results.push_back(new Literal(removeAllWhitespaces(ptEntRef)));
     } else if (isWildcard(ptEntRef)) {
-        results.push_back(Wildcard());
+        results.push_back(new Wildcard());
     } else if (isSynonym(ptEntRef)) {
         results.push_back(buildSynonym(entities, ptEntRef));
     } else {
@@ -242,17 +242,17 @@ std::vector<ClauseArgument> PQLParser::buildPatternParameters(const std::vector<
     }
 
     // third argument is expression-spec
-    results.push_back(ExpressionSpec(ptExpressionSpec));
+    results.push_back(new ExpressionSpec(ptExpressionSpec));
     return results;
 }
 
 /**
  * Helper function to buildSTParameters, buildPatternParameters
 */
-Synonym PQLParser::buildSynonym(const std::vector<Synonym>& entities, const std::string& str) {
+Synonym * PQLParser::buildSynonym(const std::vector<Synonym>& entities, const std::string& str) {
     for (const Synonym& entity : entities) {
         if (entity.getValue() == str) {
-            return entity;
+            return new Synonym(entity.getType(), entity.getValue());
             break;  // We have already matched an entity, no need to continue searching
         }
     }

@@ -9,5 +9,8 @@ std::string Wildcard::getValue() const {
 }
 
 bool Wildcard::operator==(const ClauseArgument& other) const {
-    return other.isWildcard();
+    if (const Wildcard* ptr = dynamic_cast<const Wildcard*>(&other)) {
+        return true;
+    }
+    return false;
 }

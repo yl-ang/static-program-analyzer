@@ -11,8 +11,8 @@ bool ExpressionSpec::isExpressionSpec() const {
 }
 
 bool ExpressionSpec::operator==(const ClauseArgument& other) const {
-    if (!other.isExpressionSpec()) {
-        return false;
+    if (const ExpressionSpec* ptr = dynamic_cast<const ExpressionSpec*>(&other)) {
+        return this->getValue() == other.getValue();
     }
-    return this->getValue() == other.getValue();
+    return false;
 }
