@@ -14,12 +14,12 @@ enum class SuchThatClauseType {
 
 class SuchThatClause : public QueryClause {
 private:
-    SuchThatClauseType type;
-    Synonym firstArg;
-    Synonym secondArg;
+    const SuchThatClauseType type;
+    const ClauseArgument* firstArg;
+    const ClauseArgument* secondArg;
 
 public:
-    SuchThatClause(const SuchThatClauseType&, const Synonym&, const Synonym&);
+    SuchThatClause(const SuchThatClauseType&, const ClauseArgument*, const ClauseArgument*);
     static SuchThatClauseType determineType(const std::string);  // update here
     ClauseType getType() const override;
     bool equals(const QueryClause& other) const override;

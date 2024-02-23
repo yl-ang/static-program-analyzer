@@ -2,15 +2,16 @@
 
 #include "QueryClause.h"
 #include "qps/clauseArguments/Synonym.h"
+#include "qps/clauseArguments/ExpressionSpec.h"
 
 class PatternClause : public QueryClause {
 private:
-    Synonym assignSynonym;
-    Synonym firstArg;
-    Synonym secondArg;
+    const Synonym* assignSynonym;
+    const ClauseArgument* firstArg;
+    const ExpressionSpec* secondArg;
 
 public:
-    PatternClause(const Synonym&, const Synonym&, const Synonym&);
+    PatternClause(const Synonym*, const ClauseArgument*, const ExpressionSpec*);
     ClauseType getType() const override;
     bool equals(const QueryClause&) const override;
     Table evaluate(const PKBFacadeReader&) override;

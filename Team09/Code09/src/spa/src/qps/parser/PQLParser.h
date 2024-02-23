@@ -18,12 +18,12 @@ private:
     static PatternClause toPatternClause(std::vector<Synonym>, std::string);
 
     static std::vector<std::string> searchClause(const std::regex&, const std::string&);
-    static std::vector<ClauseArgument> buildSTParameters(const std::vector<Synonym>&,
+    static std::vector<ClauseArgument*> buildSTParameters(const std::vector<Synonym>&,
                                                             const std::vector<std::string>&);
-    static std::vector<ClauseArgument> buildPatternParameters(const std::vector<Synonym>&,
+    static std::vector<ClauseArgument*> buildPatternParameters(const std::vector<Synonym>&,
                                                             const std::vector<std::string>&);                                                          
     static std::vector<std::string> cleanParameters(const std::string&);
-    static Synonym buildSynonym(const std::vector<Synonym>& entities,const std::string& str);
+    static Synonym* buildSynonym(const std::vector<Synonym>& entities,const std::string& str);
     static Synonym buildExpression(const std::string& str);
 public:
     static Query parse(UnparsedQuery);
