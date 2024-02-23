@@ -1,6 +1,6 @@
 #include "PatternClause.h"
 
-PatternClause::PatternClause(const Synonym& assign, const ClauseArgument& f, const ExpressionSpec& s)
+PatternClause::PatternClause(const ClauseArgument& assign, const ClauseArgument& f, const ClauseArgument& s)
     : assignSynonym(assign), firstArg(f), secondArg(s) {}
 
 ClauseType PatternClause::getType() const {

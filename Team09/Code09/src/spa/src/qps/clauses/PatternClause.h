@@ -6,12 +6,12 @@
 
 class PatternClause : public QueryClause {
 private:
-    const Synonym assignSynonym;
+    const ClauseArgument& assignSynonym;
     const ClauseArgument& firstArg;
-    const ExpressionSpec secondArg;
+    const ClauseArgument& secondArg;
 
 public:
-    PatternClause(const Synonym&, const ClauseArgument&, const ExpressionSpec&);
+    PatternClause(const ClauseArgument&, const ClauseArgument&, const ClauseArgument&);
     ClauseType getType() const override;
     bool equals(const QueryClause&) const override;
     // Table evaluate(const PKBFacadeReader&) override;
