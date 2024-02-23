@@ -12,7 +12,7 @@ private:
 
 public:
     PatternClause(const ClauseArgument&, const ClauseArgument&, const ClauseArgument&);
-    ClauseType getType() const override;
-    bool equals(const QueryClause&) const override;
+    ClauseType getType();
+    bool equals(const QueryClause&);
     // Table evaluate(const PKBFacadeReader&) override;
 };

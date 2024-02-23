@@ -25,6 +25,5 @@ public:
     };
 
     virtual std::string getValue() const = 0;
-    
     virtual bool operator==(const ClauseArgument& other) const = 0;
 };

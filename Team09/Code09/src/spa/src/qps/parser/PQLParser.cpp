@@ -6,13 +6,6 @@
 #include "../ParserUtils.h"
 #include "../exceptions/Exception.h"
 
-#include "qps/clauseArguments/ClauseArgument.h"
-#include "qps/clauseArguments/Literal.h"
-#include "qps/clauseArguments/Integer.h"
-#include "qps/clauseArguments/Wildcard.h"
-#include "qps/clauseArguments/Synonym.h"
-#include "qps/clauseArguments/ExpressionSpec.h"
-
 // Checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
@@ -149,7 +142,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
         std::vector<ClauseArgument> entityVector{buildSTParameters(entities, parameterStringsToParse)};
-        // How to convert to SuchThatClause?
+
         return SuchThatClause(SuchThatClause::determineRelationshipType(type), entityVector[0], entityVector[1]);
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
@@ -196,11 +189,8 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
 /**
  * Helper function to toSTClause
  * 
- * Here will have to determine if parameters are:
- * literal
- * wildcard
- * integer
- * synonym
+ * Determine if parameters are:
+ * literal, wildcard, integer, synonym
 */
 std::vector<ClauseArgument> PQLParser::buildSTParameters(const std::vector<Synonym>& entities, 
                                                         const std::vector<std::string>& strings) {
@@ -242,7 +232,7 @@ std::vector<ClauseArgument> PQLParser::buildPatternParameters(const std::vector<
 
     // second argument is ent-ref
     if (isQuotedIdent(ptEntRef)) {
-        results.push_back(Literal(ptEntRef));
+        results.push_back(Literal(removeAllWhitespaces(ptEntRef)));
     } else if (isWildcard(ptEntRef)) {
         results.push_back(Wildcard());
     } else if (isSynonym(ptEntRef)) {

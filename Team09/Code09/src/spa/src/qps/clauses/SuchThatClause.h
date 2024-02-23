@@ -21,7 +21,7 @@ private:
 public:
     SuchThatClause(const RelationshipType&, ClauseArgument&, ClauseArgument&);
     static RelationshipType determineRelationshipType(const std::string&);
-    ClauseType getType() const override;
-    bool equals(const QueryClause& other) const override;
+    ClauseType getType();
+    bool equals(const QueryClause& other);
     // ClauseResult evaluate(PKBFacadeReader&) override;
 };
