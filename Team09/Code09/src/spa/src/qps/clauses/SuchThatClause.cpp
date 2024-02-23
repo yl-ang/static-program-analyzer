@@ -3,7 +3,7 @@
 #include <iostream>
 
 // TODO(Ezekiel): add validations for arguments
-SuchThatClause::SuchThatClause(const SuchThatClauseType& t, const ClauseArgument* f, const ClauseArgument* s)
+SuchThatClause::SuchThatClause(const SuchThatClauseType& t, const ClauseArgument& f, const ClauseArgument& s)
     : type(t), firstArg(f), secondArg(s) {}
 
 ClauseType SuchThatClause::getType() const {
@@ -12,7 +12,7 @@ ClauseType SuchThatClause::getType() const {
 
 bool SuchThatClause::equals(const QueryClause& other) const {
     if (const SuchThatClause* ptr = dynamic_cast<const SuchThatClause*>(&other)) {
-        return type == ptr->type && *firstArg == *(ptr->firstArg) && *secondArg == *(ptr->secondArg);
+        return type == ptr->type && firstArg == ptr->firstArg && secondArg == ptr->secondArg;
     }
     return false;
 }

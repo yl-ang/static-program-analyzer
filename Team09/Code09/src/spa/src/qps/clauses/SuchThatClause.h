@@ -15,8 +15,8 @@ enum class SuchThatClauseType {
 class SuchThatClause : public QueryClause {
 private:
     const SuchThatClauseType type;
-    const ClauseArgument* firstArg;
-    const ClauseArgument* secondArg;
+    const ClauseArgument firstArg;
+    const ClauseArgument secondArg;
 
 public:
     SuchThatClause(const SuchThatClauseType&, const ClauseArgument*, const ClauseArgument*);
