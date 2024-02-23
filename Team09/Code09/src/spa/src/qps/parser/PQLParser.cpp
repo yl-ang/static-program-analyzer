@@ -140,7 +140,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
         std::string parameters = argMatch[2];
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
-        std::vector<Synonym> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        std::vector<ClauseArgument> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
         return SuchThatClause(SuchThatClause::determineType(type), entityVector[0], entityVector[1]);
     } else {
         std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
@@ -162,7 +162,7 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
         parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
                                        cleanedParameters.end());
 
-        std::vector<Synonym> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        std::vector<ClauseArgument> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
     } else {
         std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
@@ -181,7 +181,8 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
     return result;
 }
 
-std::vector<Synonym> PQLParser::matchParameterToQueryEntity(const std::vector<Synonym>& entities,
+// Here will have to determine if integer, string, wildcard, or synonym
+std::vector<ClauseArgument> PQLParser::matchParameterToQueryEntity(const std::vector<Synonym>& entities,
                                                             const std::vector<std::string>& strings) {
     std::vector<Synonym> results{};
 
@@ -195,3 +196,9 @@ std::vector<Synonym> PQLParser::matchParameterToQueryEntity(const std::vector<Sy
     }
     return results;
 }
+
+// Create function to determine input's type
+// literal
+// wildcard
+// synonym
+// integer
