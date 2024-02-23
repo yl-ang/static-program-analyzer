@@ -5,7 +5,14 @@
 #include "../GrammarUtils.h"
 #include "../ParserUtils.h"
 #include "../exceptions/Exception.h"
+
+#include "qps/clauseArguments/ClauseArgument.h"
+#include "qps/clauseArguments/Literal.h"
+#include "qps/clauseArguments/Integer.h"
+#include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauseArguments/Synonym.h"
+#include "qps/clauseArguments/ExpressionSpec.h"
+
 
 // checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
@@ -140,7 +147,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
         std::string parameters = argMatch[2];
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
-        std::vector<ClauseArgument> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        std::vector<ClauseArgument> entityVector{matchSTParameters(entities, parameterStringsToParse)};
         return SuchThatClause(SuchThatClause::determineType(type), entityVector[0], entityVector[1]);
     } else {
         std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
@@ -162,7 +169,8 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
         parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
                                        cleanedParameters.end());
 
-        std::vector<ClauseArgument> entityVector{matchParameterToQueryEntity(entities, parameterStringsToParse)};
+        // change the parsing of pattern clauses
+        std::vector<ClauseArgument> entityVector{matchPatternParameters(entities, parameterStringsToParse)};
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
     } else {
         std::cout << "Cannot convert string to SuchThatClause: " << str << "\n";
@@ -182,23 +190,64 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
 }
 
 // Here will have to determine if integer, string, wildcard, or synonym
-std::vector<ClauseArgument> PQLParser::matchParameterToQueryEntity(const std::vector<Synonym>& entities,
+// literal
+// wildcard
+// integer
+// synonym
+std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Synonym>& entities,
                                                             const std::vector<std::string>& strings) {
-    std::vector<Synonym> results{};
+    std::vector<ClauseArgument*> results{};
 
     for (const std::string& str : strings) {
-        for (const Synonym& entity : entities) {
-            if (entity.getValue() == str) {
-                results.push_back(entity);
-                break;  // We have already matched an entity, no need to continue searching
-            }
+        if (isEntRef(str)) {
+            results.push_back(buildEntRef(entities, str));
+        } else if (isStmtRef(str)) {
+            results.push_back(buildEntRef(entities, str));
+        } else {
+            std::cout << "Issues determining ig is literal, wildcard, integer or synonym: " << str << "\n";
+            exit(1);
         }
     }
     return results;
 }
 
-// Create function to determine input's type
-// literal
-// wildcard
-// synonym
-// integer
+ClauseArgument* PQLParser::buildEntRef(const std::vector<Synonym>& entities,
+                                    const std::string& str) {
+    ClauseArgument* result;
+    if (isQuotedIdent(str)) {
+        result = new Literal(str);
+    } else if (isWildcard(str)) {
+        result = new Wildcard();
+    } else if (isInteger(str)) {
+        result = new Integer(str);
+    } else if (isSynonym(str)) {
+        result = buildSynonym(entities, str);
+    } else {
+        std::cout << "Issues determining ig is literal, wildcard, integer or synonym: " << str << "\n";
+        exit(1);
+    }
+    return result;
+}
+
+// Here will have to determine if integer, string, wildcard, or synonym
+std::vector<ClauseArgument> PQLParser::buildPatternParameters(const std::vector<Synonym>& entities,
+                                                            const std::vector<std::string>& strings) {
+    std::vector<ClauseArgument> results{};
+
+    for (const std::string& str : strings) {
+        
+    }
+    return results;
+}
+
+Synonym* PQLParser::buildSynonym(const std::vector<Synonym>& entities,
+                                    const std::string& str) {
+    for (const Synonym& entity : entities) {
+        if (entity.getValue() == str) {
+            return new Synonym(entity.getType(), entity.getValue());
+            break;  // We have already matched an entity, no need to continue searching
+        }
+    }
+    std::cout << "Could not find Synonym when parsing clauses, amongst declarations: " << str << "\n";
+    exit(1);
+}
