@@ -23,7 +23,7 @@ public:
     // Getters for Statements
     [[nodiscard]] std::unordered_set<Stmt> getStmts() const;
     [[nodiscard]] Stmt* getStatementByStmtNum(StmtNum stmtNum) const;
-    [[nodiscard]] std::vector<Stmt*> getStatementsByType(
+    [[nodiscard]] std::unordered_set<Stmt*> getStatementsByType(
         StatementType type) const;
 
 private:
