@@ -8,7 +8,6 @@
 
 using namespace std;  // NOLINT
 
-/*
 std::queue<Token> makeTokenQueue(std::vector<Token> tokens) {
     std::queue<Token> queue;
     for (auto token : tokens) {
@@ -220,5 +219,3 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(procedure == result);
     }
 }
-
-*/
