@@ -10,6 +10,9 @@ bool ExpressionSpec::isExpressionSpec() const {
     return true;
 }
 
-bool ExpressionSpec::operator==(const ExpressionSpec& other) const {
-    return value == other.value;
+bool ExpressionSpec::operator==(const ClauseArgument& other) const {
+    if (!other.isExpressionSpec()) {
+        return false;
+    }
+    return this->getValue() == other.getValue();
 }

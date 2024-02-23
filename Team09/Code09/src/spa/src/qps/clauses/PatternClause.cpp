@@ -16,8 +16,8 @@ bool PatternClause::equals(const QueryClause& other) const {
     return false;
 }
 
-Table PatternClause::evaluate(const PKBFacadeReader& pkb) {
-    // TODO(Ezekiel): implement evaluate
+// Table PatternClause::evaluate(const PKBFacadeReader& pkb) {
+//     // TODO(Ezekiel): implement evaluate
 
-    return Table();
-}
+//     return Table();
+// }

@@ -10,6 +10,10 @@ bool Literal::isLiteral() const {
     return true;
 }
 
-bool Literal::operator==(const Literal& other) const {
-    return value == other.value;
+bool Literal::operator==(const ClauseArgument& other) const {
+    if (!other.isLiteral()) {
+        return false;
+    }
+
+    return this->getValue() == other.getValue();
 }

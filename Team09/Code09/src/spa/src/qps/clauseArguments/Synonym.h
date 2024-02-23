@@ -31,5 +31,5 @@ public:
     std::string getValue() const override;
     static std::string entityTypeToString(DesignEntityType);
     void print();
-    bool operator==(const Synonym& other) const;
+    bool operator==(const ClauseArgument& other) const override;
 };

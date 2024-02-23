@@ -14,7 +14,7 @@ public:
     virtual ~QueryClause(){};
     virtual ClauseType getType() const = 0;
     virtual bool equals(const QueryClause& other) const = 0;
-    virtual Table evaluate(const PKBFacadeReader&) = 0;
+    // virtual Table evaluate(const PKBFacadeReader&) = 0;
 };
 
 class SelectClause : public QueryClause {
@@ -26,5 +26,5 @@ public:
     ClauseType getType() const override;
     bool equals(const QueryClause& other) const override;
     std::string getArgument() const;
-    Table evaluate(const PKBFacadeReader&) override;
+    // Table evaluate(const PKBFacadeReader&) override;
 };

@@ -7,3 +7,7 @@ bool Wildcard::isWildcard() const {
 std::string Wildcard::getValue() const {
     return "_";
 }
+
+bool Wildcard::operator==(const ClauseArgument& other) const {
+    return other.isWildcard();
+}
