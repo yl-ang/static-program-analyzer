@@ -13,27 +13,25 @@ public:
     // Setters for common entities
     void setVariables(const std::unordered_set<Variable> &inputVariables) const;
     void setConstants(const std::unordered_set<Constant> &inputConstants) const;
-    void setProcedures(
-        const std::unordered_set<Procedure> &inputProcedures) const;
+    void setProcedures(const std::unordered_set<Procedure> &inputProcedures) const;
 
     // Setter for statement entity
     void setStmts(const std::unordered_set<Stmt> &inputStmts) const;
 
     // Setter for FollowsStore
-    void setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>
-                             &followsPairs) const;
+    void setFollowsStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &followsPairs) const;
 
     // Setter for ParentStore
-    void setParentStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>
-                            &parentPairs) const;
+    void setParentStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &parentPairs) const;
 
     // Setter for ModifiesStore
-    void setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>>
-                              &modifiesPairs) const;
+    void setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesPairs) const;
 
     // Setter for UsesStore
-    void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>
-                          &usesPairs) const;
+    void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
+
+    void setPatternStore(
+        const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;
 
 private:
     PKB *pkbReference = nullptr;
