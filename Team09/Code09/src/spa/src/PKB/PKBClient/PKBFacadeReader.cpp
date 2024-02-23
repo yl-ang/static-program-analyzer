@@ -67,7 +67,7 @@ bool PKBFacadeReader::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
 }
 
 bool PKBFacadeReader::hasFollowRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
-    return pkbReference->followsStore->hasFollowStarRelationship(arg1, arg2);
+    return pkbReference->followsStore->hasFollowRelationship(arg1, arg2);
 }
 
 bool PKBFacadeReader::hasFollowStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
