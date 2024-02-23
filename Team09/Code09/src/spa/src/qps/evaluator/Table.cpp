@@ -68,35 +68,20 @@ Table Table::join(const Table& other) {
         return Table{mergeHeaders(headers, other.headers), emptyRows};  // return empty table
     }
 
-    // ai-gen start(copilot, 0, e)
-    // prompt: get common headers the new table should be the union of the headers
     std::vector<Synonym> commonHeaders{getCommonHeaders(other)};
     if (commonHeaders.size() == 0) {
-        return crossProduct(other);
+        return cartesianProduct(other);
     }
 
     std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
-    // ai-gen end
 
     // ai-gen start(copilot, 1, e)
     // prompt: find the rows that have the same values for the common headers
     std::vector<Row> newRows{};
     for (Row row : rows) {
         for (Row otherRow : other.rows) {
-            bool isSame = true;
-            for (Synonym header : commonHeaders) {
-                if (row.at(header.getValue()) != otherRow.at(header.getValue())) {
-                    isSame = false;
-                    break;
-                }
-            }
-            if (isSame) {
-                Row newRow{row};
-                for (Synonym header : other.headers) {
-                    SynonymValue headerValue = header.getValue();
-                    newRow[headerValue] = otherRow.at(headerValue);
-                }
-                newRows.push_back(newRow);
+            if (areJoinableRows(row, otherRow, commonHeaders)) {
+                newRows.push_back(combineRows(row, otherRow, other.headers));
             }
         }
     }
@@ -105,9 +90,27 @@ Table Table::join(const Table& other) {
     return Table{newHeaders, newRows};
 }
 
+bool Table::areJoinableRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& commonHeaders) {
+    for (Synonym header : commonHeaders) {
+        if (row.at(header.getValue()) != otherRow.at(header.getValue())) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Row Table::combineRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& otherHeaders) {
+    Row newRow{row};
+    for (Synonym header : otherHeaders) {
+        SynonymValue headerValue = header.getValue();
+        newRow[headerValue] = otherRow.at(headerValue);
+    }
+    return newRow;
+}
+
 // ai-gen start(copilot, 0, e)
 // prompt: create cross product of two tables
-Table Table::crossProduct(const Table& other) {
+Table Table::cartesianProduct(const Table& other) {
     std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
 
     std::vector<Row> newRows{};

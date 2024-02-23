@@ -28,6 +28,24 @@ private:
     static std::vector<Synonym> mergeHeaders(const std::vector<Synonym>&, const std::vector<Synonym>&);
 
     /**
+     * Returns true if the rows are joinable.
+     * They are joinable if the values of the rows are the same for their common headers.
+     * @param row1 the first row
+     * @param row2 the second row
+     * @param headers the synonyms to compare
+     * @return true if the rows are joinable
+     */
+    static bool areJoinableRows(const Row&, const Row&, const std::vector<Synonym>&);
+
+    /**
+     * Combines 2 rows into 1 row.
+     * @param row1 the first row
+     * @param row2 the second row
+     * @return the combined row
+     */
+    static Row combineRows(const Row&, const Row&, const std::vector<Synonym>&);
+
+    /**
      * Returns the common headers between this table and another table.
      * @param other the other table to compare with
      * @return the common headers
@@ -49,12 +67,13 @@ private:
     bool containsHeader(const Synonym&) const;
 
     /**
-     * Returns the cross product of this table and another table.
+     * Returns the cartesian product of this table and another table.
+     * Every item in this table is paired with every item in the other table.
      * Used when joining tables with no common headers.
      * @param other the other table to cross product with
      * @return the cross product of the tables
      */
-    Table crossProduct(const Table&);
+    Table cartesianProduct(const Table&);
 
 public:
     Table();
