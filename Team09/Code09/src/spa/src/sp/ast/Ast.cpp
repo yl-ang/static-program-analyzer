@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "sp/exceptions/SyntaxError.h"
-
 /*
 root node is fixed so we create that at the top first before traversing the
 token vector. now we process the procedures each procedure.  procedure
@@ -43,12 +41,8 @@ next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
 ProcedureNode AST::buildProcedureAST(std::queue<Token>& tokens) {
-    Token procedureKeyword = tokens.front();
-    checkSyntax(PROCEDURE, procedureKeyword.type);
     tokens.pop();
     Token procName = tokens.front();
-    checkSyntax(NAME, procName.type);
-    // if everything is valid, we can create the node
     ProcedureNode node = ProcedureNode(procName.value);
     tokens.pop();
 
@@ -63,8 +57,6 @@ well.
 
 */
 StatementListNode AST::buildStatementListAST(std::queue<Token>& tokens) {
-    Token openCurly = tokens.front();
-    checkSyntax(OPEN_CURLY_BRACE, openCurly.type);
     tokens.pop();
 
     StatementListNode statementList = StatementListNode();
@@ -74,9 +66,6 @@ StatementListNode AST::buildStatementListAST(std::queue<Token>& tokens) {
         statementList.add_child(statement);
     }
 
-    checkMissingToken(CLOSE_CURLY_BRACE, tokens);
-    Token closeCurly = tokens.front();
-    checkSyntax(CLOSE_CURLY_BRACE, closeCurly.type);
     tokens.pop();
     return statementList;
 }
@@ -97,11 +86,8 @@ ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
     ReadNode readNode = ReadNode();
     tokens.pop();
     Token varName = tokens.front();
-    checkSyntax(NAME, varName.type);
     VarNode nameNode = buildVarNameAST(varName);
     tokens.pop();
-    Token semiColon = tokens.front();
-    checkSyntax(SEMICOLON, semiColon.type);
     readNode.add_child(nameNode);
     tokens.pop();
     return readNode;
@@ -111,11 +97,8 @@ PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
     PrintNode printNode = PrintNode();
     tokens.pop();
     Token varName = tokens.front();
-    checkSyntax(NAME, varName.type);
     VarNode nameNode = buildVarNameAST(varName);
     tokens.pop();
-    Token semiColon = tokens.front();
-    checkSyntax(SEMICOLON, semiColon.type);
     printNode.add_child(nameNode);
     tokens.pop();
     return printNode;
@@ -125,13 +108,9 @@ AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
     VarNode nameNode = VarNode(varName.value);
     tokens.pop();
-    Token equality = tokens.front();
-    checkSyntax(EQUAL, equality.type);
     AssignmentNode node = AssignmentNode();
     tokens.pop();
     ExpressionNode expression = buildExpressionAST(tokens);
-    Token semiColon = tokens.front();
-    checkSyntax(SEMICOLON, semiColon.type);
     tokens.pop();
 
     node.add_child(nameNode);
@@ -224,16 +203,11 @@ ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
         return buildIntAST(token);
     case OPEN_BRACKET:
         return buildExprFromFactorAST(tokens);
-    default:
-        // TODO(ben): refactor this syntax error to its own class
-        throw SyntaxError("Unrecognised token " + getLexicalEnumString(token.type) + " encountered for factor.");
     }
 }
 
 ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
     ExpressionNode expression = buildExpressionAST(tokens);
-    Token closeBracketToken = tokens.front();
-    checkSyntax(CLOSE_BRACKET, closeBracketToken.type);
     tokens.pop();
     return expression;
 }
@@ -244,26 +218,4 @@ VarNode AST::buildVarNameAST(Token token) {
 
 ConstNode AST::buildIntAST(Token token) {
     return ConstNode(token.value);
-}
-
-/*
-------------------------------------------
-
-Syntax Error methods
-
-------------------------------------------
-*/
-
-void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected, std::queue<Token>& tokens) {
-    if (tokens.size() != 0) {
-        return;
-    }
-    throw MissingTokenError(expected);
-}
-
-void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received) {
-    if (expected == received) {
-        return;
-    }
-    throw LexicalSyntaxError(expected, received);
 }
