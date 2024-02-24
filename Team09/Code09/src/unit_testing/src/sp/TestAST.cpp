@@ -499,7 +499,7 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
 
-        ASTNode result = ast.buildExpressionAST(queue);
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
         REQUIRE(lessThan == result);
     }
 }
