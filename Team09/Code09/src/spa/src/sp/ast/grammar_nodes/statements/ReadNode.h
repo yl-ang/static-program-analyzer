@@ -4,5 +4,8 @@
 class ReadNode : public StatementNode {
 public:
     ReadNode() : StatementNode("", "read") {}
-    void accept(AstVisitor* visitor) override;
+
+    void accept(AstVisitor* visitor) override {
+        visitor->visitRead(this);
+    }
 };

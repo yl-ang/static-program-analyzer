@@ -11,5 +11,8 @@ class TermNode : public ExpressionNode {
 public:
     explicit TermNode(LEXICAL_TOKEN_TYPE type) : ExpressionNode(type) {}
     TermNode(std::string value, std::string type) : ExpressionNode(value, type) {}
-    void accept(AstVisitor* visitor) override;
+
+    void accept(AstVisitor* visitor) override {
+        visitor->visitTerm(this);
+    }
 };

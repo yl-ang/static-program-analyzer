@@ -4,5 +4,8 @@
 class PrintNode : public StatementNode {
 public:
     PrintNode() : StatementNode("", "print") {}
-    void accept(AstVisitor* visitor) override;
+
+    void accept(AstVisitor* visitor) override {
+        visitor->visitPrint(this);
+    }
 };

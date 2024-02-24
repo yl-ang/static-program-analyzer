@@ -7,5 +7,8 @@
 class ProcedureNode : public ASTNode {
 public:
     explicit ProcedureNode(std::string name) : ASTNode(name, "proc") {}
-    void accept(AstVisitor* visitor) override;
+
+    void accept(AstVisitor* visitor) override {
+        visitor->visitProcedure(this);
+    }
 };

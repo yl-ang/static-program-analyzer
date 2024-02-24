@@ -5,12 +5,12 @@
 #include "../ast/grammar_nodes/statements/StatementNode.h"
 // #include "../ast/grammar_nodes/statements/WhileNode.h"
 // #include "../ast/grammar_nodes/statements/IfNode.h"
+#include "../ast/grammar_nodes/ConstantNode.h"
 #include "../ast/grammar_nodes/ExpressionNode.h"
 #include "../ast/grammar_nodes/FactorNode.h"
 #include "../ast/grammar_nodes/TermNode.h"
+#include "../ast/grammar_nodes/VariableNode.h"
 #include "../ast/grammar_nodes/statements/AssignmentNode.h"
-// #include "../ast/grammar_nodes/VariableNode.h"
-#include "../ast/grammar_nodes/ConstantNode.h"
 
 // Visitor interface for Design Extractor
 class AstVisitor {
@@ -27,6 +27,6 @@ public:
     virtual void visitExpression(ExpressionNode* node) = 0;
     virtual void visitFactor(FactorNode* node) = 0;
     virtual void visitTerm(TermNode* node) = 0;
-    // virtual void visitVariable(VariableNode* node) = 0;
+    virtual void visitVariable(VariableNode* node) = 0;
     virtual void visitConstant(ConstantNode* node) = 0;
 };
