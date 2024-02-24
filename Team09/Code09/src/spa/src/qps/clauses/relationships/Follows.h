@@ -12,15 +12,15 @@ private:
     ClauseArgument& follower;
 
     bool hasNoSynonyms();
-
+    bool bothAreWildcards();
     bool hasAtLeastOneWildcard();
 
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym);
-
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader& reader);
+    ClauseResult evaluateSynonymInteger(PKBFacadeReader&, bool);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, bool);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Follows(ClauseArgument& followee, ClauseArgument& follower);
+    Follows(ClauseArgument&, ClauseArgument&);
 
-    ClauseResult evaluate(PKBFacadeReader& reader) override;
+    ClauseResult evaluate(PKBFacadeReader&) override;
 };

@@ -16,10 +16,10 @@ static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE
 SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument* f, ClauseArgument* s)
     : type(t), firstArg(*f), secondArg(*s) {}
 
-ClauseType SuchThatClause::getType() {
+ClauseType SuchThatClause::getType() const {
     return ClauseType::SUCH_THAT;
 }
-bool SuchThatClause::equals(const QueryClause& other) {
+bool SuchThatClause::equals(const QueryClause& other) const {
     if (const SuchThatClause* ptr = dynamic_cast<const SuchThatClause*>(&other)) {
         return type == ptr->type && (firstArg) == (ptr->firstArg) && (secondArg) == (ptr->secondArg);
     }

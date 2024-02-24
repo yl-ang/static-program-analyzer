@@ -3,8 +3,12 @@
 Follows::Follows(ClauseArgument& followee, ClauseArgument& follower) : followee(followee), follower(follower) {}
 
 ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
-    if (hasNoSynonyms() || hasAtLeastOneWildcard()) {
+    if (hasNoSynonyms() || bothAreWildcards()) {
         return {reader.hasFollowRelationship(followee, follower)};
+    }
+
+    if (hasAtLeastOneWildcard()) {
+        return evaluateSynonymWildcard(reader, followee.isSynonym());
     }
 
     if ((followee.isSynonym() && follower.isInteger()) || (followee.isInteger() && follower.isSynonym())) {
@@ -12,6 +16,40 @@ ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
     }
 
     return evaluateBothSynonyms(reader);
+}
+
+ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
+    Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+
+    std::unordered_set<Stmt> allStmts{};
+
+    if (syn.getType() == DesignEntityType::STMT) {
+        allStmts = reader.getStmts();
+    } else {
+        auto allTypeStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
+        for (Stmt* stmt : allTypeStmts) {
+            allStmts.insert(*stmt);
+        }
+    }
+
+    SynonymValues values{};
+    for (Stmt stmt : allStmts) {
+        StmtNum stmtNum = stmt.stmtNum;
+        std::optional<StmtNum> stmtNumOpt;
+        if (followeeIsSynonym) {
+            // Get all stmts that are followed by some other stmt
+            stmtNumOpt = reader.getFollowee(stmtNum);
+        } else {
+            // Get all stmts that are following some other stmt
+            stmtNumOpt = reader.getFollower(stmtNum);
+        }
+
+        if (stmtNumOpt.has_value()) {
+            values.push_back(std::to_string(stmtNumOpt.value()));
+        }
+    }
+
+    return {syn, values};
 }
 
 ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
@@ -58,8 +96,8 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
             continue;
         }
 
-        followeeValues.push_back({std::to_string(followerStmtNumOpt.value())});
-        followerValues.push_back({std::to_string(followeeStmtNum)});
+        followeeValues.push_back({std::to_string(followeeStmtNum)});
+        followerValues.push_back({std::to_string(followerStmtNumOpt.value())});
     }
 
     std::vector<SynonymValues> synonymValues{followeeValues, followerValues};
@@ -73,4 +111,8 @@ bool Follows::hasNoSynonyms() {
 
 bool Follows::hasAtLeastOneWildcard() {
     return followee.isWildcard() || follower.isWildcard();
+}
+
+bool Follows::bothAreWildcards() {
+    return followee.isWildcard() && follower.isWildcard();
 }
