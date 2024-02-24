@@ -85,8 +85,24 @@ StatementNode AST::buildStatementAST(std::queue<Token>& tokens) {
     Token first_token = tokens.front();
     if (first_token.type == NAME) {
         return buildAssignmentAST(tokens);
+    } else if (first_token.type == READ) {
+        return buildReadAST(tokens);
     }
     throw UnrecognisedTokenError(first_token.type);
+}
+
+ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
+    ReadNode readNode = ReadNode();
+    tokens.pop();
+    Token varName = tokens.front();
+    checkSyntax(NAME, varName.type);
+    NameNode nameNode = buildVarNameAST(varName);
+    tokens.pop();
+    Token semiColon = tokens.front();
+    checkSyntax(SEMICOLON, semiColon.type);
+    readNode.add_child(nameNode);
+    tokens.pop();
+    return readNode;
 }
 
 AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
