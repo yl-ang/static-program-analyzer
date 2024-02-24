@@ -1,8 +1,5 @@
 #include "PKB.h"
 
-#include "PKB/Stores/EntityStore.h"
-#include "PKB/Stores/StatementStore.h"
-
 PKB::PKB() noexcept {
     variableStore = std::make_shared<EntityStore<Variable>>();
     constantStore = std::make_shared<EntityStore<Constant>>();
