@@ -229,10 +229,6 @@ ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
         // TODO(ben): refactor this syntax error to its own class
         throw SyntaxError("Unrecognised token " + getLexicalEnumString(token.type) + " encountered for factor.");
     }
-    if (token.type == NAME) {
-        return buildVarNameAST(token);
-    }
-    return buildIntAST(token);
 }
 
 ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
