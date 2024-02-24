@@ -98,7 +98,7 @@ ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
     tokens.pop();
     Token varName = tokens.front();
     checkSyntax(NAME, varName.type);
-    NameNode nameNode = buildVarNameAST(varName);
+    VarNode nameNode = buildVarNameAST(varName);
     tokens.pop();
     Token semiColon = tokens.front();
     checkSyntax(SEMICOLON, semiColon.type);
@@ -112,7 +112,7 @@ PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
     tokens.pop();
     Token varName = tokens.front();
     checkSyntax(NAME, varName.type);
-    NameNode nameNode = buildVarNameAST(varName);
+    VarNode nameNode = buildVarNameAST(varName);
     tokens.pop();
     Token semiColon = tokens.front();
     checkSyntax(SEMICOLON, semiColon.type);
@@ -123,7 +123,7 @@ PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
 
 AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
-    NameNode nameNode = NameNode(varName.value);
+    VarNode nameNode = VarNode(varName.value);
     tokens.pop();
     Token equality = tokens.front();
     checkSyntax(EQUAL, equality.type);
@@ -238,12 +238,12 @@ ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
     return expression;
 }
 
-NameNode AST::buildVarNameAST(Token token) {
-    return NameNode(token.value);
+VarNode AST::buildVarNameAST(Token token) {
+    return VarNode(token.value);
 }
 
-IntegerNode AST::buildIntAST(Token token) {
-    return IntegerNode(token.value);
+ConstNode AST::buildIntAST(Token token) {
+    return ConstNode(token.value);
 }
 
 /*

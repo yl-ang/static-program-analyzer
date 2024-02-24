@@ -5,14 +5,14 @@
 #include <vector>
 
 #include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/ConstNode.h"
 #include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
 #include "sp/ast/grammar_nodes/FactorNode.h"
-#include "sp/ast/grammar_nodes/IntegerNode.h"
-#include "sp/ast/grammar_nodes/NameNode.h"
 #include "sp/ast/grammar_nodes/ProcedureNode.h"
 #include "sp/ast/grammar_nodes/ProgramNode.h"
 #include "sp/ast/grammar_nodes/TermNode.h"
+#include "sp/ast/grammar_nodes/VarNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
 #include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
@@ -41,8 +41,8 @@ public:
 
     void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
     void checkMissingToken(LEXICAL_TOKEN_TYPE expected, std::queue<Token>& tokens);
-    NameNode buildVarNameAST(Token token);
-    IntegerNode buildIntAST(Token token);
+    VarNode buildVarNameAST(Token token);
+    ConstNode buildIntAST(Token token);
     ReadNode buildReadAST(std::queue<Token>& tokens);
     PrintNode buildPrintAST(std::queue<Token>& tokens);
     ExpressionNode buildExprFromFactorAST(std::queue<Token>& tokens);

@@ -5,7 +5,7 @@
 #include "sp/ast/AstNode.h"
 #include "sp/ast/grammar_nodes/FactorNode.h"
 
-class NameNode : public FactorNode {
+class VarNode : public FactorNode {
 public:
-    explicit NameNode(std::string value) : FactorNode(value, "var") {}
+    explicit VarNode(std::string value) : FactorNode(value, "var") {}
 };
