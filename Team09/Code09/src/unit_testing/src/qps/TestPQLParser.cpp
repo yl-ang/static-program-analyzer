@@ -197,7 +197,7 @@ TEST_CASE("PQLParser: Parent (2)") {
                                         static_cast<ClauseArgument*>(&s2), 
                                         static_cast<ClauseArgument*>(&w));
     SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, 
-                                        static_cast<ClauseArgument*>(&s1),
+                                        static_cast<ClauseArgument*>(&s2),
                                         static_cast<ClauseArgument*>(&i));
     SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, 
                                         static_cast<ClauseArgument*>(&s2),
@@ -262,7 +262,7 @@ TEST_CASE("PQLParser: Parent (3)") {
                                         static_cast<ClauseArgument*>(&s2));
     SuchThatClause ans4 = SuchThatClause(RelationshipType::PARENT, 
                                         static_cast<ClauseArgument*>(&i),
-                                        static_cast<ClauseArgument*>(&s1));
+                                        static_cast<ClauseArgument*>(&s2));
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
@@ -368,7 +368,7 @@ TEST_CASE("PQLParser: Select ... pattern (1)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    Literal l = Literal("x+y");
+    Literal l = Literal("\"x+y\"");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
                                     static_cast<ClauseArgument*>(&l));
@@ -395,7 +395,7 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    Literal l = Literal("_x+y_");
+    Literal l = Literal("_\"x+y\"_");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
                                     static_cast<ClauseArgument*>(&l));
@@ -423,7 +423,7 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     Synonym v2 = Synonym(DesignEntityType::VARIABLE, "v2");
-    Literal l = Literal("x+y");
+    Literal l = Literal("_\"x+y\"_");
     Literal lw = Literal("Whatever");
     Wildcard w = Wildcard();
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
