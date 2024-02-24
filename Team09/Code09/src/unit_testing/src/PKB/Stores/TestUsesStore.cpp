@@ -108,7 +108,7 @@ TEST_CASE("UsesStore - All Tests") {
 
     SECTION("Test hasStatementVariableUseRelationship with Integer arg1 and Synonym arg2 (Expecting true)") {
         usesStore.setUsesStore({{1, "x"}, {2, "y"}, {3, "z"}});
-        // Test when both arguments are synonyms and have variable use
+        // Test when both arguments have variable use
         ClauseArgument* integerArg1 = new Integer("3");
         ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "z");
         REQUIRE(usesStore.hasStatementVariableUseRelationship(*integerArg1, *synonymArg2));
@@ -117,9 +117,9 @@ TEST_CASE("UsesStore - All Tests") {
         delete synonymArg2;
     }
 
-    SECTION("Test hasStatementVariableUseRelationship with Synonym arg1 and Synonym arg2 (Expecting False)") {
+    SECTION("Test hasStatementVariableUseRelationship with Integer arg1 and Synonym arg2 (Expecting False)") {
         usesStore.setUsesStore({{1, "x"}, {2, "y"}, {3, "z"}});
-        // Test when both arguments are synonyms but no variable use relationship
+        // Test when both arguments have no variable use relationship
         ClauseArgument* integerArg1 = new Integer("3");
         ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "w");
         REQUIRE_FALSE(usesStore.hasStatementVariableUseRelationship(*integerArg1, *synonymArg2));
