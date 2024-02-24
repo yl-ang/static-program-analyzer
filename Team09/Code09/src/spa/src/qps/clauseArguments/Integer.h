@@ -10,5 +10,6 @@ public:
     Integer(const std::string& v);
     std::string getValue() const override;
     bool isInteger() const override;
-    bool operator==(const Integer& other) const;
+    std::string getClauseType() const override;
+    bool operator==(const ClauseArgument& other) const override;
 };
