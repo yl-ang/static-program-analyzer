@@ -5,15 +5,18 @@
 #include "../ParserUtils.h"
 #include "../exceptions/QPSSemanticError.h"
 #include "../exceptions/QPSSyntaxError.h"
+#include "SynonymStore.h"
 
 class Validator {
 public:
     void validate(std::vector<std::string>);
 
-private:
-    bool isValidSelectStatement(std::string);
-    bool isValidDeclarationStatement(std::string);
+protected:
+    SynonymStore synonymStore = {};
 
-    bool isValidSuchThatClause(std::string);
-    bool isValidPatternClause(std::string);
+    void validateSelectStatement(const std::string& statement);
+    void validateDeclarationStatement(const std::string& statement);
+
+    void validateSuchThatClause(const std::string& suchThatClause);
+    void validatePatternClause(const std::string& patternClause);
 };

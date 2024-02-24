@@ -32,6 +32,12 @@ bool isEntRef(std::string str) {
     return isSynonym(str) || isWildcard(str) || isQuotedIdent(str);
 }
 
+// TODO(Han Qin): Redo isExpressionSpec after Milestone 1.
+bool isExpressionSpec(std::string str) {
+    return std::regex_match(str, std::regex("^_\\s*\"(?:(?:0|[1-9][0-9]*)|[a-zA-Z][a-zA-Z0-9]*)\"\\s*_$")) ||
+           isWildcard(str);
+}
+
 bool isSelectStatement(std::string str) {
     return std::regex_search(str, std::regex("^Select"));
 }

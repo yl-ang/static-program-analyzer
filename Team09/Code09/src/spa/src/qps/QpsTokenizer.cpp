@@ -3,7 +3,7 @@
 #include "ParserUtils.h"
 
 std::vector<std::string> QpsTokenizer::tokenize(std::string inputQueryString) {
-    std::string cleanInputString = replaceAllWhitespaces(inputQueryString);
+    std::string cleanInputString = replaceAllExtraWhitespaces(inputQueryString);
 
     std::vector<std::string> inputQueryTokens = {};
     std::string delimiter = ";";
