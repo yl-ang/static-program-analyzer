@@ -87,6 +87,8 @@ StatementNode AST::buildStatementAST(std::queue<Token>& tokens) {
         return buildAssignmentAST(tokens);
     } else if (first_token.type == READ) {
         return buildReadAST(tokens);
+    } else if (first_token.type == PRINT) {
+        return buildPrintAST(tokens);
     }
     throw UnrecognisedTokenError(first_token.type);
 }
@@ -103,6 +105,20 @@ ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
     readNode.add_child(nameNode);
     tokens.pop();
     return readNode;
+}
+
+PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
+    PrintNode printNode = PrintNode();
+    tokens.pop();
+    Token varName = tokens.front();
+    checkSyntax(NAME, varName.type);
+    NameNode nameNode = buildVarNameAST(varName);
+    tokens.pop();
+    Token semiColon = tokens.front();
+    checkSyntax(SEMICOLON, semiColon.type);
+    printNode.add_child(nameNode);
+    tokens.pop();
+    return printNode;
 }
 
 AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
@@ -150,8 +166,7 @@ ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
     return buildSubExpressionAST(tokens, &term);
 }
 
-ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens,
-                                          ExpressionNode* node) {
+ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
@@ -221,16 +236,14 @@ Syntax Error methods
 ------------------------------------------
 */
 
-void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                            std::queue<Token>& tokens) {
+void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected, std::queue<Token>& tokens) {
     if (tokens.size() != 0) {
         return;
     }
     throw MissingTokenError(expected);
 }
 
-void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected,
-                      LEXICAL_TOKEN_TYPE received) {
+void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received) {
     if (expected == received) {
         return;
     }
