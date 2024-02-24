@@ -44,8 +44,7 @@ public:
     std::string value;
     int line_number;
 
-    Token(LEXICAL_TOKEN_TYPE token_type, std::string token_value,
-          int token_line_number) {
+    Token(LEXICAL_TOKEN_TYPE token_type, std::string token_value, int token_line_number) {
         type = token_type;
         value = token_value;
         line_number = token_line_number;
@@ -53,8 +52,7 @@ public:
 
     // Overloading the equality operator (==)
     bool operator==(const Token& other) const {
-        return (value == other.value && type == other.type &&
-                line_number == other.line_number);
+        return (value == other.value && type == other.type && line_number == other.line_number);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Token& obj) {

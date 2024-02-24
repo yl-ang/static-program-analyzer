@@ -165,6 +165,57 @@ ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionN
 }
 
 /*
+Grammar: rel_factor '>' rel_factor | rel_factor '>=' rel_factor |
+          rel_factor '<' rel_factor | rel_factor '<=' rel_factor |
+          rel_factor '==' rel_factor | rel_factor '!=' rel_factor
+*/
+ExpressionNode AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
+    auto leftHandNode = buildRelationalFactorAST(tokens);
+    Token conditionalOp = tokens.front();
+    // TODO(ben): change this to a proper check with clearer syntax error
+    if (RelationalOperators.find(conditionalOp.type) == RelationalOperators.end()) {
+        throw SyntaxError("Expected relational operator");
+    }
+    ExpressionNode operatorNode = ExpressionNode(conditionalOp.type);
+    tokens.pop();
+    auto rightHandNode = buildRelationalFactorAST(tokens);
+    operatorNode.add_child(leftHandNode);
+    operatorNode.add_child(rightHandNode);
+    return operatorNode;
+}
+
+/*
+cond_expr: rel_expr  | '!' '(' cond_expr ')'  | '(' cond_expr ')' _cond_expr
+_cond_expr: '&&' '(' cond_expr ')' | '||' '(' cond_expr ')'
+
+rel_expr: rel_factor rel_op rel_factor
+rel_op: '>' | '>=' | '<' | '<=' | '==' | '!='
+
+rel_factor: var_name | const_value | expr
+A rel_factor will always be terminated by a close bracket (because of rel_expr grammar) or a
+rel_op (because of rel_expr grammar). If we check the following token in the queue and realise
+those are actually the case, we can attempt to build a var/const. Otherwise we build an expression
+*/
+ExpressionNode AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
+    // create a temporary queue to access the following elements in the tokens queue
+    auto temp = tokens;
+    temp.pop();
+    Token followingToken = temp.front();
+    Token token = tokens.front();
+    if (followingToken.type == CLOSE_BRACKET ||
+        RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
+        tokens.pop();
+        if (token.type == NAME) {
+            return buildVarNameAST(token);
+        } else if (token.type == INTEGER) {
+            return buildIntAST(token);
+        }
+        throw SyntaxError("Unrecognised token for Relational Factor");
+    }
+    return buildExpressionAST(tokens);
+}
+
+/*
 Similar idea to buildExpression, because of its left recursive nature, we can
 perform the same thing. The rules will be transformed from: A : A '*' B | A '/'
 B | A '%' B | B
