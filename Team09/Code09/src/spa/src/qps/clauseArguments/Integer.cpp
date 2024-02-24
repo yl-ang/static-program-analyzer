@@ -10,6 +10,14 @@ bool Integer::isInteger() const {
     return true;
 }
 
-bool Integer::operator==(const Integer& other) const {
-    return other.value == value;
+std::string Integer::getClauseType() const {
+    return "Integer";
+}
+
+bool Integer::operator==(const ClauseArgument& other) const {
+    if (!other.isInteger()) {
+        return false;
+    }
+
+    return this->getValue() == other.getValue();
 }

@@ -1,33 +1,22 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <ostream>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
-enum BASIC_TOKEN_TYPE {
-    _NAME,
-    _INTEGER,
-    SYMBOL,
-    KEYWORD
-};
+enum BASIC_TOKEN_TYPE { _NAME, _INTEGER, SYMBOL, KEYWORD };
 
 const std::unordered_set<std::string> KEYWORDS = {
-    "procedure",
-    "while",
-    "if",
-    "then",
-    "else",
-    "read",
-    "print"
-};
+    "procedure", "while", "if", "then", "else", "read", "print"};
 
 /**
- * @brief Provides a intermediate representation of each string to disambiguate between strings that have the same value but different type
- * such as the keyword 'procedure' and the var_name 'procedure'. 
+ * @brief Provides a intermediate representation of each string to disambiguate
+ * between strings that have the same value but different type such as the
+ * keyword 'procedure' and the var_name 'procedure'.
  */
 class BasicToken {
- public:
+public:
     BASIC_TOKEN_TYPE type;
     std::string value;
 
@@ -43,8 +32,7 @@ class BasicToken {
 
     friend std::ostream& operator<<(std::ostream& os, const BasicToken& obj) {
         os << "{ \"value\": \"" << obj.value << "\", "
-        << "\"type\": \"" << obj.type;
+           << "\"type\": \"" << obj.type;
         return os;
     }
-
 };

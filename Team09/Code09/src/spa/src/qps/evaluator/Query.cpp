@@ -15,10 +15,10 @@ std::vector<Synonym> Query::getSelectEntities() const {
 
 Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
     std::vector<Synonym> header{selectEntities};
-    std::vector<Row> rows{};
+    std::vector<ColumnData> columns{};
 
     for (Synonym entity : selectEntities) {
-        Row row{};
+        ColumnData row{};
 
         switch (entity.getType()) {
         case DesignEntityType::VARIABLE:
@@ -37,8 +37,8 @@ Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
             }
             break;
         }
-        rows.push_back(row);
+        columns.push_back(row);
     }
 
-    return Table{header, rows};
+    return Table{header, columns};
 }

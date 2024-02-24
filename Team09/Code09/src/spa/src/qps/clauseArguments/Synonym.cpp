@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "qps/exceptions/Exception.h"
+
 Synonym::Synonym(const DesignEntityType& t, const std::string& n) : type(t), name(n) {}
 
 DesignEntityType Synonym::getType() const {
@@ -16,8 +18,12 @@ std::string Synonym::getValue() const {
     return name;
 }
 
-bool Synonym::operator==(const Synonym& other) const {
-    return type == other.type && name == other.name;
+bool Synonym::operator==(const ClauseArgument& other) const {
+    if (!other.isSynonym()) {
+        return false;
+    }
+
+    return this->getValue() == other.getValue();
 }
 
 void Synonym::print() {
@@ -26,6 +32,10 @@ void Synonym::print() {
 
 bool Synonym::isSynonym() const {
     return true;
+}
+
+std::string Synonym::getClauseType() const {
+    return "Synonym";
 }
 
 std::string Synonym::entityTypeToString(DesignEntityType type) {
@@ -49,7 +59,7 @@ std::string Synonym::entityTypeToString(DesignEntityType type) {
     case DesignEntityType::PROCEDURE:
         return "PROCEDURE";
     default:
-        return "UNKNOWN";
+        throw Exception("EntityType to string is not in valid EntityTypes");
     }
 }
 
@@ -74,8 +84,7 @@ DesignEntityType Synonym::determineType(const std::string type) {
     } else if (type == "assign") {
         entityType = DesignEntityType::ASSIGN;
     } else {
-        std::cout << "EntityType is not found in valid types: " << type << "\n";
-        exit(1);
+        throw Exception("String is not found in valid EntityTypes: " + type);
     }
     return entityType;
 }

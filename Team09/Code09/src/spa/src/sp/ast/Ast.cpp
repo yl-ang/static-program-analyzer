@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "sp/exceptions/SyntaxError.h"
-
 /*
 root node is fixed so we create that at the top first before traversing the
 token vector. now we process the procedures each procedure.  procedure
@@ -43,12 +41,8 @@ next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
 ProcedureNode AST::buildProcedureAST(std::queue<Token>& tokens) {
-    Token procedureKeyword = tokens.front();
-    checkSyntax(PROCEDURE, procedureKeyword.type);
     tokens.pop();
     Token procName = tokens.front();
-    checkSyntax(NAME, procName.type);
-    // if everything is valid, we can create the node
     ProcedureNode node = ProcedureNode(procName.value);
     tokens.pop();
 
@@ -63,8 +57,6 @@ well.
 
 */
 StatementListNode AST::buildStatementListAST(std::queue<Token>& tokens) {
-    Token openCurly = tokens.front();
-    checkSyntax(OPEN_CURLY_BRACE, openCurly.type);
     tokens.pop();
 
     StatementListNode statementList = StatementListNode();
@@ -74,9 +66,6 @@ StatementListNode AST::buildStatementListAST(std::queue<Token>& tokens) {
         statementList.add_child(statement);
     }
 
-    checkMissingToken(CLOSE_CURLY_BRACE, tokens);
-    Token closeCurly = tokens.front();
-    checkSyntax(CLOSE_CURLY_BRACE, closeCurly.type);
     tokens.pop();
     return statementList;
 }
@@ -85,21 +74,43 @@ StatementNode AST::buildStatementAST(std::queue<Token>& tokens) {
     Token first_token = tokens.front();
     if (first_token.type == NAME) {
         return buildAssignmentAST(tokens);
+    } else if (first_token.type == READ) {
+        return buildReadAST(tokens);
+    } else if (first_token.type == PRINT) {
+        return buildPrintAST(tokens);
     }
     throw UnrecognisedTokenError(first_token.type);
 }
 
+ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
+    ReadNode readNode = ReadNode();
+    tokens.pop();
+    Token varName = tokens.front();
+    VariableNode nameNode = buildVarNameAST(varName);
+    tokens.pop();
+    readNode.add_child(nameNode);
+    tokens.pop();
+    return readNode;
+}
+
+PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
+    PrintNode printNode = PrintNode();
+    tokens.pop();
+    Token varName = tokens.front();
+    VariableNode nameNode = buildVarNameAST(varName);
+    tokens.pop();
+    printNode.add_child(nameNode);
+    tokens.pop();
+    return printNode;
+}
+
 AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
-    NameNode nameNode = NameNode(varName.value);
+    VariableNode nameNode = VariableNode(varName.value);
     tokens.pop();
-    Token equality = tokens.front();
-    checkSyntax(EQUAL, equality.type);
     AssignmentNode node = AssignmentNode();
     tokens.pop();
     ExpressionNode expression = buildExpressionAST(tokens);
-    Token semiColon = tokens.front();
-    checkSyntax(SEMICOLON, semiColon.type);
     tokens.pop();
 
     node.add_child(nameNode);
@@ -130,16 +141,19 @@ More info can be found here: https://en.wikipedia.org/wiki/Left_recursion
 
 */
 ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
-    TermNode term = buildTermAST(tokens);
+    /*
+    We perform upcasting here because there is a chance of the following flow
+    happening: Expr -> term -> factor -> expr.
+    */
+    ExpressionNode term = buildTermAST(tokens);
     return buildSubExpressionAST(tokens, &term);
 }
 
-ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens,
-                                          ExpressionNode* node) {
+ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
-        TermNode term = buildTermAST(tokens);
+        ExpressionNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
         expressionNode.add_child(*node);
         expressionNode.add_child(term);
@@ -159,17 +173,17 @@ to the following 2 rules:
 A : BA'
 A' : '*' BA' | '/' BA' | '%' BA' | e
 */
-TermNode AST::buildTermAST(std::queue<Token>& tokens) {
-    FactorNode factorNode = buildFactorAST(tokens);
+ExpressionNode AST::buildTermAST(std::queue<Token>& tokens) {
+    ExpressionNode factorNode = buildFactorAST(tokens);
     return buildSubTermAST(tokens, &factorNode);
 }
 
-TermNode AST::buildSubTermAST(std::queue<Token>& tokens, TermNode* node) {
+ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
         tokens.pop();
-        FactorNode factorNode = buildFactorAST(tokens);
-        TermNode termNode = TermNode(front.type);
+        ExpressionNode factorNode = buildFactorAST(tokens);
+        ExpressionNode termNode = TermNode(front.type);
         termNode.add_child(*node);
         termNode.add_child(factorNode);
 
@@ -179,44 +193,29 @@ TermNode AST::buildSubTermAST(std::queue<Token>& tokens, TermNode* node) {
     return *node;
 }
 
-// For now just assume theres no bracketed expressions
-FactorNode AST::buildFactorAST(std::queue<Token>& tokens) {
+ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
     tokens.pop();
-    if (token.type == NAME) {
+    switch (token.type) {
+    case NAME:
         return buildVarNameAST(token);
+    case INTEGER:
+        return buildIntAST(token);
+    case OPEN_BRACKET:
+        return buildExprFromFactorAST(tokens);
     }
-    return buildIntAST(token);
 }
 
-NameNode AST::buildVarNameAST(Token token) {
-    return NameNode(token.value);
+ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
+    ExpressionNode expression = buildExpressionAST(tokens);
+    tokens.pop();
+    return expression;
 }
 
-IntegerNode AST::buildIntAST(Token token) {
-    return IntegerNode(token.value);
+VariableNode AST::buildVarNameAST(Token token) {
+    return VariableNode(token.value);
 }
 
-/*
-------------------------------------------
-
-Syntax Error methods
-
-------------------------------------------
-*/
-
-void AST::checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                            std::queue<Token>& tokens) {
-    if (tokens.size() != 0) {
-        return;
-    }
-    throw MissingTokenError(expected);
-}
-
-void AST::checkSyntax(LEXICAL_TOKEN_TYPE expected,
-                      LEXICAL_TOKEN_TYPE received) {
-    if (expected == received) {
-        return;
-    }
-    throw LexicalSyntaxError(expected, received);
+ConstantNode AST::buildIntAST(Token token) {
+    return ConstantNode(token.value);
 }

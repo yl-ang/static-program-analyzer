@@ -2,7 +2,8 @@
 #include "catch.hpp"
 
 // ai-gen start(gpt, 1, e)
-// prompt: https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat
+// prompt:
+// https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat
 using Procedure = std::string;
 using Variable = std::string;
 using Constant = std::string;
@@ -51,3 +52,4 @@ TEST_CASE("EntityStore - Base Test") {
         REQUIRE_FALSE(emptyStore.hasEntity("randomEntity"));
     }
 }
+// ai-gen end

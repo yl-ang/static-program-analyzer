@@ -12,6 +12,15 @@ std::string replaceAllExtraWhitespaces(const std::string& str) {
     return trim(replacedString);
 }
 
+std::string removeAllWhitespaces(std::string str) {
+    std::string replacedString;
+
+    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
+    replacedString = std::regex_replace(str, whitespacePattern, "");
+
+    return replacedString;
+}
+
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;

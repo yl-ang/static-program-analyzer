@@ -27,9 +27,10 @@ public:
     static DesignEntityType determineType(const std::string);
 
     bool isSynonym() const override;
+    std::string getClauseType() const override;
     DesignEntityType getType() const;
     std::string getValue() const override;
     static std::string entityTypeToString(DesignEntityType);
     void print();
-    bool operator==(const Synonym& other) const;
+    bool operator==(const ClauseArgument& other) const override;
 };

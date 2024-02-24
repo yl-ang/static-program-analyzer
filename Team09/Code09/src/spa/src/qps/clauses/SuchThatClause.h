@@ -3,23 +3,25 @@
 #include "QueryClause.h"
 #include "qps/clauseArguments/Synonym.h"
 
-enum class SuchThatClauseType {
-    FOLLOWS,
-    FOLLOWS_STAR,
-    PARENT,
-    PARENT_STAR,
+enum class RelationshipType { FOLLOWS, FOLLOWS_STAR, PARENT, PARENT_STAR, USES, MODIFIES };  // update here
+
+static const std::unordered_map<std::string, RelationshipType> relationshipTypeMap = {
+    {"Follows", RelationshipType::FOLLOWS},
+    {"Follows*", RelationshipType::FOLLOWS_STAR},
+    {"Parent", RelationshipType::PARENT},
+    {"Parent*", RelationshipType::PARENT_STAR},
 };  // update here
 
 class SuchThatClause : public QueryClause {
 private:
-    SuchThatClauseType type;
-    Synonym firstArg;
-    Synonym secondArg;
+    const RelationshipType type;
+    const ClauseArgument* firstArg;
+    const ClauseArgument* secondArg;
 
 public:
-    SuchThatClause(const SuchThatClauseType&, const Synonym&, const Synonym&);
-    static SuchThatClauseType determineType(const std::string);  // update here
-    ClauseType getType() const override;
-    bool equals(const QueryClause& other) const override;
-    Table evaluate(const PKBFacadeReader&) override;
+    SuchThatClause(const RelationshipType&, ClauseArgument*, ClauseArgument*);
+    static RelationshipType determineRelationshipType(const std::string&);
+    ClauseType getType();
+    bool equals(const QueryClause& other);
+    // ClauseResult evaluate(PKBFacadeReader&) override;
 };
