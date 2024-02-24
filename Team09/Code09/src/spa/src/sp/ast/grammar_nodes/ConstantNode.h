@@ -6,4 +6,5 @@
 class ConstantNode : public FactorNode {
 public:
     explicit ConstantNode(std::string value) : FactorNode(value, "const") {}
+    void accept(AstVisitor* visitor) override;
 };

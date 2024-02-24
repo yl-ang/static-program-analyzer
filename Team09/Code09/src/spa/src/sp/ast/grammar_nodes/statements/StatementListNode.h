@@ -5,4 +5,5 @@
 class StatementListNode : public ASTNode {
 public:
     StatementListNode() : ASTNode("", "stmtList") {}
+    void accept(AstVisitor* visitor) override;
 };

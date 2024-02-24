@@ -5,16 +5,16 @@
 #include <string>
 #include <vector>
 
+#include "AstNodeInterface.h"
 #include "sp/tokenizer/Token.h"
 
-class ASTNode {
+class ASTNode : public AstNodeInterface {
     std::vector<ASTNode> children;
     std::string value;
     std::string type;
 
 public:
-    ASTNode(std::string value, std::string type,
-            std::vector<ASTNode> children = {})
+    ASTNode(std::string value, std::string type, std::vector<ASTNode> children = {})
         : value(value), type(type), children(children) {}
 
     void add_child(ASTNode child) {
@@ -23,8 +23,7 @@ public:
 
     // equality function override
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
-        return lhs.value == rhs.value && lhs.type == rhs.type &&
-               lhs.children == rhs.children;
+        return lhs.value == rhs.value && lhs.type == rhs.type && lhs.children == rhs.children;
     }
 
     std::string getType() const {
@@ -46,7 +45,8 @@ public:
 
         for (size_t i = 0; i < obj.children.size(); ++i) {
             os << obj.children[i];
-            if (i != obj.children.size() - 1) os << ", ";
+            if (i != obj.children.size() - 1)
+                os << ", ";
         }
         os << "] }";
         return os;

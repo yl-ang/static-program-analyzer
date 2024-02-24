@@ -8,4 +8,5 @@
 class ProgramNode : public ASTNode {
 public:
     ProgramNode() : ASTNode("main", "program") {}
+    void accept(AstVisitor* visitor) override;
 };

@@ -1,5 +1,5 @@
-#include <string>
 #pragma once
+#include <string>
 
 #include "sp/ast/AstNode.h"
 

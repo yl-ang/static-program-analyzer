@@ -11,4 +11,5 @@ class FactorNode : public TermNode {
 public:
     explicit FactorNode(LEXICAL_TOKEN_TYPE type) : TermNode(type) {}
     FactorNode(std::string value, std::string type) : TermNode(value, type) {}
+    void accept(AstVisitor* visitor) override;
 };
