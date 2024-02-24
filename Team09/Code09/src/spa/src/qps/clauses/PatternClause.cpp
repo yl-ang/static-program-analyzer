@@ -1,4 +1,5 @@
 #include "PatternClause.h"
+#include "qps/ParserUtils.h"
 
 PatternClause::PatternClause(const ClauseArgument* assign, const ClauseArgument* f, const ClauseArgument* s)
     : assignSynonym(assign), firstArg(f), secondArg(s) {}
@@ -13,7 +14,7 @@ bool PatternClause::equals(const QueryClause& other) {
             && (*firstArg).getClauseType() == (*ptr->firstArg).getClauseType()
             && (*secondArg).getValue() == (*ptr->secondArg).getValue()
             && (*secondArg).getClauseType() == (*ptr->secondArg).getClauseType()
-            && (*assignSynonym).getValue() == (*ptr->assignSynonym).getValue()
+            && removeAllWhitespaces((*assignSynonym).getValue()) == removeAllWhitespaces((*ptr->assignSynonym).getValue())
             && (*assignSynonym).getClauseType() == (*ptr->assignSynonym).getClauseType();
     }
     return false;
