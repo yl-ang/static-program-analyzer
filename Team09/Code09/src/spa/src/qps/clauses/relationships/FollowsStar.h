@@ -6,7 +6,7 @@
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
-class Follows : public Relationship {
+class FollowsStar : public Relationship {
 private:
     ClauseArgument& followee;
     ClauseArgument& follower;
@@ -27,7 +27,7 @@ private:
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Follows(ClauseArgument&, ClauseArgument&);
+    FollowsStar(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
 };

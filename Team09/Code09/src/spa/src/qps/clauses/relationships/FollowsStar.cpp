@@ -1,10 +1,10 @@
-#include "Follows.h"
+#include "FollowsStar.h"
 
-Follows::Follows(ClauseArgument& followee, ClauseArgument& follower) : followee(followee), follower(follower) {}
+FollowsStar::FollowsStar(ClauseArgument& followee, ClauseArgument& follower) : followee(followee), follower(follower) {}
 
-ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
+ClauseResult FollowsStar::evaluate(PKBFacadeReader& reader) {
     if (isSimpleResult()) {
-        return {reader.hasFollowRelationship(followee, follower)};
+        return {reader.hasFollowStarRelationship(followee, follower)};
     }
 
     if ((followee.isSynonym() && follower.isWildcard()) || (followee.isWildcard() && follower.isSynonym())) {
@@ -18,7 +18,7 @@ ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
-ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
     Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
@@ -52,36 +52,43 @@ ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool foll
     return {syn, values};
 }
 
-ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
     Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
     Integer integer = static_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
 
     StmtNum stmtNum = std::stoi(integer.getValue());
-    std::optional<StmtNum> stmtNumOpt;
+    std::unordered_set<StmtNum> stmtNums;
     if (followeeIsSynonym) {
-        stmtNumOpt = reader.getFollowee(stmtNum);
+        stmtNums = reader.getFolloweesStar(stmtNum);
     } else {
-        stmtNumOpt = reader.getFollower(stmtNum);
+        stmtNums = reader.getFollowersStar(stmtNum);
     }
 
-    if (!stmtNumOpt.has_value()) {
+    if (stmtNums.size() == 0) {
         return {syn, {}};
     }
 
     if (syn.getType() == DesignEntityType::STMT) {
-        return {syn, {std::to_string(stmtNumOpt.value())}};
+        SynonymValues values{};
+        for (StmtNum stmtNum : stmtNums) {
+            values.push_back(std::to_string(stmtNum));
+        }
+        return {syn, values};
     }
 
-    Stmt* stmt = reader.getStatementByStmtNum(stmtNumOpt.value());
-    StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-    if (stmt->type != synonymType) {
-        return {syn, {}};
+    SynonymValues values{};
+    for (StmtNum stmtNum : stmtNums) {
+        Stmt* stmt = reader.getStatementByStmtNum(stmtNum);
+        StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
+        if (stmt->type == synonymType) {
+            values.push_back(std::to_string(stmtNum));
+        }
     }
 
-    return {syn, {std::to_string(stmtNumOpt.value())}};
+    return {syn, values};
 }
 
-ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult FollowsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym followeeSyn = static_cast<Synonym&>(followee);
     Synonym followerSyn = static_cast<Synonym&>(follower);
 
@@ -90,14 +97,12 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues followerValues{};
 
     for (const Stmt& followee : reader.getStmts()) {
-        StmtNum followeeStmtNum = followee.stmtNum;
-        std::optional<StmtNum> followerStmtNumOpt = reader.getFollower(followeeStmtNum);
-        if (!followerStmtNumOpt.has_value()) {
-            continue;
-        }
+        std::string followeeStmtNumStr = std::to_string(followee.stmtNum);
 
-        followeeValues.push_back({std::to_string(followeeStmtNum)});
-        followerValues.push_back({std::to_string(followerStmtNumOpt.value())});
+        for (StmtNum followerStmtNum : reader.getFollowersStar(followee.stmtNum)) {
+            followeeValues.push_back(followeeStmtNumStr);
+            followerValues.push_back(std::to_string(followerStmtNum));
+        }
     }
 
     std::vector<SynonymValues> synonymValues{followeeValues, followerValues};
@@ -105,6 +110,6 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
     return {synonyms, synonymValues};
 }
 
-bool Follows::isSimpleResult() const {
+bool FollowsStar::isSimpleResult() const {
     return !followee.isSynonym() && !follower.isSynonym();
 }

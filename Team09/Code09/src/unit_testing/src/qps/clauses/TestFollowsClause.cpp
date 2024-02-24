@@ -1,46 +1,8 @@
 #include "PKB/PKBClient/PKBFacadeWriter.h"
+#include "TesterHelper.h"
 #include "catch.hpp"
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/SuchThatClause.h"
-
-class FollowsTester {
-private:  // NOLINT
-    PKBFacadeReader pkb;
-    ClauseArgument* firstArg;
-    ClauseArgument* secondArg;
-    ClauseResult result;
-
-public:  // NOLINT
-    FollowsTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : pkb{pkb},
-          firstArg{firstArg},
-          secondArg{secondArg},
-          result{SuchThatClause(RelationshipType::FOLLOWS, firstArg, secondArg).evaluate(pkb)} {}
-
-    void testBoolean(bool expected) {
-        REQUIRE(result.isBoolean());
-        REQUIRE(result.getBoolean() == expected);
-    }
-
-    FollowsTester testSynonyms(std::vector<Synonym> expectedSynonyms) {
-        REQUIRE(!result.isBoolean());
-        REQUIRE(result.getSynonyms() == expectedSynonyms);
-        return *this;
-    }
-
-    FollowsTester testSynonymValues(std::vector<SynonymValues> expectedValues) {
-        REQUIRE(!result.isBoolean());
-
-        auto synonymValues = result.getAllSynonymValues();
-
-        for (auto& values : synonymValues) {
-            std::sort(values.begin(), values.end());
-        }
-
-        REQUIRE(synonymValues == expectedValues);
-        return *this;
-    }
-};
 
 TEST_CASE("SuchThatClause evaluate for follows relationship with no synonyms") {
     PKB pkb{};
@@ -123,7 +85,7 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
         FollowsTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that Follows(5, s), out of bounds
-        FollowsTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, new Integer("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("Follows(Synonym, Wildcard)") {
