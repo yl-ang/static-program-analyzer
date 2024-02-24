@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "qps/clauseArguments/Integer.h"
 #include "qps/exceptions/Exception.h"
 #include "relationships/Follows.h"
 #include "relationships/FollowsStar.h"
@@ -33,9 +32,9 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     auto it = RELATIONSHIP_TYPE_MAP.find(type);
     if (it != RELATIONSHIP_TYPE_MAP.end()) {
         return it->second;
-    } else {
-        throw Exception("suchThatClauseType is not found in valid types: " + type);
     }
+
+    throw Exception("suchThatClauseType is not found in valid types: " + type);
 }
 
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {

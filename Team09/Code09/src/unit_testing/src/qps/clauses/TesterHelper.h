@@ -1,5 +1,4 @@
 #include "PKB/PKBClient/PKBFacadeReader.h"
-#include "PKB/PKBClient/PKBFacadeWriter.h"
 #include "catch.hpp"
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/SuchThatClause.h"
