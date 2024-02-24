@@ -4,7 +4,7 @@
 
 class ClauseArgument {
 public:
-    virtual ~ClauseArgument() {} // Virtual destructor
+    virtual ~ClauseArgument() {}  // Virtual destructor
 
     virtual bool isExpressionSpec() const {
         return false;
