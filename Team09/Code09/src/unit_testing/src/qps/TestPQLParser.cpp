@@ -1,7 +1,5 @@
 #include <qps/parser/PQLParser.h>
-#include <iostream>
 #include <tuple>
-using namespace std;
 #include "catch.hpp"
 
 // parsing entities
