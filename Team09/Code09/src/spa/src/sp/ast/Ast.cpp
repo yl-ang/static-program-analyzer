@@ -162,7 +162,11 @@ More info can be found here: https://en.wikipedia.org/wiki/Left_recursion
 
 */
 ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
-    TermNode term = buildTermAST(tokens);
+    /*
+    We perform upcasting here because there is a chance of the following flow
+    happening: Expr -> term -> factor -> expr.
+    */
+    ExpressionNode term = buildTermAST(tokens);
     return buildSubExpressionAST(tokens, &term);
 }
 
@@ -170,7 +174,7 @@ ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionN
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
-        TermNode term = buildTermAST(tokens);
+        ExpressionNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
         expressionNode.add_child(*node);
         expressionNode.add_child(term);
@@ -190,17 +194,17 @@ to the following 2 rules:
 A : BA'
 A' : '*' BA' | '/' BA' | '%' BA' | e
 */
-TermNode AST::buildTermAST(std::queue<Token>& tokens) {
-    FactorNode factorNode = buildFactorAST(tokens);
+ExpressionNode AST::buildTermAST(std::queue<Token>& tokens) {
+    ExpressionNode factorNode = buildFactorAST(tokens);
     return buildSubTermAST(tokens, &factorNode);
 }
 
-TermNode AST::buildSubTermAST(std::queue<Token>& tokens, TermNode* node) {
+ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node) {
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
         tokens.pop();
-        FactorNode factorNode = buildFactorAST(tokens);
-        TermNode termNode = TermNode(front.type);
+        ExpressionNode factorNode = buildFactorAST(tokens);
+        ExpressionNode termNode = TermNode(front.type);
         termNode.add_child(*node);
         termNode.add_child(factorNode);
 
@@ -211,13 +215,32 @@ TermNode AST::buildSubTermAST(std::queue<Token>& tokens, TermNode* node) {
 }
 
 // For now just assume theres no bracketed expressions
-FactorNode AST::buildFactorAST(std::queue<Token>& tokens) {
+ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
     tokens.pop();
+    switch (token.type) {
+    case NAME:
+        return buildVarNameAST(token);
+    case INTEGER:
+        return buildIntAST(token);
+    case OPEN_BRACKET:
+        return buildExprFromFactorAST(tokens);
+    default:
+        // TODO(ben): refactor this syntax error to its own class
+        throw SyntaxError("Unrecognised token " + getLexicalEnumString(token.type) + " encountered for factor.");
+    }
     if (token.type == NAME) {
         return buildVarNameAST(token);
     }
     return buildIntAST(token);
+}
+
+ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
+    ExpressionNode expression = buildExpressionAST(tokens);
+    Token closeBracketToken = tokens.front();
+    checkSyntax(CLOSE_BRACKET, closeBracketToken.type);
+    tokens.pop();
+    return expression;
 }
 
 NameNode AST::buildVarNameAST(Token token) {
