@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "qps/clauseArguments/Integer.h"
+#include "qps/exceptions/Exception.h"
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
@@ -29,8 +30,7 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     if (it != RELATIONSHIP_TYPE_MAP.end()) {
         return it->second;
     } else {
-        std::cout << "suchThatClauseType is not found in valid types: " << type << "\n";
-        exit(1);
+        throw Exception("suchThatClauseType is not found in valid types: " + type);
     }
 }
 
