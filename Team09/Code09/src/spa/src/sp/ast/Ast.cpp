@@ -172,10 +172,6 @@ Grammar: rel_factor '>' rel_factor | rel_factor '>=' rel_factor |
 ExpressionNode AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
     auto leftHandNode = buildRelationalFactorAST(tokens);
     Token conditionalOp = tokens.front();
-    // TODO(ben): change this to a proper check with clearer syntax error
-    if (RelationalOperators.find(conditionalOp.type) == RelationalOperators.end()) {
-        throw SyntaxError("Expected relational operator");
-    }
     ExpressionNode operatorNode = ExpressionNode(conditionalOp.type);
     tokens.pop();
     auto rightHandNode = buildRelationalFactorAST(tokens);
@@ -207,10 +203,8 @@ ExpressionNode AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
         tokens.pop();
         if (token.type == NAME) {
             return buildVarNameAST(token);
-        } else if (token.type == INTEGER) {
-            return buildIntAST(token);
         }
-        throw SyntaxError("Unrecognised token for Relational Factor");
+        return buildIntAST(token);
     }
     return buildExpressionAST(tokens);
 }
