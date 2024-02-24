@@ -18,8 +18,6 @@
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
-#include "sp/exceptions/LexicalSyntaxError.h"
-#include "sp/exceptions/MissingTokenError.h"
 #include "sp/exceptions/UnrecognisedTokenError.h"
 #include "sp/tokenizer/Token.h"
 
@@ -38,9 +36,6 @@ public:
     ExpressionNode buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node);
     TermNode buildBinaryTermAST(std::queue<Token>& tokens, std::queue<Token>& factor, LEXICAL_TOKEN_TYPE type);
     ExpressionNode buildFactorAST(std::queue<Token>& tokens);
-
-    void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
-    void checkMissingToken(LEXICAL_TOKEN_TYPE expected, std::queue<Token>& tokens);
     VarNode buildVarNameAST(Token token);
     ConstNode buildIntAST(Token token);
     ReadNode buildReadAST(std::queue<Token>& tokens);
