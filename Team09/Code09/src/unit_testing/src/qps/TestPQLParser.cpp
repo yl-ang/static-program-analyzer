@@ -149,7 +149,7 @@ TEST_CASE("PQLParser: Parent (1)") {
                                         static_cast<ClauseArgument*>(&w));
     SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, 
                                         static_cast<ClauseArgument*>(&s1),
-                                        static_cast<ClauseArgument*>(&));
+                                        static_cast<ClauseArgument*>(&i));
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
