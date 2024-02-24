@@ -146,22 +146,22 @@ ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
     happening: Expr -> term -> factor -> expr.
     */
     ExpressionNode term = buildTermAST(tokens);
-    return buildSubExpressionAST(tokens, &term);
+    return buildSubExpressionAST(tokens, term);
 }
 
-ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node) {
+ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode& node) {
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
         ExpressionNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
-        expressionNode.add_child(*node);
+        expressionNode.add_child(node);
         expressionNode.add_child(term);
 
-        return buildSubExpressionAST(tokens, &expressionNode);
+        return buildSubExpressionAST(tokens, expressionNode);
     }
 
-    return *node;
+    return node;
 }
 
 /*
@@ -220,22 +220,22 @@ A' : '*' BA' | '/' BA' | '%' BA' | e
 */
 ExpressionNode AST::buildTermAST(std::queue<Token>& tokens) {
     ExpressionNode factorNode = buildFactorAST(tokens);
-    return buildSubTermAST(tokens, &factorNode);
+    return buildSubTermAST(tokens, factorNode);
 }
 
-ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node) {
+ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode& node) {
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
         tokens.pop();
         ExpressionNode factorNode = buildFactorAST(tokens);
         ExpressionNode termNode = TermNode(front.type);
-        termNode.add_child(*node);
+        termNode.add_child(node);
         termNode.add_child(factorNode);
 
-        return buildSubTermAST(tokens, &termNode);
+        return buildSubTermAST(tokens, termNode);
     }
 
-    return *node;
+    return node;
 }
 
 ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {

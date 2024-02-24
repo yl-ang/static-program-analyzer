@@ -35,9 +35,9 @@ public:
     ExpressionNode buildExpressionAST(std::queue<Token>& tokens);
     ExpressionNode buildBinaryExpressionAST(std::queue<Token>& tokens, std::queue<Token>& term,
                                             LEXICAL_TOKEN_TYPE type);
-    ExpressionNode buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node);
+    ExpressionNode buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode& node);
     ExpressionNode buildTermAST(std::queue<Token>& tokens);
-    ExpressionNode buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node);
+    ExpressionNode buildSubTermAST(std::queue<Token>& tokens, ExpressionNode& node);
     TermNode buildBinaryTermAST(std::queue<Token>& tokens, std::queue<Token>& factor, LEXICAL_TOKEN_TYPE type);
     ExpressionNode buildFactorAST(std::queue<Token>& tokens);
     VariableNode buildVarNameAST(Token token);

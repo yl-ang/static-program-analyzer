@@ -483,7 +483,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode2 == result);
     }
 
-    SECTION("Build relational expression") {
+    SECTION("Build relational expression with var and const") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
             Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
@@ -496,6 +496,117 @@ TEST_CASE("AST Build Tests") {
 
         lessThan.add_child(zNode);
         lessThan.add_child(oneNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+    SECTION("Build relational expression with var and var") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "y", 0),
+        };
+
+        ASTNode zNode = ASTNode("z", "var");
+        ASTNode yNode = ASTNode("y", "const");
+        ASTNode lessThan = ASTNode("", "<");
+
+        lessThan.add_child(zNode);
+        lessThan.add_child(yNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+
+    SECTION("Build relational expression with const and var") {
+        std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+                                              Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+                                              Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0)};
+
+        ASTNode zNode = ASTNode("z", "var");
+        ASTNode oneNode = ASTNode("1", "const");
+        ASTNode lessThan = ASTNode("", "<");
+
+        lessThan.add_child(oneNode);
+        lessThan.add_child(zNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+
+    SECTION("Build relational expression with const and const") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "2", 0),
+        };
+
+        ASTNode twoNode = ASTNode("2", "var");
+        ASTNode oneNode = ASTNode("1", "const");
+        ASTNode lessThan = ASTNode("", "<");
+
+        lessThan.add_child(oneNode);
+        lessThan.add_child(twoNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+
+    SECTION("Build relational expression with var and expr") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+        };
+
+        ASTNode zNode = ASTNode("z", "var");
+        ASTNode lessThan = ASTNode("", "<");
+        ASTNode addNode = ASTNode("", "add");
+        ASTNode xNode = ASTNode("x", "var");
+        ASTNode yNode = ASTNode("y", "var");
+        addNode.add_child(xNode);
+        addNode.add_child(yNode);
+
+        lessThan.add_child(zNode);
+        lessThan.add_child(addNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+
+    SECTION("Build relational expression with expr and expr") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+        };
+
+        ASTNode xNode = ASTNode("x", "var");
+        ASTNode yNode = ASTNode("y", "var");
+        ASTNode mulNode = ASTNode("", "mul");
+        ASTNode lessThan = ASTNode("", "<");
+        ASTNode addNode = ASTNode("", "add");
+        ASTNode xNode2 = ASTNode("x", "var");
+        ASTNode yNode2 = ASTNode("y", "var");
+        addNode.add_child(xNode2);
+        addNode.add_child(yNode2);
+
+        mulNode.add_child(xNode);
+        mulNode.add_child(yNode);
+
+        lessThan.add_child(mulNode);
+        lessThan.add_child(addNode);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
