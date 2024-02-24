@@ -4,6 +4,7 @@
 
 #include "qps/clauseArguments/Integer.h"
 #include "qps/exceptions/Exception.h"
+#include "relationships/Follows.h"
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
@@ -13,14 +14,14 @@ static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE
 }
 
 SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument* f, ClauseArgument* s)
-    : type(t), firstArg(f), secondArg(s) {}
+    : type(t), firstArg(*f), secondArg(*s) {}
 
 ClauseType SuchThatClause::getType() {
     return ClauseType::SUCH_THAT;
 }
 bool SuchThatClause::equals(const QueryClause& other) {
     if (const SuchThatClause* ptr = dynamic_cast<const SuchThatClause*>(&other)) {
-        return type == ptr->type && *(firstArg) == *(ptr->firstArg) && *(secondArg) == *(ptr->secondArg);
+        return type == ptr->type && (firstArg) == (ptr->firstArg) && (secondArg) == (ptr->secondArg);
     }
     return false;
 }
@@ -34,24 +35,17 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     }
 }
 
-// ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
-//     // TODO(Ezekiel): implement evaluate
-
-//     switch (type) {
-//     case (RelationshipType::FOLLOWS):
-
-//         if (firstArg.isInteger() && secondArg.isInteger()) {
-//             return {reader.hasFollowRelationship(firstArg, secondArg)};
-//         }
-
-//         return {false};
-//     case (RelationshipType::FOLLOWS_STAR):
-//         return {false};
-//     case (RelationshipType::PARENT):
-//         return {false};
-//     case (RelationshipType::PARENT_STAR):
-//         return {false};
-//     default:
-//         return {false};
-//     }
-// }
+ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
+    switch (type) {
+    case (RelationshipType::FOLLOWS):
+        return Follows(firstArg, secondArg).evaluate(reader);
+    case (RelationshipType::FOLLOWS_STAR):
+        return {false};
+    case (RelationshipType::PARENT):
+        return {false};
+    case (RelationshipType::PARENT_STAR):
+        return {false};
+    default:
+        return {false};
+    }
+}

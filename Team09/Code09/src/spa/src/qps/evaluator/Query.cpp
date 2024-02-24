@@ -4,18 +4,31 @@ Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& 
              const std::vector<PatternClause>& pc)
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
-std::vector<std::string> Query::evaluate(const PKBFacadeReader& pkb) {
-    std::vector<Table> clauseTables{};
+std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
+    std::vector<ClauseResult> clauseResults{};
     for (SuchThatClause stc : suchThatClauses) {
-        clauseTables.push_back(stc.evaluate(pkb));
+        clauseResults.push_back(stc.evaluate(pkb));
     }
 
     for (PatternClause pc : patternClauses) {
-        clauseTables.push_back(pc.evaluate(pkb));
+        clauseResults.push_back(pc.evaluate(pkb));
     }
 
-    if (clauseTables.empty()) {
+    if (clauseResults.empty()) {
         return buildSelectTable(pkb).extractResults(selectEntities);
+    }
+
+    std::vector<Table> clauseTables{};
+    for (ClauseResult result : clauseResults) {
+        // 1. Check if all Boolean results are true.
+        if (result.isBoolean() && !result.getBoolean()) {
+            return {};
+        }
+
+        // 2. Consolidate all tables.
+        std::vector<Synonym> headers = result.getSynonyms();
+        std::vector<ColumnData> columns = result.getAllSynonymValues();
+        clauseTables.push_back(Table{headers, columns});
     }
 
     Table result = clauseTables[0];

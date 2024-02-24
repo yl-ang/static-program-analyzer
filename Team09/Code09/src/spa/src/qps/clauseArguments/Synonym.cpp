@@ -58,6 +58,8 @@ std::string Synonym::entityTypeToString(DesignEntityType type) {
         return "CONSTANT";
     case DesignEntityType::PROCEDURE:
         return "PROCEDURE";
+    case DesignEntityType::PRINT:
+        return "PRINT";
     default:
         throw Exception("EntityType to string is not in valid EntityTypes");
     }
@@ -83,6 +85,8 @@ DesignEntityType Synonym::determineType(const std::string type) {
         entityType = DesignEntityType::IF;
     } else if (type == "assign") {
         entityType = DesignEntityType::ASSIGN;
+    } else if (type == "print") {
+        entityType = DesignEntityType::PRINT;
     } else {
         throw Exception("String is not found in valid EntityTypes: " + type);
     }
