@@ -192,7 +192,7 @@ std::vector<std::string> PQLParser::cleanParameters(const std::string& parameter
  * Determine if parameters are:
  * literal, wildcard, integer, synonym
 */
-std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Synonym>& entities, 
+std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Synonym>& entities,
                                                         const std::vector<std::string>& strings) {
     std::vector<ClauseArgument*> results{};
     for (const std::string& str : strings) {
