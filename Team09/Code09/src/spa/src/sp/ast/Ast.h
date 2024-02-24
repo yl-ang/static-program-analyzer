@@ -14,6 +14,7 @@
 #include "sp/ast/grammar_nodes/ProgramNode.h"
 #include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
@@ -30,22 +31,18 @@ public:
     StatementNode buildStatementAST(std::queue<Token>& tokens);
     AssignmentNode buildAssignmentAST(std::queue<Token>& tokens);
     ExpressionNode buildExpressionAST(std::queue<Token>& tokens);
-    ExpressionNode buildBinaryExpressionAST(std::queue<Token>& tokens,
-                                            std::queue<Token>& term,
+    ExpressionNode buildBinaryExpressionAST(std::queue<Token>& tokens, std::queue<Token>& term,
                                             LEXICAL_TOKEN_TYPE type);
-    ExpressionNode buildSubExpressionAST(std::queue<Token>& tokens,
-                                         ExpressionNode* node);
+    ExpressionNode buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node);
     TermNode buildTermAST(std::queue<Token>& tokens);
     TermNode buildSubTermAST(std::queue<Token>& tokens, TermNode* node);
-    TermNode buildBinaryTermAST(std::queue<Token>& tokens,
-                                std::queue<Token>& factor,
-                                LEXICAL_TOKEN_TYPE type);
+    TermNode buildBinaryTermAST(std::queue<Token>& tokens, std::queue<Token>& factor, LEXICAL_TOKEN_TYPE type);
     FactorNode buildFactorAST(std::queue<Token>& tokens);
 
     void checkSyntax(LEXICAL_TOKEN_TYPE expected, LEXICAL_TOKEN_TYPE received);
-    void checkMissingToken(LEXICAL_TOKEN_TYPE expected,
-                           std::queue<Token>& tokens);
+    void checkMissingToken(LEXICAL_TOKEN_TYPE expected, std::queue<Token>& tokens);
     NameNode buildVarNameAST(Token token);
     IntegerNode buildIntAST(Token token);
     ReadNode buildReadAST(std::queue<Token>& tokens);
+    PrintNode buildPrintAST(std::queue<Token>& tokens);
 };
