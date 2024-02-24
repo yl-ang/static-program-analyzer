@@ -86,7 +86,7 @@ ReadNode AST::buildReadAST(std::queue<Token>& tokens) {
     ReadNode readNode = ReadNode();
     tokens.pop();
     Token varName = tokens.front();
-    VarNode nameNode = buildVarNameAST(varName);
+    VariableNode nameNode = buildVarNameAST(varName);
     tokens.pop();
     readNode.add_child(nameNode);
     tokens.pop();
@@ -97,7 +97,7 @@ PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
     PrintNode printNode = PrintNode();
     tokens.pop();
     Token varName = tokens.front();
-    VarNode nameNode = buildVarNameAST(varName);
+    VariableNode nameNode = buildVarNameAST(varName);
     tokens.pop();
     printNode.add_child(nameNode);
     tokens.pop();
@@ -106,7 +106,7 @@ PrintNode AST::buildPrintAST(std::queue<Token>& tokens) {
 
 AssignmentNode AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
-    VarNode nameNode = VarNode(varName.value);
+    VariableNode nameNode = VariableNode(varName.value);
     tokens.pop();
     AssignmentNode node = AssignmentNode();
     tokens.pop();
@@ -212,10 +212,10 @@ ExpressionNode AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
     return expression;
 }
 
-VarNode AST::buildVarNameAST(Token token) {
-    return VarNode(token.value);
+VariableNode AST::buildVarNameAST(Token token) {
+    return VariableNode(token.value);
 }
 
-ConstNode AST::buildIntAST(Token token) {
-    return ConstNode(token.value);
+ConstantNode AST::buildIntAST(Token token) {
+    return ConstantNode(token.value);
 }

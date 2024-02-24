@@ -5,14 +5,13 @@
 #include <vector>
 
 #include "sp/ast/AstNode.h"
-#include "sp/ast/grammar_nodes/ConstNode.h"
 #include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
 #include "sp/ast/grammar_nodes/FactorNode.h"
 #include "sp/ast/grammar_nodes/ProcedureNode.h"
 #include "sp/ast/grammar_nodes/ProgramNode.h"
 #include "sp/ast/grammar_nodes/TermNode.h"
-#include "sp/ast/grammar_nodes/VarNode.h"
+#include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
 #include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
@@ -36,8 +35,8 @@ public:
     ExpressionNode buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node);
     TermNode buildBinaryTermAST(std::queue<Token>& tokens, std::queue<Token>& factor, LEXICAL_TOKEN_TYPE type);
     ExpressionNode buildFactorAST(std::queue<Token>& tokens);
-    VarNode buildVarNameAST(Token token);
-    ConstNode buildIntAST(Token token);
+    VariableNode buildVarNameAST(Token token);
+    ConstantNode buildIntAST(Token token);
     ReadNode buildReadAST(std::queue<Token>& tokens);
     PrintNode buildPrintAST(std::queue<Token>& tokens);
     ExpressionNode buildExprFromFactorAST(std::queue<Token>& tokens);
