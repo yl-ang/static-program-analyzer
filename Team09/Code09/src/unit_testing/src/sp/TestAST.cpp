@@ -482,4 +482,24 @@ TEST_CASE("AST Build Tests") {
         ASTNode result = ast.buildExpressionAST(queue);
         REQUIRE(addNode2 == result);
     }
+
+    SECTION("Build relational expression") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+        };
+
+        ASTNode zNode = ASTNode("z", "var");
+        ASTNode oneNode = ASTNode("1", "const");
+        ASTNode lessThan = ASTNode("", "<");
+
+        lessThan.add_child(zNode);
+        lessThan.add_child(oneNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
 }
