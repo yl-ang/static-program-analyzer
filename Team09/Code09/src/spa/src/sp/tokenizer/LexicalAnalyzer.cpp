@@ -19,24 +19,21 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
         }
         return new BasicToken(curr, BASIC_TOKEN_TYPE::_INTEGER);
 
-    // Symbol
+        // Symbol
     } else if (std::all_of(curr.begin(), curr.end(), ::ispunct)) {
         if (!isValidSymbol(curr)) {
             throw SyntaxError("Invalid symbol!");
         }
         return new BasicToken(curr, BASIC_TOKEN_TYPE::SYMBOL);
 
-    // Keyword or Name
-    } else if (std::all_of(curr.begin(), curr.end(), ::isalpha)) {
-        if (!isValidName(curr)) {
-            throw SyntaxError("Invalid name!");
-        }
-        return disambiguate(curr, prev, next);
-
-    // Name
+        // Name
     } else if (std::all_of(curr.begin(), curr.end(), ::isalnum)) {
         if (!isValidName(curr)) {
             throw SyntaxError("Invalid name!");
+        }
+        // Keyword or Name
+        if (std::all_of(curr.begin(), curr.end(), ::isalpha)) {
+            return disambiguate(curr, prev, next);
         }
         return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 
@@ -46,30 +43,34 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
 }
 
 BasicToken* LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std::string next) {
+    bool isKeyword = false;
     if (KEYWORDS.find(curr) != KEYWORDS.end()) {
-        // keyword match, disambiguate by checking neighbours
+        // Keyword match, disambiguate by checking neighbours
         if (curr == "if" || curr == "while") {
             if (next == "(") {
-                return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+                isKeyword = true;
             }
         } else if (curr == "then") {
             if (prev == ")" && next == "{") {
-                return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+                isKeyword = true;
             }
         } else if (curr == "else") {
             if (prev == "}" && next == "{") {
-                return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+                isKeyword = true;
             }
         } else if (curr == "procedure" || curr == "read" || curr == "print") {
             if (isValidName(next)) {
-                return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+                isKeyword = true;
             }
         } else {
             // Shouldn't reach here
-            throw SyntaxError("Invalid token!");
+            throw SyntaxError("Error disambiguating token!");
         }
     }
-    // keyword not matched, assign type NAME
+    if (isKeyword) {
+        return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+    }
+    // Keyword not matched, assign type NAME
     return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 }
 
@@ -86,7 +87,8 @@ bool LexicalAnalyzer::isValidName(std::string value) {
 }
 
 bool LexicalAnalyzer::isValidSymbol(std::string value) {
-    // SYMBOL: + | - | * | / | % | < | > | && | || | != | == | = | >= | <= | ! | { | } | ( | ) | ;
+    // SYMBOL: + | - | * | / | % | < | > | && | || | != | == | = | >= | <= | ! |
+    // { | } | ( | ) | ;
     std::regex symbolRegex(R"(\+|\-|\*|\/|\%|<|>|&&|\|\||!=|==|=|>=|<=|!|\{|\}|\(|\)|;)");
     return std::regex_match(value, symbolRegex);
 }
