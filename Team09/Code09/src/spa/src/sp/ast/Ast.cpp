@@ -214,7 +214,6 @@ ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* n
     return *node;
 }
 
-// For now just assume theres no bracketed expressions
 ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
     tokens.pop();
