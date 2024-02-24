@@ -8,17 +8,18 @@ ClauseResult FollowsStar::evaluate(PKBFacadeReader& reader) {
     }
 
     if ((followee.isSynonym() && follower.isWildcard()) || (followee.isWildcard() && follower.isSynonym())) {
-        return evaluateSynonymWildcard(reader, followee.isSynonym());
+        return evaluateSynonymWildcard(reader);
     }
 
     if ((followee.isSynonym() && follower.isInteger()) || (followee.isInteger() && follower.isSynonym())) {
-        return evaluateSynonymInteger(reader, followee.isSynonym());
+        return evaluateSynonymInteger(reader);
     }
 
     return evaluateBothSynonyms(reader);
 }
 
-ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+    bool followeeIsSynonym = followee.isSynonym();
     Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
@@ -49,7 +50,8 @@ ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader, bool 
     return {syn, values};
 }
 
-ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader) {
+    bool followeeIsSynonym = followee.isSynonym();
     Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
     Integer integer = dynamic_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
 

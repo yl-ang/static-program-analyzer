@@ -6,10 +6,10 @@
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
-class Follows : public Relationship {
+class Parent : public Relationship {
 private:
-    ClauseArgument& followee;
-    ClauseArgument& follower;
+    ClauseArgument& parent;
+    ClauseArgument& child;
 
     /**
      * Check if the result is a simple boolean result.
@@ -18,16 +18,12 @@ private:
      */
     bool isSimpleResult() const;
 
-    /**
-     * Evaluate clause which has 1 synonym and 1 integer.
-     * @return true if the result is a boolean result, false otherwise.
-     */
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Follows(ClauseArgument&, ClauseArgument&);
+    Parent(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
 };

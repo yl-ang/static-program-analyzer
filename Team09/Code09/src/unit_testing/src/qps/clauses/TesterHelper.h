@@ -50,17 +50,19 @@ public:  // NOLINT
             if (it == entries.end()) {
                 entries.insert(entry);
             } else {
-                FAIL("Duplicate entry found in synonym values");
+                FAIL("Duplicate entry found in synonym values: " + entry);
             }
         }
 
         for (int i = 0; i < expectedValues[0].size(); i++) {
             std::string entry = "";
-            for (int j = 0; j < allSynonymValues.size(); j++) {
-                entry += allSynonymValues[j][i] + ",";
+            for (int j = 0; j < expectedValues.size(); j++) {
+                entry += expectedValues[j][i] + ",";
             }
             auto it = entries.find(entry);
-            REQUIRE(it != entries.end());
+            if (it == entries.end()) {
+                FAIL("Missing entry in synonym values: " + entry);
+            }
         }
 
         return *this;
@@ -77,4 +79,10 @@ class FollowsStarTester : public SuchThatTester {
 public:
     FollowsStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS_STAR) {}
+};
+
+class ParentTester : public SuchThatTester {
+public:
+    ParentTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT) {}
 };

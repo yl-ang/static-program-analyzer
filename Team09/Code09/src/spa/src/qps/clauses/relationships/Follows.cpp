@@ -8,17 +8,18 @@ ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
     }
 
     if ((followee.isSynonym() && follower.isWildcard()) || (followee.isWildcard() && follower.isSynonym())) {
-        return evaluateSynonymWildcard(reader, followee.isSynonym());
+        return evaluateSynonymWildcard(reader);
     }
 
     if ((followee.isSynonym() && follower.isInteger()) || (followee.isInteger() && follower.isSynonym())) {
-        return evaluateSynonymInteger(reader, followee.isSynonym());
+        return evaluateSynonymInteger(reader);
     }
 
     return evaluateBothSynonyms(reader);
 }
 
-ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+    bool followeeIsSynonym = followee.isSynonym();
     Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
@@ -49,7 +50,8 @@ ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool foll
     return {syn, values};
 }
 
-ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
+ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader) {
+    bool followeeIsSynonym = followee.isSynonym();
     Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
     Integer integer = dynamic_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
 
@@ -82,7 +84,6 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym followeeSyn = dynamic_cast<Synonym&>(followee);
     Synonym followerSyn = dynamic_cast<Synonym&>(follower);
 
-    std::vector<Synonym> synonyms = {followeeSyn, followerSyn};
     SynonymValues followeeValues{};
     SynonymValues followerValues{};
 
@@ -93,10 +94,11 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
             continue;
         }
 
-        followeeValues.push_back({std::to_string(followeeStmtNum)});
-        followerValues.push_back({std::to_string(followerStmtNumOpt.value())});
+        followeeValues.push_back(std::to_string(followeeStmtNum));
+        followerValues.push_back(std::to_string(followerStmtNumOpt.value()));
     }
 
+    std::vector<Synonym> synonyms{followeeSyn, followerSyn};
     std::vector<SynonymValues> synonymValues{followeeValues, followerValues};
 
     return {synonyms, synonymValues};

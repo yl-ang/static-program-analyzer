@@ -22,8 +22,8 @@ private:
      * Evaluate clause which has 1 synonym and 1 integer.
      * @return true if the result is a boolean result, false otherwise.
      */
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader&, bool);
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, bool);
+    ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:

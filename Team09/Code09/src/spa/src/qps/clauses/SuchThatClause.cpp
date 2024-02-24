@@ -6,6 +6,7 @@
 #include "qps/exceptions/Exception.h"
 #include "relationships/Follows.h"
 #include "relationships/FollowsStar.h"
+#include "relationships/Parent.h"
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
@@ -45,7 +46,8 @@ ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
         return FollowsStar(firstArg, secondArg).evaluate(reader);
 
     case (RelationshipType::PARENT):
-        return {false};
+        return Parent(firstArg, secondArg).evaluate(reader);
+
     case (RelationshipType::PARENT_STAR):
         return {false};
     default:
