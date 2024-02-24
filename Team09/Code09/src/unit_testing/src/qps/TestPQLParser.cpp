@@ -111,7 +111,6 @@ TEST_CASE("PQLParser: Select (2))") {
 // As syntax is the same for all these
 // To ensure that Follows/Parent*/Follows* work, will test one clause each minimally
 TEST_CASE("PQLParser: Parent (1)") {
-    
     std::string select_st_1 = "Select s1 such that Parent(s1,s2)";
     std::string select_st_2 = "Select s1 such that Parent(s1,_)";
     std::string select_st_3 = "Select s1 such that Parent(s1,4)";
@@ -141,13 +140,13 @@ TEST_CASE("PQLParser: Parent (1)") {
     Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
     Wildcard w = Wildcard();
     Integer i = Integer("4");
-    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, 
-                                        static_cast<ClauseArgument*>(&s1), 
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT,
+                                        static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&w));
-    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&i));
     REQUIRE(result_11.size() == 1);
@@ -156,7 +155,7 @@ TEST_CASE("PQLParser: Parent (1)") {
     REQUIRE(ans1.equals(result_11[0]));
     REQUIRE(ans2.equals(result_12[0]));
     REQUIRE(ans3.equals(result_13[0]));
-    
+
     // Pattern checking
     REQUIRE(result_21.size() == 0);
     REQUIRE(result_22.size() == 0);
@@ -193,13 +192,13 @@ TEST_CASE("PQLParser: Parent (2)") {
     Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
     Wildcard w = Wildcard();
     Integer i = Integer("4");
-    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, 
-                                        static_cast<ClauseArgument*>(&s2), 
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT,
+                                        static_cast<ClauseArgument*>(&s2),
                                         static_cast<ClauseArgument*>(&w));
-    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&s2),
                                         static_cast<ClauseArgument*>(&i));
-    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&s2),
                                         static_cast<ClauseArgument*>(&s1));
     REQUIRE(result_11.size() == 1);
@@ -208,7 +207,7 @@ TEST_CASE("PQLParser: Parent (2)") {
     REQUIRE(ans1.equals(result_11[0]));
     REQUIRE(ans2.equals(result_12[0]));
     REQUIRE(ans3.equals(result_13[0]));
-    
+
     // Pattern checking
     REQUIRE(result_21.size() == 0);
     REQUIRE(result_22.size() == 0);
@@ -251,16 +250,16 @@ TEST_CASE("PQLParser: Parent (3)") {
     Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
     Wildcard w = Wildcard();
     Integer i = Integer("4");
-    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&w),
                                         static_cast<ClauseArgument*>(&s1));
     SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&i),
                                         static_cast<ClauseArgument*>(&s1));
-    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&w),
                                         static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans4 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans4 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&i),
                                         static_cast<ClauseArgument*>(&s2));
     REQUIRE(result_11.size() == 1);
@@ -271,7 +270,7 @@ TEST_CASE("PQLParser: Parent (3)") {
     REQUIRE(ans2.equals(result_12[0]));
     REQUIRE(ans3.equals(result_13[0]));
     REQUIRE(ans4.equals(result_14[0]));
-    
+
     // Pattern checking
     REQUIRE(result_21.size() == 0);
     REQUIRE(result_22.size() == 0);
@@ -314,16 +313,16 @@ TEST_CASE("PQLParser: Parent (4)") {
     // Such that checking
     Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
     Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, 
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&s2));
     SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT_STAR,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans3 = SuchThatClause(RelationshipType::FOLLOWS, 
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::FOLLOWS,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans4 = SuchThatClause(RelationshipType::FOLLOWS_STAR, 
+    SuchThatClause ans4 = SuchThatClause(RelationshipType::FOLLOWS_STAR,
                                         static_cast<ClauseArgument*>(&s1),
                                         static_cast<ClauseArgument*>(&s2));
     REQUIRE(result_11.size() == 1);
@@ -334,7 +333,7 @@ TEST_CASE("PQLParser: Parent (4)") {
     REQUIRE(ans2.equals(result_12[0]));
     REQUIRE(ans3.equals(result_13[0]));
     REQUIRE(ans4.equals(result_14[0]));
-    
+
     // Pattern checking
     REQUIRE(result_21.size() == 0);
     REQUIRE(result_22.size() == 0);
