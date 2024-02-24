@@ -10,6 +10,10 @@ bool Literal::isLiteral() const {
     return true;
 }
 
+std::string Literal::getClauseType() const {
+    return "Literal";
+}
+
 bool Literal::operator==(const ClauseArgument& other) const {
     if (!other.isLiteral()) {
         return false;

@@ -34,6 +34,10 @@ bool Synonym::isSynonym() const {
     return true;
 }
 
+std::string Synonym::getClauseType() const {
+    return "Synonym";
+}
+
 std::string Synonym::entityTypeToString(DesignEntityType type) {
     switch (type) {
     case DesignEntityType::STMT:

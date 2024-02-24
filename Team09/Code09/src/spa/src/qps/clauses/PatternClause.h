@@ -14,5 +14,6 @@ public:
     PatternClause(const ClauseArgument*, const ClauseArgument*, const ClauseArgument*);
     ClauseType getType();
     bool equals(const QueryClause&);
+    void print();
     // Table evaluate(const PKBFacadeReader&) override;
 };

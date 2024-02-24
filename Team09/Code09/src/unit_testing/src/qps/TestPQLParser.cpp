@@ -1,7 +1,7 @@
 #include <qps/parser/PQLParser.h>
-
+#include <iostream>
 #include <tuple>
-
+using namespace std;
 #include "catch.hpp"
 
 // parsing entities
@@ -368,7 +368,7 @@ TEST_CASE("PQLParser: Select ... pattern (1)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    Literal l = Literal("\"x+y\"");
+    ExpressionSpec l = ExpressionSpec("\"x+y\"");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
                                     static_cast<ClauseArgument*>(&l));
@@ -395,7 +395,7 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    Literal l = Literal("_\"x+y\"_");
+    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
                                     static_cast<ClauseArgument*>(&l));
@@ -413,7 +413,7 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
     std::string select_pt_1 = "Select v1 pattern a1(v1,_\"x+y\"_)";
     std::string select_pt_2 = "Select v1 pattern a1(_,_\"x + y\"_)";
     std::string select_pt_3 = "Select v1 pattern a1(\"Whatever\",_\"x +y\"_)";
-    std::string select_pt_4 = "   Select v1   pattern  a1  (v1,v2)   ";
+    std::string select_pt_4 = "   Select v1   pattern  a1  (v1,   \"Whatever\")   ";
 
     std::vector<PatternClause> result_1 = PQLParser::findPatternClauses(entities, select_pt_1);
     std::vector<PatternClause> result_2 = PQLParser::findPatternClauses(entities, select_pt_2);
@@ -423,8 +423,9 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     Synonym v2 = Synonym(DesignEntityType::VARIABLE, "v2");
-    Literal l = Literal("_\"x+y\"_");
-    Literal lw = Literal("Whatever");
+    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
+    ExpressionSpec ew = ExpressionSpec("\"Whatever\"");
+    Literal lw = Literal("\"Whatever\"");
     Wildcard w = Wildcard();
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
@@ -437,7 +438,7 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
                                     static_cast<ClauseArgument*>(&l));
     PatternClause ans4 = PatternClause(static_cast<ClauseArgument*>(&a1),
                                     static_cast<ClauseArgument*>(&v1),
-                                    static_cast<ClauseArgument*>(&v2));
+                                    static_cast<ClauseArgument*>(&ew));
     REQUIRE(result_1.size() == 1);
     REQUIRE(result_2.size() == 1);
     REQUIRE(result_3.size() == 1);

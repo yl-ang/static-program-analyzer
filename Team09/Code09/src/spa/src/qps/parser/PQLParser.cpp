@@ -232,7 +232,7 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
 
     // second argument is ent-ref
     if (isQuotedIdent(ptEntRef)) {
-        results.push_back(new Literal(removeAllWhitespaces(ptEntRef)));
+        results.push_back(new Literal(ptEntRef));
     } else if (isWildcard(ptEntRef)) {
         results.push_back(new Wildcard());
     } else if (isSynonym(ptEntRef)) {
@@ -242,7 +242,7 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
     }
 
     // third argument is expression-spec
-    results.push_back(new ExpressionSpec(ptExpressionSpec));
+    results.push_back(new ExpressionSpec(removeAllWhitespaces(ptExpressionSpec)));
     return results;
 }
 
