@@ -11,8 +11,9 @@ bool Literal::isLiteral() const {
 }
 
 bool Literal::operator==(const ClauseArgument& other) const {
-    if (const Literal* ptr = dynamic_cast<const Literal*>(&other)) {
-        return this->getValue() == other.getValue();
+    if (!other.isLiteral()) {
+        return false;
     }
-    return false;
+
+    return this->getValue() == other.getValue();
 }
