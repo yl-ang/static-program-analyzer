@@ -14,7 +14,7 @@ bool PatternClause::equals(const QueryClause& other) {
             && (*firstArg).getClauseType() == (*ptr->firstArg).getClauseType()
             && (*secondArg).getValue() == (*ptr->secondArg).getValue()
             && (*secondArg).getClauseType() == (*ptr->secondArg).getClauseType()
-            && removeAllWhitespaces((*assignSynonym).getValue()) == 
+            && removeAllWhitespaces((*assignSynonym).getValue()) ==
                 removeAllWhitespaces((*ptr->assignSynonym).getValue())
             && (*assignSynonym).getClauseType() == (*ptr->assignSynonym).getClauseType();
     }
