@@ -43,7 +43,7 @@ std::string getLexicalEnumString(LEXICAL_TOKEN_TYPE type) {
     case ELSE:
         return "else";
     case EQUAL:
-        return "==";
+        return "=";
     case NOT:
         return "!";
     case ANDAND:
