@@ -13,9 +13,11 @@ class SpTokenizer {
 private:
     LexicalAnalyzer lexicalAnalyzer;
     SyntaxValidator syntaxValidator;
-    int stmtNum = 0;
+    // Statement number counter that increments with every statement
+    int stmtNumCounter = 0;
     const int NO_STMT_NUM = -1;
-    int notStmt = 0;
+    // Countdown for tokens that should not be given a statement number
+    int noStmtNumCounter = 0;
 
 public:
     /**
