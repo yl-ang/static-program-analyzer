@@ -7,6 +7,7 @@
 enum class DesignEntityType {
     STMT,
     READ,
+    PRINT,
     CALL,
     WHILE,
     IF,
