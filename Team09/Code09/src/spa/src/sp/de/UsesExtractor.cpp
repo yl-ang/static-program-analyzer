@@ -31,6 +31,11 @@ void UsesExtractor::visitWhile(WhileNode* node) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
     }
 
+    // Extract uses relationships from usesExtractorHelper and append to usesExtractor
+    // Each uses relationship will have the userStmtNum of the nested statement
+    // So we simply replace the userStmtNum from the extracted uses relationship
+    // with the current WhileNode stmtNum
+
     UsesExtractor* usesExtractorHelper = new UsesExtractor();
     dfsVisitHelper(node->getStmtLstNode(), usesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper.getUses();
@@ -40,12 +45,6 @@ void UsesExtractor::visitWhile(WhileNode* node) {
         pair.first = userStmtNum;
         this->uses.insert(pair);
     }
-
-    // Extract uses relationships from usesExtractorHelper and append to usesExtractor
-    // Each uses relationship will have the userStmtNum of the nested statement
-    // So we simply replace the userStmtNum from the extracted uses relationship
-    // with the current WhileNode stmtNum
-    // delete usesExtractorHelper
 }
 
 void UsesExtractor::visitIf(IfNode* node) {

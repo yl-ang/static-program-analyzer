@@ -5,12 +5,12 @@ void ExpressionNode::accept(AstVisitor* visitor) {
 }
 
 std::vector<std::string> ExpressionNode::getVars() {
-    findVariables(this->getChildren());
+    findVariables(children);
     return variables;
 }
 
 std::vector<std::string> ExpressionNode::getConsts() {
-    findConstants(this->getChildren());
+    findConstants(children);
     return constants;
 }
 
