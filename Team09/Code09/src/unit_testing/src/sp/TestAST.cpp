@@ -756,10 +756,10 @@ TEST_CASE("AST Build Tests") {
 
     SECTION("Build relational expression with parenthesised exprs") {
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0), Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),          Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),         Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
@@ -790,5 +790,147 @@ TEST_CASE("AST Build Tests") {
 
         auto result = ast.buildRelationalExpressionAST(queue);
         REQUIRE(lessThan == *(result.get()));
+    }
+
+    SECTION("Build conditional expr to bracketed rel_expr") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+        };
+
+        std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+        std::unique_ptr<ASTNode> xNode2 = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode2 = std::make_unique<ASTNode>("y", "var");
+
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::unique_ptr<ASTNode>> children1 = {};
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        children.push_back(std::move(xNode2));
+        children.push_back(std::move(yNode2));
+
+        auto addNode = std::make_unique<ASTNode>("", "add", std::move(children));
+
+        children1.push_back(std::move(xNode));
+        children1.push_back(std::move(yNode));
+
+        auto mulNode = std::make_unique<ASTNode>("", "mul", std::move(children1));
+
+        children2.push_back(std::move(mulNode));
+        children2.push_back(std::move(addNode));
+
+        auto lessThan = ASTNode("", "<", std::move(children2));
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildConditionalExpressionAST(queue);
+        REQUIRE(lessThan == *(result.get()));
+    }
+
+    SECTION("Build conditional expr to non bracketed rel_expr") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+        };
+
+        std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+        std::unique_ptr<ASTNode> xNode2 = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode2 = std::make_unique<ASTNode>("y", "var");
+
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::unique_ptr<ASTNode>> children1 = {};
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        children.push_back(std::move(xNode2));
+        children.push_back(std::move(yNode2));
+
+        auto addNode = std::make_unique<ASTNode>("", "add", std::move(children));
+
+        children1.push_back(std::move(xNode));
+        children1.push_back(std::move(yNode));
+
+        auto mulNode = std::make_unique<ASTNode>("", "mul", std::move(children1));
+
+        children2.push_back(std::move(mulNode));
+        children2.push_back(std::move(addNode));
+
+        auto lessThan = ASTNode("", "<", std::move(children2));
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildConditionalExpressionAST(queue);
+        REQUIRE(lessThan == *(result.get()));
+    }
+
+    SECTION("Build not conditional expression") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NOT, "!", 0),          Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),         Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
+
+        std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        std::vector<std::unique_ptr<ASTNode>> children3 = {};
+
+        children2.push_back(std::move(xNode));
+        children2.push_back(std::move(yNode));
+
+        auto lessThan = std::make_unique<ASTNode>("", "<", std::move(children2));
+
+        children3.push_back(std::move(lessThan));
+
+        auto notNode = ASTNode("", "!", std::move(children3));
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildConditionalExpressionAST(queue);
+        REQUIRE(notNode == *(result.get()));
+    }
+
+    SECTION("Build binary conditional expression") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),     Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::ANDAND, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+        };
+        std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+        std::unique_ptr<ASTNode> xNode1 = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode1 = std::make_unique<ASTNode>("y", "var");
+
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        std::vector<std::unique_ptr<ASTNode>> children3 = {};
+        children.push_back(std::move(xNode));
+        children.push_back(std::move(yNode));
+
+        auto lessThan = std::make_unique<ASTNode>("", "<", std::move(children));
+        children2.push_back(std::move(xNode1));
+        children2.push_back(std::move(yNode1));
+
+        auto moreThan = std::make_unique<ASTNode>("", ">", std::move(children2));
+        children3.push_back(std::move(lessThan));
+        children3.push_back(std::move(moreThan));
+        auto andandNode = ASTNode("", "&&", std::move(children3));
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildConditionalExpressionAST(queue);
+        REQUIRE(andandNode == *(result.get()));
     }
 }
