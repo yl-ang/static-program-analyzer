@@ -34,11 +34,11 @@ std::unordered_set<Stmt> PKBFacadeReader::getStmts() const {
     return pkbReference->stmtStore->getStatements();
 }
 
-Stmt *PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) const {
+std::optional<Stmt> PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) const {
     return pkbReference->stmtStore->getStatementByStmtNum(stmtNum);
 }
 
-std::unordered_set<Stmt *> PKBFacadeReader::getStatementsByType(StatementType type) const {
+std::unordered_set<std::optional<Stmt>> PKBFacadeReader::getStatementsByType(StatementType type) const {
     return pkbReference->stmtStore->getStatementsByType(type);
 }
 
