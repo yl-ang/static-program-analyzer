@@ -24,3 +24,4 @@ public:
     void visitConstant(ConstantNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();
+};

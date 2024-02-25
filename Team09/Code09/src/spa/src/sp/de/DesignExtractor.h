@@ -30,14 +30,4 @@ private:
     UsesExtractor* usesExtractor;
     ModifiesExtractor* modifiesExtractor;
     PatternExtractor* patternExtractor;
-
-    std::unordered_set<std::string> variables;
-    std::unordered_set<std::string> constants;
-    std::unordered_set<std::string> procedures;
-    std::unordered_set<Stmt> statements;
-    std::unordered_set<std::pair<StmtNum, StmtNum>> follows;
-    std::unordered_set<std::pair<StmtNum, StmtNum>> parent;
-    std::unordered_set<std::pair<StmtNum, Variable>> modifies;
-    std::unordered_set<std::pair<StmtNum, Variable>> uses;
-    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> pattern;
 };
