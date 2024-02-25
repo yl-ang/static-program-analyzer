@@ -1,8 +1,13 @@
 #pragma once
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "sp/ast/AstNode.h"
 
 class StatementListNode : public ASTNode {
 public:
-    StatementListNode() : ASTNode("", "stmtList") {}
+    explicit StatementListNode(std::vector<std::unique_ptr<ASTNode>> children)
+        : ASTNode("", "stmtList", std::move(children)) {}
 };
