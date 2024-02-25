@@ -13,5 +13,5 @@ public:
 
     void accept(AstVisitor* visitor) override;
 
-    std::string ReadNode::getVar();
+    std::string getVar();
 };
