@@ -32,12 +32,12 @@ ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
         return evaluateOthers(reader);
     }
 
-    return {false};
+    return {{}, {}};
 }
 
 ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
-    Synonym aSyn = static_cast<Synonym&>(assignSynonym);
-    Synonym fSyn = static_cast<Synonym&>(firstArg);  // This is 100% variable
+    Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
+    Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable
 
     std::unordered_set<Stmt> allStmts = reader.getStmts();
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -72,17 +72,13 @@ ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
         throw Exception("Unequal size of the 2 lists.");
     }
 
-    if (stmtNumbers.size() == 0) {
-        return {false};
-    }
-
     std::vector<Synonym> returnSyn = {aSyn, fSyn};
     std::vector<SynonymValues> returnSynValues = {stmtNumbers, synValues};
     return {returnSyn, returnSynValues};
 }
 
 ClauseResult PatternClause::evaluateOthers(PKBFacadeReader& reader) {
-    Synonym aSyn = static_cast<Synonym&>(assignSynonym);
+    Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     std::unordered_set<Stmt> allStmts = reader.getStmts();
     std::vector<std::string> stmtNumbers = {};
 
@@ -102,9 +98,5 @@ ClauseResult PatternClause::evaluateOthers(PKBFacadeReader& reader) {
         }
     }
 
-    if (stmtNumbers.size() == 0) {
-        return {false};
-    } else {
-        return {aSyn, stmtNumbers};
-    }
+    return {aSyn, stmtNumbers};
 }
