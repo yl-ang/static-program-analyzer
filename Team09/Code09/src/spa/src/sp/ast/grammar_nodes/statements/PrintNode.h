@@ -5,7 +5,7 @@ class PrintNode : public StatementNode {
 public:
     PrintNode() : StatementNode("", "print") {}
 
-    void accept(AstVisitor* visitor) override {
-        visitor->visitPrint(this);
-    }
+    void accept(AstVisitor* visitor) override;
+
+    std::string getVar();
 };

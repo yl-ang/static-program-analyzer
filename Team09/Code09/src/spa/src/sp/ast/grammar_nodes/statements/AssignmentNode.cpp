@@ -4,7 +4,7 @@ void AssignmentNode::accept(AstVisitor* visitor) {
     visitor->visitAssign(this);
 }
 
-ASTNode* AssignmentNode::getExpr() {
+ExpressionNode* AssignmentNode::getExpr() {
     std::vector<ASTNode*> children = this->getChildren();
     for (const auto& child : children) {
         if (typeid(child) == typeid(ExpressionNode)) {
@@ -13,11 +13,11 @@ ASTNode* AssignmentNode::getExpr() {
     }
 }
 
-ASTNode* AssignmentNode::getVar() {
+std::string AssignmentNode::getVar() {
     std::vector<ASTNode*> children = this->getChildren();
     for (const auto& child : children) {
         if (typeid(child) == typeid(VariableNode)) {
-            return child;
+            return child->getValue();
         }
     }
 }

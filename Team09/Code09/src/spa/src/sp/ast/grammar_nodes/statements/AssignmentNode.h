@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <typeinfo>
 #include <vector>
 
@@ -9,6 +10,6 @@ public:
 
     void accept(AstVisitor* visitor) override;
 
-    ASTNode* getExpr();
-    ASTNode* getVar();
+    ExpressionNode* getExpr();
+    std::string getVar();
 };
