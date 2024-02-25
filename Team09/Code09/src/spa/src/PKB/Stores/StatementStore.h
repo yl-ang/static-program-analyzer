@@ -15,7 +15,7 @@ public:
     void setStatements(const std::unordered_set<Stmt>& inputStmts);
     const std::unordered_set<Stmt>& getStatements() const;
     std::optional<Stmt> getStatementByStmtNum(StmtNum stmtNum) const;
-    std::unordered_set<std::optional<Stmt>> getStatementsByType(StatementType type) const;
+    std::unordered_set<Stmt> getStatementsByType(StatementType type) const;
 
 private:
     std::unordered_set<Stmt> statementSet;

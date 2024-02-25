@@ -21,7 +21,7 @@ public:
     // Getters for Statements
     [[nodiscard]] std::unordered_set<Stmt> getStmts() const;
     [[nodiscard]] std::optional<Stmt> getStatementByStmtNum(StmtNum stmtNum) const;
-    [[nodiscard]] std::unordered_set<std::optional<Stmt>> getStatementsByType(StatementType type) const;
+    [[nodiscard]] std::unordered_set<Stmt> getStatementsByType(StatementType type) const;
 
     // Getters for FollowsStore
     std::optional<StmtNum> getFollower(StmtNum s1);

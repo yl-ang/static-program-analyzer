@@ -25,10 +25,16 @@ std::optional<Stmt> StatementStore::getStatementByStmtNum(StmtNum stmtNum) const
     return std::nullopt;
 }
 
-std::unordered_set<std::optional<Stmt>> StatementStore::getStatementsByType(StatementType type) const {
+std::unordered_set<Stmt> StatementStore::getStatementsByType(StatementType type) const {
     auto it = statementTypeMap.find(type);
     if (it != statementTypeMap.end()) {
-        return it->second;
+        std::unordered_set<Stmt> result;
+        for (const auto& optionalStmt : it->second) {
+            if (optionalStmt.has_value()) {
+                result.insert(optionalStmt.value());
+            }
+        }
+        return result;
     }
     return {};
 }
