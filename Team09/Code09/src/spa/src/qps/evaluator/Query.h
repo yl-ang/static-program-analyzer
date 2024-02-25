@@ -11,7 +11,7 @@
 class Query {
 public:
     Query(const std::vector<Synonym>&, const std::vector<SuchThatClause>&, const std::vector<PatternClause>&);
-    std::vector<std::string> evaluate(const PKBFacadeReader&);
+    std::vector<std::string> evaluate(PKBFacadeReader&);
     std::vector<Synonym> getSelectEntities() const;
 
 private:

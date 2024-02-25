@@ -32,6 +32,7 @@ bool isQuotedIdent(std::string);
 
 bool isStmtRef(std::string);
 bool isEntRef(std::string);
+bool isExpressionSpec(std::string);
 
 bool isSelectStatement(std::string);
 bool isDeclarationStatement(std::string);

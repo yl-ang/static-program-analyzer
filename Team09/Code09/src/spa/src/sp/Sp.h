@@ -19,7 +19,7 @@ class SP {
 private:
     SourceLoader sourceLoader;
     SpTokenizer tokenizer;
-    AST ast;
+    // AST ast;
     DesignExtractor designExtractor;
     PKBFacadeWriter pkbWriter;
 

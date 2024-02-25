@@ -9,8 +9,8 @@ Covers var_name, parenthesis, and const_value
 */
 class FactorNode : public TermNode {
 public:
-    explicit FactorNode(LEXICAL_TOKEN_TYPE type) : TermNode(type) {}
-    FactorNode(std::string value, std::string type) : TermNode(value, type) {}
+    explicit FactorNode(LEXICAL_TOKEN_TYPE type, int stmtNumber) : TermNode(type, {}, stmtNumber) {}
+    FactorNode(std::string value, std::string type, int stmtNumber) : TermNode(value, type, stmtNumber) {}
 
     void accept(AstVisitor* visitor) override {
         visitor->visitFactor(this);

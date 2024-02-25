@@ -59,7 +59,7 @@ std::unordered_set<std::pair<StmtNum, Variable>> ModifiesExtractor::getModifies(
     return this->modifies;
 }
 
-void UsesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, UsesExtractor* visitor) {
+void ModifiesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, ModifiesExtractor* visitor) {
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {

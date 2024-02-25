@@ -2,8 +2,13 @@
 
 #include <iostream>
 
-#include "qps/clauseArguments/Integer.h"
 #include "qps/exceptions/Exception.h"
+#include "relationships/Follows.h"
+#include "relationships/FollowsStar.h"
+#include "relationships/Modifies.h"
+#include "relationships/Parent.h"
+#include "relationships/ParentStar.h"
+#include "relationships/Uses.h"
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
@@ -13,14 +18,14 @@ static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE
 }
 
 SuchThatClause::SuchThatClause(const RelationshipType& t, ClauseArgument* f, ClauseArgument* s)
-    : type(t), firstArg(f), secondArg(s) {}
+    : type(t), firstArg(*f), secondArg(*s) {}
 
-ClauseType SuchThatClause::getType() {
+ClauseType SuchThatClause::getType() const {
     return ClauseType::SUCH_THAT;
 }
-bool SuchThatClause::equals(const QueryClause& other) {
+bool SuchThatClause::equals(const QueryClause& other) const {
     if (const SuchThatClause* ptr = dynamic_cast<const SuchThatClause*>(&other)) {
-        return type == ptr->type && *(firstArg) == *(ptr->firstArg) && *(secondArg) == *(ptr->secondArg);
+        return type == ptr->type && (firstArg) == (ptr->firstArg) && (secondArg) == (ptr->secondArg);
     }
     return false;
 }
@@ -29,29 +34,31 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     auto it = RELATIONSHIP_TYPE_MAP.find(type);
     if (it != RELATIONSHIP_TYPE_MAP.end()) {
         return it->second;
-    } else {
-        throw Exception("suchThatClauseType is not found in valid types: " + type);
     }
+
+    throw Exception("suchThatClauseType is not found in valid types: " + type);
 }
 
-// ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
-//     // TODO(Ezekiel): implement evaluate
+ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
+    switch (type) {
+    case (RelationshipType::FOLLOWS):
+        return Follows(firstArg, secondArg).evaluate(reader);
 
-//     switch (type) {
-//     case (RelationshipType::FOLLOWS):
+    case (RelationshipType::FOLLOWS_STAR):
+        return FollowsStar(firstArg, secondArg).evaluate(reader);
 
-//         if (firstArg.isInteger() && secondArg.isInteger()) {
-//             return {reader.hasFollowRelationship(firstArg, secondArg)};
-//         }
+    case (RelationshipType::PARENT):
+        return Parent(firstArg, secondArg).evaluate(reader);
 
-//         return {false};
-//     case (RelationshipType::FOLLOWS_STAR):
-//         return {false};
-//     case (RelationshipType::PARENT):
-//         return {false};
-//     case (RelationshipType::PARENT_STAR):
-//         return {false};
-//     default:
-//         return {false};
-//     }
-// }
+    case (RelationshipType::PARENT_STAR):
+        return ParentStar(firstArg, secondArg).evaluate(reader);
+
+    case (RelationshipType::USES):
+        return Uses(firstArg, secondArg).evaluate(reader);
+
+    case (RelationshipType::MODIFIES):
+        return Modifies(firstArg, secondArg).evaluate(reader);
+    }
+
+    return {false};
+}

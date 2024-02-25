@@ -6,7 +6,7 @@
 
 class VariableNode : public FactorNode {
 public:
-    explicit VariableNode(std::string value) : FactorNode(value, "var") {}
+    explicit VariableNode(std::string value, int stmtNumber) : FactorNode(value, "var", stmtNumber) {}
     void accept(AstVisitor* visitor) override {
         visitor->visitVariable(this);
     }

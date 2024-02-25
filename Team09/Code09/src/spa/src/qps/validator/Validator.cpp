@@ -3,21 +3,25 @@
 void Validator::validate(std::vector<std::string> statementList) {
     for (std::string statement : statementList) {
         if (isDeclarationStatement(statement)) {
-            isValidDeclarationStatement(statement);
+            validateDeclarationStatement(statement);
+
+            std::vector<std::string> wordList = stringToWordList(statement.substr(0, statement.size() - 1));
+            std::string variableType = wordList[0];
+            std::string variableName = wordList[1];
+            synonymStore.storeSynonym(variableName, variableType);
         } else if (isSelectStatement(statement)) {
-            isValidSelectStatement(statement);
+            validateSelectStatement(statement);
         } else {
             throw QPSSyntaxError();
         }
     }
 }
 
-bool Validator::isValidSelectStatement(std::string statement) {
+void Validator::validateSelectStatement(const std::string& statement) {
     int firstSpaceIndex = statement.find_first_of(WHITESPACES);
 
     // No characters after "Select"
     if (firstSpaceIndex == std::string::npos) {
-        return false;
         throw QPSSyntaxError();
     }
     std::string selectWord = statement.substr(0, firstSpaceIndex);
@@ -27,69 +31,174 @@ bool Validator::isValidSelectStatement(std::string statement) {
     bool containsPattern = containsPatternClause(remainingStatement);
 
     int secondSpaceIndex = statement.find_first_of(WHITESPACES, firstSpaceIndex + 1);
+    std::string synonymToReturn;
+    std::string remainingClausesStatement = "";
     if (secondSpaceIndex == std::string::npos) {
-        return false;
+        synonymToReturn = trim(statement.substr(firstSpaceIndex, std::string::npos));
+        if (synonymToReturn == "") {
+            throw QPSSyntaxError();
+        }
+    } else {
+        synonymToReturn = trim(statement.substr(firstSpaceIndex, secondSpaceIndex - firstSpaceIndex));
+        remainingClausesStatement = trim(statement.substr(secondSpaceIndex, std::string::npos));
+    }
+
+    if (!isSynonym(synonymToReturn)) {
         throw QPSSyntaxError();
     }
 
-    std::string returnSynonym = trim(statement.substr(firstSpaceIndex, secondSpaceIndex - firstSpaceIndex));
-    if (!isSynonym(returnSynonym)) {
-        return false;
-        throw QPSSyntaxError();
+    // Ensure that the synonym is in the variable store
+    bool hasSynonym = synonymStore.containsSynonymName(synonymToReturn);
+    if (!hasSynonym) {
+        throw QPSSemanticError();
     }
 
-    std::vector<std::string> clauseList = getAllClauses(trim(statement.substr(secondSpaceIndex, std::string::npos)));
+    std::vector<std::string> clauseList = getAllClauses(remainingClausesStatement);
+    if (clauseList.size() == 0) {
+        return;
+    }
 
-    return true;
-
-    return false;
+    for (std::string clause : clauseList) {
+        if (containsSuchThatClause(clause)) {
+            validateSuchThatClause(clause);
+        } else if (containsPatternClause(clause)) {
+            validatePatternClause(clause);
+        } else {
+            throw QPSSyntaxError();
+        }
+    }
 }
 
-bool Validator::isValidDeclarationStatement(std::string statement) {
+void Validator::validateDeclarationStatement(const std::string& statement) {
     if (statement.back() != ';') {
-        return false;
+        throw QPSSyntaxError();
     }
-    statement.pop_back();
+    std::string newStatement = statement.substr(0, statement.size() - 1);
 
-    int firstSpaceIndex = statement.find_first_of(" \n\t\b\r\f");
+    int firstSpaceIndex = newStatement.find_first_of(" \n\t\b\r\f");
     if (firstSpaceIndex == std::string::npos) {
-        return false;
+        throw QPSSyntaxError();
     }
 
-    std::string firstWord = statement.substr(0, firstSpaceIndex + 1);  // design-entity
-    std::string remainingStatement = statement.substr(firstSpaceIndex + 1, std::string::npos);
+    std::string firstWord = newStatement.substr(0, firstSpaceIndex + 1);  // design-entity
+    std::string remainingStatement = newStatement.substr(firstSpaceIndex + 1, std::string::npos);
 
     std::vector<std::string> synonymList = splitByDelimiter(trim(remainingStatement), ",");
     if (synonymList.size() == 0) {
-        return false;
+        throw QPSSyntaxError();
     }
 
     for (std::string synonym : synonymList) {
         if (!isSynonym(synonym)) {
-            return false;
+            throw QPSSyntaxError();
         }
     }
-    return true;
 }
 
-bool Validator::isValidSuchThatClause(std::string suchThatClause) {
-    bool startsWithSuchThat = std::regex_search(suchThatClause, std::regex("such that"));
-    if (!startsWithSuchThat) {
-        return false;
+void Validator::validateSuchThatClause(const std::string& suchThatClause) {
+    bool hasProperStructure = std::regex_match(suchThatClause, std::regex("^such that .*\\([^)]*\\)$"));
+    if (!hasProperStructure) {
+        throw QPSSyntaxError();
     }
 
-    std::string relRef = trim(suchThatClause.substr(9));  // remove such that from the clause
+    // Remove "such that"
+    std::string removedSuchThatClause = trim(suchThatClause.substr(9));
 
-    return true;
+    // Get string until '(' --> relRef
+    std::string relRefString;
+    std::string parameterString;
+    std::tie(relRefString, parameterString) = substringUntilDelimiter(removedSuchThatClause, "(");
+
+    // Depending on the relRef do checks
+    relRefString = trim(relRefString);
+    std::regex relRefPatterns = std::regex("Follows|Follows*|Parent|Parent*|Uses|Modifies");
+    bool isRelRef = std::regex_search(relRefString, relRefPatterns);
+    if (!isRelRef) {
+        throw QPSSyntaxError();
+    }
+
+    // relRef Follows(*) and Parents(*) --> ('stmtRef', 'stmtRef')
+    // relRef Uses and Modifies --> ('entRef', 'stmtRef')
+    parameterString = trim(parameterString);
+    parameterString = parameterString.substr(0, parameterString.size() - 1);  // Remove ending ')'
+    std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
+    if (refs.size() != 2) {
+        throw QPSSyntaxError();
+    }
+
+    // TODO(Han Qin): Semantic Error QPS Grammar other rules 4 & 5.
+    bool hasCorrectRefFormat = false;
+    if (relRefString == "Follows" || relRefString == "Follows*" || relRefString == "Parent" ||
+        relRefString == "Parent*") {
+        hasCorrectRefFormat = isStmtRef(refs[0]) && isStmtRef(refs[1]);
+    } else if (relRefString == "Uses" || relRefString == "Modifies") {
+        hasCorrectRefFormat = isStmtRef(refs[0]) && isEntRef(refs[1]);
+    }
+
+    // Ensure that synonym is in the variable store
+    bool hasVariable = true;
+    for (const std::string& ref : refs) {
+        if (isSynonym(ref)) {
+            hasVariable = hasVariable && synonymStore.containsSynonymName(ref);
+        }
+    }
+    if (!hasVariable) {
+        throw QPSSemanticError();
+    }
+
+    if (!hasCorrectRefFormat) {
+        throw QPSSyntaxError();
+    }
 }
 
-bool Validator::isValidPatternClause(std::string patternClause) {
-    bool startsWithPattern = std::regex_search(patternClause, std::regex("pattern"));
-    if (!startsWithPattern) {
-        return false;
+void Validator::validatePatternClause(const std::string& patternClause) {
+    bool hasProperStructure = std::regex_match(patternClause, std::regex("^pattern .*\\([^)]*\\)$"));
+    if (!hasProperStructure) {
+        throw QPSSyntaxError();
     }
 
-    std::string relRef = trim(patternClause.substr(8));
+    // Remove "pattern"
+    std::string removedPatternClause = trim(patternClause.substr(7));
 
-    return true;
+    // Get string until '(' --> syn-assign
+    std::string synString;
+    std::string parameterString;
+    std::tie(synString, parameterString) = substringUntilDelimiter(removedPatternClause, "(");
+
+    synString = trim(synString);
+    if (!isSynonym(synString)) {
+        throw QPSSyntaxError();
+    }
+
+    // Semantic Error: QPS Grammar other rules 3
+    bool isSynAssign = synonymStore.containsSynonym(synString, "assign");
+    if (!isSynAssign) {
+        throw QPSSemanticError();
+    }
+
+    // ('entRef', 'expression-spec')
+    parameterString = trim(parameterString);
+    parameterString = parameterString.substr(0, parameterString.size() - 1);  //  Remove ending ')'
+    std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
+
+    if (refs.size() != 2) {
+        throw QPSSyntaxError();
+    }
+
+    bool hasCorrectFormat = isEntRef(refs[0]);
+    hasCorrectFormat = hasCorrectFormat && isExpressionSpec(refs[1]);
+    if (!hasCorrectFormat) {
+        throw QPSSyntaxError();
+    }
+
+    // Ensure that the synonyms are in the variable store
+    // Semantic Error: QPS Grammar other rules 6
+    bool isVariableSynonym = true;
+    if (isSynonym(refs[0])) {
+        isVariableSynonym = synonymStore.containsSynonym(refs[0], "variable");
+    }
+
+    if (!isVariableSynonym) {
+        throw QPSSemanticError();
+    }
 }

@@ -16,23 +16,32 @@ TEST_CASE("Trim Test") {
     REQUIRE(trim(inputString_WithTab) == expectedString);
     REQUIRE(trim(inputString_WithMultipleSpaces) == expectedString);
     REQUIRE(trim(inputString_WithMixedWhitespaces) == expectedString);
+
+    std::string inputString_JustSpace = "  ";
+    std::string expectedString_JustSpace = "";
+    REQUIRE(trim(inputString_JustSpace) == expectedString_JustSpace);
 }
 
-// TEST_CASE("Substring By Delimiter") {
-//     std::string expectedString = "Substring";
-//
-//     std::string resultString;
-//     size_t index;
-//     substringByDelimiter("Substring Test", " ", resultString, index);
-//
-//     REQUIRE(resultString == expectedString);
-// }
+TEST_CASE("SubstringUntilDelimiter") {
+    std::string expectedString = "Substring";
+
+    std::string resultString, remainingString;
+    std::tie(resultString, remainingString) = substringUntilDelimiter("Substring Test", " ");
+    REQUIRE(resultString == expectedString);
+
+    std::tie(resultString, remainingString) = substringUntilDelimiter("Substring", "and");
+    REQUIRE(resultString == expectedString);
+
+    expectedString = "Substring ";
+    std::tie(resultString, remainingString) = substringUntilDelimiter("Substring and Test", "and");
+    REQUIRE(resultString == expectedString);
+}
 
 TEST_CASE("Removing Whitespace Characters") {
     std::string expectedString = "This is the perfect sentence without problems.";
 
     std::string testString = "This is\tthe \nperfect sentence   without \tproblems.";
-    std::string resultString = replaceAllWhitespaces(testString);
+    std::string resultString = replaceAllExtraWhitespaces(testString);
 
     REQUIRE(resultString == expectedString);
 }
