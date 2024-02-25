@@ -12,11 +12,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE(patternStore.hasPattern(1, *new Wildcard(), *new Wildcard()));
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* wildcardArg2 = new Wildcard();
+
+        REQUIRE(patternStore.hasPattern(1, *wildcardArg1, *wildcardArg2));
 
         // Cleanup
-        delete new Wildcard();
-        delete new Wildcard();
+        delete wildcardArg1;
+        delete wildcardArg2;
     }
 
     SECTION("Test hasPattern with Wildcard, Wildcard (Expecting False)") {
@@ -25,11 +28,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* wildcardArg2 = new Wildcard();
+
         REQUIRE_FALSE(patternStore.hasPattern(4, *new Wildcard(), *new Wildcard()));
 
         // Cleanup
-        delete new Wildcard();
-        delete new Wildcard();
+        delete wildcardArg1;
+        delete wildcardArg2;
     }
 
     SECTION("Test hasPattern with Wildcard, Synonyms (Expecting True)") {
@@ -38,11 +44,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE(patternStore.hasPattern(1, *new Wildcard(), *new Synonym(DesignEntityType::VARIABLE, "y")));
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "y");
+
+        REQUIRE(patternStore.hasPattern(1, *wildcardArg1, *synonymsArg2));
 
         // Cleanup
-        delete new Wildcard();
-        delete new Synonym(DesignEntityType::VARIABLE, "y");
+        delete wildcardArg1;
+        delete synonymsArg2;
     }
 
     SECTION("Test hasPattern with Wildcard, Synonyms (Expecting False)") {
@@ -51,11 +60,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE_FALSE(patternStore.hasPattern(1, *new Wildcard(), *new Synonym(DesignEntityType::VARIABLE, "z")));
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "z");
+
+        REQUIRE_FALSE(patternStore.hasPattern(1, *wildcardArg1, *synonymsArg2));
 
         // Cleanup
-        delete new Wildcard();
-        delete new Synonym(DesignEntityType::VARIABLE, "z");
+        delete wildcardArg1;
+        delete synonymsArg2;
     }
 
     SECTION("Test hasPattern with Synonyms, Wildcard (Expecting True)") {
@@ -64,11 +76,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE(patternStore.hasPattern(2, *new Synonym(DesignEntityType::VARIABLE, "a"), *new Wildcard()));
+        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "a");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+
+        REQUIRE(patternStore.hasPattern(2, *synonymsArg1, *wildcardArg2));
 
         // Cleanup
-        delete new Synonym(DesignEntityType::VARIABLE, "a");
-        delete new Wildcard();
+        delete synonymsArg1;
+        delete wildcardArg2;
     }
 
     SECTION("Test hasPattern with Synonyms, Wildcard (Expecting False)") {
@@ -77,7 +92,10 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE_FALSE(patternStore.hasPattern(3, *new Synonym(DesignEntityType::VARIABLE, "c"), *new Wildcard()));
+        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "c");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+
+        REQUIRE_FALSE(patternStore.hasPattern(3, *synonymsArg1, *wildcardArg2));
 
         // Cleanup
         delete new Synonym(DesignEntityType::VARIABLE, "c");
@@ -90,12 +108,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE(patternStore.hasPattern(2, *new Synonym(DesignEntityType::VARIABLE, "a"),
-                                        *new Synonym(DesignEntityType::VARIABLE, "b")));
+        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "a");
+        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "b");
+
+        REQUIRE(patternStore.hasPattern(2, *synonymsArg1, *synonymsArg2));
 
         // Cleanup
-        delete new Synonym(DesignEntityType::VARIABLE, "a");
-        delete new Synonym(DesignEntityType::VARIABLE, "b");
+        delete synonymsArg1;
+        delete synonymsArg2;
     }
 
     SECTION("Test hasPattern with Synonyms, Synonyms (Expecting False)") {
@@ -104,11 +124,13 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        REQUIRE_FALSE(patternStore.hasPattern(3, *new Synonym(DesignEntityType::VARIABLE, "a"),
-                                              *new Synonym(DesignEntityType::VARIABLE, "c")));
+        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "a");
+        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "c");
+
+        REQUIRE_FALSE(patternStore.hasPattern(3, *synonymsArg1, *synonymsArg2));
 
         // Cleanup
-        delete new Synonym(DesignEntityType::VARIABLE, "a");
-        delete new Synonym(DesignEntityType::VARIABLE, "c");
+        delete synonymsArg1;
+        delete synonymsArg2;
     }
 }
