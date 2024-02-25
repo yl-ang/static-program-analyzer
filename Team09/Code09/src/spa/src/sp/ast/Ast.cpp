@@ -224,6 +224,10 @@ ExpressionNode AST::buildTermAST(std::queue<Token>& tokens) {
 }
 
 ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode& node) {
+    // reached e, which is the empty string
+    if (tokens.size() == 0) {
+        return node;
+    }
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
         tokens.pop();

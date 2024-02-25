@@ -429,21 +429,20 @@ TEST_CASE("AST Build Tests") {
 
     SECTION("Build var first then parenthesis ast correctly") {
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),         Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
-
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0), Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),          Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),         Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0), Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),          Token(LEXICAL_TOKEN_TYPE::NAME, "c", 0),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
 
         ASTNode addNode = ASTNode("", "add");
-        ASTNode xNode = ASTNode("x", "var");
-        ASTNode yNode = ASTNode("y", "var");
+        ASTNode bNode = ASTNode("b", "var");
+        ASTNode cNode = ASTNode("c", "var");
         ASTNode mulNode = ASTNode("", "mul");
-        ASTNode zNode = ASTNode("z", "var");
+        ASTNode aNode = ASTNode("a", "var");
 
-        addNode.add_child(xNode);
-        addNode.add_child(yNode);
-        mulNode.add_child(zNode);
+        addNode.add_child(bNode);
+        addNode.add_child(cNode);
+        mulNode.add_child(aNode);
         mulNode.add_child(addNode);
 
         auto queue = makeTokenQueue(inputTokenArray);
@@ -455,7 +454,6 @@ TEST_CASE("AST Build Tests") {
     SECTION("Build var first then parenthesis then var ast correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),          Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
-
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
@@ -481,6 +479,47 @@ TEST_CASE("AST Build Tests") {
 
         ASTNode result = ast.buildExpressionAST(queue);
         REQUIRE(addNode2 == result);
+    }
+
+    SECTION("Build rel_factors correctly for var") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+        };
+        ASTNode zNode = ASTNode("a", "var");
+        auto queue = makeTokenQueue(inputTokenArray);
+        ASTNode result = ast.buildRelationalFactorAST(queue);
+        REQUIRE(zNode == result);
+    }
+
+    SECTION("Build rel_factors correctly for const") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+        };
+        ASTNode oneNode = ASTNode("1", "const");
+        auto queue = makeTokenQueue(inputTokenArray);
+        ASTNode result = ast.buildRelationalFactorAST(queue);
+        REQUIRE(oneNode == result);
+    }
+    SECTION("Build rel_factors correctly for expr") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0)};
+
+        ASTNode addNode = ASTNode("", "add");
+        ASTNode xNode = ASTNode("x", "var");
+        ASTNode yNode = ASTNode("y", "var");
+        ASTNode mulNode = ASTNode("", "mul");
+        ASTNode zNode = ASTNode("z", "var");
+
+        mulNode.add_child(yNode);
+        mulNode.add_child(zNode);
+
+        addNode.add_child(xNode);
+        addNode.add_child(mulNode);
+        auto queue = makeTokenQueue(inputTokenArray);
+        ASTNode result = ast.buildRelationalFactorAST(queue);
+        REQUIRE(result == result);
     }
 
     SECTION("Build relational expression with var and const") {
@@ -584,11 +623,42 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(lessThan == result);
     }
 
-    SECTION("Build relational expression with expr and expr") {
+    SECTION("Build relational expression with expressions") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+        };
+
+        ASTNode xNode = ASTNode("x", "var");
+        ASTNode yNode = ASTNode("y", "var");
+        ASTNode mulNode = ASTNode("", "mul");
+        ASTNode lessThan = ASTNode("", "<");
+        ASTNode addNode = ASTNode("", "add");
+        ASTNode xNode2 = ASTNode("x", "var");
+        ASTNode yNode2 = ASTNode("y", "var");
+        addNode.add_child(xNode2);
+        addNode.add_child(yNode2);
+
+        mulNode.add_child(xNode);
+        mulNode.add_child(yNode);
+
+        lessThan.add_child(mulNode);
+        lessThan.add_child(addNode);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        ASTNode result = ast.buildRelationalExpressionAST(queue);
+        REQUIRE(lessThan == result);
+    }
+
+    SECTION("Build relational expression with parenthesised exprs") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0), Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),          Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),         Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
