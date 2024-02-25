@@ -23,6 +23,16 @@ public:
 
     void dfsVisit(std::unique_ptr<ASTNode> node, AstVisitor* visitor);
 
+    std::unordered_set<std::string> getVariables();
+    std::unordered_set<std::string> getConstants();
+    std::unordered_set<std::string> getProcedures();
+    std::unordered_set<Stmt> getStatements();
+    std::unordered_set<std::pair<StmtNum, StmtNum>> getFollows();
+    std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();
+    std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
+
 private:
     EntityExtractor* entityExtractor;
     FollowsExtractor* followsExtractor;
