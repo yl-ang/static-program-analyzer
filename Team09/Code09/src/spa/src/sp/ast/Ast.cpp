@@ -199,6 +199,9 @@ ExpressionNode AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
     // create a temporary queue to access the following elements in the tokens queue
     auto temp = tokens;
     temp.pop();
+    if (temp.size() == 0) {
+        return buildExpressionAST(tokens);
+    }
     Token followingToken = temp.front();
     Token token = tokens.front();
     if (followingToken.type == CLOSE_BRACKET ||
