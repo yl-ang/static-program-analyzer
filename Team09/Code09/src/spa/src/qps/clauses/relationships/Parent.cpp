@@ -20,16 +20,13 @@ ClauseResult Parent::evaluate(PKBFacadeReader& reader) {
 
 ClauseResult Parent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     bool parentIsSynonym = parent.isSynonym();
-    Synonym syn = parentIsSynonym ? static_cast<Synonym&>(parent) : static_cast<Synonym&>(child);
+    Synonym syn = parentIsSynonym ? dynamic_cast<Synonym&>(parent) : dynamic_cast<Synonym&>(child);
 
     std::unordered_set<Stmt> allStmts{};
     if (syn.getType() == DesignEntityType::STMT) {
         allStmts = reader.getStmts();
     } else {
-        auto allTypeStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-        for (Stmt* stmt : allTypeStmts) {
-            allStmts.insert(*stmt);
-        }
+        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
     }
 
     std::unordered_set<StmtNum> uniqueValues{};
@@ -59,8 +56,8 @@ ClauseResult Parent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 
 ClauseResult Parent::evaluateSynonymInteger(PKBFacadeReader& reader) {
     bool parentIsSynonym = parent.isSynonym();
-    Synonym syn = parentIsSynonym ? static_cast<Synonym&>(parent) : static_cast<Synonym&>(child);
-    Integer integer = parentIsSynonym ? static_cast<Integer&>(child) : static_cast<Integer&>(parent);
+    Synonym syn = parentIsSynonym ? dynamic_cast<Synonym&>(parent) : dynamic_cast<Synonym&>(child);
+    Integer integer = parentIsSynonym ? dynamic_cast<Integer&>(child) : dynamic_cast<Integer&>(parent);
 
     StmtNum stmtNum = std::stoi(integer.getValue());
     if (parentIsSynonym) {
@@ -98,8 +95,8 @@ ClauseResult Parent::evaluateSynonymInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult Parent::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym parentSyn = static_cast<Synonym&>(parent);
-    Synonym childSyn = static_cast<Synonym&>(child);
+    Synonym parentSyn = dynamic_cast<Synonym&>(parent);
+    Synonym childSyn = dynamic_cast<Synonym&>(child);
 
     SynonymValues parentValues{};
     SynonymValues childValues{};
