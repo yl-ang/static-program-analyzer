@@ -6,8 +6,9 @@ void StatementListNode::accept(AstVisitor* visitor) {
 
 std::vector<int> StatementListNode::getStmtsStmtNum() {
     std::vector<int> stmtNums;
-    for (const auto& child : children) {
-        stmtNums.push_back(child->getStmtNum());
+    std::vector<std::unique_ptr<ASTNode>> _children = this->getChildren();
+    for (const auto& child : _children) {
+        stmtNums.push_back(child->getStmtNumber());
     }
     return stmtNums;
 }

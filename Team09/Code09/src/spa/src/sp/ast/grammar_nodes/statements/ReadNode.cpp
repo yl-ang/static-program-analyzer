@@ -1,9 +1,10 @@
 #include "ReadNode.h"
 
-void ReadNode::accept(AstVisitor* visitor) override {
+void ReadNode::accept(AstVisitor* visitor) {
     visitor->visitRead(this);
 }
 
 std::string ReadNode::getVar() {
-    return children.at(0)->getValue();
+    std::vector<std::unique_ptr<ASTNode>> _children = this->getChildren();
+    return _children.at(0)->getValue();
 }

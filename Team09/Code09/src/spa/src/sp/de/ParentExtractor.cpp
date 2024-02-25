@@ -13,7 +13,7 @@ void ParentExtractor::visitVariable(VariableNode* node) {}
 void ParentExtractor::visitConstant(ConstantNode* node) {}
 
 void ParentExtractor::visitWhile(WhileNode* node) {
-    int parentStmtNum = node->getStmtNum();
+    int parentStmtNum = node->getStmtNumber();
     std::vector<int> childrenStmtNums = node->getStmtLstNode()->getStmtsStmtNum();
     for (int i = 0; i < childrenStmtNums.size(); ++i) {
         this->parent.insert({parentStmtNum, childrenStmtNums[i]});
@@ -21,7 +21,7 @@ void ParentExtractor::visitWhile(WhileNode* node) {
 }
 
 void ParentExtractor::visitIf(IfNode* node) {
-    int parentStmtNum = node->getStmtNum();
+    int parentStmtNum = node->getStmtNumber();
     std::vector<int> thenStmtNums = node->getThenStmtLstNode()->getStmtsStmtNum();
     std::vector<int> elseStmtNums = node->getElseStmtLstNode()->getStmtsStmtNum();
     for (int i = 0; i < thenStmtNums.size(); ++i) {

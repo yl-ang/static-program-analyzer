@@ -11,47 +11,57 @@ void ModifiesExtractor::visitVariable(VariableNode* node) {}
 void ModifiesExtractor::visitConstant(ConstantNode* node) {}
 
 void ModifiesExtractor::visitRead(ReadNode* node) {
-    int modifierStmtNum = node->getStmtNum();
+    int modifierStmtNum = node->getStmtNumber();
     std::string modifiedVariable = node->getVar();
     this->modifies.insert({modifierStmtNum, modifiedVariable});
 }
 
 void ModifiesExtractor::visitAssign(AssignmentNode* node) {
-    int modifierStmtNum = node->getStmtNum();
+    int modifierStmtNum = node->getStmtNumber();
     std::string modifiedVariable = node->getVar();
     this->modifies.insert({modifierStmtNum, modifiedVariable});
 }
 
 void ModifiesExtractor::visitWhile(WhileNode* node) {
-    int modifierStmtNum = node->getStmtNum();
+    int modifierStmtNum = node->getStmtNumber();
     ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor();
     dfsVisitHelper(node->getStmtLstNode(), modifiesExtractorHelper);
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper.getModifies();
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper->getModifies();
 
     // Iterate over each element in the set and update stmtNum value
-    for (auto& pair : extractedModifies) {
-        pair.first = modifierStmtNum;
-        this->modifies.insert(pair);
+    for (auto it = extractedModifies.begin(); it != extractedModifies.end();) {
+        auto oldPair = *it;
+        it = extractedModifies.erase(it);
+
+        // Create a new pair with the updated stmtNum value and insert it
+        modifies.insert({modifierStmtNum, oldPair.second});
     }
 }
 
 void ModifiesExtractor::visitIf(IfNode* node) {
-    int modifierStmtNum = node->getStmtNum();
+    int modifierStmtNum = node->getStmtNumber();
     ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor();
     ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor();
     dfsVisitHelper(node->getThenStmtLstNode(), thenModifiesExtractorHelper);
     dfsVisitHelper(node->getElseStmtLstNode(), elseModifiesExtractorHelper);
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper.getModifies();
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedElseModifies = elseModifiesExtractorHelper.getModifies();
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper->getModifies();
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedElseModifies = elseModifiesExtractorHelper->getModifies();
 
     // Iterate over each element in the set and update stmtNum value
-    for (auto& pair : extractedThenModifies) {
-        pair.first = modifierStmtNum;
-        this->modifies.insert(pair);
+    for (auto it = extractedThenModifies.begin(); it != extractedThenModifies.end();) {
+        auto oldPair = *it;
+        it = extractedThenModifies.erase(it);
+
+        // Create a new pair with the updated stmtNum value and insert it
+        modifies.insert({modifierStmtNum, oldPair.second});
     }
-    for (auto& pair : extractedElseModifies) {
-        pair.first = modifierStmtNum;
-        this->modifies.insert(pair);
+
+    for (auto it = extractedElseModifies.begin(); it != extractedElseModifies.end();) {
+        auto oldPair = *it;
+        it = extractedElseModifies.erase(it);
+
+        // Create a new pair with the updated stmtNum value and insert it
+        modifies.insert({modifierStmtNum, oldPair.second});
     }
 }
 
@@ -63,7 +73,7 @@ void ModifiesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, ModifiesEx
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
-        dfsVisit(child, visitor);
+        dfsVisitHelper(child, visitor);
     }
     return;
 }

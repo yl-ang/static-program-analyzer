@@ -17,7 +17,7 @@ class DesignExtractor {
 public:
     DesignExtractor() {}
 
-    void extract(std::unique_ptr<ASTNode> root);
+    void extract(std::unique_ptr<ProgramNode> root);
 
     void writePKB(PKBFacadeWriter* pkbWriter);
 

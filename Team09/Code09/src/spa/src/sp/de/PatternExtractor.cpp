@@ -14,7 +14,7 @@ void PatternExtractor::visitVariable(VariableNode* node) {}
 void PatternExtractor::visitConstant(ConstantNode* node) {}
 
 void PatternExtractor::visitAssign(AssignmentNode* node) {
-    int stmtNum = node->getStmtNum();
+    int stmtNum = node->getStmtNumber();
     std::string lhs = node->getVar();
     std::vector<std::string> rhsVars = node->getExpr()->getVars();
     std::vector<std::string> rhsConsts = node->getExpr()->getConsts();
