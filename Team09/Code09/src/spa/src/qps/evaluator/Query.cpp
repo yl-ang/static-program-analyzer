@@ -20,7 +20,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
 
     std::vector<Table> clauseTables{};
     for (ClauseResult result : clauseResults) {
-        // 1. Check if all Boolean results are true.
+        // 1. Check if all Boolean results are true. If a single false, short-circuit and return empty.
         if (result.isBoolean() && !result.getBoolean()) {
             return {};
         }
@@ -29,6 +29,10 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
         std::vector<Synonym> headers = result.getSynonyms();
         std::vector<ColumnData> columns = result.getAllSynonymValues();
         clauseTables.push_back(Table{headers, columns});
+    }
+
+    if (clauseTables.empty()) {
+        return buildSelectTable(pkb).extractResults(selectEntities);
     }
 
     Table result = clauseTables[0];
