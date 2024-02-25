@@ -7,7 +7,7 @@
 
 class PKBFacadeReader {
 public:
-    PKBFacadeReader(PKB& pkbReference);
+    explicit PKBFacadeReader(PKB& pkbReference);
     PKBFacadeReader() = default;
 
     // Common Entities (Variables, Constants, Procedures)
@@ -44,20 +44,20 @@ public:
     bool hasParentStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for ModifiesStore
-    std::unordered_set<Variable> getModifiesVariablesByStatement(StmtNum stmt) const;
-    std::unordered_set<StmtNum> getModifiesStatementsByVariable(const Variable& variable) const;
-    bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
-    bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
+    [[nodiscard]] std::unordered_set<Variable> getModifiesVariablesByStatement(StmtNum stmt) const;
+    [[nodiscard]] std::unordered_set<StmtNum> getModifiesStatementsByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
+    [[nodiscard]] bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
     // Getters for UsesStore
-    std::unordered_set<Variable> getUsesVariablesByStatement(StmtNum stmt) const;
-    std::unordered_set<StmtNum> getUsesStatementsByVariable(const Variable& variable) const;
-    bool hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const;
-    bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+    [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByStatement(StmtNum stmt) const;
+    [[nodiscard]] std::unordered_set<StmtNum> getUsesStatementsByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const;
+    [[nodiscard]] bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for PatternStore
-    bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
-    bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
+    [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
+    [[nodiscard]] bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
 
 private:
     PKB* pkbReference = nullptr;
