@@ -78,8 +78,27 @@ std::unique_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
         return buildReadAST(tokens);
     } else if (first_token.type == PRINT) {
         return buildPrintAST(tokens);
+    } else if (first_token.type == WHILE) {
+        return buildWhileAST(tokens);
     }
-    return buildWhileAST(tokens);
+    return buildIfAST(tokens);
+}
+
+std::unique_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
+    Token ifToken = tokens.front();
+    std::vector<std::unique_ptr<ASTNode>> children = {};
+
+    tokens.pop();  // remove if
+    std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    tokens.pop();  // remove then
+    std::unique_ptr<StatementListNode> thenStatementList = buildStatementListAST(tokens);
+    tokens.pop();  // remove else
+    std::unique_ptr<StatementListNode> elseStatementList = buildStatementListAST(tokens);
+
+    children.push_back(std::move(conditionalExpression));
+    children.push_back(std::move(thenStatementList));
+    children.push_back(std::move(elseStatementList));
+    return std::make_unique<IfNode>(std::move(children), ifToken.line_number);
 }
 
 std::unique_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {

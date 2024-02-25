@@ -1083,4 +1083,100 @@ TEST_CASE("AST Build Tests") {
         auto result = ast.buildWhileAST(queue);
         REQUIRE(expected == *(result.get()));
     }
+
+    SECTION("Build if-then-else statement") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::IF, "if", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::THEN, "then", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::ELSE, "else", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+        };
+        std::unique_ptr<ASTNode> xNode =
+            std::make_unique<ASTNode>("x", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> yNode =
+            std::make_unique<ASTNode>("y", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> xNode1 =
+            std::make_unique<ASTNode>("x", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> yNode1 =
+            std::make_unique<ASTNode>("y", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> xNode2 =
+            std::make_unique<ASTNode>("x", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> yNode2 =
+            std::make_unique<ASTNode>("y", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> aNode =
+            std::make_unique<ASTNode>("a", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+        std::unique_ptr<ASTNode> bNode =
+            std::make_unique<ASTNode>("b", "var", std::vector<std::unique_ptr<ASTNode>>{}, 0);
+
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        std::vector<std::unique_ptr<ASTNode>> children3 = {};
+        std::vector<std::unique_ptr<ASTNode>> children4 = {};
+        std::vector<std::unique_ptr<ASTNode>> children5 = {};
+        std::vector<std::unique_ptr<ASTNode>> children6 = {};
+        std::vector<std::unique_ptr<ASTNode>> children7 = {};
+        std::vector<std::unique_ptr<ASTNode>> children8 = {};
+
+        children.push_back(std::move(xNode));
+        children.push_back(std::move(yNode));
+
+        auto lessThan = std::make_unique<ASTNode>("", "<", std::move(children), 0);
+        children2.push_back(std::move(xNode1));
+        children2.push_back(std::move(yNode1));
+
+        auto moreThan = std::make_unique<ASTNode>("", ">", std::move(children2), 0);
+        children3.push_back(std::move(lessThan));
+        children3.push_back(std::move(moreThan));
+        auto andandNode = std::make_unique<ASTNode>("", "&&", std::move(children3), 0);
+
+        children4.push_back(std::move(xNode2));
+        children4.push_back(std::move(yNode2));
+
+        auto assign = std::make_unique<ASTNode>("", "assign", std::move(children4), 0);
+        children5.push_back(std::move(assign));
+        auto stmtList = std::make_unique<ASTNode>("", "stmtList", std::move(children5));
+
+        children6.push_back(std::move(aNode));
+        children6.push_back(std::move(bNode));
+        auto assign1 = std::make_unique<ASTNode>("", "assign", std::move(children6), 0);
+        children7.push_back(std::move(assign1));
+        auto stmtList2 = std::make_unique<ASTNode>("", "stmtList", std::move(children7));
+
+        children8.push_back(std::move(andandNode));
+        children8.push_back(std::move(stmtList));
+        children8.push_back(std::move(stmtList2));
+
+        auto expected = IfNode(std::move(children8), 0);
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildIfAST(queue);
+        REQUIRE(expected == *(result.get()));
+    }
 }
