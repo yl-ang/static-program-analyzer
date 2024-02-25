@@ -3,7 +3,7 @@
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/PatternClause.h"
 
-TEST_CASE("PatternClause evaluate for parent* relationship with no synonyms") {
+TEST_CASE("PatternClause evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
@@ -16,7 +16,6 @@ TEST_CASE("PatternClause evaluate for parent* relationship with no synonyms") {
      *   x = 1;
      *   print z;
      */
-
     std::unordered_set<Stmt> stmtStoreEntries = {{StatementType::READ, 1},
                                                  {StatementType::ASSIGN, 2},
                                                  {StatementType::ASSIGN, 3},
@@ -31,16 +30,22 @@ TEST_CASE("PatternClause evaluate for parent* relationship with no synonyms") {
     writer.setConstants(constantStoreEntries);
 
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
-        {2, {"x", "x"}}, {2, {"x", "y"}}, {3, {"x", "2"}}, {3, {"x", "x"}}, {4, {"x", "1"}}};
+        {2, {"x", "x"}}, {2, {"x", "y"}}, {3, {"x", "2"}}, {3, {"x", "x"}}, {4, {"x", "2"}}};
     writer.setPatternStore(patternStoreEntries);
 
     Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
+
     Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
     Literal literal = Literal("1");
-    Wildcard wildcard = Wildcard();
-    ExpressionSpec varExp = ExpressionSpec("_\"x\"_");
-    ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
+    ExpressionSpec varExp = ExpressionSpec("_\"y\"_");
+    ExpressionSpec literalExp = ExpressionSpec("_\"1\"_");
+    SECTION("Test Wildcard and Wildcard") {
+        Wildcard wildcard = Wildcard();
 
-    PatternClause pc = PatternClause(&assignSyn, &wildcard, &varExp);
-    ClauseResult result = pc.evaluate(reader);
+        PatternClause pc = PatternClause(&assignSyn, &wildcard, &wildcard);
+        ClauseResult result = pc.evaluate(reader);
+        REQUIRE_FALSE(result.isBoolean());
+        std::vector<Synonym> resSyn = result.getSynonyms();
+        result.getAllSynonymValues();
+    }
 }

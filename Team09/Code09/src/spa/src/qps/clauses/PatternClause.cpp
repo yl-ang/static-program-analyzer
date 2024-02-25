@@ -105,6 +105,6 @@ ClauseResult PatternClause::evaluateOthers(PKBFacadeReader& reader) {
     if (stmtNumbers.size() == 0) {
         return {false};
     } else {
-        return ClauseResult{aSyn, stmtNumbers};
+        return {aSyn, stmtNumbers};
     }
 }
