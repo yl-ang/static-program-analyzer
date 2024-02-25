@@ -43,6 +43,7 @@ struct hash<Stmt> {
 }  // namespace std
 // ai-gen end
 
+// Hash method for Follows and Parent Pairs i.e <StmtNum, StmtNum>
 namespace std {
 template <>
 struct hash<std::pair<StmtNum, StmtNum>> {
@@ -53,6 +54,7 @@ struct hash<std::pair<StmtNum, StmtNum>> {
 };
 }  // namespace std
 
+// Hash method for Modifies and Uses Pairs i.e <StmtNum, Variable>
 namespace std {
 template <>
 struct hash<std::pair<StmtNum, Variable>> {
@@ -63,27 +65,18 @@ struct hash<std::pair<StmtNum, Variable>> {
 };
 }  // namespace std
 
+// Hash method for inner single pattern pair: i.e <lhs, rhs>
 namespace std {
-
 template <>
 struct hash<std::pair<std::string, std::string>> {
     size_t operator()(const std::pair<std::string, std::string>& p) const {
-        // Combine the hashes of the two strings
+        // Combine the hashes of lhs and rhs
         return hash<std::string>()(p.first) ^ (hash<std::string>()(p.second) << 1);
     }
 };
-
-template <>
-struct equal_to<std::pair<std::string, std::string>> {
-    bool operator()(const std::pair<std::string, std::string>& lhs,
-                    const std::pair<std::string, std::string>& rhs) const {
-        // Compare the two pairs for equality
-        return lhs.first == rhs.first && lhs.second == rhs.second;
-    }
-};
-
 }  // namespace std
 
+// Hash method for full single pattern pairs: i.e <StmtNum, <lhs, rhs>>
 namespace std {
 template <>
 struct hash<std::pair<int, std::pair<std::basic_string<char>, std::basic_string<char>>>> {
