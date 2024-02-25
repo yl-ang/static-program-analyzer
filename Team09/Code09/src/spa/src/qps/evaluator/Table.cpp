@@ -40,10 +40,10 @@ Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(head
 
 /**
  * currently assumes there is only 1 entity.
- * @TODO(Ezekiel): handle multiple entities
+ * @TODO(Ezekiel): handle multiple entities -- milestone 2
  */
 std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synonyms) {
-    if (isEmpty() || synonyms.size() == 0 || !containsHeader(synonyms[0])) {
+    if (this->isEmpty() || synonyms.empty() || !containsHeader(synonyms[0])) {
         return {};
     }
 
