@@ -36,6 +36,11 @@ public:
     std::vector<std::unique_ptr<ASTNode>> const& getChildren() const {
         return children;
     }
+
+    void accept(AstVisitor* visitor) override {
+        // TODO: Implement this
+    }
+
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members
         if (lhs.getValue() != rhs.getValue() || lhs.getType() != rhs.getType() ||
