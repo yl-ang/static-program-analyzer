@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "AbstractionExtractor.h"
+#include "NodeDeclarations.h"
 
 class UsesExtractor : public AbstractionExtractor {
 public:

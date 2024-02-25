@@ -1,5 +1,8 @@
 #include "ExpressionNode.h"
 
+#include "ConstantNode.h"
+#include "VariableNode.h"
+
 void ExpressionNode::accept(AstVisitor* visitor) {
     visitor->visitExpression(this);
 }

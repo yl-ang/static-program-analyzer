@@ -1,5 +1,7 @@
 #include "ParentExtractor.h"
 
+#include "NodeDeclarations.h"
+
 void ParentExtractor::visitProgram(ProgramNode* node) {}
 void ParentExtractor::visitStmtLst(StatementListNode* node) {}
 void ParentExtractor::visitExpression(ExpressionNode* node) {}

@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 
+#include "../ExpressionNode.h"
+#include "StatementListNode.h"
 #include "sp/ast/AstNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
 
