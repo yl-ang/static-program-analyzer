@@ -36,7 +36,7 @@ TEST_CASE("StatementStore tests", "[StatementStore]") {
         // Test getStatementsByType
         auto result = statementStore.getStatementsByType(StatementType::ASSIGN);
         REQUIRE(!result.empty());
-        REQUIRE(result == std::unordered_set<std::optional<Stmt>>{std::make_optional(Stmt{StatementType::ASSIGN, 1})});
+        REQUIRE(result == std::unordered_set<Stmt>{Stmt{StatementType::ASSIGN, 1}});
 
         result = statementStore.getStatementsByType(StatementType::READ);
         REQUIRE_FALSE(!result.empty());

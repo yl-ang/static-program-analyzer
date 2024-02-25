@@ -38,7 +38,7 @@ std::optional<Stmt> PKBFacadeReader::getStatementByStmtNum(StmtNum stmtNum) cons
     return pkbReference->stmtStore->getStatementByStmtNum(stmtNum);
 }
 
-std::unordered_set<std::optional<Stmt>> PKBFacadeReader::getStatementsByType(StatementType type) const {
+std::unordered_set<Stmt> PKBFacadeReader::getStatementsByType(StatementType type) const {
     return pkbReference->stmtStore->getStatementsByType(type);
 }
 
