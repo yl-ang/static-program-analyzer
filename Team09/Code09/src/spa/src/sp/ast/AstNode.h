@@ -27,6 +27,10 @@ public:
     std::string getValue() const {
         return value;
     }
+
+    std::vector<std::unique_ptr<ASTNode>> const& getChildren() const {
+        return children;
+    }
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members
         if (lhs.getValue() != rhs.getValue() || lhs.getType() != rhs.getType() ||
