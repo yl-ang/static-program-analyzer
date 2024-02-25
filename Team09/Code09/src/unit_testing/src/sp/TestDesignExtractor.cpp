@@ -5,27 +5,68 @@
 TEST_CASE("Design Extractor Tests") {
     DesignExtractor designExtractor;
 
-    SECTION("extract") {
-        // ASTNode root = ASTNode("+", "add");
-        // ASTNode child1 = ASTNode("x", "var");
-        // ASTNode child2 = ASTNode("*", "mul");
-        // ASTNode child3 = ASTNode("y", "var");
-        // ASTNode child4 = ASTNode("1", "const");
-        // ASTNode child5 = ASTNode("z", "var");
-        // ASTNode child6 = ASTNode("3", "const");
+    // x = y;
+    std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+    std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+    std::vector<std::unique_ptr<ASTNode>> childrenA = {};
+    childrenA.push_back(std::move(xNode));
+    childrenA.push_back(std::move(yNode));
+    auto equalNode = std::make_unique<ASTNode>("", "assign", std::move(childrenA));
 
-        // child1.add_child(child3);
-        // child1.add_child(child4);
-        // child1.add_child(child5);
-        // child3.add_child(child6);
-        // root.add_child(child1);
-        // root.add_child(child2);
+    // read a;
+    std::unique_ptr<ASTNode> aNode = std::make_unique<ASTNode>("a", "var");
+    std::vector<std::unique_ptr<ASTNode>> childrenR = {};
+    childrenR.push_back(std::move(aNode));
+    auto readNode = std::make_unique<ASTNode>("", "read", std::move(childrenR));
 
-        // designExtractor.extract(root);
+    // print z;
+    std::unique_ptr<ASTNode> zNode = std::make_unique<ASTNode>("z", "var");
+    std::vector<std::unique_ptr<ASTNode>> childrenP = {};
+    childrenP.push_back(std::move(zNode));
+    auto printNode = std::make_unique<ASTNode>("", "print", std::move(childrenP));
 
-        // std::unordered_set<std::string> expectedVariables;
-        // expectedVariables.insert({"x", "y", "z"});
+    std::vector<std::unique_ptr<ASTNode>> children1 = {};
+    std::vector<std::unique_ptr<ASTNode>> children2 = {};
 
-        // REQUIRE(expectedVariables == designExtractor.getVariables());
+    children1.push_back(std::move(equalNode));
+    auto stmtList = std::make_unique<ASTNode>("", "stmtList", std::move(children1));
+
+    children2.push_back(std::move(stmtList));
+    auto procedure = ASTNode("a", "proc", std::move(children2));
+
+    SECTION("Variables extracted correctly") {
+        REQUIRE(expectedVariables == designExtractor.getVariables());
+    }
+
+    SECTION("Constants extracted correctly") {
+        REQUIRE(expectedConstants == designExtractor.getConstants());
+    }
+
+    SECTION("Procedure extracted correctly") {
+        REQUIRE(expectedProcedures == designExtractor.getProcedures());
+    }
+
+    SECTION("Statements extracted correctly") {
+        REQUIRE(expectedStatements == designExtractor.getStatements());
+    }
+
+    SECTION("Follows extracted correctly") {
+        REQUIRE(expectedFollows == designExtractor.getFollows());
+    }
+
+    SECTION("Parent extracted correctly") {
+        REQUIRE(expectedParent == designExtractor.getParent());
+    }
+
+    SECTION("Uses extracted correctly") {
+        REQUIRE(expectedUses == designExtractor.getUses());
+    }
+
+    SECTION("Modifies extracted correctly") {
+        REQUIRE(expectedModifies == designExtractor.getModifies());
+    }
+
+    SECTION("Pattern extracted correctly") {
+        REQUIRE(expectedPattern == designExtractor.getPattern());
     }
 }
