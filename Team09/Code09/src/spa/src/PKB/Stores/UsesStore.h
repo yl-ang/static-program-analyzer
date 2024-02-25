@@ -1,13 +1,13 @@
 #pragma once
 
-#include <qps/clauseArguments/ClauseArgument.h>
-
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "PKB/Utils/DataTypes.h"
+#include "qps/clauseArguments/ClauseArgument.h"
+#include "qps/clauseArguments/Literal.h"
 
 class UsesStore {
 public:

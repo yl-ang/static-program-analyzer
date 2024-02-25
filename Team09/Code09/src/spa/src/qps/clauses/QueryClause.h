@@ -2,11 +2,7 @@
 
 #include <PKB/PKBClient/PKBFacadeReader.h>
 
-#include <string>
-
-#include "../evaluator/Table.h"
 #include "ClauseResult.h"
-#include "qps/clauseArguments/Synonym.h"
 
 enum class ClauseType { SELECT, SUCH_THAT, PATTERN };
 

@@ -91,3 +91,9 @@ public:
     ParentStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT_STAR) {}
 };
+
+class UsesTester : public SuchThatTester {
+public:
+    UsesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::USES) {}
+};

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "QueryClause.h"
-#include "qps/clauseArguments/Synonym.h"
 #include "relationships/Follows.h"
 #include "relationships/Relationship.h"
 

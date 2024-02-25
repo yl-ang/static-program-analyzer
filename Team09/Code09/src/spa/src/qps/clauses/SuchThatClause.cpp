@@ -7,6 +7,7 @@
 #include "relationships/FollowsStar.h"
 #include "relationships/Parent.h"
 #include "relationships/ParentStar.h"
+#include "relationships/Uses.h"
 
 namespace {
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
@@ -50,6 +51,9 @@ ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
 
     case (RelationshipType::PARENT_STAR):
         return ParentStar(firstArg, secondArg).evaluate(reader);
+
+    case (RelationshipType::USES):
+        return Uses(firstArg, secondArg).evaluate(reader);
 
     default:
         return {false};
