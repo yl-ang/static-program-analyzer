@@ -16,7 +16,7 @@ enum class DesignEntityStatementType {
     IF,
 };
 
-static std::unordered_map<DesignEntityStatementType, StatementType> DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP = {
+static std::unordered_map<DesignEntityStatementType, StatementType> DESIGN_ENTITY_STMT_TYPE_TO_STMT_TYPE_MAP = {
     {DesignEntityStatementType::ASSIGN, StatementType::ASSIGN},
     {DesignEntityStatementType::WHILE, StatementType::WHILE},
     {DesignEntityStatementType::IF, StatementType::IF},

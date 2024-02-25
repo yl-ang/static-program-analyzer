@@ -91,8 +91,15 @@ std::unordered_set<std::pair<StmtNum, Variable>> UsesExtractor::getUses() {
 void UsesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, UsesExtractor* visitor) {
     node->accept(visitor);
 
-    for (auto& child : node->getChildren()) {
-        dfsVisitHelper(child, visitor);
+    for (auto const& child : node->getChildren()) {
+        dfsVisitHelper(child.get(), visitor);
     }
-    return;
+}
+
+void UsesExtractor::dfsVisitHelper(ASTNode* node, UsesExtractor* visitor) {
+    node->accept(visitor);
+
+    for (auto& child : node->getChildren()) {
+        dfsVisitHelper(child.get(), visitor);
+    }
 }
