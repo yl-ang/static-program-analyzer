@@ -902,12 +902,11 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),     Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
 
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::ANDAND, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
 
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
-        };
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
         std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
         std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
         std::unique_ptr<ASTNode> xNode1 = std::make_unique<ASTNode>("x", "var");
@@ -932,5 +931,73 @@ TEST_CASE("AST Build Tests") {
 
         auto result = ast.buildConditionalExpressionAST(queue);
         REQUIRE(andandNode == *(result.get()));
+    }
+
+    SECTION("While loop test statement") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 1),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 1),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+        };
+        std::unique_ptr<ASTNode> xNode = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode = std::make_unique<ASTNode>("y", "var");
+        std::unique_ptr<ASTNode> xNode1 = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode1 = std::make_unique<ASTNode>("y", "var");
+        std::unique_ptr<ASTNode> xNode2 = std::make_unique<ASTNode>("x", "var");
+        std::unique_ptr<ASTNode> yNode2 = std::make_unique<ASTNode>("y", "var");
+
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::unique_ptr<ASTNode>> children2 = {};
+        std::vector<std::unique_ptr<ASTNode>> children3 = {};
+        std::vector<std::unique_ptr<ASTNode>> children4 = {};
+        std::vector<std::unique_ptr<ASTNode>> children5 = {};
+        std::vector<std::unique_ptr<ASTNode>> children6 = {};
+
+        children.push_back(std::move(xNode));
+        children.push_back(std::move(yNode));
+
+        auto lessThan = std::make_unique<ASTNode>("", "<", std::move(children));
+        children2.push_back(std::move(xNode1));
+        children2.push_back(std::move(yNode1));
+
+        auto moreThan = std::make_unique<ASTNode>("", ">", std::move(children2));
+        children3.push_back(std::move(lessThan));
+        children3.push_back(std::move(moreThan));
+        auto andandNode = std::make_unique<ASTNode>("", "&&", std::move(children3));
+
+        children4.push_back(std::move(xNode2));
+        children4.push_back(std::move(yNode2));
+
+        auto assign = std::make_unique<ASTNode>("", "assign", std::move(children4));
+        children6.push_back(std::move(assign));
+        auto stmtList = std::make_unique<ASTNode>("", "stmtList", std::move(children6));
+
+        children5.push_back(std::move(andandNode));
+        children5.push_back(std::move(stmtList));
+        auto expected = WhileNode(std::move(children5));
+
+        auto queue = makeTokenQueue(inputTokenArray);
+
+        auto result = ast.buildWhileAST(queue);
+        REQUIRE(expected == *(result.get()));
     }
 }
