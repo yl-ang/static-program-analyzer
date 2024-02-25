@@ -150,6 +150,9 @@ ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
 }
 
 ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode& node) {
+    if (tokens.size() == 0) {
+        return node;
+    }
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
