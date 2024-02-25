@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -24,4 +25,5 @@ public:
     void visitConstant(ConstantNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    void ModifiesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, ModifiesExtractor* visitor);
 };

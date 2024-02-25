@@ -5,35 +5,35 @@ void ExpressionNode::accept(AstVisitor* visitor) {
 }
 
 std::vector<std::string> ExpressionNode::getVars() {
-    findVariables(getChildren());
+    findVariables(this->getChildren());
     return variables;
 }
 
 std::vector<std::string> ExpressionNode::getConsts() {
-    findConstants(getChildren());
+    findConstants(this->getChildren());
     return constants;
 }
 
 // Function to traverse through all children nodes and retrieve variable nodes
-void ExpressionNode::findVariables(std::vector<std::unique_ptr<ASTNode>> children) {
-    for (std::unique_ptr<ASTNode> child : children) {
-        if (typeid(child) == typeid(VariableNode)) {
-            variables.push_back(child->getValue());
+void ExpressionNode::findVariables(std::vector<std::unique_ptr<ASTNode>>& children) {
+    for (auto& child : children) {
+        // Use dynamic_cast to check if the child node is of type VariableNode
+        if (auto variableNodePtr = dynamic_cast<VariableNode*>(child.get())) {
+            variables.push_back(variableNodePtr->getValue());
         }
         // Recursively traverse child nodes
         findVariables(child->getChildren());
     }
-    return;
 }
 
 // Function to traverse through all children nodes and retrieve constant nodes
-void ExpressionNode::findConstants(std::vector<std::unique_ptr<ASTNode>> children) {
-    for (std::unique_ptr<ASTNode> child : children) {
-        if (typeid(child) == typeid(ConstantNode)) {
-            constants.push_back(child->getValue());
+void ExpressionNode::findConstants(std::vector<std::unique_ptr<ASTNode>>& children) {
+    for (auto& child : children) {
+        // Use dynamic_cast to check if the child node is of type ConstantNode
+        if (auto constantNodePtr = dynamic_cast<ConstantNode*>(child.get())) {
+            constants.push_back(constantNodePtr->getValue());
         }
         // Recursively traverse child nodes
         findConstants(child->getChildren());
     }
-    return;
 }

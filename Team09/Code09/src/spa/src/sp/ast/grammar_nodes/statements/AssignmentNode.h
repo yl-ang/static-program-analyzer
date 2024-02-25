@@ -13,6 +13,6 @@ public:
 
     void accept(AstVisitor* visitor) override;
 
-    ExpressionNode* getExpr();
+    std::unique_ptr<ExpressionNode> getExpr();
     std::string getVar();
 };

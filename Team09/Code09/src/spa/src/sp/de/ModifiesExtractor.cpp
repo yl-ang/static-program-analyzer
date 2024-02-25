@@ -39,8 +39,8 @@ void ModifiesExtractor::visitIf(IfNode* node) {
     int modifierStmtNum = node->getStmtNum();
     ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor();
     ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor();
-    dfsVisitHelper(node->getThenStmtLst(), thenModifiesExtractorHelper);
-    dfsVisitHelper(node->getElseStmtLst(), elseModifiesExtractorHelper);
+    dfsVisitHelper(node->getThenStmtLstNode(), thenModifiesExtractorHelper);
+    dfsVisitHelper(node->getElseStmtLstNode(), elseModifiesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper.getModifies();
     std::unordered_set<std::pair<StmtNum, Variable>> extractedElseModifies = elseModifiesExtractorHelper.getModifies();
 

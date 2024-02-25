@@ -1,8 +1,5 @@
 #include "ParentExtractor.h"
 
-#include <algorithm>
-#include <vector>
-
 void ParentExtractor::visitProgram(ProgramNode* node) {}
 void ParentExtractor::visitStmtLst(StatementListNode* node) {}
 void ParentExtractor::visitExpression(ExpressionNode* node) {}
