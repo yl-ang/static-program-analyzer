@@ -12,21 +12,20 @@ void StatementStore::setStatements(const std::unordered_set<Stmt>& inputStmts) {
 
     // Update statementTypeMap
     for (const auto& stmt : inputStmts) {
-        statementNumMap[stmt.stmtNum] = const_cast<Stmt*>(&stmt);
-        statementTypeMap[stmt.type].insert(const_cast<Stmt*>(&stmt));
+        statementNumMap[stmt.stmtNum] = stmt;
+        statementTypeMap[stmt.type].insert(stmt);
     }
 }
 
-Stmt* StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
+std::optional<Stmt> StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
     auto it = statementNumMap.find(stmtNum);
     if (it != statementNumMap.end()) {
         return it->second;
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-std::unordered_set<Stmt*> StatementStore::getStatementsByType(
-    StatementType type) const {
+std::unordered_set<std::optional<Stmt>> StatementStore::getStatementsByType(StatementType type) const {
     auto it = statementTypeMap.find(type);
     if (it != statementTypeMap.end()) {
         return it->second;
