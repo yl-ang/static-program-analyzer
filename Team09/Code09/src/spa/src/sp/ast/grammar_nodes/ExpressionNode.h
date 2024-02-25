@@ -25,6 +25,6 @@ public:
     std::vector<std::string> getVars();
     std::vector<std::string> getConsts();
 
-    void findVariables(std::vector<std::unique_ptr<ASTNode>> children);
-    void findConstants(std::vector<std::unique_ptr<ASTNode>> children);
+    void findVariables(const std::vector<std::unique_ptr<ASTNode>>& children);
+    void findConstants(const std::vector<std::unique_ptr<ASTNode>>& children);
 };

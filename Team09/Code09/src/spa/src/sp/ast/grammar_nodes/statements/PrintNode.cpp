@@ -5,6 +5,6 @@ void PrintNode::accept(AstVisitor* visitor) {
 }
 
 std::string PrintNode::getVar() {
-    std::vector<std::unique_ptr<ASTNode>> _children = this->getChildren();
+    const std::vector<std::unique_ptr<ASTNode>>& _children = this->getChildren();
     return _children.at(0)->getValue();
 }
