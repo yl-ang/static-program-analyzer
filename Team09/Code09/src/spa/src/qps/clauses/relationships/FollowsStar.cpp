@@ -19,17 +19,14 @@ ClauseResult FollowsStar::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
-    Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
 
     if (syn.getType() == DesignEntityType::STMT) {
         allStmts = reader.getStmts();
     } else {
-        auto allTypeStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-        for (Stmt* stmt : allTypeStmts) {
-            allStmts.insert(*stmt);
-        }
+        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
     }
 
     SynonymValues values{};
@@ -53,8 +50,8 @@ ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader, bool 
 }
 
 ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
-    Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
-    Integer integer = static_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
+    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+    Integer integer = dynamic_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
 
     StmtNum stmtNum = std::stoi(integer.getValue());
     std::unordered_set<StmtNum> stmtNums;
@@ -78,9 +75,12 @@ ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader, bool f
 
     SynonymValues values{};
     for (StmtNum stmtNum : stmtNums) {
-        Stmt* stmt = reader.getStatementByStmtNum(stmtNum);
+        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+        if (!stmt.has_value()) {
+            continue;
+        }
         StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-        if (stmt->type == synonymType) {
+        if (stmt.value().type == synonymType) {
             values.push_back(std::to_string(stmtNum));
         }
     }
@@ -89,8 +89,8 @@ ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader, bool f
 }
 
 ClauseResult FollowsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym followeeSyn = static_cast<Synonym&>(followee);
-    Synonym followerSyn = static_cast<Synonym&>(follower);
+    Synonym followeeSyn = dynamic_cast<Synonym&>(followee);
+    Synonym followerSyn = dynamic_cast<Synonym&>(follower);
 
     std::vector<Synonym> synonyms = {followeeSyn, followerSyn};
     SynonymValues followeeValues{};

@@ -19,17 +19,14 @@ ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool followeeIsSynonym) {
-    Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
 
     if (syn.getType() == DesignEntityType::STMT) {
         allStmts = reader.getStmts();
     } else {
-        auto allTypeStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-        for (Stmt* stmt : allTypeStmts) {
-            allStmts.insert(*stmt);
-        }
+        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
     }
 
     SynonymValues values{};
@@ -53,8 +50,8 @@ ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader, bool foll
 }
 
 ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader, bool followeeIsSynonym) {
-    Synonym syn = static_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
-    Integer integer = static_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
+    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+    Integer integer = dynamic_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
 
     StmtNum stmtNum = std::stoi(integer.getValue());
     std::optional<StmtNum> stmtNumOpt;
@@ -72,18 +69,18 @@ ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader, bool follo
         return {syn, {std::to_string(stmtNumOpt.value())}};
     }
 
-    Stmt* stmt = reader.getStatementByStmtNum(stmtNumOpt.value());
-    StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-    if (stmt->type != synonymType) {
-        return {syn, {}};
+    std::optional<Stmt> stmtOpt = reader.getStatementByStmtNum(stmtNumOpt.value());
+    const auto synType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
+    if (stmtOpt.has_value() && stmtOpt.value().type == synType) {
+        return {syn, {std::to_string(stmtNumOpt.value())}};
     }
 
     return {syn, {std::to_string(stmtNumOpt.value())}};
 }
 
 ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym followeeSyn = static_cast<Synonym&>(followee);
-    Synonym followerSyn = static_cast<Synonym&>(follower);
+    Synonym followeeSyn = dynamic_cast<Synonym&>(followee);
+    Synonym followerSyn = dynamic_cast<Synonym&>(follower);
 
     std::vector<Synonym> synonyms = {followeeSyn, followerSyn};
     SynonymValues followeeValues{};
