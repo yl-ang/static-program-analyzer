@@ -1,5 +1,7 @@
 #include "DesignExtractor.h"
 
+#include <sp/ast/AstNode.h>
+
 #include <vector>
 
 void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
@@ -26,15 +28,15 @@ void DesignExtractor::extract(std::unique_ptr<ProgramNode> root) {
                                       modifiesExtractor};
 
     for (auto& visitor : visitors) {
-        dfsVisit(std::move(std:) : move(root), visitor);
+        dfsVisit((std::unique_ptr<ASTNode>&&)std::move(root), visitor);
     }
 }
 
-void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode> node, AstVisitor* visitor) {
+void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visitor) {
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
-        dfsVisit(std::move(std::) move(child), visitor);
+        dfsVisit((std::unique_ptr<ASTNode>&&)child, visitor);
     }
     return;
 }
