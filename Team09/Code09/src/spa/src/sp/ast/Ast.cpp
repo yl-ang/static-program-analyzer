@@ -146,22 +146,73 @@ ExpressionNode AST::buildExpressionAST(std::queue<Token>& tokens) {
     happening: Expr -> term -> factor -> expr.
     */
     ExpressionNode term = buildTermAST(tokens);
-    return buildSubExpressionAST(tokens, &term);
+    return buildSubExpressionAST(tokens, term);
 }
 
-ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode* node) {
+ExpressionNode AST::buildSubExpressionAST(std::queue<Token>& tokens, ExpressionNode& node) {
+    if (tokens.size() == 0) {
+        return node;
+    }
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
         ExpressionNode term = buildTermAST(tokens);
         ExpressionNode expressionNode = ExpressionNode(front.type);
-        expressionNode.add_child(*node);
+        expressionNode.add_child(node);
         expressionNode.add_child(term);
 
-        return buildSubExpressionAST(tokens, &expressionNode);
+        return buildSubExpressionAST(tokens, expressionNode);
     }
 
-    return *node;
+    return node;
+}
+
+/*
+Grammar: rel_factor '>' rel_factor | rel_factor '>=' rel_factor |
+          rel_factor '<' rel_factor | rel_factor '<=' rel_factor |
+          rel_factor '==' rel_factor | rel_factor '!=' rel_factor
+*/
+ExpressionNode AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
+    auto leftHandNode = buildRelationalFactorAST(tokens);
+    Token conditionalOp = tokens.front();
+    ExpressionNode operatorNode = ExpressionNode(conditionalOp.type);
+    tokens.pop();
+    auto rightHandNode = buildRelationalFactorAST(tokens);
+    operatorNode.add_child(leftHandNode);
+    operatorNode.add_child(rightHandNode);
+    return operatorNode;
+}
+
+/*
+cond_expr: rel_expr  | '!' '(' cond_expr ')'  | '(' cond_expr ')' _cond_expr
+_cond_expr: '&&' '(' cond_expr ')' | '||' '(' cond_expr ')'
+
+rel_expr: rel_factor rel_op rel_factor
+rel_op: '>' | '>=' | '<' | '<=' | '==' | '!='
+
+rel_factor: var_name | const_value | expr
+A rel_factor will always be terminated by a close bracket (because of rel_expr grammar) or a
+rel_op (because of rel_expr grammar). If we check the following token in the queue and realise
+those are actually the case, we can attempt to build a var/const. Otherwise we build an expression
+*/
+ExpressionNode AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
+    // create a temporary queue to access the following elements in the tokens queue
+    auto temp = tokens;
+    temp.pop();
+    if (temp.size() == 0) {
+        return buildExpressionAST(tokens);
+    }
+    Token followingToken = temp.front();
+    Token token = tokens.front();
+    if (followingToken.type == CLOSE_BRACKET ||
+        RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
+        tokens.pop();
+        if (token.type == NAME) {
+            return buildVarNameAST(token);
+        }
+        return buildIntAST(token);
+    }
+    return buildExpressionAST(tokens);
 }
 
 /*
@@ -175,22 +226,26 @@ A' : '*' BA' | '/' BA' | '%' BA' | e
 */
 ExpressionNode AST::buildTermAST(std::queue<Token>& tokens) {
     ExpressionNode factorNode = buildFactorAST(tokens);
-    return buildSubTermAST(tokens, &factorNode);
+    return buildSubTermAST(tokens, factorNode);
 }
 
-ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode* node) {
+ExpressionNode AST::buildSubTermAST(std::queue<Token>& tokens, ExpressionNode& node) {
+    // reached e, which is the empty string
+    if (tokens.size() == 0) {
+        return node;
+    }
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
         tokens.pop();
         ExpressionNode factorNode = buildFactorAST(tokens);
         ExpressionNode termNode = TermNode(front.type);
-        termNode.add_child(*node);
+        termNode.add_child(node);
         termNode.add_child(factorNode);
 
-        return buildSubTermAST(tokens, &termNode);
+        return buildSubTermAST(tokens, termNode);
     }
 
-    return *node;
+    return node;
 }
 
 ExpressionNode AST::buildFactorAST(std::queue<Token>& tokens) {
