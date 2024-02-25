@@ -106,6 +106,8 @@ TEST_CASE("isValidSelectStatment") {
 TEST_CASE("validateSuchThatClause") {
     SynonymStore testStore;
     testStore.storeSynonym("s1", "stmt");
+    testStore.storeSynonym("v", "variable");
+    testStore.storeSynonym("re", "read");
 
     TestValidator validator(testStore);
 
@@ -118,8 +120,29 @@ TEST_CASE("validateSuchThatClause") {
     std::string inputString_Follows_Stmt_VALID = "such that Follows(s1,2)";
     REQUIRE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_VALID));
 
+    std::string inputString_Parent_VALID = "such that Parent(re,s1)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_Parent_VALID));
+
+    std::string inputString_Modifies_VALID = "such that Modifies(s1,v)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_Modifies_VALID));
+
+    std::string inputString_Uses_VALID = "such that Uses(s1,v)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_Uses_VALID));
+
     std::string inputString_Follows_Stmt_INVALID = "such that Follows(s2,2)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
+
+    std::string inputString_Parent_FirstArgVariable_INVALID = "such that Parent(v,s1)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Parent_FirstArgVariable_INVALID));
+
+    std::string inputString_Modifies_FirstArgWildcard_INVALID = "such that Modifies(_,v)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_FirstArgWildcard_INVALID));
+
+    std::string inputString_Modifies_SecondArgVar_INVALID = "such that Modifies(v,s1)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_SecondArgVar_INVALID));
+
+    std::string inputString_Uses_FirstArgWildcard_INVALID = "such that Uses(_,v)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Uses_FirstArgWildcard_INVALID));
 }
 
 TEST_CASE("validatePatternClause") {

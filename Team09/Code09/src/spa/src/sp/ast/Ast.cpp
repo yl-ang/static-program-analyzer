@@ -76,8 +76,21 @@ std::unique_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
         return buildAssignmentAST(tokens);
     } else if (first_token.type == READ) {
         return buildReadAST(tokens);
+    } else if (first_token.type == PRINT) {
+        return buildPrintAST(tokens);
     }
-    return buildPrintAST(tokens);
+    return buildWhileAST(tokens);
+}
+
+std::unique_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
+    std::vector<std::unique_ptr<ASTNode>> children = {};
+    // remove the keyword
+    tokens.pop();
+    std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    std::unique_ptr<StatementListNode> statements = buildStatementListAST(tokens);
+    children.push_back(std::move(conditionalExpression));
+    children.push_back(std::move(statements));
+    return std::make_unique<WhileNode>(std::move(children));
 }
 
 std::unique_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
@@ -168,6 +181,79 @@ std::unique_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
     }
 
     return node;
+}
+/*
+building the conditional expression ast is slightly tricky. Consider the following flow:
+cond_expr -> rel_expr -> expr -> term -> factor -> '(' expr ')' -> ...
+because of this, we need to look for either a '!', '&&' or a '||'. If there isnt any before the
+current close bracket, we parse it as a rel_expr instaed. To do this, we can follow this algorithm here:
+https://www.geeksforgeeks.org/check-for-balanced-parentheses-in-an-expression/. We will just iterate throught the tokens
+to find the brackets. In this case, only ( and ). Tokens passed here are guarenteed to start with an open bracket
+*/
+std::unique_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::queue<Token>& tokens) {
+    auto tempTokens = tokens;
+    std::stack<Token> stack;
+    stack.push(tempTokens.front());
+    tempTokens.pop();
+    bool isRelExpr = true;
+    while (tempTokens.size() != 0 && stack.size() != 0) {
+        Token current = tempTokens.front();
+        if (current.type == OPEN_BRACKET) {
+            stack.push(current);
+
+        } else if (current.type == CLOSE_BRACKET) {
+            stack.pop();
+        } else if (RelationalOperators.find(current.type) != RelationalOperators.end()) {
+            isRelExpr = false;
+        }
+        tempTokens.pop();
+    }
+    if (isRelExpr) {
+        return buildRelationalExpressionAST(tokens);
+    }
+
+    std::unique_ptr<ExpressionNode> leftHandSide = handleBracketedCondExpr(tokens);
+    // means its just a !(realFactor)
+    if (tokens.size() == 0) {
+        return leftHandSide;
+    }
+    Token logicalOperator = tokens.front();
+    tokens.pop();  // pop the logical op
+    std::unique_ptr<ExpressionNode> rightHandSide = handleBracketedCondExpr(tokens);
+
+    std::vector<std::unique_ptr<ASTNode>> children = {};
+    children.push_back(std::move(leftHandSide));
+    children.push_back(std::move(rightHandSide));
+    return std::make_unique<ExpressionNode>(logicalOperator.type, std::move(children), logicalOperator.line_number);
+}
+
+std::unique_ptr<ExpressionNode> AST::handleBracketedCondExpr(std::queue<Token>& tokens) {
+    tokens.pop();
+    std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+    tokens.pop();
+    return conditionalExpr;
+}
+
+/*
+cond_expr: rel_expr | '!' '(' cond_expr ')' |
+           '(' cond_expr ')' '&&' '(' cond_expr ')' |
+           '(' cond_expr ')' '||' '(' cond_expr ')'
+
+check for '!' first. otherwise check for open brackets. If there are no open brackets,
+its guaranteed to be a rel_expr
+*/
+std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
+    if (tokens.front().type == NOT) {
+        Token notNode = tokens.front();
+        tokens.pop();
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+        children.push_back(std::move(conditionalExpr));
+        return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
+    } else if (tokens.front().type == OPEN_BRACKET) {
+        return buildBinaryConditionalExpressionAST(tokens);
+    }
+    return buildRelationalExpressionAST(tokens);
 }
 
 /*
