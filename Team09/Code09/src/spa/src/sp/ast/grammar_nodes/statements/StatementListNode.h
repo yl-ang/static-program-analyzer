@@ -9,5 +9,5 @@
 class StatementListNode : public ASTNode {
 public:
     explicit StatementListNode(std::vector<std::unique_ptr<ASTNode>> children)
-        : ASTNode("", "stmtList", std::move(children)) {}
+        : ASTNode("", "stmtList", std::move(children), -1) {}
 };

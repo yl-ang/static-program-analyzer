@@ -10,5 +10,5 @@
 class ProgramNode : public ASTNode {
 public:
     explicit ProgramNode(std::vector<std::unique_ptr<ASTNode>> children)
-        : ASTNode("main", "program", std::move(children)) {}
+        : ASTNode("main", "program", std::move(children), -1) {}
 };
