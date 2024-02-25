@@ -126,13 +126,27 @@ void Validator::validateSuchThatClause(const std::string& suchThatClause) {
         throw QPSSyntaxError();
     }
 
-    // TODO(Han Qin): Semantic Error QPS Grammar other rules 4 & 5.
+    std::string arg1, arg2 = refs[0], refs[1];
     bool hasCorrectRefFormat = false;
     if (relRefString == "Follows" || relRefString == "Follows*" || relRefString == "Parent" ||
         relRefString == "Parent*") {
-        hasCorrectRefFormat = isStmtRef(refs[0]) && isStmtRef(refs[1]);
+        hasCorrectRefFormat = isStmtRef(arg1) && isStmtRef(arg2);
     } else if (relRefString == "Uses" || relRefString == "Modifies") {
-        hasCorrectRefFormat = isStmtRef(refs[0]) && isEntRef(refs[1]);
+        // Semantic Error QPS Grammar other rules 4
+        if (isWildcard(arg1)) {
+            throw QPSSemanticError();
+        }
+        // Semantic Error QPS Grammar other rules 5b
+        if (isSynonym(arg2) && !synonymStore.containsSynonym(arg2, "variable")) {
+            throw QPSSemanticError();
+        }
+        hasCorrectRefFormat = isStmtRef(arg1) && isEntRef(arg2);
+    }
+    // Semantic Error QPS Grammar other rules 5a
+    if ((relRefString == "Parent" || relRefString == "Parent*") && isSynonym(arg1) &&
+        (synonymStore.containsSynonym(arg1, "variable") || synonymStore.containsSynonym(arg1, "constant") ||
+         synonymStore.containsSynonym(arg1, "procedure"))) {
+        throw QPSSemanticError();
     }
 
     // Ensure that synonym is in the variable store
