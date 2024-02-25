@@ -33,7 +33,7 @@ public:
         return stmtNumber;
     }
 
-    std::vector<std::unique_ptr<ASTNode>> const& getChildren() const {
+    const std::vector<std::unique_ptr<ASTNode>>& getChildren() const {
         return children;
     }
 
