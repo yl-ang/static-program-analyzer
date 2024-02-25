@@ -5,6 +5,7 @@
 #include "qps/exceptions/Exception.h"
 #include "relationships/Follows.h"
 #include "relationships/FollowsStar.h"
+#include "relationships/Modifies.h"
 #include "relationships/Parent.h"
 #include "relationships/ParentStar.h"
 #include "relationships/Uses.h"
@@ -55,7 +56,9 @@ ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
     case (RelationshipType::USES):
         return Uses(firstArg, secondArg).evaluate(reader);
 
-    default:
-        return {false};
+    case (RelationshipType::MODIFIES):
+        return Modifies(firstArg, secondArg).evaluate(reader);
     }
+
+    return {false};
 }
