@@ -1,5 +1,5 @@
 #pragma once
-#include "../ast/AstNode.h"
+/*
 #include "../ast/grammar_nodes/ConstantNode.h"
 #include "../ast/grammar_nodes/ExpressionNode.h"
 #include "../ast/grammar_nodes/FactorNode.h"
@@ -14,6 +14,21 @@
 #include "../ast/grammar_nodes/statements/StatementListNode.h"
 #include "../ast/grammar_nodes/statements/StatementNode.h"
 #include "../ast/grammar_nodes/statements/WhileNode.h"
+*/
+
+class ProgramNode;
+class ProcedureNode;
+class StatementListNode;
+class ReadNode;
+class PrintNode;
+class WhileNode;
+class IfNode;
+class AssignmentNode;
+class ExpressionNode;
+class FactorNode;
+class TermNode;
+class VariableNode;
+class ConstantNode;
 
 // Visitor interface for Design Extractor
 class AstVisitor {
