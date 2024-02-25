@@ -24,3 +24,7 @@ void ModifiesExtractor::visitProcedure(ProcedureNode* node) {}
 void ModifiesExtractor::visitPrint(PrintNode* node) {}
 void ModifiesExtractor::visitVariable(VariableNode* node) {}
 void ModifiesExtractor::visitConstant(ConstantNode* node) {}
+
+std::unordered_set<std::pair<StmtNum, Variable>> ModifiesExtractor::getModifies() {
+    return this->modifies;
+}

@@ -2,11 +2,13 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 #include "AbstractionExtractor.h"
 
 class ParentExtractor : public AbstractionExtractor {
 public:
+    ParentExtractor() {}
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
@@ -20,7 +22,5 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
-};
 
-// Setter for ParentStore
-void setParentStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& parentPairs) const;
+    std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();

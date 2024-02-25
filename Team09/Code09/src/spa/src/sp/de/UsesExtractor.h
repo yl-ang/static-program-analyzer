@@ -2,11 +2,13 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 #include "AbstractionExtractor.h"
 
 class UsesExtractor : public AbstractionExtractor {
 public:
+    UsesExtractor() {}
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
@@ -20,10 +22,6 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
+
+    std::unordered_set<std::pair<StmtNum, Variable>> getUses();
 };
-
-// // Setter for UsesStore
-// void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
-
-// void setPatternStore(
-//     const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;

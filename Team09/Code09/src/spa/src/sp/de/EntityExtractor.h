@@ -30,7 +30,6 @@ private:
     std::unordered_set<std::string> variables;
     std::unordered_set<std::string> constants;
     std::unordered_set<std::string> procedures;
-    std::unordered_set<std::string> variables;
     std::unordered_set<Stmt> statements;
 
 public:
@@ -49,4 +48,9 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
+
+    std::unordered_set<std::string> getVariables();
+    std::unordered_set<std::string> getConstants();
+    std::unordered_set<std::string> getProcedures();
+    std::unordered_set<Stmt> getStatements();
 };

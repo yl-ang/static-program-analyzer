@@ -7,6 +7,7 @@
 
 class ModifiesExtractor : public AbstractionExtractor {
 public:
+    ModifiesExtractor() {}
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
@@ -20,7 +21,6 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
-};
 
-// // Setter for ModifiesStore
-// void setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesPairs) const;
+    std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+};

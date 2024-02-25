@@ -29,3 +29,7 @@ void FollowsExtractor::visitIf(IfNode* node) {}
 void FollowsExtractor::visitAssign(AssignmentNode* node) {}
 void FollowsExtractor::visitVariable(VariableNode* node) {}
 void FollowsExtractor::visitConstant(ConstantNode* node) {}
+
+std::unordered_set<std::pair<StmtNum, StmtNum>> FollowsExtractor::getFollows() {
+    return this->follows;
+}

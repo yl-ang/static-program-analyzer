@@ -29,3 +29,7 @@ void ParentExtractor::visitPrint(PrintNode* node) {}
 void ParentExtractor::visitAssign(AssignmentNode* node) {}
 void ParentExtractor::visitVariable(VariableNode* node) {}
 void ParentExtractor::visitConstant(ConstantNode* node) {}
+
+std::unordered_set<std::pair<StmtNum, StmtNum>> ParentExtractor::getParent() {
+    return this->parent;
+}

@@ -23,8 +23,8 @@ void EntityExtractor::visitPrint(PrintNode* node) {
     this->statements.insert(Stmt{print, stmtNum});
 }
 
-// void EntityExtractor::visitWhile(WhileNode* node) {}
-// void EntityExtractor::visitIf(IfNode* node) {}
+void EntityExtractor::visitWhile(WhileNode* node) {}
+void EntityExtractor::visitIf(IfNode* node) {}
 
 void EntityExtractor::visitAssign(AssignmentNode* node) {
     int stmtNum = node->getStmtNum();
@@ -40,4 +40,20 @@ void EntityExtractor::visitVariable(VariableNode* node) {
 void EntityExtractor::visitConstant(ConstantNode* node) {
     std::string constant = node->getValue();
     this->constants.insert(constant);
+}
+
+std::unordered_set<std::string> EntityExtractor::getVariables() {
+    return this->variables;
+}
+
+std::unordered_set<std::string> EntityExtractor::getConstants() {
+    return this->constants;
+}
+
+std::unordered_set<std::string> EntityExtractor::getProcedures() {
+    return this->procedures;
+}
+
+std::unordered_set<Stmt> EntityExtractor::getStatements() {
+    return this->statements;
 }

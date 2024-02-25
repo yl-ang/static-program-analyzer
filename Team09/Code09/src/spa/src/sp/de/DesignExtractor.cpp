@@ -1,19 +1,17 @@
 #include "DesignExtractor.h"
 
-void DesignExtractor::extract(ASTNode root) {
-    // DFS
-    for (ASTNode child : root.getChildren()) {
-        extract(child);
-    }
+#include <vector>
 
-    // Check if the current node is of type "var"
-    if (root.getType() == "var") {
-        variables.insert(root.getValue());
-    }
-}
-
-void DesignExtractor::writePKB(PKBFacadeWriter writer) {
-    writer.setVariables(variables);
+void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
+    writer->setVariables(entityExtractor->getVariables());
+    writer->setConstants(entityExtractor->getConstants());
+    writer->setProcedures(entityExtractor->getProcedures());
+    writer->setStmts(entityExtractor->getStatements());
+    writer->setFollowsStore(followsExtractor->getFollows());
+    writer->setParentStore(parentExtractor->getParent());
+    writer->setUsesStore(usesExtractor->getUses());
+    writer->setModifiesStore(modifiesExtractor->getModifies());
+    writer->setPatternStore(patternExtractor->getPattern());
 }
 
 void DesignExtractor::extract(ASTNode* root) {
@@ -22,20 +20,22 @@ void DesignExtractor::extract(ASTNode* root) {
     this->parentExtractor = new ParentExtractor();
     this->usesExtractor = new UsesExtractor();
     this->modifiesExtractor = new ModifiesExtractor();
+    this->patternExtractor = new PatternExtractor();
+
     std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor, parentExtractor, usesExtractor,
                                       modifiesExtractor};
 
     for (auto& visitor : visitors) {
-        dfsTraversal(root, visitor);
+        dfsVisit(root, visitor);
     }
 }
 
-void dfsTraversal(ASTNode* node, AstVisitor* visitor) {
+void DesignExtractor::dfsVisit(ASTNode* node, AstVisitor* visitor) {
     if (!node)
         return;
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
-        dfsTraversal(child, visitor);
+        dfsVisit(child, visitor);
     }
 }

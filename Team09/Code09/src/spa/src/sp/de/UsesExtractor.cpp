@@ -36,6 +36,10 @@ void UsesExtractor::visitRead(ReadNode* node) {}
 void UsesExtractor::visitVariable(VariableNode* node) {}
 void UsesExtractor::visitConstant(ConstantNode* node) {}
 
+std::unordered_set<std::pair<StmtNum, Variable>> UsesExtractor::getUses() {
+    return this->uses;
+}
+
 //    // Setter for UsesStore
 //     void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
 
