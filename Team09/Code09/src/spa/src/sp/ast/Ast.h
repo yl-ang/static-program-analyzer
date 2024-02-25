@@ -14,6 +14,7 @@
 #include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/IfNode.h"
 #include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
@@ -50,4 +51,5 @@ public:
     std::unique_ptr<ExpressionNode> buildBinaryConditionalExpressionAST(std::queue<Token>& tokens);
     std::unique_ptr<ExpressionNode> handleBracketedCondExpr(std::queue<Token>& tokens);
     std::unique_ptr<WhileNode> buildWhileAST(std::queue<Token>& tokens);
+    std::unique_ptr<IfNode> buildIfAST(std::queue<Token>& tokens);
 };
