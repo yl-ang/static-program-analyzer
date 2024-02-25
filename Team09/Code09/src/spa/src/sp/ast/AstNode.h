@@ -29,7 +29,7 @@ public:
         return value;
     }
 
-    int getStmtNum() const {
+    int getStmtNumber() const {
         return stmtNumber;
     }
 
@@ -39,7 +39,7 @@ public:
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members
         if (lhs.getValue() != rhs.getValue() || lhs.getType() != rhs.getType() ||
-            lhs.children.size() != rhs.children.size()) {
+            lhs.children.size() != rhs.children.size() || lhs.getStmtNumber() != rhs.getStmtNumber()) {
             return false;
         }
 
@@ -58,6 +58,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& obj) {
         os << "{ \"value\": \"" << obj.value << "\", "
            << "\"type\": \"" << obj.type << "\", "
+           << "\"line number\": \"" << obj.stmtNumber << "\","
            << "\"children\": [";
 
         for (size_t i = 0; i < obj.children.size(); ++i) {

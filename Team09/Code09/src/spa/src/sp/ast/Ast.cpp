@@ -78,41 +78,63 @@ std::unique_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
         return buildReadAST(tokens);
     } else if (first_token.type == PRINT) {
         return buildPrintAST(tokens);
+    } else if (first_token.type == WHILE) {
+        return buildWhileAST(tokens);
     }
-    return buildWhileAST(tokens);
+    return buildIfAST(tokens);
+}
+
+std::unique_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
+    Token ifToken = tokens.front();
+    std::vector<std::unique_ptr<ASTNode>> children = {};
+
+    tokens.pop();  // remove if
+    std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    tokens.pop();  // remove then
+    std::unique_ptr<StatementListNode> thenStatementList = buildStatementListAST(tokens);
+    tokens.pop();  // remove else
+    std::unique_ptr<StatementListNode> elseStatementList = buildStatementListAST(tokens);
+
+    children.push_back(std::move(conditionalExpression));
+    children.push_back(std::move(thenStatementList));
+    children.push_back(std::move(elseStatementList));
+    return std::make_unique<IfNode>(std::move(children), ifToken.line_number);
 }
 
 std::unique_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
     std::vector<std::unique_ptr<ASTNode>> children = {};
     // remove the keyword
+    Token whileToken = tokens.front();
     tokens.pop();
     std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
     std::unique_ptr<StatementListNode> statements = buildStatementListAST(tokens);
     children.push_back(std::move(conditionalExpression));
     children.push_back(std::move(statements));
-    return std::make_unique<WhileNode>(std::move(children));
+    return std::make_unique<WhileNode>(std::move(children), whileToken.line_number);
 }
 
 std::unique_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
     std::vector<std::unique_ptr<ASTNode>> children = {};
+    Token readToken = tokens.front();
     tokens.pop();
     Token varName = tokens.front();
     std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
     children.push_back(std::move(nameNode));
     tokens.pop();
-    return std::make_unique<ReadNode>(std::move(children));
+    return std::make_unique<ReadNode>(std::move(children), readToken.line_number);
 }
 
 std::unique_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
     std::vector<std::unique_ptr<ASTNode>> children = {};
+    Token printToken = tokens.front();
     tokens.pop();
     Token varName = tokens.front();
     std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
     children.push_back(std::move(nameNode));
     tokens.pop();
-    return std::make_unique<PrintNode>(std::move(children));
+    return std::make_unique<PrintNode>(printToken.line_number, std::move(children));
 }
 
 std::unique_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& tokens) {
@@ -121,13 +143,14 @@ std::unique_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& token
 
     std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
+    Token assignmentToken = tokens.front();
     tokens.pop();
     std::unique_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
     tokens.pop();
 
     children.push_back(std::move(nameNode));
     children.push_back(std::move(expression));
-    return std::make_unique<AssignmentNode>(std::move(children));
+    return std::make_unique<AssignmentNode>(std::move(children), assignmentToken.line_number);
 }
 
 /*

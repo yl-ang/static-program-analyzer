@@ -8,8 +8,8 @@
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
 class ReadNode : public StatementNode {
 public:
-    explicit ReadNode(std::vector<std::unique_ptr<ASTNode>> children)
-        : StatementNode("", "read", std::move(children)) {}
+    explicit ReadNode(std::vector<std::unique_ptr<ASTNode>> children, int statementNumber)
+        : StatementNode("", "read", statementNumber, std::move(children)) {}
 
     void accept(AstVisitor* visitor) override;
 

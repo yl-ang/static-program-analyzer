@@ -8,8 +8,8 @@
 
 class WhileNode : public StatementNode {
 public:
-    explicit WhileNode(std::vector<std::unique_ptr<ASTNode>> children)
-        : StatementNode("", "while", std::move(children)) {}
+    explicit WhileNode(std::vector<std::unique_ptr<ASTNode>> children, int statementNumber)
+        : StatementNode("", "while", statementNumber, std::move(children)) {}
 
     void accept(AstVisitor* visitor) override;
 
