@@ -1,8 +1,10 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "AbstractionExtractor.h"
 
@@ -24,4 +26,5 @@ public:
     void visitConstant(ConstantNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    void dfsVisitHelper(std::unique_ptr<ASTNode> node, UsesExtractor* visitor);
 };

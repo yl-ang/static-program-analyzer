@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "AbstractionExtractor.h"
 
@@ -25,6 +26,3 @@ public:
 
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
 };
-
-// void setPatternStore(
-//     const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;

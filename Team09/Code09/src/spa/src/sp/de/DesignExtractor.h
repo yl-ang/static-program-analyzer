@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <utility>
@@ -16,14 +17,13 @@ class DesignExtractor {
 public:
     DesignExtractor() {}
 
-    void extract(ASTNode* root);
+    void extract(std::unique_ptr<ASTNode> root);
 
     void writePKB(PKBFacadeWriter* pkbWriter);
 
-    void dfsVisit(ASTNode* node, AstVisitor* visitor);
+    void dfsVisit(std::unique_ptr<ASTNode> node, AstVisitor* visitor);
 
 private:
-    // PKBFacadeWriter* PKBwriter;
     EntityExtractor* entityExtractor;
     FollowsExtractor* followsExtractor;
     ParentExtractor* parentExtractor;

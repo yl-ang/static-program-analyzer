@@ -1,19 +1,19 @@
 #pragma once
 #include "../ast/AstNode.h"
-#include "../ast/grammar_nodes/ProcedureNode.h"
-#include "../ast/grammar_nodes/ProgramNode.h"
-#include "../ast/grammar_nodes/statements/StatementListNode.h"
-#include "../ast/grammar_nodes/statements/StatementNode.h"
-// #include "../ast/grammar_nodes/statements/WhileNode.h"
-// #include "../ast/grammar_nodes/statements/IfNode.h"
 #include "../ast/grammar_nodes/ConstantNode.h"
 #include "../ast/grammar_nodes/ExpressionNode.h"
 #include "../ast/grammar_nodes/FactorNode.h"
+#include "../ast/grammar_nodes/ProcedureNode.h"
+#include "../ast/grammar_nodes/ProgramNode.h"
 #include "../ast/grammar_nodes/TermNode.h"
 #include "../ast/grammar_nodes/VariableNode.h"
 #include "../ast/grammar_nodes/statements/AssignmentNode.h"
+#include "../ast/grammar_nodes/statements/IfNode.h"
 #include "../ast/grammar_nodes/statements/PrintNode.h"
 #include "../ast/grammar_nodes/statements/ReadNode.h"
+#include "../ast/grammar_nodes/statements/StatementListNode.h"
+#include "../ast/grammar_nodes/statements/StatementNode.h"
+#include "../ast/grammar_nodes/statements/WhileNode.h"
 
 // Visitor interface for Design Extractor
 class AstVisitor {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,7 @@ Covers addition and subtraction
 class ExpressionNode : public ASTNode {
 private:
     std::vector<std::string> variables;
+    std::vector<std::string> constants;
 
 public:
     explicit ExpressionNode(LEXICAL_TOKEN_TYPE type) : ASTNode("", getLexicalEnumString(type)) {}
@@ -20,5 +22,8 @@ public:
     void accept(AstVisitor* visitor) override;
 
     std::vector<std::string> getVars();
-    void findVariables(std::vector<ASTNode*> children);
+    std::vector<std::string> getConsts();
+
+    void findVariables(std::vector<std::unique_ptr<ASTNode>> children);
+    void findConstants(std::vector<std::unique_ptr<ASTNode>> children);
 };

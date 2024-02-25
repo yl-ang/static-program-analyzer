@@ -14,7 +14,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setPatternStore(patternExtractor->getPattern());
 }
 
-void DesignExtractor::extract(ASTNode* root) {
+void DesignExtractor::extract(std::unique_ptr<ASTNode> root) {
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
@@ -30,12 +30,11 @@ void DesignExtractor::extract(ASTNode* root) {
     }
 }
 
-void DesignExtractor::dfsVisit(ASTNode* node, AstVisitor* visitor) {
-    if (!node)
-        return;
+void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode> node, AstVisitor* visitor) {
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
         dfsVisit(child, visitor);
     }
+    return;
 }
