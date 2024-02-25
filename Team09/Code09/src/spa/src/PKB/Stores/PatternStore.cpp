@@ -30,7 +30,7 @@ bool PatternStore::hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs)
 
 bool PatternStore::hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2) {
     if (arg1.isWildcard() & arg2.isWildcard()) {
-        return patternsMap.size() > 0;
+        return !patternsMap[stmtNum].empty();
     }
 
     // if arg1 is wildcard, check if arg2 expression is found in any of the expressions for the stmtNum supplied

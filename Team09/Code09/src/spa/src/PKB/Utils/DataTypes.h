@@ -83,3 +83,16 @@ struct equal_to<std::pair<std::string, std::string>> {
 };
 
 }  // namespace std
+
+namespace std {
+template <>
+struct hash<std::pair<int, std::pair<std::basic_string<char>, std::basic_string<char>>>> {
+    size_t operator()(const std::pair<int, std::pair<std::basic_string<char>, std::basic_string<char>>>& p) const {
+        size_t hash = 17;
+        hash = hash * 31 + std::hash<int>{}(p.first);
+        hash = hash * 31 + std::hash<std::basic_string<char>>{}(p.second.first);
+        hash = hash * 31 + std::hash<std::basic_string<char>>{}(p.second.second);
+        return hash;
+    }
+};
+}  // namespace std
