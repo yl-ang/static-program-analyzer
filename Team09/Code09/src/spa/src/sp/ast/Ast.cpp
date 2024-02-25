@@ -200,6 +200,10 @@ std::unique_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::qu
     }
 
     std::unique_ptr<ExpressionNode> leftHandSide = handleBracketedCondExpr(tokens);
+    // means its just a !(realFactor)
+    if (tokens.size() == 0) {
+        return leftHandSide;
+    }
     Token logicalOperator = tokens.front();
     tokens.pop();  // pop the logical op
     std::unique_ptr<ExpressionNode> rightHandSide = handleBracketedCondExpr(tokens);
@@ -227,8 +231,12 @@ its guaranteed to be a rel_expr
 */
 std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
     if (tokens.front().type == NOT) {
+        Token notNode = tokens.front();
         tokens.pop();
-        return buildConditionalExpressionAST(tokens);
+        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+        children.push_back(std::move(conditionalExpr));
+        return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
     } else if (tokens.front().type == OPEN_BRACKET) {
         return buildBinaryConditionalExpressionAST(tokens);
     }
