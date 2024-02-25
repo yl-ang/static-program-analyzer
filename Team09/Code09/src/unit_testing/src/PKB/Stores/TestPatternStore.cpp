@@ -70,6 +70,22 @@ TEST_CASE("PatternStore - All Tests") {
         delete synonymsArg2;
     }
 
+    SECTION("Test hasPattern with Wildcard, Synonyms (Expecting False)") {
+        std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patterns = {
+            {1, {"x", "y"}}, {2, {"a", "b"}}, {3, {"p", "q"}}};
+
+        patternStore.setPatterns(patterns);
+
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "y");
+
+        REQUIRE_FALSE(patternStore.hasPattern(4, *wildcardArg1, *synonymsArg2));
+
+        // Cleanup
+        delete wildcardArg1;
+        delete synonymsArg2;
+    }
+
     SECTION("Test hasPattern with Synonyms, Wildcard (Expecting True)") {
         std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patterns = {
             {1, {"x", "y"}}, {2, {"a", "b"}}, {3, {"p", "q"}}};
@@ -92,14 +108,14 @@ TEST_CASE("PatternStore - All Tests") {
 
         patternStore.setPatterns(patterns);
 
-        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "c");
+        ClauseArgument* synonymsArg1 = new Synonym(DesignEntityType::VARIABLE, "x");
         ClauseArgument* wildcardArg2 = new Wildcard();
 
-        REQUIRE_FALSE(patternStore.hasPattern(3, *synonymsArg1, *wildcardArg2));
+        REQUIRE_FALSE(patternStore.hasPattern(4, *synonymsArg1, *wildcardArg2));
 
         // Cleanup
-        delete new Synonym(DesignEntityType::VARIABLE, "c");
-        delete new Wildcard();
+        delete synonymsArg1;
+        delete wildcardArg2;
     }
 
     SECTION("Test hasPattern with Synonyms, Synonyms (Expecting True)") {

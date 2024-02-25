@@ -44,10 +44,14 @@ bool PatternStore::hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgum
 
     // if arg2 is wildcard, check if variable arg1 contains an expression in patternsMap
     if (arg2.isWildcard()) {
-        return std::any_of(patternsMap.begin(), patternsMap.end(), [&](const auto& pattern) {
-            return std::any_of(pattern.second.begin(), pattern.second.end(),
+        auto stmtNumIter = patternsMap.find(stmtNum);
+
+        if (stmtNumIter != patternsMap.end()) {
+            return std::any_of(stmtNumIter->second.begin(), stmtNumIter->second.end(),
                                [&](const auto& pair) { return pair.first == arg1.getValue(); });
-        });
+        } else {
+            return false;
+        }
     }
 
     // if both are not wildcards, check if the pair of patternsMap.find(stmtNum) is the same as arg1.getValue and
