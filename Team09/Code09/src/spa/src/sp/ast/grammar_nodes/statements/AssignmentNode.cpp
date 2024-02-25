@@ -7,7 +7,7 @@ void AssignmentNode::accept(AstVisitor* visitor) {
 std::unique_ptr<ExpressionNode> AssignmentNode::getExpr() {
     const std::vector<std::unique_ptr<ASTNode>>& _children = this->getChildren();
     auto exprNodePtr = dynamic_cast<ExpressionNode*>(_children.at(1).get());
-    std::unique_ptr<ExpressionNode> exprUniquePtr = std::make_unique<ExpressionNode>(*exprNodePtr);
+    std::unique_ptr<ExpressionNode> exprUniquePtr = std::unique_ptr<ExpressionNode>(exprNodePtr);
     return exprUniquePtr;
 }
 
