@@ -126,7 +126,7 @@ void Validator::validateSuchThatClause(const std::string& suchThatClause) {
         throw QPSSyntaxError();
     }
 
-    std::string arg1, arg2 = refs[0], refs[1];
+    std::string arg1 = refs[0], arg2 = refs[1];
     bool hasCorrectRefFormat = false;
     if (relRefString == "Follows" || relRefString == "Follows*" || relRefString == "Parent" ||
         relRefString == "Parent*") {
