@@ -56,7 +56,7 @@ public:
            << "\"children\": [";
 
         for (size_t i = 0; i < obj.children.size(); ++i) {
-            os << "[" << std::move(obj.children[i]) << "]";
+            os << "[" << *(obj.children[i]) << "]";
             if (i != obj.children.size() - 1)
                 os << ", ";
         }
