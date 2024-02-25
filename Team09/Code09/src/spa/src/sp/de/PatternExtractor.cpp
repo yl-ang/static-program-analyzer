@@ -1,5 +1,7 @@
 #include "PatternExtractor.h"
 
+#include "NodeDeclarations.h"
+
 void PatternExtractor::visitPrint(PrintNode* node) {}
 void PatternExtractor::visitWhile(WhileNode* node) {}
 void PatternExtractor::visitIf(IfNode* node) {}

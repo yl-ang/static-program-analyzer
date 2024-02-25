@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "AbstractionExtractor.h"
+#include "NodeDeclarations.h"
 
 class ModifiesExtractor : public AbstractionExtractor {
 public:

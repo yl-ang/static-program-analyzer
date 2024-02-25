@@ -1,5 +1,7 @@
 #include "ModifiesExtractor.h"
 
+#include "NodeDeclarations.h"
+
 void ModifiesExtractor::visitProgram(ProgramNode* node) {}
 void ModifiesExtractor::visitStmtLst(StatementListNode* node) {}
 void ModifiesExtractor::visitExpression(ExpressionNode* node) {}

@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "NodeDeclarations.h"
+
 void FollowsExtractor::visitProgram(ProgramNode* node) {}
 void FollowsExtractor::visitExpression(ExpressionNode* node) {}
 void FollowsExtractor::visitFactor(FactorNode* node) {}
