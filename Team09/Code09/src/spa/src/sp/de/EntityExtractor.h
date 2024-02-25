@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,19 +36,19 @@ private:
 public:
     EntityExtractor() {}
 
-    void visitProgram(ProgramNode* node) override;
-    void visitProcedure(ProcedureNode* node) override;
-    void visitStmtLst(StatementListNode* node) override;
-    void visitRead(ReadNode* node) override;
-    void visitPrint(PrintNode* node) override;
-    void visitWhile(WhileNode* node) override;
-    void visitIf(IfNode* node) override;
-    void visitAssign(AssignmentNode* node) override;
-    void visitExpression(ExpressionNode* node) override;
-    void visitFactor(FactorNode* node) override;
-    void visitTerm(TermNode* node) override;
-    void visitVariable(VariableNode* node) override;
-    void visitConstant(ConstantNode* node) override;
+    void visitProgram(std::unique_ptr<ProgramNode> node) override;
+    void visitProcedure(std::unique_ptr<ProcedureNode> node) override;
+    void visitStmtLst(std::unique_ptr<StatementListNode> node) override;
+    void visitRead(std::unique_ptr<ReadNode> node) override;
+    void visitPrint(std::unique_ptr<PrintNode> node) override;
+    void visitWhile(std::unique_ptr<WhileNode> node) override;
+    void visitIf(std::unique_ptr<IfNode> node) override;
+    void visitAssign(std::unique_ptr<AssignmentNode> node) override;
+    void visitExpression(std::unique_ptr<ExpressionNode> node) override;
+    void visitFactor(std::unique_ptr<FactorNode> node) override;
+    void visitTerm(std::unique_ptr<TermNode> node) override;
+    void visitVariable(std::unique_ptr<VariableNode> node) override;
+    void visitConstant(std::unique_ptr<ConstantNode> node) override;
 
     std::unordered_set<std::string> getVariables();
     std::unordered_set<std::string> getConstants();
