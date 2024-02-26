@@ -281,14 +281,11 @@ std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<To
     //     return buildBinaryConditionalExpressionAST(tokens);
     // }
 
-    std::queue<Token> tempTokens = tokens;
-    tempTokens.pop();
-
-    if (tempTokens.front().type == NOT) {
+    if (tokens.front().type == NOT) {
         Token notNode = tokens.front();
         tokens.pop();
         std::vector<std::unique_ptr<ASTNode>> children = {};
-        std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+        std::unique_ptr<ExpressionNode> conditionalExpr = handleBracketedCondExpr(tokens);
         children.push_back(std::move(conditionalExpr));
         return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
     } else if (tokens.front().type == OPEN_BRACKET) {
