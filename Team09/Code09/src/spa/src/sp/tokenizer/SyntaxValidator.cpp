@@ -18,25 +18,12 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         // Terminal at top of stack, and token match
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
-            std::cout << "parsingStack: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << "Input: " << currToken
-                      << std::endl;
             index++;
 
             // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
-                std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
-                std::cout << "Unable to parse " << input.at(index).value << input.at(index + 1).value
-                          << input.at(index + 2).value << std::endl;
-                std::cout << "Input: " << currToken << std::endl;
-
-                SyntaxValidator::Symbol nt = std::get<NonTerminal>(stackTop);
-
-                // if (nt != nullptr) {
-                //     std::cout << "Unidentified terminal" << std::endl;
-                // }
-
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
             std::vector<SyntaxValidator::Symbol>& grammarRule = ite->second;
@@ -58,13 +45,11 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             }
 
         } else {
-            // Shouldn't reach here
-            std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
+            // lexical token type but not = currtoken
             throw SyntaxError("Unexpected grammar rule");
         }
     }
     if (!parsingStack.empty() || index != input.size()) {
-        std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
         throw SyntaxError(" Unexpected end of input");
     }
     std::cout << "Syntax is valid" << std::endl;
