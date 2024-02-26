@@ -70,6 +70,21 @@ Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
                 row.push_back(prod);
             }
             break;
+        case DesignEntityType::STMT:
+            for (Stmt stmt : pkb.getStmts()) {
+                row.push_back(std::to_string(stmt.stmtNum));
+            }
+            break;
+        case DesignEntityType::READ:
+        case DesignEntityType::ASSIGN:
+        case DesignEntityType::CALL:
+        case DesignEntityType::PRINT:
+        case DesignEntityType::WHILE:
+        case DesignEntityType::IF:
+            for (Stmt stmt : pkb.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[entity.getType()])) {
+                row.push_back(std::to_string(stmt.stmtNum));
+            }
+            break;
         }
         columns.push_back(row);
     }
