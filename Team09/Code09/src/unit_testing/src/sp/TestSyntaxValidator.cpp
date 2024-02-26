@@ -97,17 +97,17 @@ TEST_CASE("Syntax Validator Tests") {
         REQUIRE(result);
     }
 
-    // SECTION("Handle incorrect PROCEDURE") {
-    //     // Missing close curly brace token
-    //     std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1),
-    //                                  Token(NAME, "example", -1),
-    //                                  Token(OPEN_CURLY_BRACE, "{", -1),
-    //                                  Token(NAME, "x", 1),
-    //                                  Token(EQUAL, "=", 1),
-    //                                  Token(INTEGER, "1", 1),
-    //                                  Token(SEMICOLON, ";", 1)};
-    //     REQUIRE_THROWS_AS(syntaxValidator.validateSyntax(tokens), SyntaxError);
-    // }
+    SECTION("Handle incorrect PROCEDURE") {
+        // Missing close curly brace token
+        std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1),
+                                     Token(NAME, "example", -1),
+                                     Token(OPEN_CURLY_BRACE, "{", -1),
+                                     Token(NAME, "x", 1),
+                                     Token(EQUAL, "=", 1),
+                                     Token(INTEGER, "1", 1),
+                                     Token(SEMICOLON, ";", 1)};
+        REQUIRE_THROWS_AS(syntaxValidator.validateSyntax(tokens), SyntaxError);
+    }
 
     SECTION("Handle correct ASSIGN STATEMENT") {
         std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1),
