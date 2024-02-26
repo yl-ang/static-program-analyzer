@@ -33,9 +33,9 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 
                 SyntaxValidator::Symbol nt = std::get<NonTerminal>(stackTop);
 
-                if (nt != nullptr) {
-                    std::cout << "Unidentified terminal" << std::endl;
-                }
+                // if (nt != nullptr) {
+                //     std::cout << "Unidentified terminal" << std::endl;
+                // }
 
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
