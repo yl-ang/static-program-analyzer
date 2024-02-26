@@ -1,22 +1,43 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_set>
+#include <utility>
 
 #include "././PKB/PKBClient/PKBFacadeWriter.h"
-#include "sp/ast/AstNode.h"
+#include "EntityExtractor.h"
+#include "FollowsExtractor.h"
+#include "ModifiesExtractor.h"
+#include "ParentExtractor.h"
+#include "PatternExtractor.h"
+#include "UsesExtractor.h"
 
 class DesignExtractor {
- public:
-  DesignExtractor() {}
+public:
+    DesignExtractor() {}
 
-  void extract(ASTNode root);
+    void extract(std::unique_ptr<ProgramNode> root);
 
-  void writePKB(PKBFacadeWriter);
+    void writePKB(PKBFacadeWriter* pkbWriter);
 
-  std::unordered_set<std::string> getVariables() const { return variables; }
+    void dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visitor);
 
- private:
-  //  PKBFacadeWriter* PKBwriter;
-  std::unordered_set<std::string> variables;
+    std::unordered_set<std::string> getVariables();
+    std::unordered_set<std::string> getConstants();
+    std::unordered_set<std::string> getProcedures();
+    std::unordered_set<Stmt> getStatements();
+    std::unordered_set<std::pair<StmtNum, StmtNum>> getFollows();
+    std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();
+    std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
+
+private:
+    EntityExtractor* entityExtractor;
+    FollowsExtractor* followsExtractor;
+    ParentExtractor* parentExtractor;
+    UsesExtractor* usesExtractor;
+    ModifiesExtractor* modifiesExtractor;
+    PatternExtractor* patternExtractor;
 };

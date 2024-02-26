@@ -1,7 +1,6 @@
-#include <string>
 #pragma once
-
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 

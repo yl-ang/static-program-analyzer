@@ -7,9 +7,10 @@
 #include <utility>
 #include <vector>
 
+#include "AstNodeInterface.h"
 #include "sp/tokenizer/Token.h"
 
-class ASTNode {
+class ASTNode : public AstNodeInterface {
     std::vector<std::unique_ptr<ASTNode>> children;
     std::string value;
     std::string type;
@@ -32,9 +33,14 @@ public:
         return stmtNumber;
     }
 
-    std::vector<std::unique_ptr<ASTNode>> const& getChildren() const {
+    const std::vector<std::unique_ptr<ASTNode>>& getChildren() const {
         return children;
     }
+
+    void accept(AstVisitor* visitor) override {
+        // TODO: Implement this
+    }
+
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members
         if (lhs.getValue() != rhs.getValue() || lhs.getType() != rhs.getType() ||

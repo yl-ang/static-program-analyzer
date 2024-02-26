@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -9,4 +10,8 @@ class PrintNode : public StatementNode {
 public:
     explicit PrintNode(int statementNumber, std::vector<std::unique_ptr<ASTNode>> children)
         : StatementNode("", "print", statementNumber, std::move(children)) {}
+
+    void accept(AstVisitor* visitor) override;
+
+    std::string getVar();
 };

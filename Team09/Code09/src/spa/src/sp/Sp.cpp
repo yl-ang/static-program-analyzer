@@ -16,7 +16,7 @@ void SP::processFile(std::string filepath) {
     std::vector<std::string> simpleProgramAsString = sourceLoader.loadSimple(buffer);
 
     std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
-    // std::unique_ptr<ASTNode> astRoot = ast.buildAST(tokens);
-    // designExtractor.extract(*(astRoot.get()));
-    // designExtractor.writePKB(pkbWriter);
+    std::unique_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
+    designExtractor.extract(std::move(astRoot));
+    designExtractor.writePKB(&pkbWriter);
 }
