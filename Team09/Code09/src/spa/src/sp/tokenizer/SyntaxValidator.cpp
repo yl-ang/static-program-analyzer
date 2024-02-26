@@ -1,5 +1,7 @@
 #include "SyntaxValidator.h"
 
+#include <iostream>
+
 bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
     // Initialise parsing table and stack
     SyntaxValidator::ParsingTable parsingTable = initialiseSIMPLEParsingTable();
@@ -16,12 +18,25 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         // Terminal at top of stack, and token match
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
+            std::cout << "parsingStack: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << "Input: " << currToken
+                      << std::endl;
             index++;
 
             // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
+                std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
+                std::cout << "Unable to parse " << input.at(index).value << input.at(index + 1).value
+                          << input.at(index + 2).value << std::endl;
+                std::cout << "Input: " << currToken << std::endl;
+
+                SyntaxValidator::Symbol nt = std::get<NonTerminal>(stackTop);
+
+                if (nt != nullptr) {
+                    std::cout << "Unidentified terminal" << std::endl;
+                }
+
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
             std::vector<SyntaxValidator::Symbol>& grammarRule = ite->second;
@@ -44,12 +59,15 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 
         } else {
             // Shouldn't reach here
+            std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
             throw SyntaxError("Unexpected grammar rule");
         }
     }
     if (!parsingStack.empty() || index != input.size()) {
+        std::cout << "Could not parse Statement " << input.at(index).line_number << std::endl;
         throw SyntaxError(" Unexpected end of input");
     }
+    std::cout << "Syntax is valid" << std::endl;
     return true;
 }
 
@@ -74,10 +92,12 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 if (i + 1 < input.size() &&
                     (input[i + 1].type == LEXICAL_TOKEN_TYPE::ANDAND || input[i + 1].type == LEXICAL_TOKEN_TYPE::OR)) {
                     // Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
-                    grammarRule.erase(grammarRule.begin(), dupl + 1);
+                    std::cout << "Using Grammar Rule ( cond expr ) _cond_expr" << std::endl;
+                    grammarRule.erase(grammarRule.begin(), dupl);
                 } else {
                     // Grammar rule cond_expr: rel_expr
-                    std::vector<SyntaxValidator::Symbol> newRule(grammarRule.begin(), dupl);
+                    std::cout << "Using Grammar Rule rel_expr" << std::endl;
+                    std::vector<SyntaxValidator::Symbol> newRule(grammarRule.begin(), dupl - 1);
                     grammarRule.assign(newRule.begin(), newRule.end());
                 }
                 return grammarRule;
