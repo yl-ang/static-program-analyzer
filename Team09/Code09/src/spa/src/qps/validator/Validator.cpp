@@ -5,10 +5,13 @@ void Validator::validate(std::vector<std::string> statementList) {
         if (isDeclarationStatement(statement)) {
             validateDeclarationStatement(statement);
 
-            std::vector<std::string> wordList = stringToWordList(statement.substr(0, statement.size() - 1));
-            std::string variableType = wordList[0];
-            std::string variableName = wordList[1];
-            synonymStore.storeSynonym(variableName, variableType);
+            std::string varType, remainingString;
+            std::tie(varType, remainingString) = substringUntilDelimiter(statement, " ");
+            remainingString = remainingString.substr(0, remainingString.size() - 1);
+            std::vector<std::string> varNames = splitByDelimiter(remainingString, ",");
+            for (std::string varName : varNames) {
+                synonymStore.storeSynonym(varName, varType);
+            }
         } else if (isSelectStatement(statement)) {
             validateSelectStatement(statement);
         } else {
