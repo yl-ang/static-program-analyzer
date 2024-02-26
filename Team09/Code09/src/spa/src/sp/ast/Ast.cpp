@@ -186,6 +186,8 @@ std::unique_ptr<ExpressionNode> AST::buildExpressionAST(std::queue<Token>& token
 
 std::unique_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& tokens,
                                                            std::unique_ptr<ExpressionNode> node) {
+    std::cout << "Building SubExpressionAST" << std::endl;
+    std::cout << "Tokens size: " << tokens.size() << std::endl;
     if (tokens.size() == 0) {
         return node;
     }
@@ -199,9 +201,11 @@ std::unique_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
         children.push_back(std::move(node));
         children.push_back(std::move(term));
 
+        std::cout << "Building SubExpressionAST 2" << std::endl;
         return buildSubExpressionAST(
             tokens, std::make_unique<ExpressionNode>(front.type, std::move(children), front.line_number));
     }
+    std::cout << "Node is " << node.get()->getValue() << std::endl;
 
     return node;
 }
@@ -266,7 +270,21 @@ check for '!' first. otherwise check for open brackets. If there are no open bra
 its guaranteed to be a rel_expr
 */
 std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
-    if (tokens.front().type == NOT) {
+    // if (tokens.front().type == NOT) {
+    //     Token notNode = tokens.front();
+    //     tokens.pop();
+    //     std::vector<std::unique_ptr<ASTNode>> children = {};
+    //     std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+    //     children.push_back(std::move(conditionalExpr));
+    //     return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
+    // } else if (tokens.front().type == OPEN_BRACKET) {
+    //     return buildBinaryConditionalExpressionAST(tokens);
+    // }
+
+    std::queue<Token> tempTokens = tokens;
+    tempTokens.pop();
+
+    if (tempTokens.front().type == NOT) {
         Token notNode = tokens.front();
         tokens.pop();
         std::vector<std::unique_ptr<ASTNode>> children = {};
@@ -276,6 +294,7 @@ std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<To
     } else if (tokens.front().type == OPEN_BRACKET) {
         return buildBinaryConditionalExpressionAST(tokens);
     }
+
     return buildRelationalExpressionAST(tokens);
 }
 
@@ -310,22 +329,30 @@ those are actually the case, we can attempt to build a var/const. Otherwise we b
 */
 std::unique_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
     // create a temporary queue to access the following elements in the tokens queue
-    std::queue<Token> temp = tokens;
-    temp.pop();
-    if (temp.size() == 0) {
-        return buildExpressionAST(tokens);
-    }
-    Token followingToken = temp.front();
-    Token token = tokens.front();
-    if (followingToken.type == CLOSE_BRACKET ||
-        RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
-        tokens.pop();
-        if (token.type == NAME) {
-            return buildVarNameAST(token);
+    try {
+        std::queue<Token> temp = tokens;
+        temp.pop();
+        if (temp.size() == 0) {
+            std::cout << "Build ExpressionAST 1" << std::endl;
+            return buildExpressionAST(tokens);
         }
-        return buildIntAST(token);
+        Token followingToken = temp.front();
+        Token token = tokens.front();
+        if (followingToken.type == CLOSE_BRACKET ||
+            RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
+            tokens.pop();
+            if (token.type == NAME) {
+                std::cout << "Build VarNameAST" << std::endl;
+                return buildVarNameAST(token);
+            }
+            std::cout << "Build IntAST" << std::endl;
+            return buildIntAST(token);
+        }
+        std::cout << "Build ExpressionAST 2" << std::endl;
+        return buildExpressionAST(tokens);
+    } catch (std::exception& e) {
+        std::cout << "Exception caught: " << e.what() << std::endl;
     }
-    return buildExpressionAST(tokens);
 }
 
 /*

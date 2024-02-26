@@ -33,6 +33,10 @@ void DesignExtractor::extract(std::unique_ptr<ProgramNode> root) {
 }
 
 void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visitor) {
+    if (!node) {
+        return;
+    }
+
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
