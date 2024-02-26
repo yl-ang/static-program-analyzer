@@ -93,7 +93,7 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                     (input[i + 1].type == LEXICAL_TOKEN_TYPE::ANDAND || input[i + 1].type == LEXICAL_TOKEN_TYPE::OR)) {
                     // Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
                     std::cout << "Using Grammar Rule ( cond expr ) _cond_expr" << std::endl;
-                    grammarRule.erase(grammarRule.begin(), dupl);
+                    grammarRule.erase(grammarRule.begin(), dupl + 1);
                 } else {
                     // Grammar rule cond_expr: rel_expr
                     std::cout << "Using Grammar Rule rel_expr" << std::endl;
