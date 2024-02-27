@@ -27,6 +27,6 @@ public:
     void visitConstant(ConstantNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getUses();
-    void dfsVisitHelper(std::unique_ptr<ASTNode> node, UsesExtractor* visitor);
+    void dfsVisitHelper(std::shared_ptr<ASTNode> node, UsesExtractor* visitor);
     void dfsVisitHelper(ASTNode* node, UsesExtractor* visitor);
 };

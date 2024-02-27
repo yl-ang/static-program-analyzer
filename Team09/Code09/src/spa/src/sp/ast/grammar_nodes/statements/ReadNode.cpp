@@ -5,6 +5,6 @@ void ReadNode::accept(AstVisitor* visitor) {
 }
 
 std::string ReadNode::getVar() {
-    const std::vector<std::unique_ptr<ASTNode>>& _children = this->getChildren();
+    const std::vector<std::shared_ptr<ASTNode>>& _children = this->getChildren();
     return _children.at(0)->getValue();
 }

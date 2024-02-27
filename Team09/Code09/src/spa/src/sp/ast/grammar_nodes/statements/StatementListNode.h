@@ -8,7 +8,7 @@
 
 class StatementListNode : public ASTNode {
 public:
-    explicit StatementListNode(std::vector<std::unique_ptr<ASTNode>> children)
+    explicit StatementListNode(std::vector<std::shared_ptr<ASTNode>> children)
         : ASTNode("", "stmtList", std::move(children), -1) {}
 
     void accept(AstVisitor* visitor) override;

@@ -79,7 +79,7 @@ void ModifiesExtractor::dfsVisitHelper(ASTNode* node, ModifiesExtractor* visitor
     }
 }
 
-void ModifiesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, ModifiesExtractor* visitor) {
+void ModifiesExtractor::dfsVisitHelper(std::shared_ptr<ASTNode> node, ModifiesExtractor* visitor) {
     node->accept(visitor);
 
     for (auto const& child : node->getChildren()) {

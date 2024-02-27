@@ -16,7 +16,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setPatternStore(getPattern());
 }
 
-void DesignExtractor::extract(std::unique_ptr<ProgramNode> root) {
+void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
@@ -28,11 +28,11 @@ void DesignExtractor::extract(std::unique_ptr<ProgramNode> root) {
                                       modifiesExtractor};
 
     for (auto& visitor : visitors) {
-        dfsVisit((std::unique_ptr<ASTNode>&&)std::move(root), visitor);
+        dfsVisit(root, visitor);
     }
 }
 
-void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visitor) {
+void DesignExtractor::dfsVisit(std::shared_ptr<ASTNode>&& node, AstVisitor* visitor) {
     if (!node) {
         return;
     }
@@ -40,7 +40,7 @@ void DesignExtractor::dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visi
     node->accept(visitor);
 
     for (auto& child : node->getChildren()) {
-        dfsVisit((std::unique_ptr<ASTNode>&&)child, visitor);
+        dfsVisit((std::shared_ptr<ASTNode>&&)child, visitor);
     }
     return;
 }

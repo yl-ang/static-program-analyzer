@@ -9,8 +9,9 @@
 #include "sp/tokenizer/Token.h"
 class ProgramNode : public ASTNode {
 public:
-    explicit ProgramNode(std::vector<std::unique_ptr<ASTNode>> children)
-        : ASTNode("main", "program", std::move(children), -1) {}
+    explicit ProgramNode(std::vector<std::shared_ptr<ASTNode>> children)
+        : ASTNode("main", "program", (children), -1) {
+    }
 
     void accept(AstVisitor* visitor) override {
         visitor->visitProgram(this);

@@ -10,12 +10,13 @@
 
 class IfNode : public StatementNode {
 public:
-    explicit IfNode(std::vector<std::unique_ptr<ASTNode>> children, int lineNumber)
-        : StatementNode("", "if", lineNumber, std::move(children)) {}
+    explicit IfNode(std::vector<std::shared_ptr<ASTNode>> children, int lineNumber)
+        : StatementNode("", "if", lineNumber, (children)) {
+    }
 
     void accept(AstVisitor* visitor) override;
 
-    std::unique_ptr<ExpressionNode> getCond();
-    std::unique_ptr<StatementListNode> getThenStmtLstNode();
-    std::unique_ptr<StatementListNode> getElseStmtLstNode();
+    std::shared_ptr<ExpressionNode> getCond();
+    std::shared_ptr<StatementListNode> getThenStmtLstNode();
+    std::shared_ptr<StatementListNode> getElseStmtLstNode();
 };

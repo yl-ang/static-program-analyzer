@@ -17,8 +17,8 @@ void SP::processFile(std::string filepath) {
 
     try {
         std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
-        std::unique_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
-        designExtractor.extract(std::move(astRoot));
+        std::shared_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
+        designExtractor.extract(astRoot);
         designExtractor.writePKB(&pkbWriter);
     } catch (SyntaxError& e) {
         std::cerr << "Syntax Error" << std::endl;

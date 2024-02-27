@@ -20,20 +20,20 @@ Assumptions:
 - Program is syntatically correct
 */
 
-std::unique_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
+std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
     std::queue<Token> token_queue = {};
     for (auto token : tokens) {
         token_queue.push(token);
     }
 
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<ASTNode>> children = {};
 
     while (token_queue.size()) {
-        std::unique_ptr<ProcedureNode> procedure = buildProcedureAST(token_queue);
-        children.push_back(std::move(procedure));
+        std::shared_ptr<ProcedureNode> procedure = buildProcedureAST(token_queue);
+        children.push_back((procedure));
     }
 
-    return std::make_unique<ProgramNode>(std::move(children));
+    return std::make_shared<ProgramNode>((children));
 }
 /*
 Grammar: 'procedure' proc_name { stmtList }
@@ -42,15 +42,15 @@ element of the queue. Otherwise, we throw a syntax error. Then we look at the
 next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
-std::unique_ptr<ProcedureNode> AST::buildProcedureAST(std::queue<Token>& tokens) {
+std::shared_ptr<ProcedureNode> AST::buildProcedureAST(std::queue<Token>& tokens) {
     tokens.pop();
     Token procName = tokens.front();
     tokens.pop();
 
-    std::unique_ptr<StatementListNode> statementList = buildStatementListAST(tokens);
-    std::vector<std::unique_ptr<ASTNode>> children = {};
-    children.push_back(std::move(statementList));
-    return std::make_unique<ProcedureNode>(procName.value, std::move(children));
+    std::shared_ptr<StatementListNode> statementList = buildStatementListAST(tokens);
+    std::vector<std::shared_ptr<ASTNode>> children = {};
+    children.push_back((statementList));
+    return std::make_shared<ProcedureNode>(procName.value, (children));
 }
 
 /*
@@ -58,19 +58,19 @@ stmt list passes here includes the curly braces, so we can check for that as
 well.
 
 */
-std::unique_ptr<StatementListNode> AST::buildStatementListAST(std::queue<Token>& tokens) {
+std::shared_ptr<StatementListNode> AST::buildStatementListAST(std::queue<Token>& tokens) {
     tokens.pop();
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<ASTNode>> children = {};
 
     while (tokens.size() && tokens.front().type != CLOSE_CURLY_BRACE) {
         children.push_back(buildStatementAST(tokens));
     }
 
     tokens.pop();
-    return std::make_unique<StatementListNode>(std::move(children));
+    return std::make_shared<StatementListNode>((children));
 }
 
-std::unique_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens) {
+std::shared_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens) {
     Token first_token = tokens.front();
     if (first_token.type == NAME) {
         return buildAssignmentAST(tokens);
@@ -84,73 +84,73 @@ std::unique_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
     return buildIfAST(tokens);
 }
 
-std::unique_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
+std::shared_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
     Token ifToken = tokens.front();
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<ASTNode>> children = {};
 
     tokens.pop();  // remove if
-    std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    std::shared_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
     tokens.pop();  // remove then
-    std::unique_ptr<StatementListNode> thenStatementList = buildStatementListAST(tokens);
+    std::shared_ptr<StatementListNode> thenStatementList = buildStatementListAST(tokens);
     tokens.pop();  // remove else
-    std::unique_ptr<StatementListNode> elseStatementList = buildStatementListAST(tokens);
+    std::shared_ptr<StatementListNode> elseStatementList = buildStatementListAST(tokens);
 
-    children.push_back(std::move(conditionalExpression));
-    children.push_back(std::move(thenStatementList));
-    children.push_back(std::move(elseStatementList));
-    return std::make_unique<IfNode>(std::move(children), ifToken.line_number);
+    children.push_back((conditionalExpression));
+    children.push_back((thenStatementList));
+    children.push_back((elseStatementList));
+    return std::make_shared<IfNode>((children), ifToken.line_number);
 }
 
-std::unique_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+std::shared_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
+    std::vector<std::shared_ptr<ASTNode>> children = {};
     // remove the keyword
     Token whileToken = tokens.front();
     tokens.pop();
-    std::unique_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
-    std::unique_ptr<StatementListNode> statements = buildStatementListAST(tokens);
-    children.push_back(std::move(conditionalExpression));
-    children.push_back(std::move(statements));
-    return std::make_unique<WhileNode>(std::move(children), whileToken.line_number);
+    std::shared_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    std::shared_ptr<StatementListNode> statements = buildStatementListAST(tokens);
+    children.push_back((conditionalExpression));
+    children.push_back((statements));
+    return std::make_shared<WhileNode>((children), whileToken.line_number);
 }
 
-std::unique_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
+    std::vector<std::shared_ptr<ASTNode>> children = {};
     Token readToken = tokens.front();
     tokens.pop();
     Token varName = tokens.front();
-    std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
+    std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
-    children.push_back(std::move(nameNode));
+    children.push_back((nameNode));
     tokens.pop();
-    return std::make_unique<ReadNode>(std::move(children), readToken.line_number);
+    return std::make_shared<ReadNode>((children), readToken.line_number);
 }
 
-std::unique_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+std::shared_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
+    std::vector<std::shared_ptr<ASTNode>> children = {};
     Token printToken = tokens.front();
     tokens.pop();
     Token varName = tokens.front();
-    std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
+    std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
-    children.push_back(std::move(nameNode));
+    children.push_back((nameNode));
     tokens.pop();
-    return std::make_unique<PrintNode>(printToken.line_number, std::move(children));
+    return std::make_shared<PrintNode>(printToken.line_number, (children));
 }
 
-std::unique_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& tokens) {
+std::shared_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<ASTNode>> children = {};
 
-    std::unique_ptr<VariableNode> nameNode = buildVarNameAST(varName);
+    std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
     tokens.pop();
     Token assignmentToken = tokens.front();
     tokens.pop();
-    std::unique_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
+    std::shared_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
     tokens.pop();
 
-    children.push_back(std::move(nameNode));
-    children.push_back(std::move(expression));
-    return std::make_unique<AssignmentNode>(std::move(children), assignmentToken.line_number);
+    children.push_back((nameNode));
+    children.push_back((expression));
+    return std::make_shared<AssignmentNode>((children), assignmentToken.line_number);
 }
 
 /*
@@ -175,17 +175,17 @@ A': '+' BA' | '-' BA' | e
 More info can be found here: https://en.wikipedia.org/wiki/Left_recursion
 
 */
-std::unique_ptr<ExpressionNode> AST::buildExpressionAST(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::buildExpressionAST(std::queue<Token>& tokens) {
     /*
     We perform upcasting here because there is a chance of the following flow
     happening: Expr -> term -> factor -> expr.
     */
-    std::unique_ptr<ExpressionNode> term = buildTermAST(tokens);
-    return buildSubExpressionAST(tokens, std::move(term));
+    std::shared_ptr<ExpressionNode> term = buildTermAST(tokens);
+    return buildSubExpressionAST(tokens, (term));
 }
 
-std::unique_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& tokens,
-                                                           std::unique_ptr<ExpressionNode> node) {
+std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& tokens,
+                                                           std::shared_ptr<ExpressionNode> node) {
     std::cout << "Building SubExpressionAST" << std::endl;
     std::cout << "Tokens size: " << tokens.size() << std::endl;
     if (tokens.size() == 0) {
@@ -194,16 +194,16 @@ std::unique_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
     Token front = tokens.front();
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
-        std::unique_ptr<ExpressionNode> term = buildTermAST(tokens);
-        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::shared_ptr<ExpressionNode> term = buildTermAST(tokens);
+        std::vector<std::shared_ptr<ASTNode>> children = {};
 
         // ExpressionNode expressionNode = ExpressionNode(front.type, front.line_number);
-        children.push_back(std::move(node));
-        children.push_back(std::move(term));
+        children.push_back((node));
+        children.push_back((term));
 
         std::cout << "Building SubExpressionAST 2" << std::endl;
         return buildSubExpressionAST(
-            tokens, std::make_unique<ExpressionNode>(front.type, std::move(children), front.line_number));
+            tokens, std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
     }
     std::cout << "Node is " << node.get()->getValue() << std::endl;
 
@@ -217,7 +217,7 @@ current close bracket, we parse it as a rel_expr instaed. To do this, we can fol
 https://www.geeksforgeeks.org/check-for-balanced-parentheses-in-an-expression/. We will just iterate throught the tokens
 to find the brackets. In this case, only ( and ). Tokens passed here are guarenteed to start with an open bracket
 */
-std::unique_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::queue<Token>& tokens) {
     auto tempTokens = tokens;
     std::stack<Token> stack;
     stack.push(tempTokens.front());
@@ -239,24 +239,24 @@ std::unique_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::qu
         return buildRelationalExpressionAST(tokens);
     }
 
-    std::unique_ptr<ExpressionNode> leftHandSide = handleBracketedCondExpr(tokens);
+    std::shared_ptr<ExpressionNode> leftHandSide = handleBracketedCondExpr(tokens);
     // means its just a !(realFactor)
     if (tokens.size() == 0) {
         return leftHandSide;
     }
     Token logicalOperator = tokens.front();
     tokens.pop();  // pop the logical op
-    std::unique_ptr<ExpressionNode> rightHandSide = handleBracketedCondExpr(tokens);
+    std::shared_ptr<ExpressionNode> rightHandSide = handleBracketedCondExpr(tokens);
 
-    std::vector<std::unique_ptr<ASTNode>> children = {};
-    children.push_back(std::move(leftHandSide));
-    children.push_back(std::move(rightHandSide));
-    return std::make_unique<ExpressionNode>(logicalOperator.type, std::move(children), logicalOperator.line_number);
+    std::vector<std::shared_ptr<ASTNode>> children = {};
+    children.push_back((leftHandSide));
+    children.push_back((rightHandSide));
+    return std::make_shared<ExpressionNode>(logicalOperator.type, (children), logicalOperator.line_number);
 }
 
-std::unique_ptr<ExpressionNode> AST::handleBracketedCondExpr(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::handleBracketedCondExpr(std::queue<Token>& tokens) {
     tokens.pop();
-    std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
+    std::shared_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
     tokens.pop();
     return conditionalExpr;
 }
@@ -269,7 +269,7 @@ cond_expr: rel_expr | '!' '(' cond_expr ')' |
 check for '!' first. otherwise check for open brackets. If there are no open brackets,
 its guaranteed to be a rel_expr
 */
-std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
     // if (tokens.front().type == NOT) {
     //     Token notNode = tokens.front();
     //     tokens.pop();
@@ -284,10 +284,10 @@ std::unique_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<To
     if (tokens.front().type == NOT) {
         Token notNode = tokens.front();
         tokens.pop();
-        std::vector<std::unique_ptr<ASTNode>> children = {};
-        std::unique_ptr<ExpressionNode> conditionalExpr = handleBracketedCondExpr(tokens);
-        children.push_back(std::move(conditionalExpr));
-        return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
+        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<ExpressionNode> conditionalExpr = handleBracketedCondExpr(tokens);
+        children.push_back((conditionalExpr));
+        return std::make_shared<ExpressionNode>(notNode.type, (children), notNode.line_number);
     } else if (tokens.front().type == OPEN_BRACKET) {
         return buildBinaryConditionalExpressionAST(tokens);
     }
@@ -300,16 +300,16 @@ Grammar: rel_factor '>' rel_factor | rel_factor '>=' rel_factor |
           rel_factor '<' rel_factor | rel_factor '<=' rel_factor |
           rel_factor '==' rel_factor | rel_factor '!=' rel_factor
 */
-std::unique_ptr<ExpressionNode> AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
-    std::vector<std::unique_ptr<ASTNode>> children = {};
+std::shared_ptr<ExpressionNode> AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
+    std::vector<std::shared_ptr<ASTNode>> children = {};
 
-    std::unique_ptr<ExpressionNode> leftHandNode = buildRelationalFactorAST(tokens);
+    std::shared_ptr<ExpressionNode> leftHandNode = buildRelationalFactorAST(tokens);
     Token conditionalOp = tokens.front();
     tokens.pop();
-    std::unique_ptr<ExpressionNode> rightHandNode = buildRelationalFactorAST(tokens);
-    children.push_back(std::move(leftHandNode));
-    children.push_back(std::move(rightHandNode));
-    return std::make_unique<ExpressionNode>(conditionalOp.type, std::move(children), conditionalOp.line_number);
+    std::shared_ptr<ExpressionNode> rightHandNode = buildRelationalFactorAST(tokens);
+    children.push_back((leftHandNode));
+    children.push_back((rightHandNode));
+    return std::make_shared<ExpressionNode>(conditionalOp.type, (children), conditionalOp.line_number);
 }
 
 /*
@@ -324,7 +324,7 @@ A rel_factor will always be terminated by a close bracket (because of rel_expr g
 rel_op (because of rel_expr grammar). If we check the following token in the queue and realise
 those are actually the case, we can attempt to build a var/const. Otherwise we build an expression
 */
-std::unique_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
     // create a temporary queue to access the following elements in the tokens queue
     try {
         std::queue<Token> temp = tokens;
@@ -361,31 +361,31 @@ to the following 2 rules:
 A : BA'
 A' : '*' BA' | '/' BA' | '%' BA' | e
 */
-std::unique_ptr<ExpressionNode> AST::buildTermAST(std::queue<Token>& tokens) {
-    std::unique_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
-    return buildSubTermAST(tokens, std::move(factorNode));
+std::shared_ptr<ExpressionNode> AST::buildTermAST(std::queue<Token>& tokens) {
+    std::shared_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
+    return buildSubTermAST(tokens, (factorNode));
 }
 
-std::unique_ptr<ExpressionNode> AST::buildSubTermAST(std::queue<Token>& tokens, std::unique_ptr<ExpressionNode> node) {
+std::shared_ptr<ExpressionNode> AST::buildSubTermAST(std::queue<Token>& tokens, std::shared_ptr<ExpressionNode> node) {
     // reached e, which is the empty string
     if (tokens.size() == 0) {
         return node;
     }
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
-        std::vector<std::unique_ptr<ASTNode>> children = {};
+        std::vector<std::shared_ptr<ASTNode>> children = {};
         tokens.pop();
-        std::unique_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
-        children.push_back(std::move(node));
-        children.push_back(std::move(factorNode));
+        std::shared_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
+        children.push_back((node));
+        children.push_back((factorNode));
         return buildSubTermAST(tokens,
-                               std::make_unique<ExpressionNode>(front.type, std::move(children), front.line_number));
+                               std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
     }
 
     return node;
 }
 
-std::unique_ptr<ExpressionNode> AST::buildFactorAST(std::queue<Token>& tokens) {
+std::shared_ptr<ExpressionNode> AST::buildFactorAST(std::queue<Token>& tokens) {
     Token token = tokens.front();
     tokens.pop();
     if (token.type == NAME) {
@@ -396,16 +396,16 @@ std::unique_ptr<ExpressionNode> AST::buildFactorAST(std::queue<Token>& tokens) {
     return buildExprFromFactorAST(tokens);
 }
 
-std::unique_ptr<ExpressionNode> AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
-    std::unique_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
+std::shared_ptr<ExpressionNode> AST::buildExprFromFactorAST(std::queue<Token>& tokens) {
+    std::shared_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
     tokens.pop();
     return expression;
 }
 
-std::unique_ptr<VariableNode> AST::buildVarNameAST(Token token) {
-    return std::make_unique<VariableNode>(VariableNode(token.value, token.line_number));
+std::shared_ptr<VariableNode> AST::buildVarNameAST(Token token) {
+    return std::make_shared<VariableNode>(VariableNode(token.value, token.line_number));
 }
 
-std::unique_ptr<ConstantNode> AST::buildIntAST(Token token) {
-    return std::make_unique<ConstantNode>(ConstantNode(token.value, token.line_number));
+std::shared_ptr<ConstantNode> AST::buildIntAST(Token token) {
+    return std::make_shared<ConstantNode>(ConstantNode(token.value, token.line_number));
 }
