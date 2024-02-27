@@ -24,8 +24,8 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->modifiesExtractor = new ModifiesExtractor();
     this->patternExtractor = new PatternExtractor();
 
-    std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor, parentExtractor, usesExtractor,
-                                      modifiesExtractor};
+    std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor,  parentExtractor,
+                                      usesExtractor,   modifiesExtractor, patternExtractor};
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);

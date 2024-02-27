@@ -5,22 +5,16 @@ void IfNode::accept(AstVisitor* visitor) {
 }
 
 std::shared_ptr<ExpressionNode> IfNode::getCond() {
-    const std::vector<std::shared_ptr<ASTNode>>& _children = this->getChildren();
-    auto exprNodePtr = dynamic_cast<ExpressionNode*>(_children.at(0).get());
-    std::shared_ptr<ExpressionNode> exprUniquePtr = std::shared_ptr<ExpressionNode>(exprNodePtr);
-    return exprUniquePtr;
+    auto exprNodePtr = std::dynamic_pointer_cast<ExpressionNode>(this->getChildren().at(0));
+    return exprNodePtr;
 }
 
 std::shared_ptr<StatementListNode> IfNode::getThenStmtLstNode() {
-    const std::vector<std::shared_ptr<ASTNode>>& _children = this->getChildren();
-    auto stmtLstNodePtr = dynamic_cast<StatementListNode*>(_children.at(1).get());
-    std::shared_ptr<StatementListNode> stmtLstUniquePtr = std::shared_ptr<StatementListNode>(stmtLstNodePtr);
-    return stmtLstUniquePtr;
+    auto stmtLstNodePtr = std::dynamic_pointer_cast<StatementListNode>(this->getChildren().at(1));
+    return stmtLstNodePtr;
 }
 
 std::shared_ptr<StatementListNode> IfNode::getElseStmtLstNode() {
-    const std::vector<std::shared_ptr<ASTNode>>& _children = this->getChildren();
-    auto stmtLstNodePtr = dynamic_cast<StatementListNode*>(_children.at(2).get());
-    std::shared_ptr<StatementListNode> stmtLstUniquePtr = std::shared_ptr<StatementListNode>(stmtLstNodePtr);
-    return stmtLstUniquePtr;
+    auto stmtLstNodePtr = std::dynamic_pointer_cast<StatementListNode>(this->getChildren().at(2));
+    return stmtLstNodePtr;
 }
