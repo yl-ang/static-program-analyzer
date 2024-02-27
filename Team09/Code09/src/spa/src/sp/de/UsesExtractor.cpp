@@ -88,7 +88,7 @@ std::unordered_set<std::pair<StmtNum, Variable>> UsesExtractor::getUses() {
     return this->uses;
 }
 
-void UsesExtractor::dfsVisitHelper(std::unique_ptr<ASTNode> node, UsesExtractor* visitor) {
+void UsesExtractor::dfsVisitHelper(std::shared_ptr<ASTNode> node, UsesExtractor* visitor) {
     node->accept(visitor);
 
     for (auto const& child : node->getChildren()) {

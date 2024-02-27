@@ -1,3 +1,28 @@
-procedure a {
-  k = 1;
+procedure A {
+
+    read x1;
+
+    read x2;
+
+    x = x1 + x2;
+
+    read y;
+
+    if ( x1 == x2 ) then {
+
+        print y;
+
+    } else {
+
+        print x;
+
+    }
+
+    while (x > x1) {
+
+        x1 = x1 + 1;
+
+    }
+
+    print x1;
 }

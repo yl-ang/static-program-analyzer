@@ -10,11 +10,12 @@
 
 class AssignmentNode : public StatementNode {
 public:
-    explicit AssignmentNode(std::vector<std::unique_ptr<ASTNode>> children, int statementNumber)
-        : StatementNode("", "assign", statementNumber, std::move(children)) {}
+    explicit AssignmentNode(std::vector<std::shared_ptr<ASTNode>> children, int statementNumber)
+        : StatementNode("", "assign", statementNumber, (children)) {
+    }
 
     void accept(AstVisitor* visitor) override;
 
-    std::unique_ptr<ExpressionNode> getExpr();
+    std::shared_ptr<ExpressionNode> getExpr();
     std::string getVar();
 };

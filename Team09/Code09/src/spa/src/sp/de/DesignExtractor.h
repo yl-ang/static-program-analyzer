@@ -17,11 +17,11 @@ class DesignExtractor {
 public:
     DesignExtractor() {}
 
-    void extract(std::unique_ptr<ProgramNode> root);
+    void extract(std::shared_ptr<ProgramNode> root);
 
     void writePKB(PKBFacadeWriter* pkbWriter);
 
-    void dfsVisit(std::unique_ptr<ASTNode>&& node, AstVisitor* visitor);
+    void dfsVisit(std::shared_ptr<ASTNode>&& node, AstVisitor* visitor);
 
     std::unordered_set<std::string> getVariables();
     std::unordered_set<std::string> getConstants();

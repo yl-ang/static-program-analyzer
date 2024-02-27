@@ -11,15 +11,16 @@
 #include "sp/tokenizer/Token.h"
 
 class ASTNode : public AstNodeInterface {
-    std::vector<std::unique_ptr<ASTNode>> children;
+    std::vector<std::shared_ptr<ASTNode>> children;
     std::string value;
     std::string type;
     int stmtNumber;
 
 public:
-    ASTNode(std::string value, std::string type, std::vector<std::unique_ptr<ASTNode>> children = {},
+    ASTNode(std::string value, std::string type, std::vector<std::shared_ptr<ASTNode>> children = {},
             int stmtNumber = -1)
-        : value(value), type(type), children(std::move(children)), stmtNumber(stmtNumber) {}
+        : value(value), type(type), children((children)), stmtNumber(stmtNumber) {
+    }
 
     std::string getType() const {
         return type;
@@ -33,7 +34,7 @@ public:
         return stmtNumber;
     }
 
-    const std::vector<std::unique_ptr<ASTNode>>& getChildren() const {
+    const std::vector<std::shared_ptr<ASTNode>>& getChildren() const {
         return children;
     }
 
@@ -62,9 +63,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& obj) {
         os << "{ \"value\": \"" << obj.value << "\", "
-           << "\"type\": \"" << obj.type << "\", "
-           << "\"line number\": \"" << obj.stmtNumber << "\","
-           << "\"children\": [";
+            << "\"type\": \"" << obj.type << "\", "
+            << "\"line number\": \"" << obj.stmtNumber << "\","
+            << "\"children\": [";
 
         for (size_t i = 0; i < obj.children.size(); ++i) {
             os << "[" << *(obj.children[i]) << "]";
