@@ -1,0 +1,113 @@
+@startuml
+class PKBFacadeReader {
+    - pkbReference: PKB*
+    + PKBFacadeReader(pkbReference: PKB&)
+    + PKBFacadeReader()
+
+    + getVariables(): std::unordered_set<Variable>
+    + getConstants(): std::unordered_set<Constant>
+    + getProcedures(): std::unordered_set<Procedure>
+
+    + containsVariable(variable: Variable): bool
+    + containsConstant(constant: Constant): bool
+    + containsProcedure(procedure: Procedure): bool
+
+    + getStmts(): std::unordered_set<Stmt>
+    + getStatementByStmtNum(stmtNum: StmtNum): std::optional<Stmt>
+    + getStatementsByType(type: StatementType): std::unordered_set<Stmt>
+
+    + getFollower(s1: StmtNum): std::optional<StmtNum>
+    + getFollowee(s2: StmtNum): std::optional<StmtNum>
+    + getFollowersStar(s: StmtNum): std::unordered_set<StmtNum>
+    + getFolloweesStar(s: StmtNum): std::unordered_set<StmtNum>
+    + hasFollowRelationship(s1: StmtNum, s2: StmtNum): bool
+    + hasFollowStarRelationship(s1: StmtNum, s2: StmtNum): bool
+    + hasFollowRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+    + hasFollowStarRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+
+    + getParent(child: StmtNum): std::optional<StmtNum>
+    + getChildren(parent: StmtNum): std::unordered_set<StmtNum>
+    + getChildrenStar(parent: StmtNum): std::unordered_set<StmtNum>
+    + getParentsStar(child: StmtNum): std::unordered_set<StmtNum>
+    + hasParentRelationship(parent: StmtNum, child: StmtNum): bool
+    + hasParentStarRelationship(parent: StmtNum, child: StmtNum): bool
+    + hasParentRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+    + hasParentStarRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+
+    + getModifiesVariablesByStatement(stmt: StmtNum): std::unordered_set<Variable>
+    + getModifiesStatementsByVariable(variable: Variable): std::unordered_set<StmtNum>
+
+    + hasStatementVariableModifiesRelationship(stmt: StmtNum, variable: Variable): bool
+    + hasStatementVariableModifiesRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+    
+    + getUsesVariablesByStatement(stmt: StmtNum): std::unordered_set<Variable>
+    + getUsesStatementsByVariable(variable: Variable): std::unordered_set<StmtNum>
+
+    + hasStatementVariableUseRelationship(stmt: StmtNum, variable: Variable): bool
+    + hasStatementVariableUseRelationship(arg1: ClauseArgument, arg2: ClauseArgument): bool
+    
+    + hasPattern(stmtNum: StmtNum, lhs: std::string, rhs: std::string): bool
+    + hasPattern(stmtNum: StmtNum, arg1: ClauseArgument, arg2: ClauseArgument): bool
+}
+
+class PKBFacadeWriter {
+    - pkbReference: PKB*
+    + PKBFacadeWriter(pkb: PKB&)
+    + PKBFacadeWriter()
+
+    + setVariables(inputVariables: std::unordered_set<Variable>): void
+    + setConstants(inputConstants: std::unordered_set<Constant>): void
+    + setProcedures(inputProcedures: std::unordered_set<Procedure>): void
+    + setStmts(inputStmts: std::unordered_set<Stmt>): void
+    + setFollowsStore(followsPairs: std::unordered_set<std::pair<StmtNum, StmtNum>>): void
+    + setParentStore(parentPairs: std::unordered_set<std::pair<StmtNum, StmtNum>>): void
+    + setModifiesStore(modifiesPairs: std::unordered_set<std::pair<StmtNum, Variable>>): void
+    + setUsesStore(usesPairs: std::unordered_set<std::pair<StmtNum, Variable>>): void
+    + setPatternStore(patterns: std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>>): void
+}
+class EntityStore<T> {
+}
+
+class FollowsStore {
+}
+
+class ParentStore {
+}
+
+class ModifiesStore {
+}
+
+class UsesStore {
+}
+
+class PatternStore {
+}
+
+class StatementStore {
+}
+
+class PKB {
+    + PKB() noexcept
+    + variableStore: std::shared_ptr<EntityStore<Variable>>
+    + constantStore: std::shared_ptr<EntityStore<Constant>>
+    + procedureStore: std::shared_ptr<EntityStore<Procedure>>
+    + stmtStore: std::shared_ptr<StatementStore>
+    + followsStore: std::shared_ptr<FollowsStore>
+    + parentStore: std::shared_ptr<ParentStore>
+    + usesStore: std::shared_ptr<UsesStore>
+    + modifiesStore: std::shared_ptr<ModifiesStore>
+    + patternStore: std::shared_ptr<PatternStore>
+}
+
+EntityStore --* PKB
+FollowsStore --* PKB
+ParentStore --* PKB
+UsesStore --* PKB
+ModifiesStore --* PKB
+PatternStore --* PKB
+StatementStore --* PKB
+
+PKB --o PKBFacadeReader: contains
+PKB --o PKBFacadeWriter: contains
+
+@enduml

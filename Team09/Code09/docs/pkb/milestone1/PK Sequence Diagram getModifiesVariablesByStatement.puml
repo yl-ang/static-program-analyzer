@@ -1,0 +1,12 @@
+@startuml
+
+-> PKBFacadeReader : getModifiesVariablesByStatement(stmt)
+PKBFacadeReader -> ModifiesStore: getModifiesVariablesByStatement(stmt)
+
+alt stmtToModifiedVariables contains stmt
+    ModifiesStore -> PKBFacadeReader: Return set of modified variables
+end
+
+ModifiesStore -> PKBFacadeReader: Return empty set
+
+@enduml

@@ -1,0 +1,84 @@
+@startuml
+
+class EntityStore<T> {
+    + addEntities(inputEntities: std::unordered_set<T>): void
+    + hasEntity(entity: T): bool
+    + getAllEntities(): const std::unordered_set<T>&
+    - entities: std::unordered_set<T>
+}
+
+class FollowsStore {
+    + setFollowsStore(followsPairs: std::unordered_set<std::pair<StmtNum, StmtNum>>): void
+    + getFollower(s1: StmtNum): std::optional<StmtNum>
+    + getFollowee(s2: StmtNum): std::optional<StmtNum>
+    + getFollowersStar(s: StmtNum): std::unordered_set<StmtNum>
+    + getFolloweesStar(s: StmtNum): std::unordered_set<StmtNum>
+    + hasFollowRelationship(s1: StmtNum, s2: StmtNum): bool
+    + hasFollowStarRelationship(s1: StmtNum, s2: StmtNum): bool
+    + hasFollowRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    + hasFollowStarRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    - followerMap: std::unordered_map<StmtNum, StmtNum>
+    - followerByMap: std::unordered_map<StmtNum, StmtNum>
+    - followerStarMap: std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+    - followeeStarMap: std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+    - computeTransitiveClosure(): void
+}
+
+
+class ModifiesStore {
+
+    + setModifiesStore(modifiesSet: std::unordered_set<std::pair<StmtNum, Variable>>): void
+    + hasStatementVariableModifiesRelationship(stmt: StmtNum, variable: Variable): bool
+    + hasStatementVariableModifiesRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    + getVariablesByStatement(stmt: StmtNum): std::unordered_set<Variable>
+    + getStatementsByVariable(variable: Variable): std::unordered_set<StmtNum>
+    - stmtToModifiedVariables: std::unordered_map<StmtNum, std::unordered_set<Variable>>
+    - variableToModifyingStatements: std::unordered_map<Variable, std::unordered_set<StmtNum>>
+}
+
+class ParentStore {
+    + setParentStore(parentPairs: std::unordered_set<std::pair<StmtNum, StmtNum>>): void
+    + getParent(child: StmtNum): std::optional<StmtNum>
+    + getChildren(parent: StmtNum): std::unordered_set<StmtNum>
+    + getChildrenStar(parent: StmtNum): std::unordered_set<StmtNum>
+    + getParentsStar(child: StmtNum): std::unordered_set<StmtNum>
+    + hasParentRelationship(parent: StmtNum, child: StmtNum): bool
+    + hasParentStarRelationship(parent: StmtNum, child: StmtNum): bool
+    + hasParentRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    + hasParentStarRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    - parentMap: std::unordered_map<StmtNum, StmtNum>
+    - parentToChildrenMap: std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+    - parentStarMap: std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+    - childStarMap: std::unordered_map<StmtNum, std::unordered_set<StmtNum>>
+    - computeTransitiveClosure(): void
+}
+
+class StatementStore {
+    + setStatements(inputStmts: std::unordered_set<Stmt>): void
+    + getStatements(): const std::unordered_set<Stmt>&
+    + getStatementByStmtNum(stmtNum: StmtNum): std::optional<Stmt>
+    + getStatementsByType(type: StatementType): std::unordered_set<Stmt>
+    - statementSet: std::unordered_set<Stmt>
+    - statementNumMap: std::unordered_map<StmtNum, std::optional<Stmt>>
+    - statementTypeMap: std::unordered_map<StatementType, std::unordered_set<std::optional<Stmt>>>
+}
+
+class UsesStore {
+    + setUsesStore(usesSet: std::unordered_set<std::pair<StmtNum, Variable>>): void
+    + hasStatementVariableUseRelationship(stmt: StmtNum, variable: Variable): bool
+    + hasStatementVariableUseRelationship(arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    + getVariablesByStatement(stmt: StmtNum): std::unordered_set<Variable>
+    + getStatementsByVariable(variable: Variable): std::unordered_set<StmtNum>
+    - stmtToUsedVariables: std::unordered_map<StmtNum, std::unordered_set<Variable>>
+    - variableToUsingStatements: std::unordered_map<Variable, std::unordered_set<StmtNum>>
+}
+
+class PatternStore {
+
+    + setPatterns(patterns: std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>>): void
+    + hasPattern(stmtNum: StmtNum, lhs: std::string, rhs: std::string): bool
+    + hasPattern(stmtNum: StmtNum, arg1: ClauseArgument&, arg2: ClauseArgument&): bool
+    - patternsMap: std::unordered_map<StmtNum, std::unordered_set<std::pair<std::string, std::string>>>
+}
+
+@enduml
