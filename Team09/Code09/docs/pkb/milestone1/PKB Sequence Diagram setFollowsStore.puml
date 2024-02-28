@@ -1,0 +1,12 @@
+@startuml
+
+-> pkbFacadeWriter : setFollowsStore(followsPairs)
+pkbFacadeWriter -> FollowsStore: setFollowsStore(followsPairs)
+loop for each pair in followsPairs
+    FollowsStore --> FollowsStore : Update followerMap and followerByMap
+    note right: StmtNum s1 = pair.first;\nStmtNum s2 = pair.second;\nfollowerMap[s1] = s2;\nfollowerByMap[s2] = s1;
+end loop
+FollowsStore --> TransitiveClosureUtility : computeTransitiveClosure(followerStarMap)
+FollowsStore --> TransitiveClosureUtility : computeTransitiveClosure(followeeStarMap)
+
+@enduml
