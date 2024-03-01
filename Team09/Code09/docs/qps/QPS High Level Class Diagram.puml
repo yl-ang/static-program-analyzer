@@ -1,54 +1,41 @@
 @startuml
 
 class           QueryProcessingSubsystem
-class           QueryResultProjector
 
 ' Evaluator definition
 class           QueryEvaluator
+
 class           ClauseEvaluator
-class           RequestBuilder
-class           SelectClause
-class           DeclarationClause
-class           PatternClause
+
 class           SuchThatClause
+class           PatternClause
 
 ' Preprocessor definition
 class           QueryPreprocessor
-class           Parser
-class           SelectParser
-class           DeclarationParser
-class           PatternParser
-class           SuchThatParser
-class           Tokenizer
-class           TokenInput
-class           Tokens
 
-QueryProcessingSubsystem           -->           QueryResultProjector
+class           Parser
+class           Validator
+class           Tokenizer
+
+class           ClauseArguments
+
 QueryProcessingSubsystem           -->           QueryEvaluator
 QueryProcessingSubsystem           -->           QueryPreprocessor
 
-QueryEvaluator           <.right.           QueryPreprocessor           :           < inputs query
-QueryResultProjector           <.right.           QueryEvaluator           :           < sends result
+QueryEvaluator          .right.       QueryPreprocessor     :   < inputs clause arguments
 
-QueryEvaluator           -->           ClauseEvaluator
-QueryEvaluator           -->           RequestBuilder
-ClauseEvaluator           <.right.           RequestBuilder
+QueryEvaluator          -->         ClauseEvaluator
+ClauseEvaluator         -->         SuchThatClause
+ClauseEvaluator         -->         PatternClause
 
-ClauseEvaluator           <|--           SelectClause
-ClauseEvaluator           <|--           DeclarationClause
-ClauseEvaluator           <|--           SuchThatClause
-ClauseEvaluator           <|--           PatternClause
+QueryPreprocessor       -->         Parser
+QueryPreprocessor       -->         Validator
+QueryPreprocessor       -->         Tokenizer
 
-QueryPreprocessor           -->           Parser
-QueryPreprocessor           -->           Tokenizer
+Parser              <.right.        Validator
+Validator           <.right.        Tokenizer
 
-Parser           <|--           SelectParser
-Parser           <|--           DeclarationParser
-Parser           <|--           SuchThatParser
-Parser           <|--           PatternParser
-
-Tokenizer           -->           TokenInput
-TokenInput           -->           Tokens
+Parser              -->         ClauseArguments
 
 hide empty fields
 hide empty methods

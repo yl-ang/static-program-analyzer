@@ -1,0 +1,47 @@
+@startuml
+
+box SPA #LightGreen
+participant SPA
+end box
+
+box QPS #LightBlue
+participant QPS
+participant Tokenizer #Yellow
+participant Validator #Yellow
+participant Parser    #Yellow
+participant Evaluator #Yellow
+end box
+
+box PKB #Pink
+participant PKBReader
+end box
+
+SPA     ->      QPS     :   processQueries
+activate QPS
+activate PKBReader
+
+QPS     ->      Tokenizer   :   tokenize()
+activate Tokenizer
+Tokenizer       ->      QPS     :   tokenizedQuery
+deactivate Tokenizer
+
+QPS     ->      Validator   :   validate()
+activate Validator
+Validator       ->      QPS
+deactivate Validator
+
+QPS     ->      Parser      :   tokenizedQuery
+activate Parser
+Parser      ->      QPS     :   parsedClauseArguments
+deactivate Parser
+
+QPS     ->      Evaluator   :   parsedClauseArguments
+activate Evaluator
+Evaluator       ->      PKBReader
+PKBReader       ->      Evaluator
+Evaluator       ->      QPS
+deactivate Evaluator
+
+QPS     ->      SPA     :   results
+deactivate QPS
+@enduml
