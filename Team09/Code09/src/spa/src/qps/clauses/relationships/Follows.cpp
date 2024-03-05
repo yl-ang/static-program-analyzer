@@ -35,15 +35,15 @@ ClauseResult Follows::evaluateSynonymWildcard(PKBFacadeReader& reader) {
         StmtNum stmtNum = stmt.stmtNum;
         std::optional<StmtNum> stmtNumOpt;
         if (followeeIsSynonym) {
-            // Get all stmts that are followed by some other stmt
-            stmtNumOpt = reader.getFollowee(stmtNum);
-        } else {
-            // Get all stmts that are following some other stmt
+            // Check that this stmt has a follower
             stmtNumOpt = reader.getFollower(stmtNum);
+        } else {
+            // Check that this stmt follows some followee
+            stmtNumOpt = reader.getFollowee(stmtNum);
         }
 
         if (stmtNumOpt.has_value()) {
-            values.push_back(std::to_string(stmtNumOpt.value()));
+            values.push_back(std::to_string(stmtNum));
         }
     }
 

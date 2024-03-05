@@ -33,16 +33,17 @@ ClauseResult Parent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     for (Stmt stmt : allStmts) {
         StmtNum stmtNum = stmt.stmtNum;
         if (parentIsSynonym) {
-            // Get parent of stmt
-            std::optional<StmtNum> stmtNumOpt = reader.getParent(stmtNum);
-            if (!stmtNumOpt.has_value()) {
-                continue;
-            }
-            uniqueValues.insert(stmtNumOpt.value());
-        } else {
-            // Get all children of stmt
+            // Get children of stmt. If there is children, this is a parent
             std::unordered_set<StmtNum> children = reader.getChildren(stmtNum);
-            uniqueValues.insert(children.begin(), children.end());
+            if (!children.empty()) {
+                uniqueValues.insert(stmtNum);
+            }
+        } else {
+            // Get parent of stmt. If there is a parent, this is a child
+            std::optional<StmtNum> parentOpt = reader.getParent(stmtNum);
+            if (parentOpt.has_value()) {
+                uniqueValues.insert(stmtNum);
+            }
         }
     }
 
@@ -71,7 +72,8 @@ ClauseResult Parent::evaluateSynonymInteger(PKBFacadeReader& reader) {
 
         // Since synonym is not a stmt, check if parent is of the correct type
         StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-        if (reader.getStatementByStmtNum(stmtNum)->type == synonymType) {
+        std::optional<Stmt> parentStmtOpt = reader.getStatementByStmtNum(parentStmtNumOpt.value());
+        if (parentStmtOpt.has_value() && parentStmtOpt.value().type == synonymType) {
             return {syn, {std::to_string(parentStmtNumOpt.value())}};
         }
         return {syn, {}};
@@ -86,7 +88,8 @@ ClauseResult Parent::evaluateSynonymInteger(PKBFacadeReader& reader) {
     } else {
         StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
         for (StmtNum child : children) {
-            if (reader.getStatementByStmtNum(stmtNum)->type == synonymType) {
+            std::optional<Stmt> childStmtOpt = reader.getStatementByStmtNum(child);
+            if (childStmtOpt.has_value() && childStmtOpt.value().type == synonymType) {
                 values.push_back(std::to_string(child));
             }
         }
