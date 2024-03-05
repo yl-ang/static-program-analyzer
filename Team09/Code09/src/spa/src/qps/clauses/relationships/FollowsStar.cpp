@@ -35,15 +35,15 @@ ClauseResult FollowsStar::evaluateSynonymWildcard(PKBFacadeReader& reader) {
         StmtNum stmtNum = stmt.stmtNum;
         std::optional<StmtNum> stmtNumOpt;
         if (followeeIsSynonym) {
-            // Get all stmts that are followed by some other stmt
-            stmtNumOpt = reader.getFollowee(stmtNum);
-        } else {
-            // Get all stmts that are following some other stmt
+            // If stmt has a follower, then this is a followee
             stmtNumOpt = reader.getFollower(stmtNum);
+        } else {
+            // If stmt has a followee, then this is a follower
+            stmtNumOpt = reader.getFollowee(stmtNum);
         }
 
         if (stmtNumOpt.has_value()) {
-            values.push_back(std::to_string(stmtNumOpt.value()));
+            values.push_back(std::to_string(stmtNum));
         }
     }
 
@@ -63,7 +63,7 @@ ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader) {
         stmtNums = reader.getFollowersStar(stmtNum);
     }
 
-    if (stmtNums.size() == 0) {
+    if (stmtNums.empty()) {
         return {syn, {}};
     }
 
@@ -95,15 +95,28 @@ ClauseResult FollowsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym followerSyn = dynamic_cast<Synonym&>(follower);
 
     std::vector<Synonym> synonyms = {followeeSyn, followerSyn};
+    if (followeeSyn == followerSyn) {
+        return {synonyms, {}};
+    }
+
     SynonymValues followeeValues{};
     SynonymValues followerValues{};
 
     for (const Stmt& followee : reader.getStmts()) {
+        if (followeeSyn.getType() != DesignEntityType::STMT &&
+            DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followeeSyn.getType()] != followee.type) {
+            continue;
+        }
         std::string followeeStmtNumStr = std::to_string(followee.stmtNum);
 
         for (StmtNum followerStmtNum : reader.getFollowersStar(followee.stmtNum)) {
-            followeeValues.push_back(followeeStmtNumStr);
-            followerValues.push_back(std::to_string(followerStmtNum));
+            std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNum);
+            if (followerSyn.getType() == DesignEntityType::STMT ||
+                (followerStmtOpt.has_value() &&
+                 followerStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followerSyn.getType()])) {
+                followeeValues.push_back(followeeStmtNumStr);
+                followerValues.push_back(std::to_string(followerStmtNum));
+            }
         }
     }
 

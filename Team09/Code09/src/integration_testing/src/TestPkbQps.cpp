@@ -37,9 +37,11 @@ public:  // NOLINT
 
         REQUIRE(allSynonymValues.size() == expectedValues.size());
 
-        if (allSynonymValues.size() == 0) {
+        if (allSynonymValues.empty()) {
             return *this;
         }
+
+        REQUIRE(allSynonymValues[0].size() == expectedValues[0].size());
 
         std::unordered_set<std::string> entries{};
         for (int i = 0; i < allSynonymValues[0].size(); i++) {
@@ -275,19 +277,27 @@ TEST_CASE("Parent* relationship with no synonyms") {
         SECTION("ParentT(Synonym, Integer)") {
             Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
 
-            ParentStarTester{pfr, stmtSyn, new Integer("10")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7"}});
+            ParentStarTester{pfr, stmtSyn, new Integer("10")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7", "9"}});
             ParentStarTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             ParentStarTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
+            ParentStarTester{pfr, whileSyn, new Integer("10")}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            ParentStarTester{pfr, assignSyn, new Integer("10")}.testSynonyms({*assignSyn}).testSynonymValues({{}});
         }
 
         SECTION("ParentT(Integer, Synonym)") {
             Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
             ParentStarTester{pfr, new Integer("7"), stmtSyn}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"8", "9", "10", "11", "12"}});
             ParentStarTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             ParentStarTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            ParentStarTester{pfr, new Integer("7"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{"8"}});
         }
 
         SECTION("ParentT(Synonym, Wildcard)") {
@@ -296,6 +306,9 @@ TEST_CASE("Parent* relationship with no synonyms") {
             ParentStarTester{pfr, stmtSyn, new Wildcard()}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"3", "7", "9"}});
+
+            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
+            ParentStarTester{pfr, whileSyn, new Wildcard()}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
         }
 
         SECTION("ParentT(Wildcard, Synonym)") {
@@ -304,6 +317,9 @@ TEST_CASE("Parent* relationship with no synonyms") {
             ParentStarTester{pfr, new Wildcard(), stmtSyn}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"4", "5", "8", "9", "12", "10", "11"}});
+
+            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
+            ParentStarTester{pfr, new Wildcard(), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"9"}});
         }
     }
 
@@ -311,9 +327,22 @@ TEST_CASE("Parent* relationship with no synonyms") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
 
+        ParentStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
         ParentStarTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues({{"3", "3", "7", "7", "7", "9", "9"}, {"4", "5", "8", "9", "12", "10", "11"}});
+            .testSynonymValues(
+                {{"3", "3", "7", "7", "7", "7", "7", "9", "9"}, {"4", "5", "8", "9", "12", "10", "11", "10", "11"}});
+
+        Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
+        ParentStarTester{pfr, whileSyn, stmtSyn2}
+            .testSynonyms({*whileSyn, *stmtSyn2})
+            .testSynonymValues({{"7", "7", "7", "7", "7"}, {"8", "9", "12", "10", "11"}});
+
+        Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+        ParentStarTester{pfr, stmtSyn1, assignSyn}
+            .testSynonyms({*stmtSyn1, *assignSyn})
+            .testSynonymValues({{"3", "7"}, {"5", "8"}});
     }
 }
 
@@ -349,11 +378,14 @@ TEST_CASE("SuchThatClause evaluate for parent relationship") {
     SECTION("1 Synonym") {
         SECTION("Parent(Synonym, Integer)") {
             Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
             ParentTester{pfr, stmtSyn, new Integer("4")}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
-            ParentTester{pfr, stmtSyn, new Integer("10")}.testSynonyms({*stmtSyn}).testSynonymValues({{"9"}});
+            ParentTester{pfr, stmtSyn, new Integer("8")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7"}});
             ParentTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             ParentTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
+            ParentTester{pfr, ifSyn, new Integer("4")}.testSynonyms({*ifSyn}).testSynonymValues({{"3"}});
+            ParentTester{pfr, ifSyn, new Integer("8")}.testSynonyms({*ifSyn}).testSynonymValues({{}});
         }
 
         SECTION("Parent(Integer, Synonym)") {
@@ -362,20 +394,28 @@ TEST_CASE("SuchThatClause evaluate for parent relationship") {
             ParentTester{pfr, new Integer("7"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"8", "9", "12"}});
             ParentTester{pfr, new Integer("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             ParentTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            ParentTester{pfr, new Integer("7"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{"8"}});
+            ParentTester{pfr, new Integer("9"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
         }
 
         SECTION("Parent(Synonym, Wildcard)") {
             Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
             ParentTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"3", "7", "9"}});
+
+            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
+            ParentTester{pfr, whileSyn, new Wildcard()}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
         }
 
         SECTION("Parent(Wildcard, Synonym)") {
             Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
             ParentTester{pfr, new Wildcard(), stmtSyn}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"4", "5", "8", "9", "12", "10", "11"}});
+
+            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
+            ParentTester{pfr, new Wildcard(), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"9"}});
         }
     }
 
@@ -383,9 +423,21 @@ TEST_CASE("SuchThatClause evaluate for parent relationship") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
 
+        ParentTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
         ParentTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues({{"3", "3", "7", "7", "7", "9", "9"}, {"4", "5", "8", "9", "12", "10", "11"}});
+
+        Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
+        ParentTester{pfr, whileSyn, stmtSyn2}
+            .testSynonyms({*whileSyn, *stmtSyn2})
+            .testSynonymValues({{"7", "7", "7"}, {"8", "9", "12"}});
+
+        Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+        ParentTester{pfr, stmtSyn1, assignSyn}
+            .testSynonyms({*stmtSyn1, *assignSyn})
+            .testSynonymValues({{"3", "7"}, {"5", "8"}});
     }
 }
 
@@ -511,6 +563,10 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
             FollowsStarTester{pfr, stmtSyn, new Integer("12")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7"}});
             FollowsStarTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             FollowsStarTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsStarTester{pfr, readSyn, new Integer("2")}.testSynonyms({*readSyn}).testSynonymValues({{}});
+            FollowsStarTester{pfr, readSyn, new Integer("3")}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
         }
 
         SECTION("FollowsT(Integer, Synonym)") {
@@ -521,6 +577,12 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
             FollowsStarTester{pfr, new Integer("7"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"12"}});
             FollowsStarTester{pfr, new Integer("12"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             FollowsStarTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            FollowsStarTester{pfr, new Integer("1"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsStarTester{pfr, new Integer("1"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
         }
 
         SECTION("FollowsT(Synonym, Wildcard)") {
@@ -528,6 +590,11 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
             FollowsStarTester{pfr, stmtSyn, new Wildcard()}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"1", "2", "3", "7", "8"}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            FollowsStarTester{pfr, assignSyn, new Wildcard()}
+                .testSynonyms({*assignSyn})
+                .testSynonymValues({{"1", "8"}});
         }
 
         SECTION("FollowsT(Wildcard, Synonym)") {
@@ -535,6 +602,9 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
             FollowsStarTester{pfr, new Wildcard(), stmtSyn}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"2", "3", "6", "12", "9"}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsStarTester{pfr, readSyn, new Wildcard()}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
         }
     }
 
@@ -544,6 +614,16 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
         FollowsStarTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues({{"1", "1", "1", "2", "2", "3", "7", "8"}, {"2", "3", "6", "3", "6", "6", "12", "9"}});
+
+        FollowsStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
+        Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+        // such that Follows(re, s2)
+        FollowsStarTester{pfr, readSyn, stmtSyn2}
+            .testSynonyms({*readSyn, *stmtSyn2})
+            .testSynonymValues({{"2", "2"}, {"3", "6"}});
+        // such that Follows(s1, re)
+        FollowsStarTester{pfr, stmtSyn1, readSyn}.testSynonyms({*stmtSyn1, *readSyn}).testSynonymValues({{"1"}, {"2"}});
     }
 }
 
@@ -582,6 +662,10 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
             FollowsTester{pfr, stmtSyn, new Integer("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
             FollowsTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             FollowsTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsTester{pfr, readSyn, new Integer("2")}.testSynonyms({*readSyn}).testSynonymValues({{}});
+            FollowsTester{pfr, readSyn, new Integer("3")}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
         }
 
         SECTION("Follows(Integer, Synonym)") {
@@ -589,6 +673,16 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
             FollowsTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
             FollowsTester{pfr, new Integer("11"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
             FollowsTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            FollowsTester{pfr, new Integer("1"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsTester{pfr, new Integer("1"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
+
+            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
+            FollowsTester{pfr, new Integer("2"), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"3"}});
+            FollowsTester{pfr, new Integer("2"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{}});
         }
 
         SECTION("Follows(Synonym, Wildcard)") {
@@ -596,6 +690,9 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
             FollowsTester{pfr, stmtSyn, new Wildcard()}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"1", "2", "3", "7", "8"}});
+
+            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
+            FollowsTester{pfr, assignSyn, new Wildcard()}.testSynonyms({*assignSyn}).testSynonymValues({{"1", "8"}});
         }
 
         SECTION("Follows(Wildcard, Synonym)") {
@@ -603,6 +700,9 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
             FollowsTester{pfr, new Wildcard(), stmtSyn}
                 .testSynonyms({*stmtSyn})
                 .testSynonymValues({{"2", "3", "6", "9", "12"}});
+
+            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+            FollowsTester{pfr, new Wildcard(), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
         }
     }
 
@@ -610,9 +710,17 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
 
-        // Select s1 such that Follows(s1, s2)
+        FollowsTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
+        // such that Follows(s1, s2)
         FollowsTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues({{"1", "2", "3", "7", "8"}, {"2", "3", "6", "12", "9"}});
+
+        Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
+        // such that Follows(re, s2)
+        FollowsTester{pfr, readSyn, stmtSyn2}.testSynonyms({*readSyn, *stmtSyn2}).testSynonymValues({{"2"}, {"3"}});
+        // such that Follows(s1, re)
+        FollowsTester{pfr, stmtSyn1, readSyn}.testSynonyms({*stmtSyn1, *readSyn}).testSynonymValues({{"1"}, {"2"}});
     }
 }
