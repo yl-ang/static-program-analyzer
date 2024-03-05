@@ -54,10 +54,10 @@ TEST_CASE("AST Build Tests") {
 
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(nameNode));
-        children.push_back(std::move(integerNode));
+        children.push_back(nameNode);
+        children.push_back(integerNode);
 
-        ASTNode expectedNode = ASTNode("", "assign", std::move(children), 0);
+        ASTNode expectedNode = ASTNode("", "assign", children, 0);
 
         auto result = ast.buildAssignmentAST(queue);
         REQUIRE(expectedNode == *(result.get()));
@@ -78,11 +78,11 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
 
         // Populating the children _after_ running the method
-        children.push_back(std::move(nameNode));
-        children.push_back(std::move(integerNode));
+        children.push_back(nameNode);
+        children.push_back(integerNode);
 
         // Now we can create the expectedNode as children has been fully constructed.
-        ASTNode expectedNode = ASTNode("", "assign", std::move(children), 0);
+        ASTNode expectedNode = ASTNode("", "assign", children, 0);
 
         REQUIRE(expectedNode == *(result.get()));  // Now this should work
     }
@@ -99,10 +99,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(constNode));
-        children.push_back(std::move(const2Node));
+        children.push_back(constNode);
+        children.push_back(const2Node);
 
-        auto addNode = ASTNode("", "add", std::move(children), 0);
+        auto addNode = ASTNode("", "add", children, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -124,15 +124,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
 
-        children1.push_back(std::move(addNode));
-        children1.push_back(std::move(zNode));
+        children1.push_back(addNode);
+        children1.push_back(zNode);
 
-        auto addNode2 = ASTNode("", "add", std::move(children1), 0);
+        auto addNode2 = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode2 == *(result.get()));
     }
@@ -150,10 +150,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(xtNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xtNode);
+        children.push_back(yNode);
 
-        auto mulNode = ASTNode("", "mul", std::move(children), 0);
+        auto mulNode = ASTNode("", "mul", children, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -176,14 +176,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(yNode));
-        children.push_back(std::move(zNode));
+        children.push_back(yNode);
+        children.push_back(zNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children), 0);
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(mulNode));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        children1.push_back(xNode);
+        children1.push_back(mulNode);
 
-        auto addNode = ASTNode("", "add", std::move(children1), 0);
+        auto addNode = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -206,15 +206,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children), 0);
-        children1.push_back(std::move(mulNode));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        children1.push_back(mulNode);
 
-        children1.push_back(std::move(zNode));
+        children1.push_back(zNode);
 
-        auto addNode = ASTNode("", "add", std::move(children1), 0);
+        auto addNode = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -241,15 +241,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
-        auto equalNode = std::make_shared<ASTNode>("", "assign", std::move(children), 1);
+        children.push_back(xNode);
+        children.push_back(yNode);
+        auto equalNode = std::make_shared<ASTNode>("", "assign", children, 1);
 
-        children1.push_back(std::move(equalNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", std::move(children1));
+        children1.push_back((equalNode));
+        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
 
-        children2.push_back(std::move(stmtList));
-        auto procedure = ASTNode("a", "proc", std::move(children2));
+        children2.push_back(stmtList);
+        auto procedure = ASTNode("a", "proc", children2);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -267,8 +267,8 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(aNode));
-        auto expectedNode = ASTNode("", "read", std::move(children), 0);
+        children.push_back(aNode);
+        auto expectedNode = ASTNode("", "read", children, 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -293,14 +293,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
 
-        children.push_back(std::move(yNode));
-        auto readNode = std::make_shared<ASTNode>("", "read", std::move(children), 0);
+        children.push_back(yNode);
+        auto readNode = std::make_shared<ASTNode>("", "read", children, 0);
 
-        children1.push_back(std::move(readNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", std::move(children1));
+        children1.push_back((readNode));
+        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
 
-        children2.push_back(std::move(stmtList));
-        auto procedure = ASTNode("a", "proc", std::move(children2));
+        children2.push_back(stmtList);
+        auto procedure = ASTNode("a", "proc", children2);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -319,8 +319,8 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(aNode));
-        auto expectedNode = ASTNode("", "print", std::move(children), 0);
+        children.push_back(aNode);
+        auto expectedNode = ASTNode("", "print", children, 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -345,14 +345,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
 
-        children.push_back(std::move(yNode));
-        auto printNode = std::make_shared<ASTNode>("", "print", std::move(children), 0);
+        children.push_back(yNode);
+        auto printNode = std::make_shared<ASTNode>("", "print", children, 0);
 
-        children1.push_back(std::move(printNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", std::move(children1));
+        children1.push_back((printNode));
+        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
 
-        children2.push_back(std::move(stmtList));
-        auto procedure = ASTNode("a", "proc", std::move(children2));
+        children2.push_back(stmtList);
+        auto procedure = ASTNode("a", "proc", children2);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -372,10 +372,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(constNode));
-        children.push_back(std::move(const2Node));
+        children.push_back((constNode));
+        children.push_back((const2Node));
 
-        auto addNode = ASTNode("", "add", std::move(children), 0);
+        auto addNode = ASTNode("", "add", children, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -397,10 +397,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(constNode));
-        children.push_back(std::move(const2Node));
+        children.push_back((constNode));
+        children.push_back((const2Node));
 
-        auto addNode = ASTNode("", "add", std::move(children), 0);
+        auto addNode = ASTNode("", "add", children, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -425,15 +425,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children), 0);
-        children1.push_back(std::move(mulNode));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        children1.push_back(mulNode);
 
-        children1.push_back(std::move(zNode));
+        children1.push_back(zNode);
 
-        auto addNode = ASTNode("", "add", std::move(children1), 0);
+        auto addNode = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -460,15 +460,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children), 0);
-        children1.push_back(std::move(mulNode));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        children1.push_back(mulNode);
 
-        children1.push_back(std::move(zNode));
+        children1.push_back(zNode);
 
-        auto addNode = ASTNode("", "add", std::move(children1), 0);
+        auto addNode = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -517,15 +517,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
-        children1.push_back(std::move(addNode));
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        children1.push_back(addNode);
 
-        children1.push_back(std::move(zNode));
+        children1.push_back(zNode);
 
-        auto mulNode = ASTNode("", "mul", std::move(children1), 0);
+        auto mulNode = ASTNode("", "mul", children1, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -548,15 +548,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(bNode));
-        children.push_back(std::move(cNode));
+        children.push_back(bNode);
+        children.push_back(cNode);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
-        children1.push_back(std::move(aNode));
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        children1.push_back(aNode);
 
-        children1.push_back(std::move(addNode));
+        children1.push_back(addNode);
 
-        auto mulNode = ASTNode("", "mul", std::move(children1), 0);
+        auto mulNode = ASTNode("", "mul", children1, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -585,18 +585,18 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
-        children1.push_back(std::move(zNode));
-        children1.push_back(std::move(addNode));
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        children1.push_back(zNode);
+        children1.push_back(addNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children1), 0);
-        children2.push_back(std::move(mulNode));
-        children2.push_back(std::move(zNode2));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
+        children2.push_back(mulNode);
+        children2.push_back(zNode2);
 
-        auto addNode2 = ASTNode("", "add", std::move(children2), 0);
+        auto addNode2 = ASTNode("", "add", children2, 0);
 
         REQUIRE(addNode2 == *(result.get()));
     }
@@ -640,14 +640,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(yNode));
-        children.push_back(std::move(zNode));
+        children.push_back(yNode);
+        children.push_back(zNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children), 0);
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(mulNode));
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        children1.push_back(xNode);
+        children1.push_back(mulNode);
 
-        auto addNode = ASTNode("", "add", std::move(children1), 0);
+        auto addNode = ASTNode("", "add", children1, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -668,9 +668,9 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(zNode));
-        children.push_back(std::move(oneNode));
-        auto lessThan = ASTNode("", "<", std::move(children), 0);
+        children.push_back(zNode);
+        children.push_back(oneNode);
+        auto lessThan = ASTNode("", "<", children, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -690,9 +690,9 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(zNode));
-        children.push_back(std::move(yNode));
-        auto lessThan = ASTNode("", "<", std::move(children), 0);
+        children.push_back(zNode);
+        children.push_back(yNode);
+        auto lessThan = ASTNode("", "<", children, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -711,10 +711,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(oneNode));
-        children.push_back(std::move(zNode));
+        children.push_back(oneNode);
+        children.push_back(zNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children), 0);
+        auto lessThan = ASTNode("", "<", children, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -734,10 +734,10 @@ TEST_CASE("AST Build Tests") {
             std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
-        children.push_back(std::move(oneNode));
-        children.push_back(std::move(twoNode));
+        children.push_back(oneNode);
+        children.push_back(twoNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children), 0);
+        auto lessThan = ASTNode("", "<", children, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -759,14 +759,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
-        children1.push_back(std::move(zNode));
-        children1.push_back(std::move(addNode));
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        children1.push_back(zNode);
+        children1.push_back(addNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children1), 0);
+        auto lessThan = ASTNode("", "<", children1, 0);
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildRelationalExpressionAST(queue);
         REQUIRE(lessThan == *(result.get()));
@@ -792,20 +792,20 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(std::move(xNode2));
-        children.push_back(std::move(yNode2));
+        children.push_back(xNode2);
+        children.push_back(yNode2);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
 
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(yNode));
+        children1.push_back(xNode);
+        children1.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children1), 0);
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
 
-        children2.push_back(std::move(mulNode));
-        children2.push_back(std::move(addNode));
+        children2.push_back(mulNode);
+        children2.push_back(addNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children2), 0);
+        auto lessThan = ASTNode("", "<", children2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -834,20 +834,20 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(std::move(xNode2));
-        children.push_back(std::move(yNode2));
+        children.push_back(xNode2);
+        children.push_back(yNode2);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
 
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(yNode));
+        children1.push_back(xNode);
+        children1.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children1), 0);
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
 
-        children2.push_back(std::move(mulNode));
-        children2.push_back(std::move(addNode));
+        children2.push_back(mulNode);
+        children2.push_back(addNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children2), 0);
+        auto lessThan = ASTNode("", "<", children2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -876,20 +876,20 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(std::move(xNode2));
-        children.push_back(std::move(yNode2));
+        children.push_back(xNode2);
+        children.push_back(yNode2);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
 
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(yNode));
+        children1.push_back(xNode);
+        children1.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children1), 0);
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
 
-        children2.push_back(std::move(mulNode));
-        children2.push_back(std::move(addNode));
+        children2.push_back(mulNode);
+        children2.push_back(addNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children2), 0);
+        auto lessThan = ASTNode("", "<", children2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -918,20 +918,20 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children1 = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(std::move(xNode2));
-        children.push_back(std::move(yNode2));
+        children.push_back(xNode2);
+        children.push_back(yNode2);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", std::move(children), 0);
+        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
 
-        children1.push_back(std::move(xNode));
-        children1.push_back(std::move(yNode));
+        children1.push_back(xNode);
+        children1.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", std::move(children1), 0);
+        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
 
-        children2.push_back(std::move(mulNode));
-        children2.push_back(std::move(addNode));
+        children2.push_back(mulNode);
+        children2.push_back(addNode);
 
-        auto lessThan = ASTNode("", "<", std::move(children2), 0);
+        auto lessThan = ASTNode("", "<", children2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -955,14 +955,14 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
         std::vector<std::shared_ptr<ASTNode>> children3 = {};
 
-        children2.push_back(std::move(xNode));
-        children2.push_back(std::move(yNode));
+        children2.push_back(xNode);
+        children2.push_back(yNode);
 
-        auto lessThan = std::make_shared<ASTNode>("", "<", std::move(children2), 0);
+        auto lessThan = std::make_shared<ASTNode>("", "<", children2, 0);
 
-        children3.push_back(std::move(lessThan));
+        children3.push_back(lessThan);
 
-        auto notNode = ASTNode("", "!", std::move(children3), 0);
+        auto notNode = ASTNode("", "!", children3, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -992,17 +992,17 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children = {};
         std::vector<std::shared_ptr<ASTNode>> children2 = {};
         std::vector<std::shared_ptr<ASTNode>> children3 = {};
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto lessThan = std::make_shared<ASTNode>("", "<", std::move(children), 0);
-        children2.push_back(std::move(xNode1));
-        children2.push_back(std::move(yNode1));
+        auto lessThan = std::make_shared<ASTNode>("", "<", children, 0);
+        children2.push_back(xNode1);
+        children2.push_back(yNode1);
 
-        auto moreThan = std::make_shared<ASTNode>("", ">", std::move(children2), 0);
-        children3.push_back(std::move(lessThan));
-        children3.push_back(std::move(moreThan));
-        auto andandNode = ASTNode("", "&&", std::move(children3), 0);
+        auto moreThan = std::make_shared<ASTNode>("", ">", children2, 0);
+        children3.push_back(lessThan);
+        children3.push_back(moreThan);
+        auto andandNode = ASTNode("", "&&", children3, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -1061,32 +1061,32 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children6 = {};
         std::vector<std::shared_ptr<ASTNode>> children7 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto lessThan = std::make_shared<ASTNode>("", "==", std::move(children), 0);
-        children2.push_back(std::move(xNode1));
-        children2.push_back(std::move(yNode1));
+        auto lessThan = std::make_shared<ASTNode>("", "==", children, 0);
+        children2.push_back(xNode1);
+        children2.push_back(yNode1);
 
-        auto moreThan = std::make_shared<ASTNode>("", "!=", std::move(children2), 0);
-        children3.push_back(std::move(lessThan));
-        children3.push_back(std::move(moreThan));
-        auto andandNode = std::make_shared<ASTNode>("", "&&", std::move(children3), 0);
+        auto moreThan = std::make_shared<ASTNode>("", "!=", children2, 0);
+        children3.push_back(lessThan);
+        children3.push_back(moreThan);
+        auto andandNode = std::make_shared<ASTNode>("", "&&", children3, 0);
 
-        children4.push_back(std::move(xNode2));
-        children4.push_back(std::move(yNode2));
+        children4.push_back(xNode2);
+        children4.push_back(yNode2);
 
-        children7.push_back(std::move(andandNode));
+        children7.push_back(andandNode);
 
-        auto notNode = std::make_shared<ASTNode>("", "!", std::move(children7), 0);
+        auto notNode = std::make_shared<ASTNode>("", "!", children7, 0);
 
-        auto assign = std::make_shared<ASTNode>("", "assign", std::move(children4), 0);
-        children6.push_back(std::move(assign));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", std::move(children6));
+        auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
+        children6.push_back(assign);
+        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children6);
 
-        children5.push_back(std::move(notNode));
-        children5.push_back(std::move(stmtList));
-        auto expected = WhileNode(std::move(children5), 0);
+        children5.push_back(notNode);
+        children5.push_back(stmtList);
+        auto expected = WhileNode(children5, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -1153,36 +1153,36 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::shared_ptr<ASTNode>> children7 = {};
         std::vector<std::shared_ptr<ASTNode>> children8 = {};
 
-        children.push_back(std::move(xNode));
-        children.push_back(std::move(yNode));
+        children.push_back(xNode);
+        children.push_back(yNode);
 
-        auto lessThan = std::make_shared<ASTNode>("", "<", std::move(children), 0);
-        children2.push_back(std::move(xNode1));
-        children2.push_back(std::move(yNode1));
+        auto lessThan = std::make_shared<ASTNode>("", "<", children, 0);
+        children2.push_back(xNode1);
+        children2.push_back(yNode1);
 
-        auto moreThan = std::make_shared<ASTNode>("", ">", std::move(children2), 0);
-        children3.push_back(std::move(lessThan));
-        children3.push_back(std::move(moreThan));
-        auto andandNode = std::make_shared<ASTNode>("", "&&", std::move(children3), 0);
+        auto moreThan = std::make_shared<ASTNode>("", ">", children2, 0);
+        children3.push_back(lessThan);
+        children3.push_back(moreThan);
+        auto andandNode = std::make_shared<ASTNode>("", "&&", children3, 0);
 
-        children4.push_back(std::move(xNode2));
-        children4.push_back(std::move(yNode2));
+        children4.push_back(xNode2);
+        children4.push_back(yNode2);
 
-        auto assign = std::make_shared<ASTNode>("", "assign", std::move(children4), 0);
-        children5.push_back(std::move(assign));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", std::move(children5));
+        auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
+        children5.push_back(assign);
+        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children5);
 
-        children6.push_back(std::move(aNode));
-        children6.push_back(std::move(bNode));
-        auto assign1 = std::make_shared<ASTNode>("", "assign", std::move(children6), 0);
-        children7.push_back(std::move(assign1));
-        auto stmtList2 = std::make_shared<ASTNode>("", "stmtList", std::move(children7));
+        children6.push_back(aNode);
+        children6.push_back(bNode);
+        auto assign1 = std::make_shared<ASTNode>("", "assign", children6, 0);
+        children7.push_back(assign1);
+        auto stmtList2 = std::make_shared<ASTNode>("", "stmtList", children7);
 
-        children8.push_back(std::move(andandNode));
-        children8.push_back(std::move(stmtList));
-        children8.push_back(std::move(stmtList2));
+        children8.push_back(andandNode);
+        children8.push_back(stmtList);
+        children8.push_back(stmtList2);
 
-        auto expected = IfNode(std::move(children8), 0);
+        auto expected = IfNode(children8, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
