@@ -63,7 +63,7 @@ ClauseResult FollowsStar::evaluateSynonymInteger(PKBFacadeReader& reader) {
         stmtNums = reader.getFollowersStar(stmtNum);
     }
 
-    if (stmtNums.size() == 0) {
+    if (stmtNums.empty()) {
         return {syn, {}};
     }
 

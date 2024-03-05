@@ -73,7 +73,8 @@ ClauseResult ParentStar::evaluateSynonymInteger(PKBFacadeReader& reader) {
     } else {
         StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
         for (StmtNum stmt : stmtNums) {
-            if (reader.getStatementByStmtNum(stmt)->type == synonymType) {
+            std::optional<Stmt> stmtOpt = reader.getStatementByStmtNum(stmt);
+            if (stmtOpt.has_value() && stmtOpt.value().type == synonymType) {
                 values.push_back(std::to_string(stmt));
             }
         }
