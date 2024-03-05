@@ -196,7 +196,7 @@ std::vector<ClauseArgument*> PQLParser::buildSTParameters(const std::vector<Syno
     std::vector<ClauseArgument*> results{};
     for (const std::string& str : strings) {
         if (isQuotedIdent(str)) {
-            results.push_back(new Literal(str));
+            results.push_back(new Literal(removeAllQuotations(removeAllWhitespaces(str))));
         } else if (isWildcard(str)) {
             results.push_back(new Wildcard());
         } else if (isInteger(str)) {
@@ -231,7 +231,7 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
 
     // second argument is ent-ref
     if (isQuotedIdent(ptEntRef)) {
-        results.push_back(new Literal(ptEntRef));
+        results.push_back(new Literal(removeAllQuotations(removeAllWhitespaces(ptEntRef))));
     } else if (isWildcard(ptEntRef)) {
         results.push_back(new Wildcard());
     } else if (isSynonym(ptEntRef)) {
@@ -241,7 +241,7 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
     }
 
     // third argument is expression-spec
-    results.push_back(new ExpressionSpec(removeAllWhitespaces(ptExpressionSpec)));
+    results.push_back(new ExpressionSpec(removeAllQuotations(removeAllWhitespaces(ptExpressionSpec))));
     return results;
 }
 

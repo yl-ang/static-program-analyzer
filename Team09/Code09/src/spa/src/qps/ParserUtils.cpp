@@ -21,6 +21,15 @@ std::string removeAllWhitespaces(std::string str) {
     return replacedString;
 }
 
+std::string removeAllQuotations(std::string str) {
+    std::string replacedString;
+
+    std::regex quotationsPattern = std::regex("[" + QUOTATIONS + "]");
+    replacedString = std::regex_replace(str, quotationsPattern, "");
+
+    return replacedString;
+}
+
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;

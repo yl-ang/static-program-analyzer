@@ -352,7 +352,7 @@ TEST_CASE("PQLParser: Select ... pattern (1)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    ExpressionSpec l = ExpressionSpec("\"x+y\"");
+    ExpressionSpec l = ExpressionSpec("x+y");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
                                        static_cast<ClauseArgument*>(&l));
     REQUIRE(result_1.size() == 1);
@@ -378,7 +378,7 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
+    ExpressionSpec l = ExpressionSpec("_x+y_");
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
                                        static_cast<ClauseArgument*>(&l));
     REQUIRE(result_1.size() == 1);
@@ -405,9 +405,9 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     Synonym v2 = Synonym(DesignEntityType::VARIABLE, "v2");
-    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-    ExpressionSpec ew = ExpressionSpec("\"Whatever\"");
-    Literal lw = Literal("\"Whatever\"");
+    ExpressionSpec l = ExpressionSpec("_x+y_");
+    ExpressionSpec ew = ExpressionSpec("Whatever");
+    Literal lw = Literal("Whatever");
     Wildcard w = Wildcard();
     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
                                        static_cast<ClauseArgument*>(&l));
