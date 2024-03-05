@@ -77,7 +77,7 @@ ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader) {
         return {syn, {std::to_string(stmtNumOpt.value())}};
     }
 
-    return {syn, {std::to_string(stmtNumOpt.value())}};
+    return {syn, {}};
 }
 
 ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
@@ -88,14 +88,24 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues followerValues{};
 
     for (const Stmt& followee : reader.getStmts()) {
+        if (followeeSyn.getType() != DesignEntityType::STMT &&
+            DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followeeSyn.getType()] != followee.type) {
+            continue;
+        }
         StmtNum followeeStmtNum = followee.stmtNum;
         std::optional<StmtNum> followerStmtNumOpt = reader.getFollower(followeeStmtNum);
         if (!followerStmtNumOpt.has_value()) {
             continue;
         }
 
-        followeeValues.push_back(std::to_string(followeeStmtNum));
-        followerValues.push_back(std::to_string(followerStmtNumOpt.value()));
+        std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNumOpt.value());
+
+        if (followerSyn.getType() == DesignEntityType::STMT ||
+            (followerStmtOpt.has_value() &&
+             followerStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followerSyn.getType()])) {
+            followeeValues.push_back(std::to_string(followeeStmtNum));
+            followerValues.push_back(std::to_string(followerStmtNumOpt.value()));
+        }
     }
 
     std::vector<Synonym> synonyms{followeeSyn, followerSyn};

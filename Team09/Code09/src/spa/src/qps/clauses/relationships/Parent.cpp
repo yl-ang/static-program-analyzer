@@ -105,14 +105,23 @@ ClauseResult Parent::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues childValues{};
 
     for (const Stmt& child : reader.getStmts()) {
+        if (childSyn.getType() != DesignEntityType::STMT &&
+            DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[childSyn.getType()] != child.type) {
+            continue;
+        }
         StmtNum childStmtNum = child.stmtNum;
         std::optional<StmtNum> parentStmtNumOpt = reader.getParent(childStmtNum);
         if (!parentStmtNumOpt.has_value()) {
             continue;
         }
 
-        parentValues.push_back(std::to_string(parentStmtNumOpt.value()));
-        childValues.push_back(std::to_string(childStmtNum));
+        std::optional<Stmt> parentStmtOpt = reader.getStatementByStmtNum(parentStmtNumOpt.value());
+        if (parentSyn.getType() == DesignEntityType::STMT ||
+            (parentStmtOpt.has_value() &&
+             DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[parentSyn.getType()] == parentStmtOpt.value().type)) {
+            parentValues.push_back(std::to_string(parentStmtNumOpt.value()));
+            childValues.push_back(std::to_string(childStmtNum));
+        }
     }
 
     std::vector<Synonym> synonyms{parentSyn, childSyn};
