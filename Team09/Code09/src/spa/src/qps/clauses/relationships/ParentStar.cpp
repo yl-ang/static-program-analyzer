@@ -91,6 +91,11 @@ ClauseResult ParentStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym parentSyn = dynamic_cast<Synonym&>(parent);
     Synonym childSyn = dynamic_cast<Synonym&>(child);
 
+    std::vector<Synonym> synonyms{parentSyn, childSyn};
+    if (parentSyn == childSyn) {
+        return {synonyms, {}};
+    }
+
     SynonymValues parentValues{};
     SynonymValues childValues{};
 
@@ -113,7 +118,6 @@ ClauseResult ParentStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
         }
     }
 
-    std::vector<Synonym> synonyms{parentSyn, childSyn};
     std::vector<SynonymValues> synonymValues{parentValues, childValues};
 
     return {synonyms, synonymValues};

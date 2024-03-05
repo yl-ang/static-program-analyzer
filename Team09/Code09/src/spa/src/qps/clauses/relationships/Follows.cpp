@@ -84,6 +84,11 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym followeeSyn = dynamic_cast<Synonym&>(followee);
     Synonym followerSyn = dynamic_cast<Synonym&>(follower);
 
+    std::vector<Synonym> synonyms{followeeSyn, followerSyn};
+    if (followeeSyn == followerSyn) {
+        return {synonyms, {}};
+    }
+
     SynonymValues followeeValues{};
     SynonymValues followerValues{};
 
@@ -108,7 +113,6 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
         }
     }
 
-    std::vector<Synonym> synonyms{followeeSyn, followerSyn};
     std::vector<SynonymValues> synonymValues{followeeValues, followerValues};
 
     return {synonyms, synonymValues};

@@ -327,6 +327,8 @@ TEST_CASE("Parent* relationship with no synonyms") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
 
+        ParentStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
         ParentStarTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues(
@@ -420,6 +422,8 @@ TEST_CASE("SuchThatClause evaluate for parent relationship") {
     SECTION("2 Synonyms") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+
+        ParentTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
 
         ParentTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
@@ -611,6 +615,8 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship") {
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues({{"1", "1", "1", "2", "2", "3", "7", "8"}, {"2", "3", "6", "3", "6", "6", "12", "9"}});
 
+        FollowsStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+
         Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
         // such that Follows(re, s2)
         FollowsStarTester{pfr, readSyn, stmtSyn2}
@@ -703,6 +709,8 @@ TEST_CASE("SuchThatClause evaluate for follows relationship") {
     SECTION("Follows with 2 synonyms") {
         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+
+        FollowsTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
 
         // such that Follows(s1, s2)
         FollowsTester{pfr, stmtSyn1, stmtSyn2}
