@@ -16,17 +16,18 @@ please use visual Studio debugger breakpoint, and configure launch.vs.json prope
 1. Open your shell in IDE or stand-alone terminal , ensure you are in the Tests09 directory.
 2. Run "run_autotester.bat" file in the Tests09 directory. This will run all the system tests files in the 3 milestone
 folders.
-3. Run "run_localhost.bat" file  in the Tests09 directory. This start 3 localhost servers at ports 8000, 8001, and 8002.
-4. Open your browser and goto each localhost endpoints to view output (http://localhost:8000/, http://localhost:8001/, 
-http://localhost:8002/)
+3. Run "run_localhost.bat" file  in the Tests09 directory. This start 3 localhost servers at ports 8001, 8002, and 8003.
+4. Open your browser and goto each localhost endpoints to view output (http://localhost:8001/, http://localhost:8002/, 
+http://localhost:8003/)
 
 ### Mac
 
 1. Open your shell in IDE or stand-alone terminal , ensure you are in the Tests09 directory.
 2. Run "run_autotester.sh" file in the Tests09 directory. This will run all the system tests files in the 3 milestone
    folders.
-3. Run "run_localhost.sh" file  in the Tests09 directory. This start 3 localhost servers at ports 8000, 8001, and 8002.
-4. Open your browser and goto each localhost endpoints to view output.
+3. Run "run_localhost.sh" file  in the Tests09 directory. This start 3 localhost servers at ports 8001, 8002, and 8003.
+4. Open your browser and goto each localhost endpoints to view output (http://localhost:8001/, http://localhost:8002/,
+   http://localhost:8003/)
 
 ### Potential Issues
 1. Mac users, if autotester binary not found, please locate the autotester binary (copy the path), and 
