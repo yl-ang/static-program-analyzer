@@ -2,9 +2,9 @@
 
 CURRENT_DIR="$(dirname "$(realpath "$0")")"
 
+# Team (Mac => Replace with your path autotester.exe path)
 AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe"
 
-# Set the path to the Tests09 folder
 TESTS_FOLDER="."
 
 for MILESTONE_FOLDER in "$TESTS_FOLDER"/milestone*/; do
