@@ -1,0 +1,40 @@
+procedure Animals {
+  read elephant;
+  iteration = 1;
+  totalAnimals = 0;
+  additionalVar1 = 42;
+  additionalVar2 = totalAnimals + 100;
+
+  while (!(iteration < 5)) {
+    tiger = elephant + 2;
+    monkeyCount = 1;
+
+    while (((elephant == totalAnimals - monkeyCount * elephant) || (((9999 - tiger == monkeyCount - 1234 * iteration + tiger - iteration * iteration / 111 % 222 % 333) || ((tiger + tiger + monkeyCount> 2 * tiger) || (8888 > tiger))) && (elephant == tiger + iteration))) || (2024 % iteration - tiger - 332 + monkeyCount != monkeyCount * monkeyCount % monkeyCount * 2020)) {
+      lionCount = 1;
+      totalAnimals = totalAnimals + elephant;
+      newVar = totalAnimals - iteration;
+
+      while (!((tiger <= 100) || (10101 > elephant))) {
+        monkeyCount = monkeyCount + 2;
+        tiger = tiger * 2;
+        totalAnimals = totalAnimals * monkeyCount;
+        lionCount = lionCount + 1;
+        additionalVar1 = additionalVar1 + 1;
+        additionalVar2 = additionalVar2 - 5;
+      }
+
+      monkeyCount = monkeyCount + 1;
+    }
+
+    iteration = iteration + 1;
+    additionalVar1 = additionalVar1 * 2;
+  }
+
+  while (!(((iteration != totalAnimals % elephant) && (!(elephant * 17 + monkeyCount - 2 * x + totalAnimals / elephant + lionCount + tiger / lionCount + iteration + monkeyCount % totalAnimals + 1111 - tiger % 22228888 / totalAnimals + elephant + 641111 < elephant * totalAnimals - tiger - totalAnimals))) && (totalAnimals / totalAnimals - elephant + 9092229 - 50 / tiger != monkeyCount / k % elephant))) {
+    elephant = elephant + 1;
+    totalAnimals = totalAnimals - 1;
+    additionalVar2 = additionalVar2 * 3;
+  }
+
+  totalAnimals = totalAnimals + iteration + additionalVar1 + additionalVar2;
+}
