@@ -3,7 +3,7 @@
 CURRENT_DIR="$(dirname "$(realpath "$0")")"
 
 # Team (Mac => Replace with your path autotester.exe path)
-AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe"
+AUTOTESTER_BINARY="$CURRENT_DIR/../../Code09/cmake-build-release/src/autotester/autotester"
 
 TESTS_FOLDER="."
 
