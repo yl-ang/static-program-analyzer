@@ -1,0 +1,120 @@
+1 - Procedure Entity
+procedure pr;
+Select pr
+A
+5000
+2 - Statement Entity
+stmt s;
+Select s
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+5000
+3 - Read Entity
+read r;
+Select r
+1, 2, 4
+5000
+4 - Print Entity
+print p;
+Select p
+6, 7, 10
+5000
+5 - Assign Entity
+assign a;
+Select a
+3, 9
+5000
+6 - Call Entity
+call c;
+Select c
+none
+5000
+7 - While Entity
+while w;
+Select w
+8
+5000
+8 - If Entity
+if i;
+Select i
+5
+5000
+9 - Variable Entity
+variable v;
+Select v
+x1, x2, x, y
+5000
+10 - Constant Entity
+constant c;
+Select c
+1
+5000
+11 - Follows Relation Get all followee
+stmt s1, s2;
+Select s1 such that Follows(s1, s2)
+1, 2, 3, 4, 5, 8
+5000
+12 - Follows Relation Get all follower
+stmt s1, s2;
+Select s2 such that Follows(s1, s2)
+2, 3, 4, 5, 8, 10
+5000
+13 - Follows Star Relation Get all followee star
+stmt s1, s2;
+Select s1 such that Follows*(s1, s2)
+1, 2, 3, 4, 5, 8
+5000
+14 - Follows Star Relation Get all follower star
+stmt s1, s2;
+Select s2 such that Follows*(s1, s2)
+2, 3, 4, 5, 8, 10
+5000
+15 - Parent Relation Get all parent
+stmt s1, s2;
+Select s1 such that Parent(s1, s2)
+5, 8
+5000
+16 - Parent Relation Get all child
+stmt s1, s2;
+Select s2 such that Parent(s1, s2)
+6, 7, 9
+5000
+17 - Parent Star Relation Get all parent star
+stmt s1, s2;
+Select s1 such that Parent*(s1, s2)
+5, 8
+5000
+18 - Parent Star Relation Get all child star
+stmt s1, s2;
+Select s2 such that Parent*(s1, s2)
+6, 7, 9
+5000
+19 - Use Statement Relation Get all statement
+stmt s; variable v;
+Select s such that Uses(s, v)
+3, 5, 6, 7, 8, 9, 10
+5000
+20 - Use Statement Relation Get all variable
+stmt s; variable v;
+Select v such that Uses(s, v)
+x1, x2, x, y
+5000
+21 - Modifies Statement Relation Get all statement
+stmt s; variable v;
+Select s such that Modifies(s, v)
+1, 2, 3, 4, 8, 9
+5000
+22 - Modifies Statement Relation Get all variable
+stmt s; variable v;
+Select v such that Modifies(s, v)
+x1, x2, x, y
+5000
+23 - Assign Partial Pattern
+assign a;
+Select a pattern a ( _ , _"x1"_)
+3, 9
+5000
+24 - One Such That One Pattern
+assign a;
+Select a pattern a ( _ , _"x1"_) such that Modifies(a, "x1")
+9
+5000
