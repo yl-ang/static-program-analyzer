@@ -21,7 +21,8 @@ for /D %%M in (%TESTS_FOLDER%\milestone*) do (
     set "SOURCE_FILE=!MILESTONE_FOLDER!\milestone!MILESTONE_NUMBER!_source_!i!.txt"
 
     :: Check if the source file exists
-    while exist "!SOURCE_FILE!" (
+    if exist "!SOURCE_FILE!" (
+        :process_files
         set "QUERIES_FILE=!MILESTONE_FOLDER!\milestone!MILESTONE_NUMBER!_queries_!i!.txt"
         set "OUTPUT_FILE=!MILESTONE_FOLDER!\milestone!MILESTONE_NUMBER!_out_!i!.xml"
 
@@ -31,6 +32,7 @@ for /D %%M in (%TESTS_FOLDER%\milestone*) do (
         set /a i+=1
 
         set "SOURCE_FILE=!MILESTONE_FOLDER!\milestone!MILESTONE_NUMBER!_source_!i!.txt"
+        if exist "!SOURCE_FILE!" goto :process_files
     )
 )
 endlocal
