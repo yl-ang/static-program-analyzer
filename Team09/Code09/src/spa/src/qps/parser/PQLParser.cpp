@@ -241,7 +241,16 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
     }
 
     // third argument is expression-spec
-    results.push_back(new ExpressionSpec(removeAllQuotations(removeAllWhitespaces(ptExpressionSpec))));
+    if (isExpressionSpec(ptExpressionSpec)) {
+        if (isWildcard(ptExpressionSpec)) {
+            results.push_back(new Wildcard());
+        } else {
+            results.push_back(new ExpressionSpec(removeAllQuotations(removeAllWhitespaces(ptExpressionSpec))));
+        }
+    } else {
+        throw Exception("Pattern Expression-spec is not expression-spec or wildcard: " + ptEntRef);
+    }
+    
     return results;
 }
 
