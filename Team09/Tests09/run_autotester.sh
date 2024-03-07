@@ -1,9 +1,14 @@
 #!/bin/bash
 
 CURRENT_DIR="$(dirname "$(realpath "$0")")"
+AUTOTESTER_BINARY=
 
-# Team (Mac => Replace with your path autotester.exe path)
-AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe"
+case "$OSTYPE" in
+  darwin*)  AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/build/src/autotester/autotester" ;;
+  msys*)    AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe" ;;
+  cygwin*)  AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe" ;;
+  *)        echo "unknown: $OSTYPE" ;;
+esac
 
 TESTS_FOLDER="."
 
