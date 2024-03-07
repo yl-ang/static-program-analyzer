@@ -19,9 +19,13 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
     }
 
     std::vector<Table> clauseTables{};
-    for (ClauseResult result : clauseResults) {
-        // 1. Check if all Boolean results are true. If a single false, short-circuit and return empty.
+    for (const ClauseResult& result : clauseResults) {
+        // 1. Check if all Boolean results are true.
         if (result.isBoolean() && !result.getBoolean()) {
+            if (result.getBoolean()) {
+                continue;
+            }
+            // If a single false, short-circuit and return empty.
             return {};
         }
 
