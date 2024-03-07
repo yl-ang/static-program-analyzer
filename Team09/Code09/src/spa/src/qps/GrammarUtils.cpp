@@ -34,8 +34,9 @@ bool isEntRef(std::string str) {
 
 // TODO(Han Qin): Redo isExpressionSpec after Milestone 1.
 bool isExpressionSpec(std::string str) {
-    return std::regex_match(removeAllWhitespaces(str), std::regex("^_*\"(?:(?:0|[1-9][0-9]*)|[a-zA-Z][a-zA-Z0-9*+]*)\"_*$")) ||
-           isWildcard(str);
+    return std::regex_match(removeAllWhitespaces(str),
+            std::regex("^_*\"(?:(?:0|[1-9][0-9]*)|[a-zA-Z][a-zA-Z0-9*+]*)\"_*$")) ||
+            isWildcard(str);
 }
 
 bool isSelectStatement(std::string str) {
