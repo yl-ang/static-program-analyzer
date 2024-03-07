@@ -29,8 +29,10 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
             return {};
         }
 
-        // 2. Consolidate all tables.
+        // 2. Check if a table has common synonyms with the select clause.
         std::vector<Synonym> headers = result.getSynonyms();
+
+        // 3. Consolidate the table
         std::vector<ColumnData> columns = result.getAllSynonymValues();
         clauseTables.push_back(Table{headers, columns});
     }
@@ -44,7 +46,21 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
         result = result.join(clauseTables[i]);
     }
 
-    return result.extractResults(selectEntities);
+    bool hasCommonSynonyms = false;
+    for (Synonym header : result.getHeaders()) {
+        if (std::find(selectEntities.begin(), selectEntities.end(), header) != selectEntities.end()) {
+            hasCommonSynonyms = true;
+            break;
+        }
+    }
+
+    if (hasCommonSynonyms) {
+        return result.extractResults(selectEntities);
+    }
+    if (result.isEmpty()) {
+        return {};
+    }
+    return buildSelectTable(pkb).extractResults(selectEntities);
 }
 
 std::vector<Synonym> Query::getSelectEntities() const {
