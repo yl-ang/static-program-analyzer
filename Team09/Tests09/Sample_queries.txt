@@ -1,2 +1,0 @@
-variable v;
-Select v
