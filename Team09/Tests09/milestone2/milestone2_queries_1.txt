@@ -176,10 +176,55 @@ none
 33 - Follows while, assign, get Followee
 while w; assign a;
 Select w such that Follows(w, a)
-none
+13,23,9
 5000
 34 - Follows while, assign, get Follower
 while w; assign a;
 Select a such that Follows(w, a)
+20,21,27
+5000
+35 - Follows while, print, get Followee
+while w; print p;
+Select w such that Follows(w, p)
+none
+5000
+36 - Follows while, print, get Follower
+while w; print p;
+Select p such that Follows(w, p)
+none
+5000
+37 - Follows while, wildcard
+while w;
+Select w such that Follows(w, _)
+13,23,6,9
+5000
+38 - Follows print, assign, get Followee
+print p; assign a;
+Select p such that Follows(p, a)
+none
+5000
+39 - Follows print, assign, get Follower
+print p; assign a;
+Select a such that Follows(p, a)
+none
+5000
+40 - Follows print, if, get Followee
+print p; if i;
+Select p such that Follows(p, i)
+none
+5000
+42 - Follows print, if, get Follower
+print p; if i;
+Select i such that Follows(p, i)
+none
+5000
+43 - Follows print, wildcard
+print p;
+Select p such that Follows(p, _)
+none
+5000
+44 - Follows wildcard, print
+print p;
+Select p such that Follows(_, p)
 none
 5000
