@@ -21,7 +21,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
     std::vector<Table> clauseTables{};
     for (const ClauseResult& result : clauseResults) {
         // 1. Check if all Boolean results are true.
-        if (result.isBoolean() && !result.getBoolean()) {
+        if (result.isBoolean()) {
             if (result.getBoolean()) {
                 continue;
             }
