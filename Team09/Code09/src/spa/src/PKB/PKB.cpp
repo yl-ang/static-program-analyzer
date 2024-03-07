@@ -12,4 +12,6 @@ PKB::PKB() noexcept {
     usesStore = std::make_shared<UsesStore>();
     modifiesStore = std::make_shared<ModifiesStore>();
     patternStore = std::make_shared<PatternStore>();
+
+    nextStore = std::make_shared<NextStore>();
 }
