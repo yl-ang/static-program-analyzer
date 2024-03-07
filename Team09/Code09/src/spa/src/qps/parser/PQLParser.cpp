@@ -250,7 +250,7 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
     } else {
         throw Exception("Pattern Expression-spec is not expression-spec or wildcard: " + ptEntRef);
     }
-    
+
     return results;
 }
 
