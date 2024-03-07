@@ -167,7 +167,7 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
         std::vector<ClauseArgument*> entityVector{buildPatternParameters(entities, parameterStringsToParse)};
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
     } else {
-        throw Exception("Cannot convert string to SuchThatClause: " + str);
+        throw Exception("Cannot convert string to PatternClause: " + str);
     }
 }
 
