@@ -129,7 +129,7 @@ TEST_CASE("validateSuchThatClause") {
     std::string inputString_Uses_VALID = "such that Uses(s1,v)";
     REQUIRE(validator.testIsValidSuchThatClause(inputString_Uses_VALID));
 
-    std::string inputString_Follows_Stmt_INVALID = "such that Follows(s3,2)";
+    std::string inputString_Follows_Stmt_INVALID = "such that Follows(s4,2)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
 
     std::string inputString_Parent_FirstArgVariable_INVALID = "such that Parent(v,s1)";

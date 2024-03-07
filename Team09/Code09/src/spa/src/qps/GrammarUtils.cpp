@@ -42,7 +42,7 @@ bool isRelRef(const std::string& str) {
 // TODO(Han Qin): Redo isExpressionSpec after Milestone 1.
 bool isExpressionSpec(const std::string& str) {
     return std::regex_match(str, std::regex("^_\\s*\"(?:(?:0|[1-9][0-9]*)|[a-zA-Z][a-zA-Z0-9]*)\"\\s*_$")) ||
-        isWildcard(str);
+           isWildcard(str);
 }
 
 bool isSelectStatement(const std::string& str) {

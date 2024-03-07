@@ -6,12 +6,12 @@
 #include "ArgumentsValidator/ModifiesValidator.h"
 #include "ArgumentsValidator/ParentValidator.h"
 #include "ArgumentsValidator/UsesValidator.h"
-#include "qps/exceptions/QPSSemanticError.h"
-#include "qps/exceptions/QPSSyntaxError.h"
+#include "SynonymStore.h"
 #include "qps/GrammarUtils.h"
 #include "qps/ParserUtils.h"
 #include "qps/QPSConstants.h"
-#include "SynonymStore.h"
+#include "qps/exceptions/QPSSemanticError.h"
+#include "qps/exceptions/QPSSyntaxError.h"
 
 class Validator {
 public:

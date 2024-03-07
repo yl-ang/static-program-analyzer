@@ -17,8 +17,7 @@ void FollowsValidator::validateSemantic(SynonymStore* store) {
     for (const std::string& arg : args) {
         // Ensure that synonym is in the store and statement subtype
         if (isSynonym(arg)) {
-            if (!store->containsSynonymName(arg) ||
-                store->containsSynonym(arg, QPSConstants::VARIABLE) ||
+            if (!store->containsSynonymName(arg) || store->containsSynonym(arg, QPSConstants::VARIABLE) ||
                 store->containsSynonym(arg, QPSConstants::CONSTANT) ||
                 store->containsSynonym(arg, QPSConstants::PROCEDURE)) {
                 throw QPSSemanticError();

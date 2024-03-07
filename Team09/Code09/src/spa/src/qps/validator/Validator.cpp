@@ -10,7 +10,7 @@ void Validator::validate(std::vector<std::string> statementList) {
             validateSelectStatement(statement);
         } else {
             // NOTE: This is thrown when and empty string is made here
-            // TODO (Han Qin): Add test case to test this
+            // TODO(Han Qin): Add test case to test this
             throw QPSSyntaxError();
         }
     }
@@ -78,7 +78,8 @@ void Validator::validateReturnClause(const std::string& returnClause) {
 }
 
 void Validator::validateSuchThatClause(const std::string& suchThatClause) {
-    bool hasProperStructure = std::regex_match(suchThatClause, std::regex("^" + QPSConstants::SUCH_THAT + " .*\\([^)]*\\)$"));
+    bool hasProperStructure =
+        std::regex_match(suchThatClause, std::regex("^" + QPSConstants::SUCH_THAT + " .*\\([^)]*\\)$"));
     if (!hasProperStructure) {
         throw QPSSyntaxError();
     }
@@ -111,7 +112,8 @@ void Validator::validateRelRef(const std::string& relRefWord) {
     delete argValidator;
 }
 
-ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString, const std::vector<std::string>& arguments) {
+ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString,
+                                                 const std::vector<std::string>& arguments) {
     if (relRefString == QPSConstants::FOLLOWS || relRefString == QPSConstants::FOLLOWS_STAR) {
         return new FollowsValidator(arguments);
     } else if (relRefString == QPSConstants::PARENT || relRefString == QPSConstants::PARENT_STAR) {
@@ -126,7 +128,8 @@ ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString
 }
 
 void Validator::validatePatternClause(const std::string& patternClause) {
-    bool hasProperStructure = std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
+    bool hasProperStructure =
+        std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
     if (!hasProperStructure) {
         throw QPSSyntaxError();
     }

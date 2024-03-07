@@ -2,9 +2,9 @@
 #include <vector>
 
 #include "ArgumentsValidator.h"
+#include "qps/GrammarUtils.h"
 #include "qps/exceptions/QPSSemanticError.h"
 #include "qps/exceptions/QPSSyntaxError.h"
-#include "qps/GrammarUtils.h"
 
 class ModifiesValidator : public ArgumentsValidator {
 public:

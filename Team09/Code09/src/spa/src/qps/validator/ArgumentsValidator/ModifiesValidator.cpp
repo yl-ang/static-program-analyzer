@@ -22,8 +22,7 @@ void ModifiesValidator::validateSemantic(SynonymStore* store) {
     }
 
     if (isSynonym(arg1)) {
-        if (!store->containsSynonymName(arg1) ||
-            store->containsSynonym(arg1, QPSConstants::PRINT) ||
+        if (!store->containsSynonymName(arg1) || store->containsSynonym(arg1, QPSConstants::PRINT) ||
             store->containsSynonym(arg1, QPSConstants::CONSTANT) ||
             store->containsSynonym(arg1, QPSConstants::VARIABLE)) {
             throw QPSSemanticError();

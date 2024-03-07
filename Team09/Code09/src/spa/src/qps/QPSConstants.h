@@ -15,8 +15,8 @@ struct QPSConstants {
     inline static const std::string PROCEDURE = "procedure";
 
     inline static const std::string DESIGN_ENTITIES = STMT + '|' + READ + '|' + PRINT + '|' + CALL + '|' + WHILE + '|' +
-        IF + '|' + ASSIGN + '|' + VARIABLE + '|' + CONSTANT + '|' +
-        PROCEDURE;
+                                                      IF + '|' + ASSIGN + '|' + VARIABLE + '|' + CONSTANT + '|' +
+                                                      PROCEDURE;
 
     inline static const std::string FOLLOWS = "Follows";
     inline static const std::string FOLLOWS_STAR = "Follows*";
@@ -25,7 +25,8 @@ struct QPSConstants {
     inline static const std::string USES = "Uses";
     inline static const std::string MODIFIES = "Modifies";
 
-    inline static const std::string REL_REF = FOLLOWS + '|' + FOLLOWS_STAR + '|' + PARENT + '|' + PARENT_STAR + '|' + USES + '|' + MODIFIES;
+    inline static const std::string REL_REF =
+        FOLLOWS + '|' + FOLLOWS_STAR + '|' + PARENT + '|' + PARENT_STAR + '|' + USES + '|' + MODIFIES;
 
     inline static const std::string SELECT = "Select";
     inline static const std::string SUCH_THAT = "such that";
