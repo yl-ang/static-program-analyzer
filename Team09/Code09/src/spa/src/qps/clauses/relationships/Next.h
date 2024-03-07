@@ -3,12 +3,13 @@
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "Relationship.h"
 #include "qps/clauseArguments/ClauseArgument.h"
+#include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
-class Parent : public Relationship {
+class Next : public Relationship {
 private:
-    ClauseArgument& parent;
-    ClauseArgument& child;
+    ClauseArgument& currentStmt;
+    ClauseArgument& nextStmt;
 
     /**
      * Check if the result is a simple boolean result.
@@ -22,7 +23,7 @@ private:
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Parent(ClauseArgument&, ClauseArgument&);
+    Next(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
 };
