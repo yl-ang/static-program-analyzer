@@ -142,7 +142,7 @@ SuchThatClause PQLParser::toSTClause(std::vector<Synonym> entities, std::string 
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
         std::vector<ClauseArgument*> entityVector{buildSTParameters(entities, parameterStringsToParse)};
-        return SuchThatClause(SuchThatClause::determineRelationshipType(type), entityVector[0], entityVector[1]);
+        return SuchThatClause(Relationship::determineRelationshipType(type), entityVector[0], entityVector[1]);
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
     }
