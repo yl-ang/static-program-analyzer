@@ -5,6 +5,20 @@ Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& 
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
+    std::vector<QueryClause*> clauses{};
+    clauses.insert(clauses.end(), suchThatClauses.begin(), suchThatClauses.end());
+    clauses.insert(clauses.end(), patternClauses.begin(), patternClauses.end());
+
+    // get truthy clauses first
+    std::vector<QueryClause*> truthyClauses{};
+    for (QueryClause* clause : clauses) {
+        if (clause->evaluate(pkb).isBoolean() && clause->evaluate(pkb).getBoolean()) {
+            truthyClauses.push_back(clause);
+        }
+    }
+
+    // OLD ALGORITHM
+
     std::vector<ClauseResult> clauseResults{};
     for (SuchThatClause stc : suchThatClauses) {
         clauseResults.push_back(stc.evaluate(pkb));

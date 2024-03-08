@@ -35,6 +35,10 @@ ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     return {{}, {}};
 }
 
+bool PatternClause::isBooleanResult() const {
+    return false;
+}
+
 ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable

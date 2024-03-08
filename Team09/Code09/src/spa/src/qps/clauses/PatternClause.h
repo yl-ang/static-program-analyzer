@@ -19,4 +19,5 @@ public:
     bool equals(const QueryClause&) const override;
     void print() const;
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool isBooleanResult() const override;
 };

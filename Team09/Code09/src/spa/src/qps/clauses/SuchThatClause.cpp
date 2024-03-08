@@ -41,6 +41,10 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     throw Exception("suchThatClauseType is not found in valid types: " + type);
 }
 
+bool SuchThatClause::isBooleanResult() const {
+    return !firstArg.isSynonym() && !secondArg.isSynonym();
+}
+
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
     switch (type) {
     case (RelationshipType::FOLLOWS):
