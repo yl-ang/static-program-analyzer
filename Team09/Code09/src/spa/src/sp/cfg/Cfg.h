@@ -7,7 +7,9 @@
 class CFG {
     PKBFacadeWriter* pkbWriter;
     // Stores a mapping from line number to the possible next line numbers it can go to.
-    std::unordered_map<int, std::vector<int>> neighborMap;
-    void buildCFG(std::shared_ptr<ProcedureNode>);
+    std::unordered_map<int, std::vector<int>> parentToChildMap;
+    void buildCFG(std::shared_ptr<ProcedureNode> procedure);
     CFG(PKBFacadeWriter* pkbWriter);
+    void buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int nextLineNumber);
+    void insertIntoCFGMap(int parentStatementNumber, int childStatementNumber);
 };
