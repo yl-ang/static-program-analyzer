@@ -167,7 +167,7 @@ PatternClause PQLParser::toPatternClause(std::vector<Synonym> entities, std::str
         std::vector<ClauseArgument*> entityVector{buildPatternParameters(entities, parameterStringsToParse)};
         return PatternClause(entityVector[0], entityVector[1], entityVector[2]);
     } else {
-        throw Exception("Cannot convert string to SuchThatClause: " + str);
+        throw Exception("Cannot convert string to PatternClause: " + str);
     }
 }
 
@@ -240,8 +240,17 @@ std::vector<ClauseArgument*> PQLParser::buildPatternParameters(const std::vector
         throw Exception("Issues determining if Pattern EntRef is literal, wildcard, or synonym: " + ptEntRef);
     }
 
-    // third argument is expression-spec
-    results.push_back(new ExpressionSpec(removeAllQuotations(removeAllWhitespaces(ptExpressionSpec))));
+    // third argument is expression-spec OR wildcard
+    if (isExpressionSpec(ptExpressionSpec)) {
+        if (isWildcard(ptExpressionSpec)) {
+            results.push_back(new Wildcard());
+        } else {
+            results.push_back(new ExpressionSpec(removeAllWhitespaces(ptExpressionSpec)));
+        }
+    } else {
+        throw Exception("Pattern Expression-spec is not expression-spec or wildcard: " + ptEntRef);
+    }
+
     return results;
 }
 
