@@ -12,7 +12,7 @@ private:
     const std::string str;
     std::unique_ptr<ParsingStrategy> strategy_;
 public:
-    explicit UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
+    UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
     void set_strategy(std::unique_ptr<ParsingStrategy> &&strategy);
     std::unique_ptr<QueryClause> execute();
 };

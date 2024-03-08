@@ -5,12 +5,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../GrammarUtils.h"
-#include "../ParserUtils.h"
+#include "../../GrammarUtils.h"
+#include "../../ParserUtils.h"
 #include "StrategyUtils.h"
-#include "../QPSRegexes.h"
-#include "../exceptions/Exception.h"
-#include "../clauses/QueryClause.h"
+#include "../../QPSRegexes.h"
+#include "../../exceptions/Exception.h"
+#include "../../clauses/QueryClause.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Literal.h"

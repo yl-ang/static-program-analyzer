@@ -2,10 +2,6 @@
 
 #include <iostream>
 
-#include "../GrammarUtils.h"
-#include "../ParserUtils.h"
-#include "../exceptions/Exception.h"
-
 // Checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
@@ -89,6 +85,7 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<Synonym> 
     for (std::string clauseString : searchClause(QPSRegexes::SUCHTHAT_CLAUSE, unparsedClauses)) {
         // replaced only the below line for strategy pattern refactor
         // SuchThatClause st = toSTClause(entities, clauseString);
+        // UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
         UnparsedClause unparsedClause = UnparsedClause(entities, clauseString, std::make_unique<SuchThatStrategy>());
         std::unique_ptr<QueryClause> qc = unparsedClause.execute();
         SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());

@@ -1,7 +1,7 @@
 #include "StrategyUtils.h"
-#include "../ParserUtils.h"
+#include "../../ParserUtils.h"
 
-#include "../exceptions/Exception.h"
+#include "../../exceptions/Exception.h"
 
 /**
  * Helper function to toSTClause, toPatternClause

@@ -3,15 +3,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "UnparsedClause.h"
-#include "parsingStrategies/ParsingStrategy.h"
-#include "parsingStrategies/PatternStrategy.h"
-#include "parsingStrategies/SuchThatStrategy.h"
-#include "parsingStrategies/StrategyUtils.h"
-#include "../ParserUtils.h"
-#include "../QPSRegexes.h"
-#include "../clauses/QueryClause.h"
-#include "../evaluator/Query.h"
+#include "qps/parser/parsingStrategies/ParsingStrategy.h"
+#include "qps/parser/parsingStrategies/PatternStrategy.h"
+#include "qps/parser/parsingStrategies/SuchThatStrategy.h"
+#include "qps/parser/parsingStrategies/StrategyUtils.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Literal.h"
@@ -19,6 +14,13 @@
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/ExpressionSpec.h"
+#include "UnparsedClause.h"
+#include "../GrammarUtils.h"
+#include "../ParserUtils.h"
+#include "../exceptions/Exception.h"
+#include "../QPSRegexes.h"
+#include "../clauses/QueryClause.h"
+#include "../evaluator/Query.h"
 
 typedef std::vector<std::string> UnparsedQuery;
 
