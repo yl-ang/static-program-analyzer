@@ -11,7 +11,8 @@ UnparsedClause::UnparsedClause(const std::string input, std::unique_ptr<ParsingS
 void UnparsedClause::set_strategy(std::unique_ptr<ParsingStrategy> &&strategy){
     strategy_ = std::move(strategy);
 }
-    
-void UnparsedClause::execute() {
-    
+
+std::unique_ptr<QueryClause> UnparsedClause::execute() {
+    std::unique_ptr<QueryClause> result = strategy_->execute(input);
+    return result;
 }

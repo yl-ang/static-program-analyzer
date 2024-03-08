@@ -5,10 +5,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../GrammarUtils.h"
 #include "../ParserUtils.h"
-#include "../QPSRegexes.cpp"
+#include "StrategyUtils.h"
+#include "../QPSRegexes.h"
+#include "../exceptions/Exception.h"
 #include "../clauses/QueryClause.h"
-#include "../evaluator/Query.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Literal.h"
@@ -20,5 +22,5 @@
 class ParsingStrategy {
 public:
     virtual ~ParsingStrategy(){};
-    virtual QueryClause execute(const std::string input) const = 0;
+    virtual std::unique_ptr<QueryClause> execute(std::vector<Synonym> entities, std::string str) const = 0;
 };

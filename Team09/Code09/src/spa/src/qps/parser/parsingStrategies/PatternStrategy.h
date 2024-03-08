@@ -1,9 +1,13 @@
 #pragma once
 
 #include "ParsingStrategy.h"
-#include <string>
+
+#include "../clauses/PatternClause.h"
 
 class PatternStrategy : public ParsingStrategy {
+private:
+    static std::vector<ClauseArgument*> buildPatternParameters(const std::vector<Synonym>&, 
+                                                            const std::vector<std::string>&);                                                          
 public:
-    QueryClause execute(const std::string input) const override;
+    std::unique_ptr<QueryClause> execute(std::vector<Synonym> entities, std::string str) const override;
 };

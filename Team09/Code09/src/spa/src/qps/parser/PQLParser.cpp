@@ -87,6 +87,7 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::vector<Synonym> entities,
 std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
     std::vector<SuchThatClause> result = {};  // if there is none
     for (std::string clauseString : searchClause(QPSRegexes::SUCHTHAT_CLAUSE, unparsedClauses)) {
+        // just this line
         SuchThatClause st = toSTClause(entities, clauseString);
         result.push_back(st);
     }
