@@ -1,9 +1,10 @@
 #include "UnparsedClause.h"
 
-UnparsedClause::UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy)
+UnparsedClause::UnparsedClause(std::vector<Synonym> entities, std::string str,
+                            std::unique_ptr<ParsingStrategy> &&strategy)
     : entities(entities), str(str), strategy_(std::move(strategy)) {}
-    
-void UnparsedClause::set_strategy(std::unique_ptr<ParsingStrategy> &&strategy){
+
+void UnparsedClause::set_strategy(std::unique_ptr<ParsingStrategy> &&strategy) {
     strategy_ = std::move(strategy);
 }
 

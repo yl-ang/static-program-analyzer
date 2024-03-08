@@ -8,7 +8,8 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::vector<Synonym> enti
 
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
         std::vector<ClauseArgument*> entityVector{buildSTParameters(entities, parameterStringsToParse)};
-        return std::make_unique<SuchThatClause>(RelationshipBuilder::determineRelationshipType(type), entityVector[0], entityVector[1]);
+        return std::make_unique<SuchThatClause>(RelationshipBuilder::determineRelationshipType(type),
+                                                entityVector[0], entityVector[1]);
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
     }
