@@ -1,8 +1,8 @@
 #pragma once
 
 #include "QueryClause.h"
-#include "relationships/Follows.h"
 #include "relationships/Relationship.h"
+#include "relationships/RelationshipBuilder.h"
 
 class SuchThatClause : public QueryClause {
 private:
