@@ -2,26 +2,24 @@
 
 void NextStore::setNextStore(const std::unordered_set<std::pair<StmtNum, StmtNum>>& nextSet) {
     for (const auto& pair : nextSet) {
-        StmtNum s1 = pair.first;
-        StmtNum s2 = pair.second;
+        StmtNum nextee = pair.first;
+        StmtNum nexter = pair.second;
 
-        nexterMap[s1].insert(s2);
-        nexteeMap[s2].insert(s1);
+        nexterMap[nextee].insert(nexter);
+        nexteeMap[nexter].insert(nextee);
     }
 }
 
 std::unordered_set<StmtNum> NextStore::getNexter(StmtNum nextee) {
-    auto it = nexteeMap.find(nextee);
-    if (it != nexteeMap.end()) {
-        return it->second;
+    if (nexterMap.count(nextee)) {
+        return nexterMap[nextee];
     }
     return {};
 }
 
 std::unordered_set<StmtNum> NextStore::getNextee(StmtNum nexter) {
-    auto it = nexterMap.find(nexter);
-    if (it != nexterMap.end()) {
-        return it->second;
+    if (nexteeMap.count(nexter)) {
+        return nexteeMap[nexter];
     }
     return {};
 }
