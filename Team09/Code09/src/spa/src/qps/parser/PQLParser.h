@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../ParserUtils.h"
+#include "../QPSRegexes.cpp"
 #include "../clauses/QueryClause.h"
 #include "../evaluator/Query.h"
 #include "qps/clauseArguments/Synonym.h"
