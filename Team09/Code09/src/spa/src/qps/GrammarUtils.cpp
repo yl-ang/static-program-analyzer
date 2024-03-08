@@ -39,7 +39,6 @@ bool isRelRef(const std::string& str) {
     return std::regex_search(str, std::regex(pattern));
 }
 
-// TODO(Han Qin): Redo isExpressionSpec after Milestone 1.
 bool isExpressionSpec(const std::string& str) {
     if (isWildcard(str)) {
         return true;
