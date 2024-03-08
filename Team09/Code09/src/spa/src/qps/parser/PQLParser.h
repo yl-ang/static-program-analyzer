@@ -17,8 +17,6 @@
 
 typedef std::vector<std::string> UnparsedQuery;
 
-typedef std::tuple<std::vector<Synonym>, std::vector<QueryClause*>> ParsedQuery;
-
 class PQLParser {
 private:
     static std::string getQueryClauses(UnparsedQuery);
