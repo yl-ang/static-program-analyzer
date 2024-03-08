@@ -19,14 +19,20 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
     }
 
     std::vector<Table> clauseTables{};
-    for (ClauseResult result : clauseResults) {
-        // 1. Check if all Boolean results are true. If a single false, short-circuit and return empty.
-        if (result.isBoolean() && !result.getBoolean()) {
+    for (const ClauseResult& result : clauseResults) {
+        // 1. Check if all Boolean results are true.
+        if (result.isBoolean()) {
+            if (result.getBoolean()) {
+                continue;
+            }
+            // If a single false, short-circuit and return empty.
             return {};
         }
 
-        // 2. Consolidate all tables.
+        // 2. Check if a table has common synonyms with the select clause.
         std::vector<Synonym> headers = result.getSynonyms();
+
+        // 3. Consolidate the table
         std::vector<ColumnData> columns = result.getAllSynonymValues();
         clauseTables.push_back(Table{headers, columns});
     }
@@ -40,7 +46,21 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
         result = result.join(clauseTables[i]);
     }
 
-    return result.extractResults(selectEntities);
+    bool hasCommonSynonyms = false;
+    for (Synonym header : result.getHeaders()) {
+        if (std::find(selectEntities.begin(), selectEntities.end(), header) != selectEntities.end()) {
+            hasCommonSynonyms = true;
+            break;
+        }
+    }
+
+    if (hasCommonSynonyms) {
+        return result.extractResults(selectEntities);
+    }
+    if (result.isEmpty()) {
+        return {};
+    }
+    return buildSelectTable(pkb).extractResults(selectEntities);
 }
 
 std::vector<Synonym> Query::getSelectEntities() const {

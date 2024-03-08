@@ -1,0 +1,230 @@
+1 - Select all statements
+stmt s;
+Select s
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 18, 20, 19, 22, 23, 24, 25, 26, 27
+5000
+2- Select all while statements
+while w;
+Select w
+6, 9, 13, 23
+5000
+3- Select all read statements
+read r;
+Select r
+1
+5000
+4- Select all variables
+variable v;
+Select v
+elephant, additionalVar1, iteration, totalAnimals, additionalVar2, tiger, x, monkeyCount, lionCount, k, newVar
+5000
+5- Select all constants
+constant c;
+Select c
+100, 1, 0, 42, 332, 5, 333, 222, 8888, 22228888, 2, 9999, 1111, 2024, 1234, 111, 2020, 10101, 17, 641111, 9092229, 50, 3
+5000
+4- Select all procedure
+procedure p;
+Select p
+Animals
+5000
+5- Follows read and wildcard, get Followee
+read r;
+Select r such that Follows(r, _)
+1
+5000
+6 - Follows read, statement, get Followee
+read r; stmt s;
+Select r such that Follows(r, s)
+1
+5000
+7 - Follows read, statement, get Follower
+read r; stmt s;
+Select s such that Follows(r, s)
+2
+5000
+8 - Follows read, call, get Followee
+read r; call c;
+Select r such that Follows(r, c)
+none
+5000
+9 - Follows read, call, get Follower
+read r; call c;
+Select r such that Follows(r, c)
+none
+5000
+10 - Follows read, print, get Followee
+read r; print p;
+Select r such that Follows(r, p)
+none
+5000
+11 - Follows read, print, get Followee
+read r; print p;
+Select p such that Follows(r, p)
+none
+5000
+12 - Follows read, while, get Followee
+read r; while w;
+Select r such that Follows(r, w)
+none
+5000
+13 - Follows read, while, get Follower
+read r; while w;
+Select w such that Follows(r, w)
+none
+5000
+13 - Follows read, assign, get Followee
+read r; assign a;
+Select r such that Follows(r, a)
+1
+5000
+14 - Follows read, assign, get Follower
+read r; assign a;
+Select a such that Follows(r, a)
+2
+5000
+15 - Follows read, if, get Followee
+read r; if i;
+Select r such that Follows(r, i)
+none
+5000
+16 - Follows read, if, get Follower
+read r; if i;
+Select i such that Follows(r, i)
+none
+5000
+17 - Follows read, read, expect none
+read r;
+Select r such that Follows(r, r)
+none
+5000
+18 - Follows wildcard, wildcard
+stmt s;
+Select s such that Follows(_, _)
+1,10,11,12,13,14,15,16,17,18,19,2,20,21,22,23,24,25,26,27,3,4,5,6,7,8,9
+5000
+19 - Follows call, wildcard
+call c;
+Select c such that Follows(c, _)
+none
+5000
+20 - Follows call, assign, get Followee
+call c; assign a;
+Select c such that Follows(c, a)
+none
+5000
+21 - Follows call, assign, get Follower
+call c; assign a;
+Select a such that Follows(c, a)
+none
+5000
+22 - Follows call, if, get Followee
+call c; if i;
+Select c such that Follows(c, i)
+none
+5000
+23 - Follows call, if, get Follower
+call c; if i;
+Select i such that Follows(c, i)
+none
+5000
+24 - Follows call, while, get Followee
+call c; while w;
+Select c such that Follows(c, w)
+none
+5000
+25 - Follows call, while, get Follower
+call c; while w;
+Select w such that Follows(c, w)
+none
+5000
+26 - Follows call, print, get Followee
+call c; print p;
+Select c such that Follows(c, p)
+none
+5000
+27 - Follows call, print, get Follower
+call c; print p;
+Select p such that Follows(c, p)
+none
+5000
+28 - Follows assign, call, get Follower
+assign a; call c;
+Select a such that Follows(a, c)
+none
+5000
+29 - Follows if, call, get Followee
+if i; call c;
+Select i such that Follows(i, c)
+none
+5000
+30 - Follows if, call, get Follower
+if i; call c;
+Select c such that Follows(i, c)
+none
+5000
+31 - Follows while, call, get Followee
+while w; call c;
+Select w such that Follows(w, c)
+none
+5000
+32 - Follows while, call, get Follower
+while w; call c;
+Select c such that Follows(w, c)
+none
+5000
+33 - Follows while, assign, get Followee
+while w; assign a;
+Select w such that Follows(w, a)
+13,23,9
+5000
+34 - Follows while, assign, get Follower
+while w; assign a;
+Select a such that Follows(w, a)
+20,21,27
+5000
+35 - Follows while, print, get Followee
+while w; print p;
+Select w such that Follows(w, p)
+none
+5000
+36 - Follows while, print, get Follower
+while w; print p;
+Select p such that Follows(w, p)
+none
+5000
+37 - Follows while, wildcard
+while w;
+Select w such that Follows(w, _)
+13,23,6,9
+5000
+38 - Follows print, assign, get Followee
+print p; assign a;
+Select p such that Follows(p, a)
+none
+5000
+39 - Follows print, assign, get Follower
+print p; assign a;
+Select a such that Follows(p, a)
+none
+5000
+40 - Follows print, if, get Followee
+print p; if i;
+Select p such that Follows(p, i)
+none
+5000
+42 - Follows print, if, get Follower
+print p; if i;
+Select i such that Follows(p, i)
+none
+5000
+43 - Follows print, wildcard
+print p;
+Select p such that Follows(p, _)
+none
+5000
+44 - Follows wildcard, print
+print p;
+Select p such that Follows(_, p)
+none
+5000
