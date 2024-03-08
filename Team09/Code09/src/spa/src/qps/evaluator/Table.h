@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "qps/clauseArguments/Synonym.h"
+#include "qps/clauses/ClauseResult.h"
 
 using SynonymValue = std::string;
 using ColumnData = std::vector<std::string>;
@@ -16,6 +17,11 @@ using Row = std::unordered_map<SynonymValue, RowEntry>;
  */
 class Table {
 private:
+    /**
+     * Sentinel table indicates that this is a dummy table that can be joined on.
+     * It must NOT be confused with an empty table -- an empty table has headers but no rows.
+     */
+    bool isSentinel = false;
     std::vector<Synonym> headers;
     std::vector<Row> rows;
 
@@ -73,17 +79,17 @@ private:
      * @param other the other table to cross product with
      * @return the cross product of the tables
      */
-    Table cartesianProduct(const Table&);
+    Table cartesianProduct(const Table&) const;
 
 public:
-    Table();
+    Table() : isSentinel{true} {}
 
     /**
      * Constructs a table with headers and columns.
      * @param headers the headers of the table
      * @param columns the columns of the table, data of each header
      */
-    Table(std::vector<Synonym>, std::vector<ColumnData>);
+    Table(std::vector<Synonym> headers, std::vector<ColumnData> columns);
 
     /**
      * Constructs a table with headers and rows.
@@ -97,7 +103,7 @@ public:
      * @param synonyms the synonyms to extract
      * @return the results of the query
      */
-    std::vector<std::string> extractResults(const std::vector<Synonym>&);
+    std::vector<std::string> extractResults(const std::vector<Synonym>&) const;
 
     /**
      * Returns the headers of the table.
@@ -110,10 +116,10 @@ public:
      * with the same values for the common headers.
      * @return the joined table
      */
-    Table join(const Table&);
+    virtual Table join(const Table&) const;
 
     /**
-     * Returns true if the rows of the table is empty.
+     * Returns true if the rows of the table is empty, but it has some header.
      * @return true if the table is empty
      */
     bool isEmpty() const;

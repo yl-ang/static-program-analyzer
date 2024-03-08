@@ -2,8 +2,6 @@
 
 #include <unordered_set>
 
-Table::Table() {}
-
 Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : headers(headers) {
     if (columns.size() == 0) {
         return;
@@ -42,7 +40,7 @@ Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(head
  * currently assumes there is only 1 entity.
  * @TODO(Ezekiel): handle multiple entities -- milestone 2
  */
-std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synonyms) {
+std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synonyms) const {
     if (this->isEmpty() || synonyms.empty() || !containsHeader(synonyms[0])) {
         return {};
     }
@@ -62,14 +60,22 @@ std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synon
     return result;
 }
 
-Table Table::join(const Table& other) {
+Table Table::join(const Table& other) const {
+    if (this->isSentinel) {
+        return other;
+    }
+
+    if (other.isSentinel) {
+        return *this;
+    }
+
     if (isEmpty() || other.isEmpty()) {
         std::vector<Row> emptyRows{};
         return Table{mergeHeaders(headers, other.headers), emptyRows};  // return empty table
     }
 
     std::vector<Synonym> commonHeaders{getCommonHeaders(other)};
-    if (commonHeaders.size() == 0) {
+    if (commonHeaders.empty()) {
         return cartesianProduct(other);
     }
 
@@ -110,7 +116,7 @@ Row Table::combineRows(const Row& row, const Row& otherRow, const std::vector<Sy
 
 // ai-gen start(copilot, 0, e)
 // prompt: create cross product of two tables
-Table Table::cartesianProduct(const Table& other) {
+Table Table::cartesianProduct(const Table& other) const {
     std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
 
     std::vector<Row> newRows{};
@@ -127,7 +133,7 @@ Table Table::cartesianProduct(const Table& other) {
 
     return Table{newHeaders, newRows};
 }
-// ai-gen end
+// ai-gen ended
 
 // ai-gen start(copilot, 0, e)
 // prompt: using copilot
@@ -173,7 +179,7 @@ bool Table::containsHeader(const Synonym& qe) const {
 // ai-gen end
 
 bool Table::isEmpty() const {
-    return rows.size() == 0;
+    return !headers.empty() && rows.empty();
 }
 
 int Table::getHeaderIndex(const Synonym& qe) const {

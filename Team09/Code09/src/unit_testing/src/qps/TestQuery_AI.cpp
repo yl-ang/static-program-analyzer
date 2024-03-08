@@ -40,6 +40,9 @@ TEST_CASE(
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
 
+        Stmt s1{StatementType::ASSIGN, 1};
+        pfw.setStmts({s1});
+
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
             SuchThatClause{RelationshipType::FOLLOWS, new Synonym{DesignEntityType::STMT, "s"}, new Integer{"2"}}};
@@ -58,6 +61,9 @@ TEST_CASE(
     SECTION("Select s such that Follows(s1, 2) / Should not show any results") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
+
+        Stmt s1{StatementType::ASSIGN, 2};
+        pfw.setStmts({s1});
 
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
@@ -79,6 +85,9 @@ TEST_CASE(
                                                                     std::pair<int, int>{2, 3}};
         pfw.setFollowsStore(followsStoreEntries);
 
+        Stmt s1{StatementType::ASSIGN, 3};
+        pfw.setStmts({s1});
+
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
             SuchThatClause{RelationshipType::FOLLOWS_STAR, new Synonym{DesignEntityType::STMT, "s"}, new Integer{"3"}}};
@@ -98,6 +107,9 @@ TEST_CASE(
     SECTION("Select s such that Parent(s, 2)") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setParentStore(parentStoreEntries);
+
+        Stmt s1{StatementType::ASSIGN, 2};
+        pfw.setStmts({s1});
 
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
@@ -119,6 +131,9 @@ TEST_CASE(
     SECTION("Select s such that Parent(s1, 2) / Should not show any results") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setParentStore(parentStoreEntries);
+
+        Stmt s1{StatementType::ASSIGN, 2};
+        pfw.setStmts({s1});
 
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
@@ -142,6 +157,9 @@ TEST_CASE(
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
 
+        Stmt s1{StatementType::ASSIGN, 3};
+        pfw.setStmts({s1});
+
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{
             SuchThatClause{RelationshipType::PARENT_STAR, new Synonym{DesignEntityType::STMT, "s"}, new Integer{"3"}}};
@@ -163,6 +181,9 @@ TEST_CASE(
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "variable_x"}};
         pfw.setUsesStore(usesStoreEntries);
 
+        Stmt s1{StatementType::ASSIGN, 1};
+        pfw.setStmts({s1});
+
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{SuchThatClause{
             RelationshipType::USES, new Synonym{DesignEntityType::STMT, "s"}, new Literal{"variable_x"}}};
@@ -183,6 +204,9 @@ TEST_CASE(
     SECTION("Select s such that Uses(1, v1)") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "variable_x"}};
         pfw.setUsesStore(usesStoreEntries);
+
+        Stmt s1{StatementType::ASSIGN, 1};
+        pfw.setStmts({s1});
 
         std::vector<Synonym> selectEntities{{DesignEntityType::VARIABLE, "v1"}};
         std::vector<SuchThatClause> suchThatClauses{
@@ -206,6 +230,9 @@ TEST_CASE(
             std::pair<int, std::string>{1, "variable_x"}};
         pfw.setModifiesStore(modifiesStoreEntries);
 
+        Stmt s1{StatementType::ASSIGN, 1};
+        pfw.setStmts({s1});
+
         std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
         std::vector<SuchThatClause> suchThatClauses{SuchThatClause{
             RelationshipType::MODIFIES, new Synonym{DesignEntityType::STMT, "s"}, new Literal{"variable_x"}}};
@@ -225,6 +252,9 @@ TEST_CASE(
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{
             std::pair<int, std::string>{1, "variable_x"}};
         pfw.setModifiesStore(modifiesStoreEntries);
+
+        Stmt s1{StatementType::ASSIGN, 1};
+        pfw.setStmts({s1});
 
         std::vector<Synonym> selectEntities{{DesignEntityType::VARIABLE, "v1"}};
         std::vector<SuchThatClause> suchThatClauses{SuchThatClause{RelationshipType::MODIFIES, new Integer{"1"},
