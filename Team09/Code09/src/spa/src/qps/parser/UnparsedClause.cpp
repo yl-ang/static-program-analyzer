@@ -1,10 +1,5 @@
 #include "UnparsedClause.h"
 
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <vector>
-
 UnparsedClause::UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy)
     : entities(entities), str(str), strategy_(std::move(strategy)) {}
     

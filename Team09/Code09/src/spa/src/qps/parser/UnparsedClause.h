@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "parsingStrategies/ParsingStrategy.h"
 #include "parsingStrategies/SuchThatStrategy.h"
 #include "parsingStrategies/PatternStrategy.h"

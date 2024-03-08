@@ -3,7 +3,6 @@
 #include "ParsingStrategy.h"
 
 #include "../../clauses/PatternClause.h"
-#include "StrategyUtils.h"
 
 class PatternStrategy : public ParsingStrategy {
 private:

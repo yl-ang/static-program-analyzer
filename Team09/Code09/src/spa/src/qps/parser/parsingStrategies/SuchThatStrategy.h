@@ -3,7 +3,6 @@
 #include "ParsingStrategy.h"
 
 #include "../../clauses/SuchThatClause.h"
-#include "StrategyUtils.h"
 
 class SuchThatStrategy : public ParsingStrategy {
 private:
