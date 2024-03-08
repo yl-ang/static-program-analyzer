@@ -145,3 +145,19 @@ bool PKBFacadeReader::hasPattern(StmtNum stmtNum, std::string lhs, std::string r
 bool PKBFacadeReader::hasPattern(StmtNum stmtNum, ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->patternStore->hasPattern(stmtNum, arg1, arg2);
 }
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNexter(StmtNum nextee) {
+    return pkbReference->nextStore->getNexter(nextee);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNextee(StmtNum nexter) {
+    return pkbReference->nextStore->getNextee(nexter);
+}
+
+bool PKBFacadeReader::hasNextRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasNextRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
+}
