@@ -79,3 +79,5 @@ std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getModifies() 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getPattern() {
     return patternExtractor->getPattern();
 }
+
+void DesignExtractor::getCFG() {}

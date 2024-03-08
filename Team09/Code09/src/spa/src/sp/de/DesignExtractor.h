@@ -23,6 +23,8 @@ public:
 
     void dfsVisit(std::shared_ptr<ASTNode>&& node, AstVisitor* visitor);
 
+    void getCFG();
+
     std::unordered_set<std::string> getVariables();
     std::unordered_set<std::string> getConstants();
     std::unordered_set<std::string> getProcedures();
