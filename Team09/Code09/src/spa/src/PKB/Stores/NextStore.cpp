@@ -39,7 +39,7 @@ bool NextStore::hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2) 
 
     // if arg 1 is wildcard, check if arg2 has nextee(s)
     if (arg1.isWildcard()) {
-        return !getNextee(std::stoi(arg1.getValue())).empty();
+        return !getNextee(std::stoi(arg2.getValue())).empty();
     }
 
     // if arg2 is wildcard, check if arg1 has nexters(s)
