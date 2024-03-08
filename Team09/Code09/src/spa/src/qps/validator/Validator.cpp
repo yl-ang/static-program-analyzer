@@ -106,10 +106,46 @@ void Validator::validateRelRef(const std::string& relRefWord) {
     parameterString = trim(parameterString);
     parameterString = parameterString.substr(0, parameterString.size() - 1);  // Remove ending ')'
     std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
+
     ArgumentsValidator* argValidator = buildArgValidator(relRefString, refs);
     argValidator->validateSyntax();
     argValidator->validateSemantic(&synonymStore);
     delete argValidator;
+}
+
+void Validator::validatePatternClause(const std::string& patternClause) {
+    bool hasProperStructure =
+        std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
+    if (!hasProperStructure) {
+        throw QPSSyntaxError();
+    }
+
+    // Remove "pattern"
+    std::string removedPatternClause = trim(patternClause.substr(QPSConstants::PATTERN.size()));
+
+    validatePattern(removedPatternClause);
+}
+
+void Validator::validatePattern(const std::string& pattern) {
+    // Get string until '(' --> syn-assign
+    std::string synString;
+    std::string parameterString;
+    std::tie(synString, parameterString) = substringUntilDelimiter(pattern, "(");
+
+    synString = trim(synString);
+    if (!isSynonym(synString)) {
+        throw QPSSyntaxError();
+    }
+
+    // ('entRef', 'expression-spec')
+    parameterString = trim(parameterString);
+    parameterString = parameterString.substr(0, parameterString.size() - 1);  //  Remove ending ')'
+    std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
+
+    ArgumentsValidator* patternArgValidator = buildPatternValidator(synString, refs);
+    patternArgValidator->validateSyntax();
+    patternArgValidator->validateSemantic(&synonymStore);
+    delete patternArgValidator;
 }
 
 ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString,
@@ -127,55 +163,11 @@ ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString
     }
 }
 
-void Validator::validatePatternClause(const std::string& patternClause) {
-    bool hasProperStructure =
-        std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
-    if (!hasProperStructure) {
-        throw QPSSyntaxError();
-    }
-
-    // Remove "pattern"
-    std::string removedPatternClause = trim(patternClause.substr(QPSConstants::PATTERN.size()));
-
-    // Get string until '(' --> syn-assign
-    std::string synString;
-    std::string parameterString;
-    std::tie(synString, parameterString) = substringUntilDelimiter(removedPatternClause, "(");
-
-    synString = trim(synString);
-    if (!isSynonym(synString)) {
-        throw QPSSyntaxError();
-    }
-
-    // Semantic Error: QPS Grammar other rules 3
-    bool isSynAssign = synonymStore.containsSynonym(synString, QPSConstants::ASSIGN);
-    if (!isSynAssign) {
-        throw QPSSemanticError();
-    }
-
-    // ('entRef', 'expression-spec')
-    parameterString = trim(parameterString);
-    parameterString = parameterString.substr(0, parameterString.size() - 1);  //  Remove ending ')'
-    std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
-
-    if (refs.size() != 2) {
-        throw QPSSyntaxError();
-    }
-
-    bool hasCorrectFormat = isEntRef(refs[0]);
-    hasCorrectFormat = hasCorrectFormat && isExpressionSpec(refs[1]);
-    if (!hasCorrectFormat) {
-        throw QPSSyntaxError();
-    }
-
-    // Ensure that the synonyms are in the variable store
-    // Semantic Error: QPS Grammar other rules 6
-    bool isVariableSynonym = true;
-    if (isSynonym(refs[0])) {
-        isVariableSynonym = synonymStore.containsSynonym(refs[0], QPSConstants::VARIABLE);
-    }
-
-    if (!isVariableSynonym) {
+ArgumentsValidator* Validator::buildPatternValidator(const std::string& synonymString,
+                                                     const std::vector<std::string>& arguments) {
+    if (synonymStore.containsSynonym(synonymString, QPSConstants::ASSIGN)) {
+        return new AssignPatternValidator(arguments);
+    } else {
         throw QPSSemanticError();
     }
 }

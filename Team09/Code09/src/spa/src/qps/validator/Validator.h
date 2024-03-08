@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "ArgumentsValidator/ArgumentsValidator.h"
+#include "ArgumentsValidator/AssignPatternValidator.h"
 #include "ArgumentsValidator/FollowsValidator.h"
 #include "ArgumentsValidator/ModifiesValidator.h"
 #include "ArgumentsValidator/ParentValidator.h"
@@ -26,7 +27,11 @@ protected:
 
     void validateSuchThatClause(const std::string& suchThatClause);
     void validateRelRef(const std::string& relRef);
-    ArgumentsValidator* buildArgValidator(const std::string& relRefString, const std::vector<std::string>& arguments);
 
     void validatePatternClause(const std::string& patternClause);
+    void validatePattern(const std::string& pattern);
+
+    ArgumentsValidator* buildArgValidator(const std::string& relRefString, const std::vector<std::string>& arguments);
+    ArgumentsValidator* buildPatternValidator(const std::string& relRefString,
+                                              const std::vector<std::string>& arguments);
 };

@@ -149,6 +149,7 @@ TEST_CASE("validatePatternClause") {
     SynonymStore testStore;
     testStore.storeSynonymWithStatement("assign a;");
     testStore.storeSynonymWithStatement("variable v;");
+    testStore.storeSynonymWithStatement("stmt iff;");
 
     TestValidator validator(testStore);
 
@@ -169,6 +170,9 @@ TEST_CASE("validatePatternClause") {
 
     std::string inputString_INVALID = "pattern a(v, _x\"_)";
     REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID));
+
+    std::string inputString_INVALID_stmt = "pattern iff (v, _\"x\"_)";
+    REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID_stmt));
 }
 
 TEST_CASE("validateSelectStatement_STPattern_VALID") {
