@@ -36,30 +36,6 @@ Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(head
     }
 }
 
-/**
- * currently assumes there is only 1 entity.
- * @TODO(Ezekiel): handle multiple entities -- milestone 2
- */
-std::vector<std::string> Table::extractResults(const std::vector<Synonym>& synonyms) const {
-    if (this->isEmpty() || synonyms.empty() || !containsHeader(synonyms[0])) {
-        return {};
-    }
-
-    std::vector<std::string> result{};
-    std::unordered_set<std::string> seen{};
-
-    for (Row row : rows) {
-        SynonymValue synonymVal = synonyms[0].getValue();
-        RowEntry entry = row.at(synonymVal);
-        if (seen.find(entry) == seen.end()) {
-            seen.insert(entry);
-            result.push_back(entry);
-        }
-    }
-
-    return result;
-}
-
 Table Table::join(const Table& other) const {
     if (this->isSentinel) {
         return other;
@@ -178,6 +154,15 @@ bool Table::containsHeader(const Synonym& qe) const {
 }
 // ai-gen end
 
+bool Table::headersIsSupersetOf(const std::vector<Synonym>& synonyms) const {
+    for (Synonym synonym : synonyms) {
+        if (!containsHeader(synonym)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Table::isEmpty() const {
     return !headers.empty() && rows.empty();
 }
@@ -193,4 +178,47 @@ int Table::getHeaderIndex(const Synonym& qe) const {
 
 std::vector<Synonym> Table::getHeaders() const {
     return headers;
+}
+
+bool Table::operator==(const Table& other) const {
+    if (this->headers.size() != other.headers.size() || this->rows.size() != other.rows.size()) {
+        return false;
+    }
+
+    for (const Synonym& header : headers) {
+        if (!other.containsHeader(header)) {
+            return false;
+        }
+    }
+
+    // For each row in this table, build its string representation and store it in a set
+    std::unordered_set<std::string> rowStrings{};
+    for (const Row& row : rows) {
+        std::string rowString{};
+        for (const Synonym& header : headers) {
+            rowString += row.at(header.getValue()) + ",";
+        }
+        rowStrings.insert(rowString);
+    }
+
+    // For each row in the other table, build its string representation and check if it exists in the set
+    for (const Row& row : other.rows) {
+        std::string rowString{};
+        // We use this' headers because we want to ensure the order of the columns is the same.
+        for (const Synonym& header : headers) {
+            rowString += row.at(header.getValue()) + ",";
+        }
+
+        if (auto it = rowStrings.find(rowString); it != rowStrings.end()) {
+            rowStrings.erase(it);
+        } else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::vector<Row> Table::getRows() const {
+    return rows;
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Table.h"
 #include "qps/clauses/ClauseResult.h"
 #include "qps/exceptions/Exception.h"
@@ -19,6 +21,7 @@ public:
     std::vector<std::string> extractResults(const std::vector<Synonym>& synonyms) const;
 
 private:
+    static Table clauseResultToTable(const ClauseResult& res);
+
     mutable Table result{};
-    Table clauseResultToTable(const ClauseResult& res) const;
 };

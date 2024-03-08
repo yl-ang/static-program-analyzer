@@ -66,13 +66,6 @@ private:
     int getHeaderIndex(const Synonym&) const;
 
     /**
-     * Returns true if the table contains the header.
-     * @param qe the header to find
-     * @return true if the table contains the header
-     */
-    bool containsHeader(const Synonym&) const;
-
-    /**
      * Returns the cartesian product of this table and another table.
      * Every item in this table is paired with every item in the other table.
      * Used when joining tables with no common headers.
@@ -80,6 +73,13 @@ private:
      * @return the cross product of the tables
      */
     Table cartesianProduct(const Table&) const;
+
+    /**
+     * Returns true if the table contains the header.
+     * @param qe the header to find
+     * @return true if the table contains the header
+     */
+    bool containsHeader(const Synonym&) const;
 
 public:
     Table() : isSentinel{true} {}
@@ -99,13 +99,6 @@ public:
     Table(std::vector<Synonym>, std::vector<Row>);
 
     /**
-     * Returns the results of the query.
-     * @param synonyms the synonyms to extract
-     * @return the results of the query
-     */
-    std::vector<std::string> extractResults(const std::vector<Synonym>&) const;
-
-    /**
      * Returns the headers of the table.
      * @return the headers of the table
      */
@@ -123,4 +116,19 @@ public:
      * @return true if the table is empty
      */
     bool isEmpty() const;
+
+    bool operator==(const Table&) const;
+
+    /**
+     * \brief Returns rows
+     * \return this rows
+     */
+    std::vector<Row> getRows() const;
+
+    /**
+     * \brief Synonyms are subset of headers
+     * \param synonyms Set of synonyms
+     * \return True if synonyms are subset of headers
+     */
+    bool headersIsSupersetOf(const std::vector<Synonym>& synonyms) const;
 };
