@@ -26,60 +26,11 @@ private:
     std::vector<Row> rows;
 
     /**
-     * Merges 2 headers. Duplicates are ignored.
-     * @param firstHeaders first set of headers to merge
-     * @param secondHeaders second set of headers to merge
-     * @return the merged headers
-     */
-    static std::vector<Synonym> mergeHeaders(const std::vector<Synonym>&, const std::vector<Synonym>&);
-
-    /**
-     * Returns true if the rows are joinable.
-     * They are joinable if the values of the rows are the same for their common headers.
-     * @param row1 the first row
-     * @param row2 the second row
-     * @param headers the synonyms to compare
-     * @return true if the rows are joinable
-     */
-    static bool areJoinableRows(const Row&, const Row&, const std::vector<Synonym>&);
-
-    /**
-     * Combines 2 rows into 1 row.
-     * @param row1 the first row
-     * @param row2 the second row
-     * @return the combined row
-     */
-    static Row combineRows(const Row&, const Row&, const std::vector<Synonym>&);
-
-    /**
-     * Returns the common headers between this table and another table.
-     * @param other the other table to compare with
-     * @return the common headers
-     */
-    std::vector<Synonym> getCommonHeaders(const Table& other) const;
-
-    /**
      * Returns the index of the header in the table.
      * @param qe the header to find
      * @return the index of the header
      */
     int getHeaderIndex(const Synonym&) const;
-
-    /**
-     * Returns the cartesian product of this table and another table.
-     * Every item in this table is paired with every item in the other table.
-     * Used when joining tables with no common headers.
-     * @param other the other table to cross product with
-     * @return the cross product of the tables
-     */
-    Table cartesianProduct(const Table&) const;
-
-    /**
-     * Returns true if the table contains the header.
-     * @param qe the header to find
-     * @return true if the table contains the header
-     */
-    bool containsHeader(const Synonym&) const;
 
 public:
     Table() : isSentinel{true} {}
@@ -105,19 +56,10 @@ public:
     std::vector<Synonym> getHeaders() const;
 
     /**
-     * Joins this table with another table on common headers, and rows
-     * with the same values for the common headers.
-     * @return the joined table
-     */
-    virtual Table join(const Table&) const;
-
-    /**
      * Returns true if the rows of the table is empty, but it has some header.
      * @return true if the table is empty
      */
     bool isEmpty() const;
-
-    bool operator==(const Table&) const;
 
     /**
      * \brief Returns rows
@@ -131,4 +73,14 @@ public:
      * \return True if synonyms are subset of headers
      */
     bool headersIsSupersetOf(const std::vector<Synonym>& synonyms) const;
+
+    /**
+     * Returns true if the table contains the header.
+     * @param qe the header to find
+     * @return true if the table contains the header
+     */
+    bool containsHeader(const Synonym&) const;
+
+    bool isSentinelTable() const;
+    bool operator==(const Table&) const;
 };
