@@ -158,24 +158,6 @@ TEST_CASE("Design Extractor Tests") {
 
     auto ProgNode = std::make_shared<ProgramNode>((childrenProg));
 
-    // designExtractor->extract(std::move(ProgNode));
-
-    /*
-            procedure main {
-        01      x = y;
-        02      read a;
-        03      print z;
-        04      while ((c < d) && (e > f)) {
-        05          g = h;
-                }
-        06      if (( i < j ) && ( k > l )) then {
-        07          i = j;
-                } else {
-        08          a = b;
-                }
-            }
-    */
-
     SECTION("Variables extracted correctly") {
         DesignExtractor designExtractor;
         designExtractor.extract(ProgNode);
