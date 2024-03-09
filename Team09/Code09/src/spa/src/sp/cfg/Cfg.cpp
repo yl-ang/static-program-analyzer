@@ -9,6 +9,7 @@
 void CFG::buildCFG(std::shared_ptr<ASTNode> procedure) {
     std::vector<std::shared_ptr<ASTNode>> children = procedure->getChildren();
     buildStatementListCFG(children[0], 0);
+    createNextRelationships();
 }
 
 void CFG::buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int loopLineStart) {
