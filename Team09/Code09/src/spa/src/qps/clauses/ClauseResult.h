@@ -25,4 +25,5 @@ public:
     bool getBoolean() const;
     std::vector<Synonym> getSynonyms() const;
     std::vector<SynonymValues> getAllSynonymValues() const;
+    bool isEmpty() const;
 };

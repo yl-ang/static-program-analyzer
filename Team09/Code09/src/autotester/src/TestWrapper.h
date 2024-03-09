@@ -9,21 +9,21 @@
 #include "AbstractWrapper.h"
 #include "Spa.h"
 class TestWrapper : public AbstractWrapper {
-
 private:
-	SPA spa;
- public:
-  // default constructor
-  TestWrapper();
+    SPA spa;
 
-  // destructor
-  ~TestWrapper();
+public:
+    // default constructor
+    TestWrapper();
 
-  // method for parsing the SIMPLE source
-  virtual void parse(std::string filename);
+    // destructor
+    ~TestWrapper();
 
-  // method for evaluating a query
-  virtual void evaluate(std::string query, std::list<std::string>& results);
+    // method for parsing the SIMPLE source
+    virtual void parse(std::string filename);
+
+    // method for evaluating a query
+    virtual void evaluate(std::string query, std::list<std::string>& results);
 };
 
 #endif

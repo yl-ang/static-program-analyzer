@@ -5,6 +5,7 @@
 #include "PKB/Stores/EntityStore.h"
 #include "PKB/Stores/FollowsStore.h"
 #include "PKB/Stores/ModifiesStore.h"
+#include "PKB/Stores/NextStore.h"
 #include "PKB/Stores/ParentStore.h"
 #include "PKB/Stores/PatternStore.h"
 #include "PKB/Stores/StatementStore.h"
@@ -26,4 +27,6 @@ public:
     std::shared_ptr<ModifiesStore> modifiesStore;
 
     std::shared_ptr<PatternStore> patternStore;
+
+    std::shared_ptr<NextStore> nextStore;
 };

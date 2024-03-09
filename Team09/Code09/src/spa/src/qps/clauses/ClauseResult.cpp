@@ -24,3 +24,7 @@ std::vector<Synonym> ClauseResult::getSynonyms() const {
 std::vector<SynonymValues> ClauseResult::getAllSynonymValues() const {
     return std::get<ComplexResult>(result).second;
 }
+
+bool ClauseResult::isEmpty() const {
+    return !isBoolean() && getAllSynonymValues().empty();
+}

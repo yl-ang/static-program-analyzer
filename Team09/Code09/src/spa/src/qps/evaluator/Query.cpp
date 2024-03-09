@@ -1,73 +1,120 @@
 #include "Query.h"
 
+#include <queue>
+
 Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& stc,
              const std::vector<PatternClause>& pc)
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
-std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) {
-    std::vector<ClauseResult> clauseResults{};
-    for (SuchThatClause stc : suchThatClauses) {
-        clauseResults.push_back(stc.evaluate(pkb));
-    }
-
-    for (PatternClause pc : patternClauses) {
-        clauseResults.push_back(pc.evaluate(pkb));
-    }
-
-    if (clauseResults.empty()) {
-        return buildSelectTable(pkb).extractResults(selectEntities);
-    }
-
-    std::vector<Table> clauseTables{};
-    for (const ClauseResult& result : clauseResults) {
-        // 1. Check if all Boolean results are true.
-        if (result.isBoolean()) {
-            if (result.getBoolean()) {
-                continue;
-            }
-            // If a single false, short-circuit and return empty.
-            return {};
-        }
-
-        // 2. Check if a table has common synonyms with the select clause.
-        std::vector<Synonym> headers = result.getSynonyms();
-
-        // 3. Consolidate the table
-        std::vector<ColumnData> columns = result.getAllSynonymValues();
-        clauseTables.push_back(Table{headers, columns});
-    }
-
-    if (clauseTables.empty()) {
-        return buildSelectTable(pkb).extractResults(selectEntities);
-    }
-
-    Table result = clauseTables[0];
-    for (size_t i = 1; i < clauseTables.size(); i++) {
-        result = result.join(clauseTables[i]);
-    }
-
-    bool hasCommonSynonyms = false;
-    for (Synonym header : result.getHeaders()) {
-        if (std::find(selectEntities.begin(), selectEntities.end(), header) != selectEntities.end()) {
-            hasCommonSynonyms = true;
-            break;
-        }
-    }
-
-    if (hasCommonSynonyms) {
-        return result.extractResults(selectEntities);
-    }
-    if (result.isEmpty()) {
+std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
+    if (!evaluateBooleanClauses(pkb)) {
         return {};
     }
-    return buildSelectTable(pkb).extractResults(selectEntities);
+
+    const TableManager tableManager{buildSelectTable(pkb)};
+    if (tableManager.isEmpty()) {
+        // There are no results to select at all. Return empty result.
+        return {};
+    }
+
+    ArrangedClauses ac = arrangeClauses();
+    if (!evaluateAndJoinClauses(tableManager, ac.selectConnectedClauses, pkb)) {
+        // There were empty results after evaluating the select clauses. Return empty result.
+        return {};
+    }
+
+    if (const TableManager newEmptyTm = TableManager{};
+        !evaluateAndJoinClauses(newEmptyTm, ac.nonSelectConnectedClauses, pkb)) {
+        // There were empty results after evaluating the non-select clauses. Return empty result.
+        return {};
+    }
+
+    return tableManager.extractResults(selectEntities);
 }
 
-std::vector<Synonym> Query::getSelectEntities() const {
-    return selectEntities;
+bool Query::evaluateAndJoinClauses(const TableManager& tm,
+                                   const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
+                                   PKBFacadeReader& pkb) {
+    for (const std::vector<QueryClausePtr>& connectedClauses : connectedClausesList) {
+        for (QueryClausePtr clause : connectedClauses) {
+            ClauseResult res = clause->evaluate(pkb);
+            tm.join(res);
+        }
+        if (tm.isEmpty()) {
+            // If the table is empty, we can stop evaluating the clauses
+            return false;
+        }
+    }
+    // If there are no clauses at all, we will return true. Table X emptyTable = emptyTable, but if there
+    // are no tables at all, the table does not undergo any operations and remains the same.
+    return true;
 }
 
-Table Query::buildSelectTable(const PKBFacadeReader& pkb) {
+// TODO(Ezekiel): Write the actual algorithm to split into connected synonyms for optimization.
+std::vector<std::vector<QueryClausePtr>> Query::splitIntoConnectedSynonyms() const {
+    std::vector<std::vector<QueryClausePtr>> res{};
+    for (QueryClausePtr c : getNonBooleanClauses()) {
+        std::vector<QueryClausePtr> connectedClauses{c};
+        res.push_back(connectedClauses);
+    }
+    return res;
+}
+
+ArrangedClauses Query::arrangeClauses() const {
+    std::vector<std::vector<QueryClausePtr>> selectConnectedClauses{};
+    std::vector<std::vector<QueryClausePtr>> nonSelectConnectedClauses{};
+
+    for (std::vector<QueryClausePtr> connectedClauses : splitIntoConnectedSynonyms()) {
+        bool hasSelectSynoyms = false;
+        for (QueryClausePtr clause : connectedClauses) {
+            if (containsSelectSynonyms(clause)) {
+                hasSelectSynoyms = true;
+                break;
+            }
+        }
+        hasSelectSynoyms ? selectConnectedClauses.push_back(connectedClauses)
+                         : nonSelectConnectedClauses.push_back(connectedClauses);
+    }
+
+    return ArrangedClauses{selectConnectedClauses, nonSelectConnectedClauses};
+}
+
+bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
+    for (SuchThatClause stc : suchThatClauses) {
+        if (stc.isBooleanResult() && !stc.evaluate(pkb).getBoolean()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
+    std::vector<QueryClausePtr> nonBooleanClauses{};
+
+    // Convert patternClauses to shared_ptr
+    for (PatternClause pc : patternClauses) {
+        nonBooleanClauses.push_back(std::make_shared<PatternClause>(pc));
+    }
+
+    // Convert suchThatClauses to shared_ptr if they are not boolean result
+    for (SuchThatClause stc : suchThatClauses) {
+        if (!stc.isBooleanResult()) {
+            nonBooleanClauses.push_back(std::make_shared<SuchThatClause>(stc));
+        }
+    }
+    return nonBooleanClauses;
+}
+
+bool Query::containsSelectSynonyms(QueryClausePtr clause) const {
+    for (Synonym selectSyn : selectEntities) {
+        if (clause->containsSynonym(selectSyn)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Table Query::buildSelectTable(const PKBFacadeReader& pkb) const {
     std::vector<Synonym> header{selectEntities};
     std::vector<ColumnData> columns{};
 

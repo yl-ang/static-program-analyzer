@@ -117,3 +117,31 @@ TEST_CASE("PatternClause evaluate") {
         REQUIRE(synValues == std::vector<SynonymValues>{{}, {}});
     }
 }
+
+// ai-gen start(copilot, 0, e)
+// prompt: use copilot
+TEST_CASE("Test pattern getSynonyms") {
+    Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
+    Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
+    Wildcard wildcard = Wildcard();
+    ExpressionSpec varExp = ExpressionSpec("_\"y\"_");
+    ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
+
+    SECTION("Test Wildcard and Wildcard") {
+        PatternClause pc = PatternClause(&assignSyn, &wildcard, &wildcard);
+        std::vector<Synonym> synonyms = pc.getSynonyms();
+        REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
+    }
+
+    SECTION("Test variable") {
+        PatternClause pc = PatternClause(&assignSyn, &variableSyn, &varExp);
+        std::vector<Synonym> synonyms = pc.getSynonyms();
+        REQUIRE(synonyms == std::vector<Synonym>{assignSyn, variableSyn});
+    }
+    SECTION("Test wildcard and literal") {
+        PatternClause pc3 = PatternClause(&assignSyn, &wildcard, &literalExp);
+        std::vector<Synonym> synonyms = pc3.getSynonyms();
+        REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
+    }
+}
+// ai-gen end
