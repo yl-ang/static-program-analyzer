@@ -12,8 +12,7 @@
 
 class SPA {
 public:
-    explicit SPA()
-        : pkbWriter(PKBFacadeWriter(pkb)), pkbReader(PKBFacadeReader(pkb)) {}
+    explicit SPA() : pkbWriter(PKBFacadeWriter(pkb)), pkbReader(PKBFacadeReader(pkb)) {}
 
     inline void parse(std::string filename) const {
         SP sp = SP(pkbWriter);
@@ -24,6 +23,11 @@ public:
         QPS qps = QPS(pkbReader);
         std::vector<std::string> result = qps.processQueries(query);
         return result;
+    }
+
+    // For integration Test (SP PKB)
+    inline PKB& getInternalPKB() {
+        return pkb;
     }
 
 private:
