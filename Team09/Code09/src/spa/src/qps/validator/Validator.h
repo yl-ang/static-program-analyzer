@@ -31,7 +31,8 @@ protected:
     void validatePatternClause(const std::string& patternClause);
     void validatePattern(const std::string& pattern);
 
-    ArgumentsValidator* buildArgValidator(const std::string& relRefString, const std::vector<std::string>& arguments);
-    ArgumentsValidator* buildPatternValidator(const std::string& relRefString,
-                                              const std::vector<std::string>& arguments);
+    std::unique_ptr<ArgumentsValidator> buildArgValidator(const std::string& relRefString,
+                                                          const std::vector<std::string>& arguments);
+    std::unique_ptr<ArgumentsValidator> buildPatternValidator(const std::string& relRefString,
+                                                              const std::vector<std::string>& arguments);
 };

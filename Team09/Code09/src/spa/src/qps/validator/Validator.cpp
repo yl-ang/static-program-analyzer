@@ -107,10 +107,9 @@ void Validator::validateRelRef(const std::string& relRefWord) {
     parameterString = parameterString.substr(0, parameterString.size() - 1);  // Remove ending ')'
     std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
 
-    ArgumentsValidator* argValidator = buildArgValidator(relRefString, refs);
+    std::unique_ptr<ArgumentsValidator> argValidator = buildArgValidator(relRefString, refs);
     argValidator->validateSyntax();
     argValidator->validateSemantic(&synonymStore);
-    delete argValidator;
 }
 
 void Validator::validatePatternClause(const std::string& patternClause) {
@@ -142,31 +141,30 @@ void Validator::validatePattern(const std::string& pattern) {
     parameterString = parameterString.substr(0, parameterString.size() - 1);  //  Remove ending ')'
     std::vector<std::string> refs = splitByDelimiter(parameterString, ",");
 
-    ArgumentsValidator* patternArgValidator = buildPatternValidator(synString, refs);
+    std::unique_ptr<ArgumentsValidator> patternArgValidator = buildPatternValidator(synString, refs);
     patternArgValidator->validateSyntax();
     patternArgValidator->validateSemantic(&synonymStore);
-    delete patternArgValidator;
 }
 
-ArgumentsValidator* Validator::buildArgValidator(const std::string& relRefString,
-                                                 const std::vector<std::string>& arguments) {
+std::unique_ptr<ArgumentsValidator> Validator::buildArgValidator(const std::string& relRefString,
+                                                                 const std::vector<std::string>& arguments) {
     if (relRefString == QPSConstants::FOLLOWS || relRefString == QPSConstants::FOLLOWS_STAR) {
-        return new FollowsValidator(arguments);
+        return std::make_unique<FollowsValidator>(arguments);
     } else if (relRefString == QPSConstants::PARENT || relRefString == QPSConstants::PARENT_STAR) {
-        return new ParentValidator(arguments);
+        return std::make_unique<ParentValidator>(arguments);
     } else if (relRefString == QPSConstants::USES) {
-        return new UsesValidator(arguments);
+        return std::make_unique<UsesValidator>(arguments);
     } else if (relRefString == QPSConstants::MODIFIES) {
-        return new ModifiesValidator(arguments);
+        return std::make_unique<ModifiesValidator>(arguments);
     } else {
         throw Exception("Not implemented: " + relRefString);
     }
 }
 
-ArgumentsValidator* Validator::buildPatternValidator(const std::string& synonymString,
-                                                     const std::vector<std::string>& arguments) {
+std::unique_ptr<ArgumentsValidator> Validator::buildPatternValidator(const std::string& synonymString,
+                                                                     const std::vector<std::string>& arguments) {
     if (synonymStore.containsSynonym(synonymString, QPSConstants::ASSIGN)) {
-        return new AssignPatternValidator(arguments);
+        return std::make_unique<AssignPatternValidator>(arguments);
     } else {
         throw QPSSemanticError();
     }
