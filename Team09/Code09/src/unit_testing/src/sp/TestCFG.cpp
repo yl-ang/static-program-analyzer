@@ -12,18 +12,6 @@
 
 using namespace std;  // NOLINT
 
-void printToken(const Token& token) {
-    std::cout << "Token(" << token.type << ", \"" << token.value << "\", " << token.line_number << "),\n";
-}
-
-// Function to print the entire vector of tokens
-void printTokens(const std::vector<Token>& tokens) {
-    std::cout << "Tokens:\n";
-    for (const auto& token : tokens) {
-        printToken(token);
-    }
-}
-
 TEST_CASE("CFG Build Tests") {
     AST ast;
     SpTokenizer tokenizer;
