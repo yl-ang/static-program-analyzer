@@ -5,9 +5,15 @@
 #include "sp/ast/Ast.h"
 #include "sp/ast/AstNode.h"
 #include "sp/tokenizer/Token.h"
-#include "utils.h"
 
 using namespace std;  // NOLINT
+std::queue<Token> makeTokenQueue(std::vector<Token> tokens) {
+    std::queue<Token> queue;
+    for (auto token : tokens) {
+        queue.push(token);
+    }
+    return queue;
+}
 
 TEST_CASE("AST Build Tests") {
     AST ast;

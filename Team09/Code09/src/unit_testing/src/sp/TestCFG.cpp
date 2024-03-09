@@ -3,7 +3,6 @@
 
 #include "catch.hpp"
 #include "sp/cfg/Cfg.h"
-#include "utils.h"
 
 using namespace std;  // NOLINT
 
