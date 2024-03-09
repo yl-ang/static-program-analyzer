@@ -15,13 +15,8 @@ void SP::processFile(std::string filepath) {
     // pass the string stream buffer to the sourceloader
     std::vector<std::string> simpleProgramAsString = sourceLoader.loadSimple(buffer);
 
-    try {
-        std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
-        std::shared_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
-        designExtractor.extract(astRoot);
-        designExtractor.writePKB(&pkbWriter);
-    } catch (SyntaxError& e) {
-        std::cerr << "Syntax Error" << std::endl;
-        std::cerr << e.what() << std::endl;
-    }
+    std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
+    std::shared_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
+    designExtractor.extract(astRoot);
+    designExtractor.writePKB(&pkbWriter);
 }

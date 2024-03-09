@@ -186,8 +186,6 @@ std::shared_ptr<ExpressionNode> AST::buildExpressionAST(std::queue<Token>& token
 
 std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& tokens,
                                                            std::shared_ptr<ExpressionNode> node) {
-    std::cout << "Building SubExpressionAST" << std::endl;
-    std::cout << "Tokens size: " << tokens.size() << std::endl;
     if (tokens.size() == 0) {
         return node;
     }
@@ -201,12 +199,9 @@ std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
         children.push_back((node));
         children.push_back((term));
 
-        std::cout << "Building SubExpressionAST 2" << std::endl;
-        return buildSubExpressionAST(
-            tokens, std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
+        return buildSubExpressionAST(tokens,
+                                     std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
     }
-    std::cout << "Node is " << node.get()->getValue() << std::endl;
-
     return node;
 }
 /*
@@ -330,7 +325,6 @@ std::shared_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>&
         std::queue<Token> temp = tokens;
         temp.pop();
         if (temp.size() == 0) {
-            std::cout << "Build ExpressionAST 1" << std::endl;
             return buildExpressionAST(tokens);
         }
         Token followingToken = temp.front();
@@ -339,13 +333,10 @@ std::shared_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>&
             RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
             tokens.pop();
             if (token.type == NAME) {
-                std::cout << "Build VarNameAST" << std::endl;
                 return buildVarNameAST(token);
             }
-            std::cout << "Build IntAST" << std::endl;
             return buildIntAST(token);
         }
-        std::cout << "Build ExpressionAST 2" << std::endl;
         return buildExpressionAST(tokens);
     } catch (std::exception& e) {
         std::cout << "Exception caught: " << e.what() << std::endl;
@@ -378,8 +369,7 @@ std::shared_ptr<ExpressionNode> AST::buildSubTermAST(std::queue<Token>& tokens, 
         std::shared_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
         children.push_back((node));
         children.push_back((factorNode));
-        return buildSubTermAST(tokens,
-                               std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
+        return buildSubTermAST(tokens, std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
     }
 
     return node;
