@@ -1,6 +1,25 @@
 #include "catch.hpp"
 #include "qps/ParserUtils.h"
 
+TEST_CASE("SplitByDelimiter") {
+    SECTION("Valid Tests") {
+        std::string validString = "Split by delimiter";
+        std::string validString_Comma = "Split, by, delimiter";
+        std::string validString_String = "Split and by and delimiter";
+        // NOTE: "Split and by anddelimiter" will also return same the result
+        std::vector<std::string> expectedResult = {"Split", "by", "delimiter"};
+        REQUIRE(splitByDelimiter(validString, " ") == expectedResult);
+        REQUIRE(splitByDelimiter(validString_Comma, ",") == expectedResult);
+        REQUIRE(splitByDelimiter(validString_String, "and") == expectedResult);
+    }
+
+    SECTION("Ends with delimiter") {
+        std::string inputString = "x y z ";
+        std::vector<std::string> expectedResult = {"x", "y", "z", ""};
+        REQUIRE(splitByDelimiter(inputString, " ") == expectedResult);
+    }
+}
+
 TEST_CASE("Trim Test") {
     std::string expectedString = "Trim Test";
 

@@ -31,6 +31,7 @@ struct QPSConstants {
                                               USES + '|' + MODIFIES + '|' + NEXT + '|' + NEXT_STAR;
 
     inline static const std::string SELECT = "Select";
+    inline static const std::string BOOLEAN = "BOOLEAN";
     inline static const std::string SUCH_THAT = "such that";
     inline static const std::string PATTERN = "pattern";
 };

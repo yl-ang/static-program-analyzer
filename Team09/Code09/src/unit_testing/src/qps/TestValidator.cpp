@@ -91,6 +91,8 @@ TEST_CASE("isValidSelectStatment") {
     std::string inputString_SelectNothingWithSpace = "Select ";
     std::string inputString_OneSuchThat = "Select v such that Follows(1,2)";
     std::string inputString_OnePattern = "Select v pattern a(v,2)";
+    std::string inputString_MultipleReturn = "Select <v, a> pattern a(v, \"2\")";
+    std::string inputString_MultipleReturn_MissingBracket = "Select v, a> pattern a(v, \"2\")";
 
     SynonymStore testStore;
     testStore.storeSynonymWithStatement("variable v;");
@@ -101,6 +103,8 @@ TEST_CASE("isValidSelectStatment") {
     REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_ExtraSemiColon));
     REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_SelectNothing));
     REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_SelectNothingWithSpace));
+    REQUIRE(validator.testIsValidSelectStatement(inputString_MultipleReturn));
+    REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_MultipleReturn_MissingBracket));
 }
 
 TEST_CASE("validateSuchThatClause") {

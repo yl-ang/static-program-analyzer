@@ -43,11 +43,11 @@ void Validator::validateSelectStatement(const std::string& statement) {
     std::string remainingStatement;
     std::tie(selectWord, remainingStatement) = substringUntilDelimiter(statement, SPACE);
 
-    std::string returnClause;
+    std::string resultClause;
     std::string remainingClausesStatement;
-    std::tie(returnClause, remainingClausesStatement) = substringUntilDelimiter(trim(remainingStatement), SPACE);
+    std::tie(resultClause, remainingClausesStatement) = splitResultAndClause(trim(remainingStatement));
 
-    validateReturnClause(returnClause);
+    validateResultClause(resultClause);
 
     std::vector<std::string> clauseList = getAllClauses(remainingClausesStatement);
     if (clauseList.size() == 0) {
@@ -65,15 +65,18 @@ void Validator::validateSelectStatement(const std::string& statement) {
     }
 }
 
-void Validator::validateReturnClause(const std::string& returnClause) {
-    if (!isSynonym(returnClause)) {
+void Validator::validateResultClause(const std::string& resultClause) {
+    if (!isResultClause(resultClause)) {
         throw QPSSyntaxError();
     }
 
+    // returnResults can be BOOLEAN or synonym(s)
+    std::vector<std::string> retResults = extractReturnResults(resultClause);
     // Ensure that the synonym is in the variable store
-    bool hasSynonym = synonymStore.containsSynonymName(returnClause);
-    if (!hasSynonym) {
-        throw QPSSemanticError();
+    for (std::string retResult : retResults) {
+        if (isSynonym(retResult) && !synonymStore.containsSynonymName(retResult)) {
+            throw QPSSemanticError();
+        }
     }
 }
 
