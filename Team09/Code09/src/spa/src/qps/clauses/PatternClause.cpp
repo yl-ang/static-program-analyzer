@@ -35,6 +35,29 @@ ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     return {{}, {}};
 }
 
+bool PatternClause::isBooleanResult() const {
+    return false;
+}
+
+bool PatternClause::containsSynonym(const Synonym& s) const {
+    return assignSynonym == s || firstArg == s || secondArg == s;
+}
+
+std::vector<Synonym> PatternClause::getSynonyms() const {
+    std::vector<Synonym> synonyms;
+
+    if (assignSynonym.isSynonym()) {
+        synonyms.push_back(dynamic_cast<Synonym&>(assignSynonym));
+    }
+    if (firstArg.isSynonym()) {
+        synonyms.push_back(dynamic_cast<Synonym&>(firstArg));
+    }
+    if (secondArg.isSynonym()) {
+        synonyms.push_back(dynamic_cast<Synonym&>(secondArg));
+    }
+    return synonyms;
+}
+
 ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable

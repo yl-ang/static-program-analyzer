@@ -1,57 +1,172 @@
 #include "GrammarUtils.h"
 
-bool isIdent(std::string str) {
+bool isIdent(const std::string& str) {
     return std::regex_match(str, std::regex("^[a-zA-Z][a-zA-Z0-9]*$"));
 }
 
-bool isName(std::string str) {
+bool isName(const std::string& str) {
     return isIdent(str);
 }
 
-bool isInteger(std::string str) {
+bool isInteger(const std::string& str) {
     return std::regex_match(str, std::regex("^(?:0|[1-9][0-9]*)$"));
 }
 
-bool isSynonym(std::string str) {
+bool isSynonym(const std::string& str) {
     return isIdent(str);
 }
 
-bool isWildcard(std::string str) {
+bool isWildcard(const std::string& str) {
     return std::regex_match(str, std::regex("^_$"));
 }
 
-bool isQuotedIdent(std::string str) {
-    return std::regex_match(str, std::regex("^\"[a-zA-Z][a-zA-Z0-9]*\"$"));
+bool isQuotedIdent(const std::string& str) {
+    bool startsAndEndsWithQuotes = std::regex_match(str, std::regex("^\".*\"$"));
+    std::string ident = trim(str.substr(1, str.size() - 2));
+    return startsAndEndsWithQuotes && isIdent(ident);
 }
 
-bool isStmtRef(std::string str) {
+bool isStmtRef(const std::string& str) {
     return isSynonym(str) || isWildcard(str) || isInteger(str);
 }
 
-bool isEntRef(std::string str) {
+bool isEntRef(const std::string& str) {
     return isSynonym(str) || isWildcard(str) || isQuotedIdent(str);
 }
 
-// TODO(Han Qin): Redo isExpressionSpec after Milestone 1.
-bool isExpressionSpec(std::string str) {
-    return std::regex_match(removeAllWhitespaces(str),
-            std::regex("^_*\"(?:(?:0|[1-9][0-9]*)|[a-zA-Z][a-zA-Z0-9*+]*)\"_*$")) ||
-            isWildcard(str);
-}
-
-bool isSelectStatement(std::string str) {
-    return std::regex_search(str, std::regex("^Select"));
-}
-
-bool isDeclarationStatement(std::string str) {
-    std::string pattern = "^(" + DesignEntity::DESIGN_ENTITIES + ")";
+bool isRelRef(const std::string& str) {
+    std::string pattern = "(" + QPSConstants::REL_REF + ")";
     return std::regex_search(str, std::regex(pattern));
 }
 
-bool containsSuchThatClause(std::string selectStatement) {
-    return std::regex_search(selectStatement, std::regex("such that"));
+bool isExpressionSpec(const std::string& str) {
+    if (isWildcard(str)) {
+        return true;
+    }
+
+    bool startsAndEndsWithUnderscores = std::regex_match(str, std::regex("^_.*_$"));
+    std::string removedUnderscoreString = str;
+    if (startsAndEndsWithUnderscores) {
+        removedUnderscoreString = trim(str.substr(1, str.size() - 2));
+    }
+    return isQuotedExpr(removedUnderscoreString);
 }
 
-bool containsPatternClause(std::string selectStatement) {
-    return std::regex_search(selectStatement, std::regex("pattern"));
+bool isQuotedExpr(const std::string& str) {
+    bool startsAndEndsWithQuotes = std::regex_match(str, std::regex("^\".*\"$"));
+    if (startsAndEndsWithQuotes) {
+        std::string removedQuoteString = trim(str.substr(1, str.size() - 2));
+        return isExpr(removedQuoteString);
+    }
+
+    return false;
+}
+
+bool isExpr(const std::string& str) {
+    if (str.empty()) {
+        return false;
+    }
+
+    int index = -1;
+    int bracketCounter = 0;
+    for (int i = str.size() - 1; i >= 0; i--) {
+        if ((str[i] == '+' || str[i] == '-') && bracketCounter == 0) {
+            index = i;
+            break;
+        }
+        if (str[i] == ')') {
+            bracketCounter++;
+        }
+        if (str[i] == '(') {
+            bracketCounter--;
+        }
+        // Open bracket before close bracket (since we going from the back)
+        if (bracketCounter < 0) {
+            return false;
+        }
+    }
+
+    // Too many close brackets
+    if (bracketCounter > 0) {
+        return false;
+    }
+
+    // +/- not found, might be term
+    if (index == -1) {
+        return isTerm(str);
+    }
+
+    std::string expr = trim(str.substr(0, index));
+    std::string term = trim(str.substr(index + 1, str.size() - index - 1));
+    return isExpr(expr) && isTerm(term);
+}
+
+bool isTerm(const std::string& str) {
+    if (str.empty()) {
+        return false;
+    }
+
+    int index = -1;
+    int bracketCounter = 0;
+    for (int i = str.size() - 1; i >= 0; i--) {
+        if ((str[i] == '*' || str[i] == '/' || str[i] == '%') && bracketCounter == 0) {
+            index = i;
+            break;
+        }
+        if (str[i] == ')') {
+            bracketCounter++;
+        }
+        if (str[i] == '(') {
+            bracketCounter--;
+        }
+        // Open bracket before close bracket (since we going from the back)
+        if (bracketCounter < 0) {
+            return false;
+        }
+    }
+
+    // Too many close brackets
+    if (bracketCounter > 0) {
+        return false;
+    }
+
+    // +/- not found, might be factor
+    if (index == -1) {
+        return isFactor(str);
+    }
+
+    std::string term = trim(str.substr(0, index));
+    std::string factor = trim(str.substr(index + 1, str.size() - index - 1));
+    return isTerm(term) && isFactor(factor);
+}
+
+bool isFactor(const std::string& str) {
+    std::string trimmedString = trim(str);
+    if (isName(trimmedString) || isInteger(trimmedString)) {
+        return true;
+    }
+
+    bool startsAndEndsWithBrackets = std::regex_match(str, std::regex("^\\(.*\\)$"));
+    std::string expr = trim(trimmedString.substr(1, trimmedString.size() - 2));
+    if (startsAndEndsWithBrackets) {
+        return isExpr(expr);
+    }
+    return false;
+}
+
+bool isSelectStatement(const std::string& str) {
+    return std::regex_search(str, std::regex("^" + QPSConstants::SELECT));
+}
+
+bool isDeclarationStatement(const std::string& str) {
+    std::string pattern = "^(" + QPSConstants::DESIGN_ENTITIES + ")";
+    return std::regex_search(str, std::regex(pattern));
+}
+
+bool containsSuchThatClause(const std::string& selectStatement) {
+    return std::regex_search(selectStatement, std::regex(QPSConstants::SUCH_THAT));
+}
+
+bool containsPatternClause(const std::string& selectStatement) {
+    return std::regex_search(selectStatement, std::regex(QPSConstants::PATTERN));
 }

@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "pkb/Utils/DataTypes.h"
+#include "PKB/Utils/DataTypes.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
 

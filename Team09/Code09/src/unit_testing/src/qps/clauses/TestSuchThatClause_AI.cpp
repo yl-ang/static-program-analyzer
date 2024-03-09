@@ -45,3 +45,67 @@ TEST_CASE("Relationship determineRelationshipType") {
     REQUIRE(RelationshipBuilder::determineRelationshipType("Modifies") == RelationshipType::MODIFIES);
 }
 // ai-gen end
+
+// ai-gen start(copilot, 0, e)
+// prompt: use copilot
+TEST_CASE("Test suchThat getSynonyms") {
+    Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
+    Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
+    Wildcard wildcard = Wildcard();
+    Literal literal = Literal("1");
+
+    SECTION("Follows") {
+        SECTION("No synonyms") {
+            SuchThatClause suchThatClause1(RelationshipType::FOLLOWS, &literal, &wildcard);
+            std::vector<Synonym> synonyms = suchThatClause1.getSynonyms();
+            REQUIRE(synonyms.empty());
+        }
+
+        SECTION("1 synonym") {
+            SuchThatClause suchThatClause2(RelationshipType::FOLLOWS, &assignSyn, &wildcard);
+            std::vector<Synonym> synonyms = suchThatClause2.getSynonyms();
+            std::vector<Synonym> expected = {assignSyn};
+            REQUIRE(synonyms == expected);
+        }
+
+        SECTION("2 synonyms") {
+            SuchThatClause suchThatClause3(RelationshipType::FOLLOWS, &assignSyn, &variableSyn);
+            std::vector<Synonym> synonyms = suchThatClause3.getSynonyms();
+            std::vector<Synonym> expected = {assignSyn, variableSyn};
+            REQUIRE(synonyms == expected);
+        }
+    }
+}
+// ai-gen end
+
+// ai-gen start(copilot, 0, e)
+// prompt: use copilot
+TEST_CASE("Test suchThat getSynonyms") {
+    Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
+    Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
+    Wildcard wildcard = Wildcard();
+    Literal literal = Literal("1");
+
+    SECTION("Follows") {
+        SECTION("No synonyms") {
+            SuchThatClause suchThatClause1(RelationshipType::FOLLOWS, &literal, &wildcard);
+            std::vector<Synonym> synonyms = suchThatClause1.getSynonyms();
+            REQUIRE(synonyms.empty());
+        }
+
+        SECTION("1 synonym") {
+            SuchThatClause suchThatClause2(RelationshipType::FOLLOWS, &assignSyn, &wildcard);
+            std::vector<Synonym> synonyms = suchThatClause2.getSynonyms();
+            std::vector<Synonym> expected = {assignSyn};
+            REQUIRE(synonyms == expected);
+        }
+
+        SECTION("2 synonyms") {
+            SuchThatClause suchThatClause3(RelationshipType::FOLLOWS, &assignSyn, &variableSyn);
+            std::vector<Synonym> synonyms = suchThatClause3.getSynonyms();
+            std::vector<Synonym> expected = {assignSyn, variableSyn};
+            REQUIRE(synonyms == expected);
+        }
+    }
+}
+// ai-gen end

@@ -59,6 +59,12 @@ public:
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
 
+    // Getters for NextStore
+    [[nodiscard]] std::unordered_set<StmtNum> getNexter(StmtNum nextee);
+    [[nodiscard]] std::unordered_set<StmtNum> getNextee(StmtNum nexter);
+    [[nodiscard]] bool hasNextRelationship(StmtNum s1, StmtNum s2);
+    [[nodiscard]] bool hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
 private:
     PKB* pkbReference = nullptr;
 };

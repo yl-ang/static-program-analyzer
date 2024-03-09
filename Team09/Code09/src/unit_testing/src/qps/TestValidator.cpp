@@ -93,8 +93,8 @@ TEST_CASE("isValidSelectStatment") {
     std::string inputString_OnePattern = "Select v pattern a(v,2)";
 
     SynonymStore testStore;
-    testStore.storeSynonym("v", "variable");
-    testStore.storeSynonym("a", "assign");
+    testStore.storeSynonymWithStatement("variable v;");
+    testStore.storeSynonymWithStatement("assign a;");
     TestValidator validator(testStore);
 
     REQUIRE(validator.testIsValidSelectStatement(inputString_SelectOne));
@@ -105,9 +105,9 @@ TEST_CASE("isValidSelectStatment") {
 
 TEST_CASE("validateSuchThatClause") {
     SynonymStore testStore;
-    testStore.storeSynonym("s1", "stmt");
-    testStore.storeSynonym("v", "variable");
-    testStore.storeSynonym("re", "read");
+    testStore.storeSynonymWithStatement("stmt s1, s2;");
+    testStore.storeSynonymWithStatement("variable v;");
+    testStore.storeSynonymWithStatement("read re;");
 
     TestValidator validator(testStore);
 
@@ -129,7 +129,7 @@ TEST_CASE("validateSuchThatClause") {
     std::string inputString_Uses_VALID = "such that Uses(s1,v)";
     REQUIRE(validator.testIsValidSuchThatClause(inputString_Uses_VALID));
 
-    std::string inputString_Follows_Stmt_INVALID = "such that Follows(s2,2)";
+    std::string inputString_Follows_Stmt_INVALID = "such that Follows(s4,2)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
 
     std::string inputString_Parent_FirstArgVariable_INVALID = "such that Parent(v,s1)";
@@ -147,8 +147,9 @@ TEST_CASE("validateSuchThatClause") {
 
 TEST_CASE("validatePatternClause") {
     SynonymStore testStore;
-    testStore.storeSynonym("a", "assign");
-    testStore.storeSynonym("v", "variable");
+    testStore.storeSynonymWithStatement("assign a;");
+    testStore.storeSynonymWithStatement("variable v;");
+    testStore.storeSynonymWithStatement("stmt iff;");
 
     TestValidator validator(testStore);
 
@@ -169,6 +170,9 @@ TEST_CASE("validatePatternClause") {
 
     std::string inputString_INVALID = "pattern a(v, _x\"_)";
     REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID));
+
+    std::string inputString_INVALID_stmt = "pattern iff (v, _\"x\"_)";
+    REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID_stmt));
 }
 
 TEST_CASE("validateSelectStatement_STPattern_VALID") {
@@ -202,7 +206,7 @@ TEST_CASE("validateSelectStatement_DuplicateSynonym_INVALID") {
 }
 
 // Order of Select and declaration is not checked.
-// However, it doesn't have to be since if it is a valid Select statement,
+// However, it doesn't have to be since even if it is a valid Select statement,
 // it would not be able to retrieve the synonyms, resulting in Semantic Error
 // Wrong error will be thrown (Semantic instead of Syntax).
 TEST_CASE("validateSelectStatement_INVALID") {
