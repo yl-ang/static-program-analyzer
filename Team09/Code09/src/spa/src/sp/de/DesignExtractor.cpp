@@ -14,6 +14,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setUsesStore(getUses());
     writer->setModifiesStore(getModifies());
     writer->setPatternStore(getPattern());
+    writer->setNextStore(getNext());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
@@ -29,6 +30,10 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
+    }
+
+    for (auto procedure : root->getChildren()) {
+        cfg.buildCFG(procedure);
     }
 }
 
@@ -78,4 +83,8 @@ std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getModifies() 
 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getPattern() {
     return patternExtractor->getPattern();
+}
+
+std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
+    return cfg.nextRelationships;
 }

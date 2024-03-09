@@ -1,6 +1,8 @@
 #include "Cfg.h"
 
 #include <memory>
+#include <unordered_set>
+#include <utility>
 
 #include "sp/ast/AstNode.h"
 // builds the CFG for a single procedure.
@@ -50,5 +52,13 @@ void CFG::insertIntoCFGMap(int parentStatementNumber, int childStatementNumber) 
         parentToChildMap[parentStatementNumber] = {childStatementNumber};
     } else {
         parentToChildMap[parentStatementNumber].push_back(childStatementNumber);
+    }
+}
+
+void CFG::createNextRelationships() {
+    for (const auto& [key, values] : parentToChildMap) {
+        for (auto value : values) {
+            nextRelationships.insert(std::make_pair(key, value));
+        }
     }
 }
