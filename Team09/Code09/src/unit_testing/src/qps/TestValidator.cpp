@@ -108,6 +108,7 @@ TEST_CASE("validateSuchThatClause") {
     testStore.storeSynonymWithStatement("stmt s1, s2;");
     testStore.storeSynonymWithStatement("variable v;");
     testStore.storeSynonymWithStatement("read re;");
+    testStore.storeSynonymWithStatement("constant c;");
 
     TestValidator validator(testStore);
 
@@ -129,6 +130,15 @@ TEST_CASE("validateSuchThatClause") {
     std::string inputString_Uses_VALID = "such that Uses(s1,v)";
     REQUIRE(validator.testIsValidSuchThatClause(inputString_Uses_VALID));
 
+    std::string inputString_Next_VALID = "such that Next(s1,s2)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_Next_VALID));
+
+    std::string inputString_NextT_VALID = "such that Next*(s1,s2)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_NextT_VALID));
+
+    std::string inputString_Next_SynonymInteger_VALID = "such that Next(s1,10)";
+    REQUIRE(validator.testIsValidSuchThatClause(inputString_Next_SynonymInteger_VALID));
+
     std::string inputString_Follows_Stmt_INVALID = "such that Follows(s4,2)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
 
@@ -143,6 +153,12 @@ TEST_CASE("validateSuchThatClause") {
 
     std::string inputString_Uses_FirstArgWildcard_INVALID = "such that Uses(_,v)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Uses_FirstArgWildcard_INVALID));
+
+    std::string inputString_Next_MissingSynonym_INVALID = "such that Next(s1,s100)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Next_MissingSynonym_INVALID));
+
+    std::string inputString_Next_SynonymConstant_INVALID = "such that Next(s1,c)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Next_SynonymConstant_INVALID));
 }
 
 TEST_CASE("validatePatternClause") {

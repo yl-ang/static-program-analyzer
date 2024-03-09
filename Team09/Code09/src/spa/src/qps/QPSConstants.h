@@ -24,9 +24,11 @@ struct QPSConstants {
     inline static const std::string PARENT_STAR = "Parent*";
     inline static const std::string USES = "Uses";
     inline static const std::string MODIFIES = "Modifies";
+    inline static const std::string NEXT = "Next";
+    inline static const std::string NEXT_STAR = "Next*";
 
-    inline static const std::string REL_REF =
-        FOLLOWS + '|' + FOLLOWS_STAR + '|' + PARENT + '|' + PARENT_STAR + '|' + USES + '|' + MODIFIES;
+    inline static const std::string REL_REF = FOLLOWS + '|' + FOLLOWS_STAR + '|' + PARENT + '|' + PARENT_STAR + '|' +
+                                              USES + '|' + MODIFIES + '|' + NEXT + '|' + NEXT_STAR;
 
     inline static const std::string SELECT = "Select";
     inline static const std::string SUCH_THAT = "such that";

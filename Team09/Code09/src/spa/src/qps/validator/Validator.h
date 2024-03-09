@@ -5,6 +5,7 @@
 #include "ArgumentsValidator/AssignPatternValidator.h"
 #include "ArgumentsValidator/FollowsValidator.h"
 #include "ArgumentsValidator/ModifiesValidator.h"
+#include "ArgumentsValidator/NextValidator.h"
 #include "ArgumentsValidator/ParentValidator.h"
 #include "ArgumentsValidator/UsesValidator.h"
 #include "SynonymStore.h"

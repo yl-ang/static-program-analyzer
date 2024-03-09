@@ -156,6 +156,8 @@ std::unique_ptr<ArgumentsValidator> Validator::buildArgValidator(const std::stri
         return std::make_unique<UsesValidator>(arguments);
     } else if (relRefString == QPSConstants::MODIFIES) {
         return std::make_unique<ModifiesValidator>(arguments);
+    } else if (relRefString == QPSConstants::NEXT || relRefString == QPSConstants::NEXT_STAR) {
+        return std::make_unique<NextValidator>(arguments);
     } else {
         throw Exception("Not implemented: " + relRefString);
     }
