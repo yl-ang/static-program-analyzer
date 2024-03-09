@@ -12,8 +12,9 @@ bool isInteger(const std::string& str) {
     return std::regex_match(str, std::regex("^(?:0|[1-9][0-9]*)$"));
 }
 
+// Assumption that there does not exist a synonym with the name BOOLEAN
 bool isSynonym(const std::string& str) {
-    return isIdent(str);
+    return isIdent(str) && !isBoolean(str);
 }
 
 bool isWildcard(const std::string& str) {
@@ -161,6 +162,37 @@ bool isSelectStatement(const std::string& str) {
 bool isDeclarationStatement(const std::string& str) {
     std::string pattern = "^(" + QPSConstants::DESIGN_ENTITIES + ")";
     return std::regex_search(str, std::regex(pattern));
+}
+
+bool isResultClause(const std::string& str) {
+    return isBoolean(str) || isTuple(str);
+}
+
+bool isBoolean(const std::string& str) {
+    return trim(str) == QPSConstants::BOOLEAN;
+}
+
+bool isTuple(const std::string& str) {
+    bool startsAndEndsWithAngularBrackets = std::regex_match(str, std::regex("^<.*>$"));
+    std::vector<std::string> elems = {};
+    std::string removedBracketsString;
+    if (startsAndEndsWithAngularBrackets) {
+        removedBracketsString = str.substr(1, str.size() - 2);
+        elems = splitByDelimiter(removedBracketsString, ",");
+    } else {
+        elems.push_back(str);
+    }
+
+    for (std::string elem : elems) {
+        if (!isElem(elem)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isElem(const std::string& str) {
+    return isSynonym(str);
 }
 
 bool containsSuchThatClause(const std::string& selectStatement) {

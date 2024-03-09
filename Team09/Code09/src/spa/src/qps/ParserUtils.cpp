@@ -47,11 +47,11 @@ std::vector<std::string> splitByDelimiter(const std::string& str, const std::str
         substring = str.substr(offset, substringSize);
         splitList.push_back(trim(substring));
 
-        offset = nextDelimiterIndex + 1;
+        offset = nextDelimiterIndex + delimiter.size();
         nextDelimiterIndex = str.find(delimiter, offset);
     }
 
-    if (offset != str.length()) {
+    if (offset <= str.length()) {
         substringSize = str.length() - offset;
         substring = str.substr(offset, substringSize);
         splitList.push_back(trim(substring));
@@ -67,7 +67,7 @@ std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& 
         return std::make_tuple(str, "");
     } else {
         std::string substring = str.substr(0, nextDelimiterIndex);
-        std::string remainingString = str.substr(nextDelimiterIndex + 1, std::string::npos);
+        std::string remainingString = str.substr(nextDelimiterIndex + delimiter.size(), std::string::npos);
         return std::make_tuple(substring, remainingString);
     }
 }
@@ -97,10 +97,30 @@ std::string trim(const std::string& str) {
     return trimmedString;
 }
 
+std::vector<std::string> extractReturnResults(const std::string& str) {
+    bool startsAndEndsWithAngularBracket = std::regex_match(str, std::regex("^<.*>$"));
+    if (startsAndEndsWithAngularBracket) {
+        std::string removedBracketsString = str.substr(1, str.size() - 2);
+        return splitByDelimiter(removedBracketsString, ",");
+    }
+    return {str};
+}
+
+std::tuple<std::string, std::string> splitResultAndClause(const std::string& str) {
+    bool hasAngularBrackets = std::regex_search(str, std::regex("<.*>"));
+    if (hasAngularBrackets) {
+        size_t closingBracketIndex = str.find_last_of(">");
+        std::string returnResult = trim(str.substr(0, closingBracketIndex + 1));
+        std::string remainingClauses = trim(str.substr(closingBracketIndex + 1));
+        return std::make_tuple(returnResult, remainingClauses);
+    }
+    return substringUntilDelimiter(str, " ");
+}
+
 // str = "such that Follows(1, 2) pattern a("_", "_")"
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
-    std::vector<std::string> clauseStarts = {"such that", "pattern"};
+    std::vector<std::string> clauseStarts = {QPSConstants::SUCH_THAT, QPSConstants::PATTERN};
 
     std::vector<size_t> allClausesIndices = {};
     for (std::string clauseString : clauseStarts) {

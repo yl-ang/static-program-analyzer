@@ -5,6 +5,7 @@
 #include "ArgumentsValidator/AssignPatternValidator.h"
 #include "ArgumentsValidator/FollowsValidator.h"
 #include "ArgumentsValidator/ModifiesValidator.h"
+#include "ArgumentsValidator/NextValidator.h"
 #include "ArgumentsValidator/ParentValidator.h"
 #include "ArgumentsValidator/UsesValidator.h"
 #include "SynonymStore.h"
@@ -23,7 +24,7 @@ protected:
 
     void validateDeclarationStatement(const std::string& statement);
     void validateSelectStatement(const std::string& statement);
-    void validateReturnClause(const std::string& returnClause);
+    void validateResultClause(const std::string& resultClause);
 
     void validateSuchThatClause(const std::string& suchThatClause);
     void validateRelRef(const std::string& relRef);

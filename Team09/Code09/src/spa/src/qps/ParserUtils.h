@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "QPSConstants.h"
+
 const std::string WHITESPACES = " \n\r\t\b\f";
 const std::string SPACE = " ";
 const std::string QUOTATIONS = "\"";
@@ -19,5 +21,7 @@ std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& 
 std::vector<std::string> stringToWordList(const std::string& string);
 std::string trim(const std::string& str);
 
+std::tuple<std::string, std::string> splitResultAndClause(const std::string& str);
+std::vector<std::string> extractReturnResults(const std::string& str);
 std::vector<std::string> getAllClauses(const std::string& str);
 std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause);

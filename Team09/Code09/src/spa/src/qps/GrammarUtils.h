@@ -26,5 +26,10 @@ bool isFactor(const std::string&);
 bool isSelectStatement(const std::string&);
 bool isDeclarationStatement(const std::string&);
 
+bool isResultClause(const std::string&);
+bool isBoolean(const std::string&);
+bool isTuple(const std::string&);
+bool isElem(const std::string&);
+
 bool containsSuchThatClause(const std::string&);
 bool containsPatternClause(const std::string&);

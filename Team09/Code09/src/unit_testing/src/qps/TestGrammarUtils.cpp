@@ -172,3 +172,85 @@ TEST_CASE("isFactor") {
         REQUIRE_FALSE(isFactor("_"));
     }
 }
+
+TEST_CASE("isResultClause") {
+    SECTION("boolean_true") {
+        REQUIRE(isResultClause("BOOLEAN"));
+    }
+
+    SECTION("elem_true") {
+        REQUIRE(isResultClause("var"));
+    }
+
+    SECTION("tuple_true") {
+        REQUIRE(isResultClause("<var>"));
+    }
+
+    SECTION("tuple with multiple elem_true") {
+        REQUIRE(isResultClause("<var, x, y>"));
+    }
+
+    SECTION("integer_false") {
+        REQUIRE_FALSE(isResultClause("10"));
+    }
+
+    SECTION("tuple with boolean_false") {
+        REQUIRE_FALSE(isResultClause("<BOOLEAN>"));
+    }
+
+    SECTION("tuple missing angular bracket_false") {
+        REQUIRE_FALSE(isResultClause("var>"));
+    }
+}
+
+TEST_CASE("isTuple") {
+    SECTION("elem_true") {
+        REQUIRE(isTuple("var"));
+    }
+
+    SECTION("one elem with angular bracket_true") {
+        REQUIRE(isTuple("<var>"));
+    }
+
+    SECTION("two elems_true") {
+        REQUIRE(isTuple("<var, x>"));
+    }
+
+    SECTION("three elems_true") {
+        REQUIRE(isTuple("<var, x, y>"));
+    }
+
+    SECTION("multiple elems & missing angular bracket_false") {
+        REQUIRE_FALSE(isTuple("var, x"));
+    }
+
+    SECTION("multiple elems & extra bracket_false") {
+        REQUIRE_FALSE(isTuple("<var, x>>"));
+    }
+
+    SECTION("multiple elems & one missing bracket_false") {
+        REQUIRE_FALSE(isTuple("<var, x"));
+    }
+
+    SECTION("multiple elems & extra comma_false") {
+        REQUIRE_FALSE(isTuple("<var, x,>"));
+    }
+
+    SECTION("multiple elems & missing variable_false") {
+        REQUIRE_FALSE(isTuple("<var, ,x>"));
+    }
+
+    SECTION("elem and BOOLEAN_false") {
+        REQUIRE_FALSE(isTuple("<var, BOOLEAN>"));
+    }
+}
+
+TEST_CASE("isElem") {
+    SECTION("synonym_true") {
+        REQUIRE(isElem("var"));
+    }
+
+    SECTION("integer_false") {
+        REQUIRE_FALSE(isElem("10"));
+    }
+}
