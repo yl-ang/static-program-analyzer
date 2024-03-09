@@ -33,8 +33,9 @@ TEST_CASE("CFG Build Tests") {
         for (auto child : astRoot->getChildren()) {
             cfg.buildCFG(child);
         }
-        std::unordered_map<int, std::vector<int>> expected = {{1, {2}}, {2, {3}}, {3, {4, 7}}, {4, {5}},  {5, {6}},
-                                                              {6, {3}}, {7, {8}}, {8, {10}},   {9, {10}}, {10, {11}}};
+        std::unordered_map<int, std::vector<int>> expected = {{1, {2}},  {2, {3}},   {3, {4, 7}}, {4, {5}},
+                                                              {5, {6}},  {6, {3}},   {7, {8, 9}}, {8, {10}},
+                                                              {9, {10}}, {10, {11}}, {11, {12}}};
 
         REQUIRE(cfg.parentToChildMap == expected);
     }
