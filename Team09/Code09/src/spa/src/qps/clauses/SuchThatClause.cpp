@@ -12,7 +12,7 @@
 #include "relationships/Uses.h"
 
 namespace {
-static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
+const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
     {"Follows", RelationshipType::FOLLOWS}, {"Follows*", RelationshipType::FOLLOWS_STAR},
     {"Parent", RelationshipType::PARENT},   {"Parent*", RelationshipType::PARENT_STAR},
     {"Uses", RelationshipType::USES},       {"Modifies", RelationshipType::MODIFIES},
@@ -39,6 +39,25 @@ RelationshipType SuchThatClause::determineRelationshipType(const std::string& ty
     }
 
     throw Exception("suchThatClauseType is not found in valid types: " + type);
+}
+
+bool SuchThatClause::isBooleanResult() const {
+    return !firstArg.isSynonym() && !secondArg.isSynonym();
+}
+
+bool SuchThatClause::containsSynonym(const Synonym& s) const {
+    return firstArg == s || secondArg == s;
+}
+
+std::vector<Synonym> SuchThatClause::getSynonyms() const {
+    std::vector<Synonym> synonyms;
+    if (firstArg.isSynonym()) {
+        synonyms.push_back(*dynamic_cast<Synonym*>(&firstArg));
+    }
+    if (secondArg.isSynonym()) {
+        synonyms.push_back(*dynamic_cast<Synonym*>(&secondArg));
+    }
+    return synonyms;
 }
 
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
