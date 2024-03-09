@@ -26,7 +26,7 @@ void TestWrapper::parse(std::string filename) {
         spa.parse(filename);
     } catch (SyntaxError& e) {
         std::cerr << "Syntax Error: " << e.what() << std::endl;
-        ::exit(0);
+        ::exit(1);
     }
 }
 
