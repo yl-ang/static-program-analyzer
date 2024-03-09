@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 #include "PKB/PKBClient/PKBFacadeReader.h"
-#include "pkb/Utils/DataTypes.h"
+#include "PKB/Utils/DataTypes.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
 

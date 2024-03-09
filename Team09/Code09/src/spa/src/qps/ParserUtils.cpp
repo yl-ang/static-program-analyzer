@@ -12,7 +12,7 @@ std::string replaceAllExtraWhitespaces(const std::string& str) {
     return trim(replacedString);
 }
 
-std::string removeAllWhitespaces(std::string str) {
+std::string removeAllWhitespaces(const std::string& str) {
     std::string replacedString;
 
     std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
@@ -21,13 +21,17 @@ std::string removeAllWhitespaces(std::string str) {
     return replacedString;
 }
 
-std::string removeAllQuotations(std::string str) {
+std::string removeAllQuotations(const std::string& str) {
     std::string replacedString;
 
     std::regex quotationsPattern = std::regex("[" + QUOTATIONS + "]");
     replacedString = std::regex_replace(str, quotationsPattern, "");
 
     return replacedString;
+}
+
+std::string cleanQuotedIdent(const std::string& str) {
+    return removeAllQuotations(removeAllWhitespaces(str));
 }
 
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter) {

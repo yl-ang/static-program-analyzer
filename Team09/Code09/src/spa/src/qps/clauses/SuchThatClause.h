@@ -1,8 +1,8 @@
 #pragma once
 
 #include "QueryClause.h"
-#include "relationships/Follows.h"
 #include "relationships/Relationship.h"
+#include "relationships/RelationshipBuilder.h"
 
 class SuchThatClause : public QueryClause {
 private:
@@ -12,7 +12,6 @@ private:
 
 public:
     SuchThatClause(const RelationshipType&, ClauseArgument*, ClauseArgument*);
-    static RelationshipType determineRelationshipType(const std::string&);
     ClauseType getType() const override;
     bool equals(const QueryClause& other) const override;
     ClauseResult evaluate(PKBFacadeReader&) override;

@@ -426,38 +426,3 @@ TEST_CASE("PQLParser: Select ... pattern (3)") {
     REQUIRE(ans3.equals(result_3[0]));
     REQUIRE(ans4.equals(result_4[0]));
 }
-
-// // Select st pattern
-// TEST_CASE("PQLParser for Select ... st ... pattern") {
-//     std::string select_stp_1 = "Select s1 such that Follows(s1,s2) pattern a1(v1,v2)";
-//     std::string select_stp_2 = "   Select s1 such   that Follows  (s1,  s2) pattern a1  (v1,  v2)   ";
-
-//     std::vector<Synonym> result_1 = PQLParser::findSelectClauses(entities, select_stp_1);
-//     std::vector<Synonym> result_2 = PQLParser::findSelectClauses(entities, select_stp_2);
-//     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(entities, select_stp_1);
-//     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(entities, select_stp_2);
-//     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_stp_1);
-//     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_stp_2);
-
-//     REQUIRE(result_1[0] == Synonym(DesignEntityType::STMT, "s1"));
-//     REQUIRE(result_1.size() == 1);
-//     REQUIRE(result_2[0] == Synonym(DesignEntityType::STMT, "s1"));
-//     REQUIRE(result_2.size() == 1);
-
-//     SuchThatClause ans1 = SuchThatClause(SuchThatClauseType::FOLLOWS, Synonym(DesignEntityType::STMT, "s1"),
-//                                          Synonym(DesignEntityType::STMT, "s2"));
-//     REQUIRE(ans1.equals(result_3[0]));
-//     REQUIRE(result_3.size() == 1);
-//     REQUIRE(ans1.equals(result_4[0]));
-//     REQUIRE(result_4.size() == 1);
-
-//     // Didn't test FOLLOWS_STAR as should be same as Follows + Going to change many things anyway.
-
-//     PatternClause ans2 =
-//         PatternClause(Synonym(DesignEntityType::ASSIGN, "a1"), Synonym(DesignEntityType::VARIABLE, "v1"),
-//                       Synonym(DesignEntityType::VARIABLE, "v2"));
-//     REQUIRE(ans2.equals(result_5[0]));
-//     REQUIRE(result_5.size() == 1);
-//     REQUIRE(ans2.equals(result_6[0]));
-//     REQUIRE(result_6.size() == 1);
-// }

@@ -36,13 +36,13 @@ TEST_CASE("SuchThatClause equals") {
 
 // ai-gen start(copilot, 0, e)
 // prompt: test suchthatclause determineRelationshiptype
-TEST_CASE("SuchThatClause determineRelationshipType") {
-    REQUIRE(SuchThatClause::determineRelationshipType("Follows") == RelationshipType::FOLLOWS);
-    REQUIRE(SuchThatClause::determineRelationshipType("Follows*") == RelationshipType::FOLLOWS_STAR);
-    REQUIRE(SuchThatClause::determineRelationshipType("Parent") == RelationshipType::PARENT);
-    REQUIRE(SuchThatClause::determineRelationshipType("Parent*") == RelationshipType::PARENT_STAR);
-    REQUIRE(SuchThatClause::determineRelationshipType("Uses") == RelationshipType::USES);
-    REQUIRE(SuchThatClause::determineRelationshipType("Modifies") == RelationshipType::MODIFIES);
+TEST_CASE("Relationship determineRelationshipType") {
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Follows") == RelationshipType::FOLLOWS);
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Follows*") == RelationshipType::FOLLOWS_STAR);
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Parent") == RelationshipType::PARENT);
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Parent*") == RelationshipType::PARENT_STAR);
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Uses") == RelationshipType::USES);
+    REQUIRE(RelationshipBuilder::determineRelationshipType("Modifies") == RelationshipType::MODIFIES);
 }
 // ai-gen end
 

@@ -11,8 +11,9 @@ const std::string SPACE = " ";
 const std::string QUOTATIONS = "\"";
 
 std::string replaceAllExtraWhitespaces(const std::string& str);
-std::string removeAllWhitespaces(std::string str);
-std::string removeAllQuotations(std::string str);
+std::string removeAllWhitespaces(const std::string& str);
+std::string removeAllQuotations(const std::string& str);
+std::string cleanQuotedIdent(const std::string& str);
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter);
 std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter);
 std::vector<std::string> stringToWordList(const std::string& string);
