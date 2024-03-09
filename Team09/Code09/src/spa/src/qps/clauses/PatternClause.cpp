@@ -47,13 +47,13 @@ std::vector<Synonym> PatternClause::getSynonyms() const {
     std::vector<Synonym> synonyms;
 
     if (assignSynonym.isSynonym()) {
-        synonyms.push_back(*dynamic_cast<Synonym*>(&assignSynonym));
+        synonyms.push_back(dynamic_cast<Synonym&>(assignSynonym));
     }
     if (firstArg.isSynonym()) {
-        synonyms.push_back(*dynamic_cast<Synonym*>(&firstArg));
+        synonyms.push_back(dynamic_cast<Synonym&>(firstArg));
     }
     if (secondArg.isSynonym()) {
-        synonyms.push_back(*dynamic_cast<Synonym*>(&secondArg));
+        synonyms.push_back(dynamic_cast<Synonym&>(secondArg));
     }
     return synonyms;
 }
