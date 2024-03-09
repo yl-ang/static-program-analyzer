@@ -8,5 +8,5 @@ public:
     void validate(std::shared_ptr<ProgramNode> programNode);
 
 private:
-    bool hasDuplicateProcedureName(std::shared_ptr<ProgramNode>);
+    void checkDuplicateProcedureNames(std::shared_ptr<ProgramNode>);
 };
