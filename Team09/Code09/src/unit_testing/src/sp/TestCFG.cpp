@@ -2,33 +2,26 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <queue>
 #include <sstream>
 
 #include "catch.hpp"
 #include "sp/SourceLoader.h"
 #include "sp/ast/Ast.h"
-#include "sp/ast/AstNode.h"
+#include "sp/cfg/Cfg.h"
 #include "sp/tokenizer/SpTokenizer.h"
 #include "sp/tokenizer/Token.h"
+#include "utils.h"
 
 using namespace std;  // NOLINT
 
-std::queue<Token> makeTokenQueue(std::vector<Token> tokens) {
-    std::queue<Token> queue;
-    for (auto token : tokens) {
-        queue.push(token);
-    }
-    return queue;
-}
-
-TEST_CASE("AST Build Tests") {
+TEST_CASE("CFG Build Tests") {
     AST ast;
     SpTokenizer tokenizer;
     SourceLoader sourceLoader;
+    CFG cfg;
 
     SECTION("Basic CFG built correctly") {
-        std::ifstream sourceProgram("Team09/Code09/src/unit_testing/src/sp/sample test files/CFG/Website.txt");
+        ifstream sourceProgram("../../../src/unit_testing/src/sp/test_files/CFG/Website.txt");
         std::stringstream buffer;
         buffer << sourceProgram.rdbuf();
 
@@ -36,5 +29,13 @@ TEST_CASE("AST Build Tests") {
         std::vector<std::string> simpleProgramAsString = sourceLoader.loadSimple(buffer);
         std::vector<Token> tokens = tokenizer.tokenize(simpleProgramAsString);
         std::shared_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
+
+        for (auto child : astRoot->getChildren()) {
+            cfg.buildCFG(child);
+        }
+        std::unordered_map<int, std::vector<int>> expected = {{1, {2}}, {2, {3}}, {3, {4, 7}}, {4, {5}},  {5, {6}},
+                                                              {6, {3}}, {7, {8}}, {8, {10}},   {9, {10}}, {10, {11}}};
+
+        REQUIRE(cfg.parentToChildMap == expected);
     }
 }

@@ -12,6 +12,7 @@
 #include "ParentExtractor.h"
 #include "PatternExtractor.h"
 #include "UsesExtractor.h"
+#include "sp/cfg/Cfg.h"
 
 class DesignExtractor {
 public:
@@ -42,4 +43,5 @@ private:
     UsesExtractor* usesExtractor;
     ModifiesExtractor* modifiesExtractor;
     PatternExtractor* patternExtractor;
+    CFG cfg;
 };
