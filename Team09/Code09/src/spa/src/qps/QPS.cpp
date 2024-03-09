@@ -10,7 +10,7 @@ std::vector<std::string> QPS::processQueries(std::string inputString) {
         validator.validate(tokenizedInput);
         Query parsedInput = parser.parse(tokenizedInput);
         return parsedInput.evaluate(pkbReader);
-    } catch (QPSSyntaxError e) {
+    } catch (Exception e) {
         return std::vector<std::string>{e.getMessage()};
     }
 }
