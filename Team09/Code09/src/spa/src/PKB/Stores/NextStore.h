@@ -17,7 +17,6 @@ public:
     std::unordered_set<StmtNum> getNextee(StmtNum nexter);
     std::unordered_set<StmtNum> getNexterStar(StmtNum nextee);
     std::unordered_set<StmtNum> getNexteeStar(StmtNum nexter);
-
     bool hasNextRelationship(StmtNum s1, StmtNum s2);
     bool hasNextRelationship(ClauseArgument &arg1, ClauseArgument &arg2);
     bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
@@ -26,6 +25,8 @@ public:
 private:
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> nexterMap;
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> nexteeMap;
+
+    // helper functions for next star
     void dfsNextStar(StmtNum current, std::unordered_set<StmtNum> &result, std::unordered_set<StmtNum> &visited,
                      const std::unordered_map<StmtNum, std::unordered_set<StmtNum>> &nextMap);
     std::unordered_set<StmtNum> computeNextStar(

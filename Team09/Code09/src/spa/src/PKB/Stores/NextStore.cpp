@@ -46,7 +46,7 @@ bool NextStore::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
 }
 
 bool NextStore::hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
-    if (arg1.isWildcard() & arg2.isWildcard()) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
         return !(nexterMap.empty());
     }
 
@@ -81,7 +81,6 @@ bool NextStore::hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& ar
     return hasNextStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
 }
 
-// Helper function for depth-first search to find transitive closure
 void NextStore::dfsNextStar(StmtNum current, std::unordered_set<StmtNum>& result, std::unordered_set<StmtNum>& visited,
                             const std::unordered_map<StmtNum, std::unordered_set<StmtNum>>& nextMap) {
     if (visited.find(current) != visited.end()) {
@@ -89,7 +88,6 @@ void NextStore::dfsNextStar(StmtNum current, std::unordered_set<StmtNum>& result
     }
 
     visited.insert(current);
-    result.insert(current);
 
     auto nexterSet = nextMap.find(current);
     if (nexterSet != nextMap.end()) {
@@ -97,6 +95,8 @@ void NextStore::dfsNextStar(StmtNum current, std::unordered_set<StmtNum>& result
             dfsNextStar(nextee, result, visited, nextMap);
         }
     }
+
+    result.insert(current);
 }
 
 std::unordered_set<StmtNum> NextStore::computeNextStar(

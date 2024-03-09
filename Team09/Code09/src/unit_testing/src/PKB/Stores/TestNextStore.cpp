@@ -3,7 +3,7 @@
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauseArguments/Wildcard.h"
 
-TEST_CASE("NextStore - All Tests") {
+TEST_CASE("NextStore - Next Tests") {
     NextStore nextStore;
 
     SECTION("Test setNextStore and getNexter") {
@@ -125,5 +125,26 @@ TEST_CASE("NextStore - All Tests") {
 
         delete integerArg1;
         delete integerArg2;
+    }
+}
+
+TEST_CASE("NextStore - NextStar Tests") {
+    NextStore nextStore;
+    nextStore.setNextStore({{1, 2}, {1, 3}, {2, 4}, {3, 4}, {4, 5}, {4, 1}});
+
+    SECTION("Test getNexterStar") {
+        std::unordered_set<StmtNum> result = nextStore.getNexterStar(1);
+        std::unordered_set<StmtNum> expected = {2, 3, 4, 5};
+        REQUIRE(result == expected);
+    }
+
+    SECTION("Test getNexteeStar") {
+        std::unordered_set<StmtNum> result = nextStore.getNexteeStar(4);
+        std::unordered_set<StmtNum> expected = {1, 2, 3};
+        REQUIRE(result == expected);
+
+        result = nextStore.getNexteeStar(5);
+        expected = {1, 2, 3, 4};
+        REQUIRE(result == expected);
     }
 }
