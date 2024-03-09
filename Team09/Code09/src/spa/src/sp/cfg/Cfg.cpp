@@ -51,8 +51,6 @@ void CFG::buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int 
 // if the parent number does not exist, we create a new entry
 // otherwise we add the child to the vector.
 void CFG::insertIntoCFGMap(int parentStatementNumber, int childStatementNumber) {
-    std::cout << "Parent statement number is: " << parentStatementNumber << ", child is: " << childStatementNumber
-              << "\n";
     if (parentToChildMap.find(parentStatementNumber) == parentToChildMap.end()) {
         parentToChildMap[parentStatementNumber] = {childStatementNumber};
     } else {
