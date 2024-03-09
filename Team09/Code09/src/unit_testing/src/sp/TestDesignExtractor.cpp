@@ -10,52 +10,6 @@
 #include "sp/de/UsesExtractor.h"
 #include "sp/tokenizer/SpTokenizer.h"
 
-// TEST_CASE("Design Extractor Test using Build AST") {
-//     SpTokenizer tokenizer;
-//     AST ast;
-//     DesignExtractor designExtractor;
-//     std::vector<std::string> program = {"procedure", "main", "{", "x", "=", "y", ";", "}"};
-
-//     for (std::string str : program) {
-//         std::cout << str << std::endl;
-//     }
-//     std::vector<Token> tokens = tokenizer.tokenize(program);
-//     std::shared_ptr<ProgramNode> astRoot = ast.buildAST(tokens);
-//     designExtractor.extract(std::move(astRoot));
-
-//     std::unordered_set<std::string> expectedVariables = {"x", "y"};
-//     std::cout << "Var Size: " << designExtractor.getVariables().size() << std::endl;
-//     REQUIRE(expectedVariables == designExtractor.getVariables());
-// }
-
-// TEST_CASE("Simple Design Extractor Test") {
-//     // x = y;
-//     std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>(VariableNode("x", 1));
-//     std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>(VariableNode("y", 1));
-//     std::vector<std::shared_ptr<ASTNode>> childrenA = {};
-//     childrenA.push_back(std::move(xNode));
-//     childrenA.push_back(std::move(yNode));
-//     auto equalNode = std::make_shared<AssignmentNode>(std::move(childrenA), 1);
-
-//     std::vector<std::shared_ptr<ASTNode>> childrenProc = {};
-//     std::vector<std::shared_ptr<ASTNode>> childrenProc1 = {};
-//     childrenProc.push_back(std::move(equalNode));
-
-//     auto stmtListProc = std::make_shared<StatementListNode>(std::move(childrenProc));
-//     childrenProc1.push_back(std::move(stmtListProc));
-//     auto ProcNode = std::make_shared<ProcedureNode>("main", std::move(childrenProc1));
-
-//     std::vector<std::shared_ptr<ASTNode>> childrenProg = {};
-//     childrenProg.push_back(std::move(ProcNode));
-
-//     auto ProgNode = std::make_shared<ProgramNode>((childrenProg));
-
-//     DesignExtractor designExtractor;
-//     designExtractor.extract(ProgNode);
-//     std::unordered_set<std::string> expectedVariables = {"x", "y"};
-//     REQUIRE(expectedVariables == designExtractor.getVariables());
-// }
-
 TEST_CASE("Design Extractor Tests") {
     /*
     01  x = y;
