@@ -9,10 +9,10 @@
 #include "EntityExtractor.h"
 #include "FollowsExtractor.h"
 #include "ModifiesExtractor.h"
+#include "NextExtractor.h"
 #include "ParentExtractor.h"
 #include "PatternExtractor.h"
 #include "UsesExtractor.h"
-#include "sp/cfg/Cfg.h"
 
 class DesignExtractor {
 public:
@@ -23,9 +23,6 @@ public:
     void writePKB(PKBFacadeWriter* pkbWriter);
 
     void dfsVisit(std::shared_ptr<ASTNode>&& node, AstVisitor* visitor);
-
-    void getCFG();
-
     std::unordered_set<std::string> getVariables();
     std::unordered_set<std::string> getConstants();
     std::unordered_set<std::string> getProcedures();
@@ -44,5 +41,5 @@ private:
     UsesExtractor* usesExtractor;
     ModifiesExtractor* modifiesExtractor;
     PatternExtractor* patternExtractor;
-    CFG cfg;
+    NextExtractor* nextExtractor;
 };

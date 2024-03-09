@@ -57,11 +57,3 @@ void CFG::insertIntoCFGMap(int parentStatementNumber, int childStatementNumber) 
         parentToChildMap[parentStatementNumber].push_back(childStatementNumber);
     }
 }
-
-void CFG::createNextRelationships() {
-    for (const auto& [key, values] : parentToChildMap) {
-        for (auto value : values) {
-            nextRelationships.insert(std::make_pair(key, value));
-        }
-    }
-}

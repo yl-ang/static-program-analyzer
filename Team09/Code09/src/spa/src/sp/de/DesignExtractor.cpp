@@ -24,6 +24,7 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->usesExtractor = new UsesExtractor();
     this->modifiesExtractor = new ModifiesExtractor();
     this->patternExtractor = new PatternExtractor();
+    this->nextExtractor = new NextExtractor();
 
     std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor,  parentExtractor,
                                       usesExtractor,   modifiesExtractor, patternExtractor};
@@ -33,7 +34,7 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     }
 
     for (auto procedure : root->getChildren()) {
-        cfg.buildCFG(procedure);
+        this->nextExtractor->buildCFG(procedure);
     }
 }
 
@@ -86,5 +87,5 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Desi
 }
 
 std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
-    return cfg.nextRelationships;
+    return nextExtractor->getNextRelationships();
 }
