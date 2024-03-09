@@ -13,6 +13,7 @@ const std::string QUOTATIONS = "\"";
 std::string replaceAllExtraWhitespaces(const std::string& str);
 std::string removeAllWhitespaces(std::string str);
 std::string removeAllQuotations(std::string str);
+std::string cleanQuotedIdent(std::string str);
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter);
 std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter);
 std::vector<std::string> stringToWordList(const std::string& string);

@@ -26,7 +26,7 @@ std::vector<ClauseArgument*> SuchThatStrategy::buildSTParameters(const std::vect
     std::vector<ClauseArgument*> results{};
     for (const std::string& str : strings) {
         if (isQuotedIdent(str)) {
-            results.push_back(new Literal(removeAllQuotations(removeAllWhitespaces(str))));
+            results.push_back(new Literal(cleanQuotedIdent(str)));
         } else if (isWildcard(str)) {
             results.push_back(new Wildcard());
         } else if (isInteger(str)) {

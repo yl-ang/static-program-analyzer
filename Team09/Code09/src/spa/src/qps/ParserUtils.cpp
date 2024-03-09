@@ -30,6 +30,10 @@ std::string removeAllQuotations(std::string str) {
     return replacedString;
 }
 
+std::string cleanQuotedIdent(std::string str) {
+    return removeAllQuotations(removeAllWhitespaces(str));
+}
+
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter) {
     size_t nextDelimiterIndex = str.find(delimiter);
     size_t offset = 0;
