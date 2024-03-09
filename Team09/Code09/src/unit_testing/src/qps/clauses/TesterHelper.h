@@ -103,3 +103,9 @@ public:
     ModifiesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::MODIFIES) {}
 };
+
+class NextTester : public SuchThatTester {
+public:
+    NextTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT) {}
+};
