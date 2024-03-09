@@ -15,11 +15,6 @@ std::unique_ptr<QueryClause> PatternStrategy::execute(std::vector<Synonym> entit
         std::unique_ptr<PatternClause> patternClause{std::make_unique<PatternClause>(
                                                             entityVector[0], entityVector[1], entityVector[2])};
 
-        // Handle clean up for buildPatternParameter here:
-        for (auto result : entityVector) {
-            delete result;
-        }
-
         return patternClause;
     } else {
         throw Exception("Cannot convert string to PatternClause: " + str);

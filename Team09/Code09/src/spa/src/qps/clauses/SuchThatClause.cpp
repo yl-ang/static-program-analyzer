@@ -22,7 +22,8 @@ bool SuchThatClause::isBooleanResult() const {
 }
 
 bool SuchThatClause::containsSynonym(const Synonym& s) const {
-    return firstArg == s || secondArg == s;
+    return (firstArg.isSynonym() && *dynamic_cast<Synonym*>(&firstArg) == s) ||
+           (secondArg.isSynonym() && *dynamic_cast<Synonym*>(&secondArg) == s);
 }
 
 std::vector<Synonym> SuchThatClause::getSynonyms() const {

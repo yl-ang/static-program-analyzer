@@ -12,11 +12,6 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::vector<Synonym> enti
             std::make_unique<SuchThatClause>(RelationshipBuilder::determineRelationshipType(type),
                                             entityVector[0], entityVector[1])};
 
-        // Handle clean up for buildPatternParameter here:
-        for (auto result : entityVector) {
-            delete result;
-        }
-
         return suchThatClause;
     } else {
         throw Exception("Cannot convert string to SuchThatClause: " + str);
