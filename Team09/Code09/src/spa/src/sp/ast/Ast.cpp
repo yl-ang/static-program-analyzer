@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <utility>
 
+#include "sp/de/AstVisitor.h"
+
 /*
 root node is fixed so we create that at the top first before traversing the
 token vector. now we process the procedures each procedure.  procedure
@@ -33,7 +35,11 @@ std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
         children.push_back((procedure));
     }
 
-    return std::make_shared<ProgramNode>((children));
+    std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>((children));
+
+    validator.validate(programNode);
+
+    return programNode;
 }
 /*
 Grammar: 'procedure' proc_name { stmtList }
@@ -198,6 +204,8 @@ std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
         // ExpressionNode expressionNode = ExpressionNode(front.type, front.line_number);
         children.push_back((node));
         children.push_back((term));
+
+        std::cout << "Building SubExpressionAST 2" << std::endl;
 
         return buildSubExpressionAST(tokens,
                                      std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
