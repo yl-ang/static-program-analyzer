@@ -1189,4 +1189,18 @@ TEST_CASE("AST Build Tests") {
         auto result = ast.buildIfAST(queue);
         REQUIRE(expected == *(result.get()));
     }
+
+    SECTION("Build call statement ast correctly") {
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::CALL, "call", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
+        };
+        auto queue = makeTokenQueue(inputTokenArray);
+        auto result = ast.buildCallAST(queue);
+
+        auto expectedNode = ASTNode("a", "call", {}, 0);
+
+        REQUIRE(expectedNode == *(result.get()));
+    }
 }
