@@ -39,6 +39,8 @@ const std::unordered_set<std::pair<StmtNum, Variable>> modifiesStoreEntries = {{
 const std::unordered_set<std::pair<StmtNum, Variable>> usesStoreEntries = {
     {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"},  {7, "num1"},
     {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
+const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
+    {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
 
 // Common results
 const QPSResult allStmts = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
@@ -84,6 +86,7 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setParentStore(parentStoreEntries);
     pfw.setModifiesStore(modifiesStoreEntries);
     pfw.setUsesStore(usesStoreEntries);
+    pfw.setPatternStore(patternStoreEntries);
 
     return PKBFacadeReader{pkb};
 }
@@ -689,4 +692,119 @@ TEST_CASE("Select with 1 such-that clause") {
         }
     }
     // ai-gen end
+
+    SECTION("Pattern") {
+        SECTION("Assign(Wildcard, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(_,_)");
+            QPSResult expected = {"1", "5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Wildcard, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_,_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_)");
+            QPSResult expected = {"1", "5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(v,_)");
+            QPSResult expected = {"num1", "num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(\"num2\",_)");
+            QPSResult expected = {"5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\",_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\",_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(_, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(_,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(_, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_,_\"1\"_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select a, Empty Result") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_\"num3\"_)");
+            REQUIRE_EMPTY(result);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(v,_\"1\"_)");
+            QPSResult expected = {"num1", "num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(\"num1\", _\"1\"_)");
+            QPSResult expected = {"1"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num1\", _\"1\"_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        // Exact Matching not implemented in Milestone 1
+        // SECTION("Assign(_, Exact Matching) Select a") {
+        //    QPSResult result = qps.processQueries("assign a; Select a pattern a(_, \"1\")");
+        //    QPSResult expected = {"1"};
+        //    REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        //}
+
+        // SECTION("Assign(_, Exact Matching) Select v") {
+        //     QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_, \"1\")");
+        //     QPSResult expected = {allVars};
+        //     REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        // }
+
+        // SECTION("Assign(Variable, Exact Matching) Select a") {
+        // }
+
+        // SECTION("Assign(Variable, Exact Matching) Select v") {
+        // }
+
+        // SECTION("Assign(VarName, Exact Matching) Select a") {
+        // }
+
+        // SECTION("Assign(VarName, Exact Matching) Select v") {
+        // }
+
+        SECTION("Assign(Variable, Partial Matching) Missing variable, Semantic Error") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(v,_\"1\"_)");
+            REQUIRE_THROW_SEMANTIC_ERROR(result);
+        }
+    }
 };
