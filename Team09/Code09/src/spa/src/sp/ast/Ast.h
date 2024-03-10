@@ -14,6 +14,7 @@
 #include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/CallNode.h"
 #include "sp/ast/grammar_nodes/statements/IfNode.h"
 #include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
@@ -52,4 +53,5 @@ public:
     std::shared_ptr<ExpressionNode> handleBracketedCondExpr(std::queue<Token>& tokens);
     std::shared_ptr<WhileNode> buildWhileAST(std::queue<Token>& tokens);
     std::shared_ptr<IfNode> buildIfAST(std::queue<Token>& tokens);
+    std::shared_ptr<CallNode> buildCallAST(std::queue<Token>& tokens);
 };
