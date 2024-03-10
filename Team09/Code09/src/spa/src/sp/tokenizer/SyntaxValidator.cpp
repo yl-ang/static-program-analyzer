@@ -19,7 +19,7 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
             index++;
-        // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
+            // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
@@ -32,7 +32,6 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             }
 
             // Handle special case cond_expr
-            
             if ((std::get<NonTerminal>(stackTop) == NT_COND_EXPR) && (currToken == LEXICAL_TOKEN_TYPE::OPEN_BRACKET)) {
                 grammarRule = disambiguateCondExprRule(index, input, grammarRule);
             }
@@ -81,7 +80,7 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 } else {
                     // Grammar rule cond_expr: rel_expr
                     std::cout << "Using Grammar Rule rel_expr" << std::endl;
-                    grammarRule.erase(dupl, grammarRule.end());   
+                    grammarRule.erase(dupl, grammarRule.end());
                 }
                 return grammarRule;
             }
@@ -143,7 +142,7 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
         {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NOT},
          {LEXICAL_TOKEN_TYPE::NOT, LEXICAL_TOKEN_TYPE::OPEN_BRACKET, NonTerminal::NT_COND_EXPR,
           LEXICAL_TOKEN_TYPE::CLOSE_BRACKET}},
-        {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_REL_EXPR}},    
+        {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_REL_EXPR}},
         {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::INTEGER}, {NonTerminal::NT_REL_EXPR}},
 
         {{NonTerminal::NT__COND_EXPR, LEXICAL_TOKEN_TYPE::ANDAND},
