@@ -19,24 +19,21 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
             index++;
-
             // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
-            std::vector<SyntaxValidator::Symbol>& grammarRule = ite->second;
+            std::vector<SyntaxValidator::Symbol> grammarRule = ite->second;
             // Handles epsilon in the first follows set
             if (grammarRule.empty()) {
                 continue;
             }
 
             // Handle special case cond_expr
-            auto dupl = std::find(grammarRule.begin(), grammarRule.end(), SyntaxValidator::Symbol{NonTerminal::DUPL});
-            if (dupl != grammarRule.end()) {
-                std::vector<SyntaxValidator::Symbol> newRule = disambiguateCondExprRule(index, input, grammarRule);
-                grammarRule.assign(newRule.begin(), newRule.end());
+            if ((std::get<NonTerminal>(stackTop) == NT_COND_EXPR) && (currToken == LEXICAL_TOKEN_TYPE::OPEN_BRACKET)) {
+                grammarRule = disambiguateCondExprRule(index, input, grammarRule);
             }
 
             // Push grammar rule onto the stack in reverse order
@@ -52,7 +49,6 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
     if (!parsingStack.empty() || index != input.size()) {
         throw SyntaxError(" Unexpected end of input");
     }
-    std::cout << "Syntax is valid" << std::endl;
     return true;
 }
 
@@ -60,6 +56,7 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
     int index, std::vector<Token> input, std::vector<SyntaxValidator::Symbol> grammarRule) {
     std::stack<char> bracketStack;
     int i = index;
+
     auto dupl = std::find(grammarRule.begin(), grammarRule.end(), SyntaxValidator::Symbol{NonTerminal::DUPL});
 
     // Perform bracket matching until the first closing parenthesis
@@ -77,13 +74,10 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 if (i + 1 < input.size() &&
                     (input[i + 1].type == LEXICAL_TOKEN_TYPE::ANDAND || input[i + 1].type == LEXICAL_TOKEN_TYPE::OR)) {
                     // Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
-                    std::cout << "Using Grammar Rule ( cond expr ) _cond_expr" << std::endl;
-                    grammarRule.erase(grammarRule.begin(), dupl + 1);
+                    grammarRule.erase(grammarRule.begin(), std::next(dupl));
                 } else {
                     // Grammar rule cond_expr: rel_expr
-                    std::cout << "Using Grammar Rule rel_expr" << std::endl;
-                    std::vector<SyntaxValidator::Symbol> newRule(grammarRule.begin(), dupl - 1);
-                    grammarRule.assign(newRule.begin(), newRule.end());
+                    grammarRule.erase(dupl, grammarRule.end());
                 }
                 return grammarRule;
             }
