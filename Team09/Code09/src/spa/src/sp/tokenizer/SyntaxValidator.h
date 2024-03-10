@@ -38,7 +38,8 @@ enum NonTerminal {
     NT_VAR_NAME,     // 20
     NT_PROC_NAME,    // 21
     NT_CONST_VALUE,  // 22
-    DUPL             // 23
+    DUPL,            // 23
+    NT_CALL          // 24
 };
 
 /**
