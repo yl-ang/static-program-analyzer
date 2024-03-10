@@ -130,21 +130,15 @@ TEST_CASE("NextStore - Next Tests") {
 
 TEST_CASE("NextStore - NextStar Tests") {
     NextStore nextStore;
-    nextStore.setNextStore({{1, 2}, {1, 3}, {2, 4}, {3, 4}, {4, 5}, {4, 1}});
+    nextStore.setNextStore(
+        {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 3}, {3, 7}, {7, 8}, {7, 9}, {8, 10}, {9, 10}, {10, 11}, {11, 12}});
 
     SECTION("Test getNexterStar") {
-        std::unordered_set<StmtNum> result = nextStore.getNexterStar(1);
-        std::unordered_set<StmtNum> expected = {2, 3, 4, 5};
-        REQUIRE(result == expected);
+        REQUIRE(nextStore.getNexterStar(1) == std::unordered_set<StmtNum>{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     }
 
     SECTION("Test getNexteeStar") {
-        std::unordered_set<StmtNum> result = nextStore.getNexteeStar(4);
-        std::unordered_set<StmtNum> expected = {1, 2, 3};
-        REQUIRE(result == expected);
-
-        result = nextStore.getNexteeStar(5);
-        expected = {1, 2, 3, 4};
-        REQUIRE(result == expected);
+        REQUIRE(nextStore.getNexteeStar(3) == std::unordered_set<StmtNum>{1, 2, 4, 5, 6});
+        REQUIRE(nextStore.getNexteeStar(5) == std::unordered_set<StmtNum>{1, 2, 3, 4, 6});
     }
 }
