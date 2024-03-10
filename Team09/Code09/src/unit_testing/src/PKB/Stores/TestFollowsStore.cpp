@@ -297,4 +297,55 @@ TEST_CASE("FollowsStore - Test for issue #260") {
         REQUIRE(followsStore.getFollowersStar(44).empty());
         REQUIRE(followsStore.getFollowersStar(45) == std::unordered_set<StmtNum>{46});
     }
+
+    SECTION("Test getFolloweesStar") {
+        REQUIRE(followsStore.getFolloweesStar(1).empty());
+        REQUIRE(followsStore.getFolloweesStar(2) == std::unordered_set<StmtNum>{1});
+        REQUIRE(followsStore.getFolloweesStar(3) == std::unordered_set<StmtNum>{2, 1});
+        REQUIRE(followsStore.getFolloweesStar(4) == std::unordered_set<StmtNum>{3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(5) == std::unordered_set<StmtNum>{4, 3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(6) == std::unordered_set<StmtNum>{5, 4, 3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(7) == std::unordered_set<StmtNum>{6, 5, 4, 3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(8) == std::unordered_set<StmtNum>{7, 6, 5, 4, 3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(9).empty());
+        REQUIRE(followsStore.getFolloweesStar(10) == std::unordered_set<StmtNum>{9});
+        REQUIRE(followsStore.getFolloweesStar(11) == std::unordered_set<StmtNum>{10, 9});
+        REQUIRE(followsStore.getFolloweesStar(12) == std::unordered_set<StmtNum>{11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(13) == std::unordered_set<StmtNum>{12, 11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(14) == std::unordered_set<StmtNum>{13, 12, 11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(15) == std::unordered_set<StmtNum>{14, 13, 12, 11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(16) == std::unordered_set<StmtNum>{15, 14, 13, 12, 11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(17) == std::unordered_set<StmtNum>{16, 15, 14, 13, 12, 11, 10, 9});
+        REQUIRE(followsStore.getFolloweesStar(18) == std::unordered_set<StmtNum>{8, 7, 6, 5, 4, 3, 2, 1});
+        REQUIRE(followsStore.getFolloweesStar(19) == std::unordered_set<StmtNum>{2, 18, 8, 7, 6, 5, 4, 3, 1});
+        REQUIRE(followsStore.getFolloweesStar(20).empty());
+        REQUIRE(followsStore.getFolloweesStar(21) == std::unordered_set<StmtNum>{20});
+        REQUIRE(followsStore.getFolloweesStar(22) == std::unordered_set<StmtNum>{21, 20});
+        REQUIRE(followsStore.getFolloweesStar(23).empty());
+        REQUIRE(followsStore.getFolloweesStar(24) == std::unordered_set<StmtNum>{23});
+        REQUIRE(followsStore.getFolloweesStar(25) == std::unordered_set<StmtNum>{24, 23});
+        REQUIRE(followsStore.getFolloweesStar(26).empty());
+        REQUIRE(followsStore.getFolloweesStar(27) == std::unordered_set<StmtNum>{26});
+        REQUIRE(followsStore.getFolloweesStar(28).empty());
+        REQUIRE(followsStore.getFolloweesStar(29).empty());
+        REQUIRE(followsStore.getFolloweesStar(30) == std::unordered_set<StmtNum>{29});
+        REQUIRE(followsStore.getFolloweesStar(31).empty());
+        REQUIRE(followsStore.getFolloweesStar(32) == std::unordered_set<StmtNum>{31});
+        REQUIRE(followsStore.getFolloweesStar(33) == std::unordered_set<StmtNum>{32, 31});
+        REQUIRE(followsStore.getFolloweesStar(34).empty());
+        REQUIRE(followsStore.getFolloweesStar(35) == std::unordered_set<StmtNum>{34});
+        REQUIRE(followsStore.getFolloweesStar(36) == std::unordered_set<StmtNum>{35, 34});
+        REQUIRE(followsStore.getFolloweesStar(37).empty());
+        REQUIRE(followsStore.getFolloweesStar(38) == std::unordered_set<StmtNum>{37});
+        REQUIRE(followsStore.getFolloweesStar(39).empty());
+        REQUIRE(followsStore.getFolloweesStar(40) == std::unordered_set<StmtNum>{28});
+        REQUIRE(followsStore.getFolloweesStar(41).empty());
+        REQUIRE(followsStore.getFolloweesStar(42) == std::unordered_set<StmtNum>{41});
+        REQUIRE(followsStore.getFolloweesStar(43) == std::unordered_set<StmtNum>{40, 28});
+        REQUIRE(followsStore.getFolloweesStar(44) == std::unordered_set<StmtNum>{27, 26});
+        REQUIRE(followsStore.getFolloweesStar(45) == std::unordered_set<StmtNum>{21, 22, 20});
+        REQUIRE(followsStore.getFolloweesStar(46) == std::unordered_set<StmtNum>{21, 45, 22, 20});
+        REQUIRE(followsStore.getFolloweesStar(47).empty());
+        REQUIRE(followsStore.getFolloweesStar(48) == std::unordered_set<StmtNum>{3, 19, 18, 8, 7, 6, 5, 4, 2, 1});
+    }
 }
