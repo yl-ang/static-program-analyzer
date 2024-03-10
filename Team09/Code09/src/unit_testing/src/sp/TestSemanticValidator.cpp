@@ -18,7 +18,7 @@ TEST_CASE("Semantic Validation Tests") {
         children.push_back(procedure1);
         children.push_back(procedure2);
         auto program = std::make_shared<ProgramNode>(children);
-        REQUIRE_NOTHROW(validator.validate(program));
+        REQUIRE_NOTHROW(validator.validateSemantics(program));
     }
     SECTION("Procedures with non-unique names throws") {
         auto procedure1 = std::make_shared<ProcedureNode>("a", std::vector<std::shared_ptr<ASTNode>>());
@@ -27,6 +27,6 @@ TEST_CASE("Semantic Validation Tests") {
         children.push_back(procedure1);
         children.push_back(procedure2);
         auto program = std::make_shared<ProgramNode>(children);
-        REQUIRE_THROWS_WITH(validator.validate(program), "Procedure with name: a declared twice");
+        REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Procedure with name: a declared twice");
     }
 }

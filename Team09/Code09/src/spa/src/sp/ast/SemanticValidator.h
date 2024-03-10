@@ -5,7 +5,7 @@
 
 class SemanticValidator {
 public:
-    void validate(std::shared_ptr<ProgramNode> programNode);
+    void validateSemantics(std::shared_ptr<ProgramNode> programNode);
 
 private:
     void checkDuplicateProcedureNames(std::shared_ptr<ProgramNode>);

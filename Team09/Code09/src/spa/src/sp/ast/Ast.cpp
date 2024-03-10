@@ -35,7 +35,7 @@ std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
 
     std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>((children));
 
-    validator.validate(programNode);
+    semanticValidator.validateSemantics(programNode);
 
     return programNode;
 }

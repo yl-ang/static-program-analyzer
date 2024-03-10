@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "sp/exceptions/semantic/DuplicateProcError.h"
-void SemanticValidator::validate(std::shared_ptr<ProgramNode> programNode) {
+void SemanticValidator::validateSemantics(std::shared_ptr<ProgramNode> programNode) {
     checkDuplicateProcedureNames(programNode);
 }
 
