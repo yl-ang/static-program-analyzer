@@ -18,13 +18,21 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         // Terminal at top of stack, and token match
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
+            std::cout << "top of stack terminal: " << input[index].value << std::endl;
             index++;
-        // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
+            // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
+                std::cout << "top of stack non terminal ERROR: " << std::get<NonTerminal>(stackTop) << std::endl;
+                std::cout << "curr token: " << input[index].value << std::endl;
+                std::cout << "next token: " << input[index + 1].value << std::endl;
+                std::cout << "next next token: " << input[index + 2].value << std::endl;
+
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
+            std::cout << "top of stack non terminal: " << std::get<NonTerminal>(stackTop) << std::endl;
+            std::cout << "top of stack token: " << input[index].value << std::endl;
             std::vector<SyntaxValidator::Symbol> grammarRule = ite->second;
             // Handles epsilon in the first follows set
             if (grammarRule.empty()) {
@@ -32,8 +40,9 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             }
 
             // Handle special case cond_expr
-            
+
             if ((std::get<NonTerminal>(stackTop) == NT_COND_EXPR) && (currToken == LEXICAL_TOKEN_TYPE::OPEN_BRACKET)) {
+                std::cout << "Disambiguate" << std::endl;
                 grammarRule = disambiguateCondExprRule(index, input, grammarRule);
             }
 
@@ -44,6 +53,10 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 
         } else {
             // lexical token type but not = currtoken
+            std::cout << "top of stack terminal ERROR: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << std::endl;
+            std::cout << "curr token: " << input[index].value << " in " << input[index - 2].value
+                      << input[index - 1].value << input[index].value << input[index + 1].value
+                      << input[index + 2].value << std::endl;
             throw SyntaxError("Unexpected grammar rule");
         }
     }
@@ -57,9 +70,15 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
     int index, std::vector<Token> input, std::vector<SyntaxValidator::Symbol> grammarRule) {
     std::stack<char> bracketStack;
+
+    std::cout << "BracketStack size: " << bracketStack.size() << std::endl;
     int i = index;
 
     auto dupl = std::find(grammarRule.begin(), grammarRule.end(), SyntaxValidator::Symbol{NonTerminal::DUPL});
+
+    if (dupl == grammarRule.end()) {
+        std::cout << "ERROR: Could not find DUPL while trying to disambiguate" << std::endl;
+    }
 
     // Perform bracket matching until the first closing parenthesis
     for (; i < input.size(); ++i) {
@@ -81,8 +100,10 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 } else {
                     // Grammar rule cond_expr: rel_expr
                     std::cout << "Using Grammar Rule rel_expr" << std::endl;
-                    grammarRule.erase(dupl, grammarRule.end());   
+                    grammarRule.erase(dupl, grammarRule.end());
                 }
+
+                std::cout << "Disambiguated Grammar Rule" << std::endl;
                 return grammarRule;
             }
         }
@@ -143,7 +164,7 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
         {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NOT},
          {LEXICAL_TOKEN_TYPE::NOT, LEXICAL_TOKEN_TYPE::OPEN_BRACKET, NonTerminal::NT_COND_EXPR,
           LEXICAL_TOKEN_TYPE::CLOSE_BRACKET}},
-        {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_REL_EXPR}},    
+        {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_REL_EXPR}},
         {{NonTerminal::NT_COND_EXPR, LEXICAL_TOKEN_TYPE::INTEGER}, {NonTerminal::NT_REL_EXPR}},
 
         {{NonTerminal::NT__COND_EXPR, LEXICAL_TOKEN_TYPE::ANDAND},
