@@ -20,15 +20,19 @@ struct QPSConstants {
 
     inline static const std::string FOLLOWS = "Follows";
     inline static const std::string FOLLOWS_STAR = "Follows*";
+    inline static const std::string FOLLOWS_STAR_REGEX = "Follows\\*";
     inline static const std::string PARENT = "Parent";
     inline static const std::string PARENT_STAR = "Parent*";
+    inline static const std::string PARENT_STAR_REGEX = "Parent\\*";
     inline static const std::string USES = "Uses";
     inline static const std::string MODIFIES = "Modifies";
     inline static const std::string NEXT = "Next";
     inline static const std::string NEXT_STAR = "Next*";
+    inline static const std::string NEXT_STAR_REGEX = "Next\\*";
 
-    inline static const std::string REL_REF = FOLLOWS + '|' + FOLLOWS_STAR + '|' + PARENT + '|' + PARENT_STAR + '|' +
-                                              USES + '|' + MODIFIES + '|' + NEXT + '|' + NEXT_STAR;
+    inline static const std::string REL_REF_REGEX = FOLLOWS + '|' + FOLLOWS_STAR_REGEX + '|' + PARENT + '|' +
+                                                    PARENT_STAR_REGEX + '|' + USES + '|' + MODIFIES + '|' + NEXT + '|' +
+                                                    NEXT_STAR_REGEX;
 
     inline static const std::string SELECT = "Select";
     inline static const std::string BOOLEAN = "BOOLEAN";

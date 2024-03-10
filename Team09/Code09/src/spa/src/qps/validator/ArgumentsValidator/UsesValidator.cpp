@@ -22,8 +22,7 @@ void UsesValidator::validateSemantic(SynonymStore* store) {
     }
 
     if (isSynonym(arg1)) {
-        if (!store->containsSynonymName(arg1) || store->containsSynonym(arg1, QPSConstants::READ) ||
-            store->containsSynonym(arg1, QPSConstants::CONSTANT) ||
+        if (!store->containsSynonymName(arg1) || store->containsSynonym(arg1, QPSConstants::CONSTANT) ||
             store->containsSynonym(arg1, QPSConstants::VARIABLE)) {
             throw QPSSemanticError();
         }

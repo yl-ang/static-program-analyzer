@@ -54,14 +54,23 @@ void Validator::validateSelectStatement(const std::string& statement) {
         return;
     }
 
+    bool hasSemanticError = false;
     for (std::string clause : clauseList) {
-        if (containsSuchThatClause(clause)) {
-            validateSuchThatClause(clause);
-        } else if (containsPatternClause(clause)) {
-            validatePatternClause(clause);
-        } else {
-            throw Exception("Not implemented: " + clause);
+        try {
+            if (containsSuchThatClause(clause)) {
+                validateSuchThatClause(clause);
+            } else if (containsPatternClause(clause)) {
+                validatePatternClause(clause);
+            } else {
+                throw Exception("Not implemented: " + clause);
+            }
+        } catch (QPSSemanticError e) {
+            hasSemanticError = true;
         }
+    }
+
+    if (hasSemanticError) {
+        throw QPSSemanticError();
     }
 }
 

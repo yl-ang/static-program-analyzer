@@ -146,11 +146,17 @@ TEST_CASE("validateSuchThatClause") {
     std::string inputString_Follows_Stmt_INVALID = "such that Follows(s4,2)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
 
+    std::string inputString_Follows_StarWithSpace_INVALID = "such that Follows *(s1,2)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_StarWithSpace_INVALID));
+
     std::string inputString_Parent_FirstArgVariable_INVALID = "such that Parent(v,s1)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Parent_FirstArgVariable_INVALID));
 
     std::string inputString_Modifies_FirstArgWildcard_INVALID = "such that Modifies(_,v)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_FirstArgWildcard_INVALID));
+
+    std::string inputString_Modifies_FirstArgVariable_INVALID = "such that Modifies(v,_)";
+    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_FirstArgVariable_INVALID));
 
     std::string inputString_Modifies_SecondArgVar_INVALID = "such that Modifies(v,s1)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_SecondArgVar_INVALID));
@@ -163,6 +169,8 @@ TEST_CASE("validateSuchThatClause") {
 
     std::string inputString_Next_SynonymConstant_INVALID = "such that Next(s1,c)";
     REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Next_SynonymConstant_INVALID));
+
+    // TODO(Han Qin): Check SyntaxError thrown before SemanticError
 }
 
 TEST_CASE("validatePatternClause") {
