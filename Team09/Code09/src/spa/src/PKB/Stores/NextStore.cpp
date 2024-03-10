@@ -81,7 +81,8 @@ bool NextStore::hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& ar
     return hasNextStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
 }
 
-void NextStore::dfsNextStar(StmtNum current, std::unordered_set<StmtNum>& result, std::unordered_set<StmtNum>& visited,
+void NextStore::dfsNextStar(StmtNum start, StmtNum current, std::unordered_set<StmtNum>& result,
+                            std::unordered_set<StmtNum>& visited,
                             const std::unordered_map<StmtNum, std::unordered_set<StmtNum>>& nextMap) {
     if (visited.find(current) != visited.end()) {
         return;
@@ -92,11 +93,13 @@ void NextStore::dfsNextStar(StmtNum current, std::unordered_set<StmtNum>& result
     auto nexterSet = nextMap.find(current);
     if (nexterSet != nextMap.end()) {
         for (StmtNum nextee : nexterSet->second) {
-            dfsNextStar(nextee, result, visited, nextMap);
+            dfsNextStar(start, nextee, result, visited, nextMap);
         }
     }
 
-    result.insert(current);
+    if (current != start) {
+        result.insert(current);
+    }
 }
 
 std::unordered_set<StmtNum> NextStore::computeNextStar(
@@ -104,7 +107,7 @@ std::unordered_set<StmtNum> NextStore::computeNextStar(
     std::unordered_set<StmtNum> result;
     std::unordered_set<StmtNum> visited;
 
-    dfsNextStar(start, result, visited, nextMap);
+    dfsNextStar(start, start, result, visited, nextMap);
 
     return result;
 }

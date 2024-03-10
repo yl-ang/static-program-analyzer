@@ -27,7 +27,8 @@ private:
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> nexteeMap;
 
     // helper functions for next star
-    void dfsNextStar(StmtNum current, std::unordered_set<StmtNum> &result, std::unordered_set<StmtNum> &visited,
+    void dfsNextStar(StmtNum start, StmtNum current, std::unordered_set<StmtNum> &result,
+                     std::unordered_set<StmtNum> &visited,
                      const std::unordered_map<StmtNum, std::unordered_set<StmtNum>> &nextMap);
     std::unordered_set<StmtNum> computeNextStar(
         StmtNum start, const std::unordered_map<StmtNum, std::unordered_set<StmtNum>> &nextMap);
