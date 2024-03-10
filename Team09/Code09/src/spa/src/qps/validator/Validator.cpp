@@ -1,18 +1,33 @@
 #include "Validator.h"
 
 void Validator::validate(std::vector<std::string> statementList) {
-    // statement example: variable v / stmt s1, s2 / Select v
+    // statement example: {variable v; stmt s1, s2; Select v}
+    // Ensure that Select is the last input
+    if (statementList.empty()) {
+        throw QPSSyntaxError();
+    }
+
+    if (!isSelectStatement(statementList[statementList.size() - 1])) {
+        throw QPSSyntaxError();
+    }
+
+    int selectStatementCounter = 0;
     for (std::string statement : statementList) {
         if (isDeclarationStatement(statement)) {
             validateDeclarationStatement(statement);
             synonymStore.storeSynonymWithStatement(statement);
         } else if (isSelectStatement(statement)) {
             validateSelectStatement(statement);
+            selectStatementCounter++;
         } else {
             // NOTE: This is thrown when and empty string is made here
             // TODO(Han Qin): Add test case to test this
             throw QPSSyntaxError();
         }
+    }
+
+    if (selectStatementCounter != 1) {
+        throw QPSSyntaxError();
     }
 }
 
@@ -27,7 +42,7 @@ void Validator::validateDeclarationStatement(const std::string& statement) {
     std::tie(designEntityWord, remainingStatement) = substringUntilDelimiter(newStatement, SPACE);
 
     std::vector<std::string> synonymList = splitByDelimiter(trim(remainingStatement), ",");
-    if (synonymList.size() == 0) {
+    if (synonymList.size() == 1 && synonymList[0].empty()) {
         throw QPSSyntaxError();
     }
 

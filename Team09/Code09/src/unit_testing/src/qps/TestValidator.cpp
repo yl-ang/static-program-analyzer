@@ -1,9 +1,14 @@
-#include <qps/validator/Validator.h>
-
 #include <string>
 #include <vector>
 
 #include "catch.hpp"
+#include "qps/exceptions/QPSSemanticError.h"
+#include "qps/exceptions/QPSSyntaxError.h"
+#include "qps/validator/Validator.h"
+
+// CUSTOM TESTING MACROS
+#define REQUIRE_THROW_SEMANTIC_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSemanticError)
+#define REQUIRE_THROW_SYNTAX_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSyntaxError)
 
 class TestValidator : public Validator {
 public:  // NOLINT
@@ -15,49 +20,24 @@ public:  // NOLINT
     }
 
     // Test Methods
-    bool testValidate(std::vector<std::string> inputStatements) {
-        try {
-            validate(inputStatements);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    void isValidValidate(std::vector<std::string> inputStatements) {
+        validate(inputStatements);
     }
 
-    bool testIsValidDeclarationStatement(const std::string& inputString) {
-        try {
-            validateDeclarationStatement(inputString);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    void isValidDeclareStmt(const std::string& inputString) {
+        validateDeclarationStatement(inputString);
     }
 
-    bool testIsValidSelectStatement(const std::string& inputString) {
-        try {
-            validateSelectStatement(inputString);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    void isValidSelectStmt(const std::string& inputString) {
+        validateSelectStatement(inputString);
     }
 
-    bool testIsValidSuchThatClause(const std::string& inputString) {
-        try {
-            validateSuchThatClause(inputString);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    void isValidSTClause(const std::string& inputString) {
+        validateSuchThatClause(inputString);
     }
 
-    bool testIsValidPatternClause(const std::string& inputString) {
-        try {
-            validatePatternClause(inputString);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    void isValidPatternClause(const std::string& inputString) {
+        validatePatternClause(inputString);
     }
 };
 
@@ -73,15 +53,15 @@ TEST_CASE("validateDeclarationStatement") {
     std::string inputString_SynonymWithSpace = "assign a b;";
     std::string inputString_SynonymInteger = "assign 1;";
 
-    REQUIRE(validator.testIsValidDeclarationStatement(inputString_OneSynonym));
-    REQUIRE(validator.testIsValidDeclarationStatement(inputString_TwoSynonyms));
-    REQUIRE(validator.testIsValidDeclarationStatement(inputString_MultipleSynonyms));
+    REQUIRE_NOTHROW(validator.isValidDeclareStmt(inputString_OneSynonym));
+    REQUIRE_NOTHROW(validator.isValidDeclareStmt(inputString_TwoSynonyms));
+    REQUIRE_NOTHROW(validator.isValidDeclareStmt(inputString_MultipleSynonyms));
 
-    REQUIRE_FALSE(validator.testIsValidDeclarationStatement(inputString_NoSynonyms));
-    REQUIRE_FALSE(validator.testIsValidDeclarationStatement(inputString_NoSynonyms2));
-    REQUIRE_FALSE(validator.testIsValidDeclarationStatement(inputString_MissingSemiColon));
-    REQUIRE_FALSE(validator.testIsValidDeclarationStatement(inputString_SynonymWithSpace));
-    REQUIRE_FALSE(validator.testIsValidDeclarationStatement(inputString_SynonymInteger));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidDeclareStmt(inputString_NoSynonyms));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidDeclareStmt(inputString_NoSynonyms2));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidDeclareStmt(inputString_MissingSemiColon));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidDeclareStmt(inputString_SynonymWithSpace));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidDeclareStmt(inputString_SynonymInteger));
 }
 
 TEST_CASE("isValidSelectStatment") {
@@ -99,12 +79,13 @@ TEST_CASE("isValidSelectStatment") {
     testStore.storeSynonymWithStatement("assign a;");
     TestValidator validator(testStore);
 
-    REQUIRE(validator.testIsValidSelectStatement(inputString_SelectOne));
-    REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_ExtraSemiColon));
-    REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_SelectNothing));
-    REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_SelectNothingWithSpace));
-    REQUIRE(validator.testIsValidSelectStatement(inputString_MultipleReturn));
-    REQUIRE_FALSE(validator.testIsValidSelectStatement(inputString_MultipleReturn_MissingBracket));
+    REQUIRE_NOTHROW(validator.isValidSelectStmt(inputString_SelectOne));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidSelectStmt(inputString_ExtraSemiColon));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidSelectStmt(inputString_SelectNothing));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidSelectStmt(inputString_SelectNothingWithSpace));
+
+    REQUIRE_NOTHROW(validator.isValidSelectStmt(inputString_MultipleReturn));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidSelectStmt(inputString_MultipleReturn_MissingBracket));
 }
 
 TEST_CASE("validateSuchThatClause") {
@@ -117,58 +98,58 @@ TEST_CASE("validateSuchThatClause") {
     TestValidator validator(testStore);
 
     std::string inputString_Follows = "such that Follows(1,2)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Follows));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Follows));
 
     std::string inputString_FollowsT = "such that Follows*(1,2)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_FollowsT));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_FollowsT));
 
     std::string inputString_Follows_Stmt_VALID = "such that Follows(s1,2)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Follows_Stmt_VALID));
 
     std::string inputString_Parent_VALID = "such that Parent(re,s1)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Parent_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Parent_VALID));
 
     std::string inputString_Modifies_VALID = "such that Modifies(s1,v)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Modifies_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Modifies_VALID));
 
     std::string inputString_Uses_VALID = "such that Uses(s1,v)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Uses_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Uses_VALID));
 
     std::string inputString_Next_VALID = "such that Next(s1,s2)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Next_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Next_VALID));
 
     std::string inputString_NextT_VALID = "such that Next*(s1,s2)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_NextT_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_NextT_VALID));
 
     std::string inputString_Next_SynonymInteger_VALID = "such that Next(s1,10)";
-    REQUIRE(validator.testIsValidSuchThatClause(inputString_Next_SynonymInteger_VALID));
+    REQUIRE_NOTHROW(validator.isValidSTClause(inputString_Next_SynonymInteger_VALID));
 
     std::string inputString_Follows_Stmt_INVALID = "such that Follows(s4,2)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_Stmt_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Follows_Stmt_INVALID));
 
     std::string inputString_Follows_StarWithSpace_INVALID = "such that Follows *(s1,2)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Follows_StarWithSpace_INVALID));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidSTClause(inputString_Follows_StarWithSpace_INVALID));
 
     std::string inputString_Parent_FirstArgVariable_INVALID = "such that Parent(v,s1)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Parent_FirstArgVariable_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Parent_FirstArgVariable_INVALID));
 
     std::string inputString_Modifies_FirstArgWildcard_INVALID = "such that Modifies(_,v)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_FirstArgWildcard_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Modifies_FirstArgWildcard_INVALID));
 
     std::string inputString_Modifies_FirstArgVariable_INVALID = "such that Modifies(v,_)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_FirstArgVariable_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Modifies_FirstArgVariable_INVALID));
 
     std::string inputString_Modifies_SecondArgVar_INVALID = "such that Modifies(v,s1)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Modifies_SecondArgVar_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Modifies_SecondArgVar_INVALID));
 
     std::string inputString_Uses_FirstArgWildcard_INVALID = "such that Uses(_,v)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Uses_FirstArgWildcard_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Uses_FirstArgWildcard_INVALID));
 
     std::string inputString_Next_MissingSynonym_INVALID = "such that Next(s1,s100)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Next_MissingSynonym_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Next_MissingSynonym_INVALID));
 
     std::string inputString_Next_SynonymConstant_INVALID = "such that Next(s1,c)";
-    REQUIRE_FALSE(validator.testIsValidSuchThatClause(inputString_Next_SynonymConstant_INVALID));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidSTClause(inputString_Next_SynonymConstant_INVALID));
 
     // TODO(Han Qin): Check SyntaxError thrown before SemanticError
 }
@@ -182,25 +163,25 @@ TEST_CASE("validatePatternClause") {
     TestValidator validator(testStore);
 
     std::string inputString_VALID = "pattern a(v, _\"x\"_)";
-    REQUIRE(validator.testIsValidPatternClause(inputString_VALID));
+    REQUIRE_NOTHROW(validator.isValidPatternClause(inputString_VALID));
 
     std::string inputString_Space_VALID = "pattern a (v, _\"x\"_)";
-    REQUIRE(validator.testIsValidPatternClause(inputString_Space_VALID));
+    REQUIRE_NOTHROW(validator.isValidPatternClause(inputString_Space_VALID));
 
     std::string inputString_Integer_VALID = "pattern a(v, _\"2\"_)";
-    REQUIRE(validator.testIsValidPatternClause(inputString_Integer_VALID));
+    REQUIRE_NOTHROW(validator.isValidPatternClause(inputString_Integer_VALID));
 
     std::string inputString_Wildcard_VALID = "pattern a(_, _\"x\"_)";
-    REQUIRE(validator.testIsValidPatternClause(inputString_Wildcard_VALID));
+    REQUIRE_NOTHROW(validator.isValidPatternClause(inputString_Wildcard_VALID));
 
     std::string inputString_Wildcards_VALID = "pattern a(_, _)";
-    REQUIRE(validator.testIsValidPatternClause(inputString_Wildcards_VALID));
+    REQUIRE_NOTHROW(validator.isValidPatternClause(inputString_Wildcards_VALID));
 
     std::string inputString_INVALID = "pattern a(v, _x\"_)";
-    REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidPatternClause(inputString_INVALID));
 
     std::string inputString_INVALID_stmt = "pattern iff (v, _\"x\"_)";
-    REQUIRE_FALSE(validator.testIsValidPatternClause(inputString_INVALID_stmt));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidPatternClause(inputString_INVALID_stmt));
 }
 
 TEST_CASE("validateSelectStatement_STPattern_VALID") {
@@ -208,7 +189,7 @@ TEST_CASE("validateSelectStatement_STPattern_VALID") {
 
     std::vector<std::string> inputStatements = {"assign a;", "variable v;",
                                                 "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
-    REQUIRE(validator.testValidate(inputStatements));
+    REQUIRE_NOTHROW(validator.isValidValidate(inputStatements));
 }
 
 TEST_CASE("validateSelectStatement_PatternST_VALID") {
@@ -216,21 +197,21 @@ TEST_CASE("validateSelectStatement_PatternST_VALID") {
 
     std::vector<std::string> inputStatements = {"assign a;", "variable v;",
                                                 "Select v pattern a(v,_\"2\"_) such that Follows(1,2)"};
-    REQUIRE(validator.testValidate(inputStatements));
+    REQUIRE_NOTHROW(validator.isValidValidate(inputStatements));
 }
 
 TEST_CASE("validateSelectStatement_UndeclaredSynonym_INVALID") {
     TestValidator validator;
     std::vector<std::string> inputStatements = {"assign a;", "variable v;",
                                                 "Select v such that Follows(1,2) pattern a(v1,_\"2\"_)"};
-    REQUIRE_FALSE(validator.testValidate(inputStatements));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidValidate(inputStatements));
 }
 
 TEST_CASE("validateSelectStatement_DuplicateSynonym_INVALID") {
     TestValidator validator;
     std::vector<std::string> inputStatements = {"assign a;", "variable v, v;",
                                                 "Select v such that Follows(1,2) pattern a(v,_\"2\"_)"};
-    REQUIRE_FALSE(validator.testValidate(inputStatements));
+    REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidValidate(inputStatements));
 }
 
 // Order of Select and declaration is not checked.
@@ -241,5 +222,5 @@ TEST_CASE("validateSelectStatement_INVALID") {
     TestValidator validator;
     std::vector<std::string> inputStatements = {"Select v such that Follows(1,2) pattern a(v,_\"2\"_)", "assign a;",
                                                 "variable v, v;"};
-    REQUIRE_FALSE(validator.testValidate(inputStatements));
+    REQUIRE_THROW_SYNTAX_ERROR(validator.isValidValidate(inputStatements));
 }
