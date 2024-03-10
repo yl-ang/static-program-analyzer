@@ -140,12 +140,6 @@ void Validator::validateRelRef(const std::string& relRefWord) {
 }
 
 void Validator::validatePatternClause(const std::string& patternClause) {
-    bool hasProperStructure =
-        std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
-    if (!hasProperStructure) {
-        throw QPSSyntaxError();
-    }
-
     // Remove "pattern"
     std::string removedPatternClause = trim(patternClause.substr(QPSConstants::PATTERN.size()));
 
@@ -159,9 +153,6 @@ void Validator::validatePattern(const std::string& pattern) {
     std::tie(synString, parameterString) = substringUntilDelimiter(pattern, "(");
 
     synString = trim(synString);
-    if (!isSynonym(synString)) {
-        throw QPSSyntaxError();
-    }
 
     // ('entRef', 'expression-spec')
     parameterString = trim(parameterString);
@@ -192,9 +183,5 @@ std::unique_ptr<ArgumentsValidator> Validator::buildArgValidator(const std::stri
 
 std::unique_ptr<ArgumentsValidator> Validator::buildPatternValidator(const std::string& synonymString,
                                                                      const std::vector<std::string>& arguments) {
-    if (synonymStore.containsSynonym(synonymString, QPSConstants::ASSIGN)) {
-        return std::make_unique<AssignPatternValidator>(arguments);
-    } else {
-        throw QPSSemanticError();
-    }
+    return std::make_unique<PatternValidator>(synonymString, arguments);
 }
