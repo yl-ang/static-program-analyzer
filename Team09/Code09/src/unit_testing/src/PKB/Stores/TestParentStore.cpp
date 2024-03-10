@@ -224,5 +224,60 @@ TEST_CASE("ParentStore - Test for issue #260") {
         REQUIRE(parentStore.getParentsStar(48).empty());
     }
 
-    SECTION("Test getChildrenStar") {}
+    SECTION("Test getChildrenStar") {
+        REQUIRE(parentStore.getChildrenStar(1).empty());
+        REQUIRE(parentStore.getChildrenStar(2).empty());
+        REQUIRE(parentStore.getChildrenStar(3).empty());
+        REQUIRE(parentStore.getChildrenStar(4).empty());
+        REQUIRE(parentStore.getChildrenStar(5).empty());
+        REQUIRE(parentStore.getChildrenStar(6).empty());
+        REQUIRE(parentStore.getChildrenStar(7).empty());
+        REQUIRE(parentStore.getChildrenStar(8) == std::unordered_set<StmtNum>{9, 10, 11, 12, 13, 14, 15, 16, 17});
+        REQUIRE(parentStore.getChildrenStar(9).empty());
+        REQUIRE(parentStore.getChildrenStar(10).empty());
+        REQUIRE(parentStore.getChildrenStar(11).empty());
+        REQUIRE(parentStore.getChildrenStar(12).empty());
+        REQUIRE(parentStore.getChildrenStar(13).empty());
+        REQUIRE(parentStore.getChildrenStar(14).empty());
+        REQUIRE(parentStore.getChildrenStar(15).empty());
+        REQUIRE(parentStore.getChildrenStar(16).empty());
+        REQUIRE(parentStore.getChildrenStar(17).empty());
+        REQUIRE(parentStore.getChildrenStar(18).empty());
+        REQUIRE(parentStore.getChildrenStar(19) == std::unordered_set<StmtNum>{20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                                                               30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                                                               40, 41, 42, 43, 44, 45, 46, 47});
+        REQUIRE(parentStore.getChildrenStar(20).empty());
+        REQUIRE(parentStore.getChildrenStar(21).empty());
+        REQUIRE(parentStore.getChildrenStar(22) == std::unordered_set<StmtNum>{23, 32, 24, 25, 26, 27, 28, 44,
+                                                                               40, 43, 30, 29, 31, 39, 33, 35,
+                                                                               34, 37, 36, 38, 41, 42});
+        REQUIRE(parentStore.getChildrenStar(23).empty());
+        REQUIRE(parentStore.getChildrenStar(24).empty());
+        REQUIRE(parentStore.getChildrenStar(25).empty());
+        REQUIRE(parentStore.getChildrenStar(26).empty());
+        REQUIRE(parentStore.getChildrenStar(27) ==
+                std::unordered_set<StmtNum>{28, 32, 40, 43, 30, 29, 31, 39, 33, 35, 34, 37, 36, 38, 41, 42});
+        REQUIRE(parentStore.getChildrenStar(28) ==
+                std::unordered_set<StmtNum>{30, 29, 39, 31, 32, 33, 35, 34, 37, 36, 38});
+        REQUIRE(parentStore.getChildrenStar(29).empty());
+        REQUIRE(parentStore.getChildrenStar(30) == std::unordered_set<StmtNum>{31, 39, 32, 33, 35, 34, 37, 36, 38});
+        REQUIRE(parentStore.getChildrenStar(31).empty());
+        REQUIRE(parentStore.getChildrenStar(32).empty());
+        REQUIRE(parentStore.getChildrenStar(33) == std::unordered_set<StmtNum>{35, 34, 37, 36, 38});
+        REQUIRE(parentStore.getChildrenStar(34).empty());
+        REQUIRE(parentStore.getChildrenStar(35).empty());
+        REQUIRE(parentStore.getChildrenStar(36).empty());
+        REQUIRE(parentStore.getChildrenStar(37).empty());
+        REQUIRE(parentStore.getChildrenStar(38).empty());
+        REQUIRE(parentStore.getChildrenStar(39).empty());
+        REQUIRE(parentStore.getChildrenStar(40) == std::unordered_set<StmtNum>{41, 42});
+        REQUIRE(parentStore.getChildrenStar(41).empty());
+        REQUIRE(parentStore.getChildrenStar(42).empty());
+        REQUIRE(parentStore.getChildrenStar(43).empty());
+        REQUIRE(parentStore.getChildrenStar(44).empty());
+        REQUIRE(parentStore.getChildrenStar(45).empty());
+        REQUIRE(parentStore.getChildrenStar(46) == std::unordered_set<StmtNum>{47});
+        REQUIRE(parentStore.getChildrenStar(47).empty());
+        REQUIRE(parentStore.getChildrenStar(48).empty());
+    }
 }
