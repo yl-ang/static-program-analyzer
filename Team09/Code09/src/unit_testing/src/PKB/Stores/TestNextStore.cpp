@@ -276,4 +276,86 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.getNexteeStar(9) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(nextStore.getNexteeStar(12) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
     }
+
+    SECTION("Test hasNextStarRelationship with Wildcards arg1 and arg2, non-empty nextStore (Expecting True)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE(nextStore.hasNextStarRelationship(*wildcardArg1, *wildcardArg2));
+
+        delete wildcardArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Wildcard arg1 and Integer arg2 (Expecting True)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *integerArg2 = new Integer("8");
+        REQUIRE(nextStore.hasNextStarRelationship(*wildcardArg1, *integerArg2));
+
+        delete wildcardArg1;
+        delete integerArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Wildcard arg1 and Integer arg2 (Expecting False)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *integerArg2 = new Integer("1");
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(*wildcardArg1, *integerArg2));
+
+        delete wildcardArg1;
+        delete integerArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Wildcard arg2 (Expecting True)") {
+        ClauseArgument *integerArg1 = new Integer("1");
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE(nextStore.hasNextStarRelationship(*integerArg1, *wildcardArg2));
+
+        delete integerArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Wildcard arg2 (Expecting False)") {
+        ClauseArgument *integerArg1 = new Integer("12");
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(*integerArg1, *wildcardArg2));
+
+        delete integerArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2 (Expecting True)") {
+        ClauseArgument *integerArg1 = new Integer("1");
+        ClauseArgument *integerArg2 = new Integer("12");
+        REQUIRE(nextStore.hasNextStarRelationship(*integerArg1, *integerArg2));
+
+        delete integerArg1;
+        delete integerArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2 (Expecting False)") {
+        nextStore.setNextStore({{1, 2}, {1, 3}, {2, 4}, {3, 4}});
+        ClauseArgument *integerArg1 = new Integer("1");
+        ClauseArgument *integerArg2 = new Integer("1");
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(*integerArg1, *integerArg2));
+
+        delete integerArg1;
+        delete integerArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2 (Expecting False)") {
+        ClauseArgument *integerArg1 = new Integer("12");
+        ClauseArgument *integerArg2 = new Integer("4");
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(*integerArg1, *integerArg2));
+
+        delete integerArg1;
+        delete integerArg2;
+    }
+
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2 (Expecting False)") {
+        ClauseArgument *integerArg1 = new Integer("6");
+        ClauseArgument *integerArg2 = new Integer("1");
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(*integerArg1, *integerArg2));
+
+        delete integerArg1;
+        delete integerArg2;
+    }
 }
