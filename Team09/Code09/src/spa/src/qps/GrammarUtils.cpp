@@ -36,7 +36,7 @@ bool isEntRef(const std::string& str) {
 }
 
 bool isRelRef(const std::string& str) {
-    std::string pattern = "(" + QPSConstants::REL_REF_REGEX + ")";
+    std::string pattern = "^(" + QPSConstants::REL_REF_REGEX + ")$";
     return std::regex_search(str, std::regex(pattern));
 }
 

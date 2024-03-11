@@ -2,11 +2,11 @@
 #include <vector>
 
 #include "ArgumentsValidator/ArgumentsValidator.h"
-#include "ArgumentsValidator/AssignPatternValidator.h"
 #include "ArgumentsValidator/FollowsValidator.h"
 #include "ArgumentsValidator/ModifiesValidator.h"
 #include "ArgumentsValidator/NextValidator.h"
 #include "ArgumentsValidator/ParentValidator.h"
+#include "ArgumentsValidator/PatternValidator.h"
 #include "ArgumentsValidator/UsesValidator.h"
 #include "SynonymStore.h"
 #include "qps/GrammarUtils.h"
