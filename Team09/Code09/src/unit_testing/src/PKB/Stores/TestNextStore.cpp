@@ -133,12 +133,30 @@ TEST_CASE("NextStore - NextStar Tests") {
     nextStore.setNextStore(
         {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 3}, {3, 7}, {7, 8}, {7, 9}, {8, 10}, {9, 10}, {10, 11}, {11, 12}});
 
-    SECTION("Test getNexterStar") {
-        REQUIRE(nextStore.getNexterStar(1) == std::unordered_set<StmtNum>{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
-    }
+    SECTION("Test hasNextStarRelationship") {
+        // Self Reflectivity Checks (3, 4, 5, 6 are in a loop should accept self reflectivity)
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(1, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(2, 2));
+        REQUIRE(nextStore.hasNextStarRelationship(3, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 6) == true);
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 7));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 8));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(9, 9));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(10, 10));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(11, 11));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 12));
 
-    SECTION("Test getNexteeStar") {
-        REQUIRE(nextStore.getNexteeStar(3) == std::unordered_set<StmtNum>{1, 2, 4, 5, 6});
-        REQUIRE(nextStore.getNexteeStar(5) == std::unordered_set<StmtNum>{1, 2, 3, 4, 6});
+        REQUIRE(nextStore.hasNextStarRelationship(1, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 6) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(1, 12) == true);
     }
 }
