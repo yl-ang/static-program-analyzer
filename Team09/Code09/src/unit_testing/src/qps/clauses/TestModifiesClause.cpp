@@ -12,28 +12,28 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with no synonyms") 
 
     SECTION("Modifies(Integer, Variable)") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         ModifiesTester{pfr, new Integer("1"), new Literal("x")}.testBoolean(true);
         ModifiesTester{pfr, new Integer("2"), new Literal("x")}.testBoolean(false);
         ModifiesTester{pfr, new Integer("1"), new Literal("y")}.testBoolean(false);
     }
 
     SECTION("Modifies(Integer, Variable) / empty store") {
-        pfw.setModifiesStore({});
+        pfw.setStatementModifiesStore({});
         ModifiesTester{pfr, new Integer("1"), new Literal("x")}.testBoolean(false);
     }
 
     SECTION("Modifies(Integer, Wildcard)") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{2, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         ModifiesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
         ModifiesTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(true);
         ModifiesTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(false);
     }
 
     SECTION("Modifies(Integer, Wildcard) / empty store") {
-        pfw.setModifiesStore({});
+        pfw.setStatementModifiesStore({});
         ModifiesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
         ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
@@ -41,7 +41,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with no synonyms") 
     SECTION("Modifies(Wildcard, Variable)") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{2, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         ModifiesTester{pfr, new Wildcard(), new Literal("x")}.testBoolean(true);
         ModifiesTester{pfr, new Wildcard(), new Literal("y")}.testBoolean(true);
         ModifiesTester{pfr, new Wildcard(), new Literal("z")}.testBoolean(false);
@@ -50,12 +50,12 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with no synonyms") 
     SECTION("Modifies(Wildcard, Wildcard)") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{2, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
     }
 
     SECTION("Modifies(Wildcard, Wildcard) / empty store") {
-        pfw.setModifiesStore({});
+        pfw.setStatementModifiesStore({});
         ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
 }
@@ -69,7 +69,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{2, "y"},
                                                                              std::pair<int, std::string>{3, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
 
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::READ, 1}, Stmt{StatementType::ASSIGN, 2},
                                           Stmt{StatementType::READ, 3}, Stmt{StatementType::PRINT, 4}};
@@ -95,7 +95,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{1, "y"},
                                                                              std::pair<int, std::string>{2, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
 
         // Select s such that Modifies(1, s)
@@ -113,7 +113,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                              std::pair<int, std::string>{2, "y"},
                                                                              std::pair<int, std::string>{3, "y"}};
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
 
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::READ, 1}, Stmt{StatementType::ASSIGN, 2},
                                           Stmt{StatementType::READ, 3}, Stmt{StatementType::PRINT, 4}};
@@ -142,7 +142,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         pfw.setVariables(variables);
 
         pfw.setStmts(stmts);
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
 
         // Select s such that Modifies(_, s)
@@ -167,7 +167,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 2 synonyms") {
         pfw.setVariables(variables);
 
         pfw.setStmts(stmts);
-        pfw.setModifiesStore(modifiesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* varSyn = new Synonym(DesignEntityType::VARIABLE, "v");
 
