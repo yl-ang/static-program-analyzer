@@ -262,7 +262,6 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(IF, "if", 1),
                                      Token(OPEN_BRACKET, "(", 1),
                                      Token(OPEN_BRACKET, "(", 1),
-                            
                                      Token(NAME, "x", 1),
                                      Token(ADD, "+", 1),
                                      Token(INTEGER, "2", 1),
@@ -285,7 +284,6 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(PRINT, "print", 2),
                                      Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
- 
                                      Token(CLOSE_CURLY_BRACE, "}", -1),
                                      Token(CLOSE_CURLY_BRACE, "}", -1)};
 
@@ -307,7 +305,6 @@ TEST_CASE("Syntax Validator Tests") {
 
                                      Token(IF, "if", 1),
                                      Token(OPEN_BRACKET, "(", 1),
-                                     
                                      Token(INTEGER, "1", 1),
                                      Token(GREATER_THAN, ">", 1),
                                      Token(OPEN_BRACKET, "(", 1),
@@ -315,7 +312,6 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(ADD, "+", 1),
                                      Token(INTEGER, "2", 1),
                                      Token(CLOSE_BRACKET, ")", 1),
-                                     
                                      Token(CLOSE_BRACKET, ")", 1),
 
                                      Token(THEN, "then", 1),
@@ -332,7 +328,6 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(PRINT, "print", 2),
                                      Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
- 
                                      Token(CLOSE_CURLY_BRACE, "}", -1),
                                      Token(CLOSE_CURLY_BRACE, "}", -1)};
 
@@ -341,34 +336,23 @@ TEST_CASE("Syntax Validator Tests") {
     }
 
     SECTION("Handle correct WHILE STATEMENT 2") {
-        std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1),
-                                     Token(NAME, "proc1", -1),
+        std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1), Token(NAME, "proc1", -1),
                                      Token(OPEN_CURLY_BRACE, "{", -1),
 
-                                     Token(WHILE, "while", 4),
-                                     Token(OPEN_BRACKET, "(", 4),
+                                     Token(WHILE, "while", 4),          Token(OPEN_BRACKET, "(", 4),
 
-                                     Token(OPEN_BRACKET, "(", 1),
-                                     Token(NAME, "x", 1),
-                                     Token(GREATER_THAN, ">", 1),
-                                     Token(INTEGER, "2", 1),
-                                     Token(CLOSE_BRACKET, ")", 1),
-                                     Token(ANDAND, "&&", 1),
-                                     Token(OPEN_BRACKET, "(", 1),
-                                     Token(NAME, "x", 1),
-                                     Token(GREATER_THAN, ">", 1),
-                                     Token(INTEGER, "2", 1),
-                                     Token(CLOSE_BRACKET, ")", 1),
-                                     
-                                     Token(CLOSE_BRACKET, ")", 4),
+                                     Token(OPEN_BRACKET, "(", 1),       Token(NAME, "x", 1),
+                                     Token(GREATER_THAN, ">", 1),       Token(INTEGER, "2", 1),
+                                     Token(CLOSE_BRACKET, ")", 1),      Token(ANDAND, "&&", 1),
+                                     Token(OPEN_BRACKET, "(", 1),       Token(NAME, "x", 1),
+                                     Token(GREATER_THAN, ">", 1),       Token(INTEGER, "2", 1),
+                                     Token(CLOSE_BRACKET, ")", 1),      Token(CLOSE_BRACKET, ")", 4),
                                      Token(OPEN_CURLY_BRACE, "{", 4),
 
-                                     Token(PRINT, "print", 2),
-                                     Token(NAME, "y", 2),
+                                     Token(PRINT, "print", 2),          Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
 
-                                     Token(CLOSE_CURLY_BRACE, "}", -1),
-                                     Token(CLOSE_CURLY_BRACE, "}", -1)};
+                                     Token(CLOSE_CURLY_BRACE, "}", -1), Token(CLOSE_CURLY_BRACE, "}", -1)};
         bool result = syntaxValidator.validateSyntax(tokens);
         REQUIRE(result);
     }
