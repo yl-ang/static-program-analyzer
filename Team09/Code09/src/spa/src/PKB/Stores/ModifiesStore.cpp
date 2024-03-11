@@ -1,7 +1,8 @@
 #include "ModifiesStore.h"
 
-void ModifiesStore::setStatementModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesSet) {
-    for (const auto& modify : modifiesSet) {
+void ModifiesStore::setStatementModifiesStore(
+    const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesStatementSet) {
+    for (const auto& modify : modifiesStatementSet) {
         StmtNum stmt = modify.first;
         Variable variable = modify.second;
 
@@ -60,14 +61,14 @@ bool ModifiesStore::hasProcedureVariableModifiesRelationship(ClauseArgument& arg
         return !procedureToModifiedVariables.empty();
     }
 
-    // if arg1 is wildcard, check if arg2 is modified by any statements
+    // if arg1 is wildcard, check if arg2 is modified by any procedures
     if (arg1.isWildcard()) {
-        return !getStatementsByVariable(arg2.getValue()).empty();
+        return !getProceduresByVariable(arg2.getValue()).empty();
     }
 
     // if arg2 is wildcard, check if arg1 modifies any variables
     if (arg2.isWildcard()) {
-        return !getVariablesByStatement(std::stoi(arg1.getValue())).empty();
+        return !getVariablesByProcedure(arg1.getValue()).empty();
     }
 
     return hasProcedureVariableModifiesRelationship(arg1.getValue(), arg2.getValue());
