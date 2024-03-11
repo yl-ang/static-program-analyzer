@@ -133,7 +133,7 @@ TEST_CASE("NextStore - NextStar Tests") {
     nextStore.setNextStore(
         {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 3}, {3, 7}, {7, 8}, {7, 9}, {8, 10}, {9, 10}, {10, 11}, {11, 12}});
 
-    SECTION("Test hasNextStarRelationship") {
+    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2") {
         // Self Reflectivity Checks (3, 4, 5, 6 are in a loop should accept self reflectivity)
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(1, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(2, 2));
@@ -255,5 +255,25 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 10));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 11));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 12));
+    }
+
+    SECTION("Test getNexterStar") {
+        REQUIRE(nextStore.getNexterStar(1) == std::unordered_set<StmtNum>{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(3) == std::unordered_set<StmtNum>{3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(6) == std::unordered_set<StmtNum>{3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(7) == std::unordered_set<StmtNum>{8, 9, 10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(8) == std::unordered_set<StmtNum>{10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(9) == std::unordered_set<StmtNum>{10, 11, 12});
+        REQUIRE(nextStore.getNexterStar(12).empty());
+    }
+
+    SECTION("Test getNexteeStar") {
+        REQUIRE(nextStore.getNexteeStar(1).empty());
+        REQUIRE(nextStore.getNexteeStar(3) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6});
+        REQUIRE(nextStore.getNexteeStar(6) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6});
+        REQUIRE(nextStore.getNexteeStar(7) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6});
+        REQUIRE(nextStore.getNexteeStar(8) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6, 7});
+        REQUIRE(nextStore.getNexteeStar(9) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6, 7});
+        REQUIRE(nextStore.getNexteeStar(12) == std::unordered_set<StmtNum>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
     }
 }
