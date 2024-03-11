@@ -161,3 +161,19 @@ bool PKBFacadeReader::hasNextRelationship(StmtNum s1, StmtNum s2) {
 bool PKBFacadeReader::hasNextRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
 }
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNexterStar(StmtNum nextee) {
+    return pkbReference->nextStore->getNexterStar(nextee);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNexteeStar(StmtNum nexter) {
+    return pkbReference->nextStore->getNexteeStar(nexter);
+}
+
+bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
+}
