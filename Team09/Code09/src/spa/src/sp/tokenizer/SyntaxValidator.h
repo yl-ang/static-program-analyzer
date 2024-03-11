@@ -14,11 +14,12 @@
 
 // Define non-terminals, no need to define terminals since LEXICAL_TOKEN_TYPES are terminals
 enum NonTerminal {
-    NT_PROGRAM,      // 0
+    NT_PROGRAM,  // 0
+    NT__PROGRAM,
     NT_PROCEDURE,    // 1
     NT_STMTLST,      // 2
     NT__STMTLST,     // 3
-    NT_STMT,         // 4
+    NT_STMT,         //  4
     NT_READ,         // 5
     NT_PRINT,        // 6
     NT_WHILE,        // 7

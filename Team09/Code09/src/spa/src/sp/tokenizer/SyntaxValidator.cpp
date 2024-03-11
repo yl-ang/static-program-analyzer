@@ -5,7 +5,9 @@
 bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
     // Initialise parsing table and stack
     SyntaxValidator::ParsingTable parsingTable = initialiseSIMPLEParsingTable();
+    input.push_back(Token(LEXICAL_TOKEN_TYPE::END_OF_FILE, "$", -1));
     std::stack<SyntaxValidator::Symbol> parsingStack;
+    parsingStack.push(LEXICAL_TOKEN_TYPE::END_OF_FILE);
     parsingStack.push(NonTerminal::NT_PROGRAM);
 
     size_t index = 0;
@@ -88,7 +90,11 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
 
 SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
     SyntaxValidator::ParsingTable parsingTable = {
-        {{NonTerminal::NT_PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE}, {NonTerminal::NT_PROCEDURE}},
+        {{NonTerminal::NT_PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE},
+         {NonTerminal::NT_PROCEDURE, NonTerminal::NT__PROGRAM}},
+        {{NonTerminal::NT__PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE},
+         {NonTerminal::NT_PROCEDURE, NonTerminal::NT__PROGRAM}},
+        {{NonTerminal::NT__PROGRAM, LEXICAL_TOKEN_TYPE::END_OF_FILE}, {}},
 
         {{NonTerminal::NT_PROCEDURE, LEXICAL_TOKEN_TYPE::PROCEDURE},
          {LEXICAL_TOKEN_TYPE::PROCEDURE, NonTerminal::NT_PROC_NAME, LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE,
