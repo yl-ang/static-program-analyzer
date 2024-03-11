@@ -23,6 +23,7 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
+    void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
 };

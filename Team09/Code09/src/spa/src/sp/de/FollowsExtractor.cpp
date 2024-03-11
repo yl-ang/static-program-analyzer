@@ -16,6 +16,7 @@ void FollowsExtractor::visitIf(IfNode* node) {}
 void FollowsExtractor::visitAssign(AssignmentNode* node) {}
 void FollowsExtractor::visitVariable(VariableNode* node) {}
 void FollowsExtractor::visitConstant(ConstantNode* node) {}
+void FollowsExtractor::visitCall(CallNode* node) {}
 
 void FollowsExtractor::visitStmtLst(StatementListNode* node) {
     std::vector<int> stmtNumbers = node->getStmtsStmtNum();

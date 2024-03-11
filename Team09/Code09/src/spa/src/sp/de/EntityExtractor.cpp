@@ -7,6 +7,7 @@ void EntityExtractor::visitStmtLst(StatementListNode* node) {}
 void EntityExtractor::visitExpression(ExpressionNode* node) {}
 void EntityExtractor::visitFactor(FactorNode* node) {}
 void EntityExtractor::visitTerm(TermNode* node) {}
+void EntityExtractor::visitCall(CallNode* node) {}
 
 void EntityExtractor::visitProcedure(ProcedureNode* node) {
     std::string procedure = node->getValue();
