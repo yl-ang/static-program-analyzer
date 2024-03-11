@@ -58,7 +58,7 @@ BasicToken* LexicalAnalyzer::disambiguate(std::string curr, std::string prev, st
             if (prev == "}" && next == "{") {
                 isKeyword = true;
             }
-        } else if (curr == "procedure" || curr == "read" || curr == "print") {
+        } else if (curr == "procedure" || curr == "read" || curr == "print" || curr == "call") {
             if (isValidName(next)) {
                 isKeyword = true;
             }
