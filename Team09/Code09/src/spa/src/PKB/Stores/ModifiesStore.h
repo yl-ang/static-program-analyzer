@@ -12,7 +12,7 @@
 class ModifiesStore {
 public:
     // TODO(yl-ang): Rename setStatementModifiesStore -> setStatementModifiesStore to avoid confusion in SP side
-    void setStatementModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesSet);
+    void setStatementModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& modifiesStatementSet);
     void setProcedureModifiesStore(const std::unordered_set<std::pair<Procedure, Variable>>& modifiesProcedureSet);
     bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
     bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
