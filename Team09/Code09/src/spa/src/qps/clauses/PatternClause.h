@@ -10,8 +10,8 @@ private:
     ClauseArgument& firstArg;
     ClauseArgument& secondArg;
 
-    ClauseResult evaluateSynonym(PKBFacadeReader&);
-    ClauseResult evaluateOthers(PKBFacadeReader&);
+    ClauseResult evaluateArgSyn(PKBFacadeReader&);
+    ClauseResult evaluateArgNonSyns(PKBFacadeReader&);
 
 public:
     PatternClause(ClauseArgument* assign, ClauseArgument* f, ClauseArgument* s);
