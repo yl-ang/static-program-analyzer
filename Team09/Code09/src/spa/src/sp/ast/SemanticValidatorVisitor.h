@@ -8,9 +8,9 @@ class SemanticValidatorVisitor : public AstVisitor {
 public:
     SemanticValidatorVisitor(std::shared_ptr<std::unordered_set<std::string>> procedureNames)
         : procedureNamesPtr(procedureNames) {}
+    std::shared_ptr<std::unordered_set<std::string>> procedureNamesPtr;
 
 protected:
-    std::shared_ptr<std::unordered_set<std::string>> procedureNamesPtr;
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;

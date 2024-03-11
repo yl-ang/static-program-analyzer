@@ -576,18 +576,6 @@ TEST_CASE("CFG Build Tests") {
             {4, {5}},
         };
 
-        for (const auto& pair : cfg.parentToChildMap) {
-            std::cout << pair.first << ": ";
-            const std::vector<int>& vec = pair.second;
-            for (size_t i = 0; i < vec.size(); ++i) {
-                std::cout << vec[i];
-                if (i < vec.size() - 1) {
-                    std::cout << ", ";
-                }
-            }
-            std::cout << std::endl;
-        }
-
         REQUIRE(cfg.parentToChildMap == expected);
     }
 }

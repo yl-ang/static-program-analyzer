@@ -13,6 +13,6 @@ public:
 private:
     void checkDuplicateProcedureNames(std::shared_ptr<ProgramNode>);
     void checkCallingProcedure(std::shared_ptr<ProgramNode>);
-    void visitNode(std::shared_ptr<ASTNode>&& node, AstVisitor* visitor);
+    void visitNode(std::shared_ptr<ASTNode>&& node, SemanticValidatorVisitor* visitor);
     SemanticValidatorVisitor* semanticValidatorVisitor;
 };
