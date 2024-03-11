@@ -385,7 +385,8 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(ELSE, "else", -1),
                                      Token(OPEN_CURLY_BRACE, "{", -1),
 
-                                     Token(PRINT, "print", 2),          Token(NAME, "y", 2),
+                                     Token(PRINT, "print", 2),
+                                     Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
 
                                      Token(CLOSE_CURLY_BRACE, "}", -1),
