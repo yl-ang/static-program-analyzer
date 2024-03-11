@@ -81,33 +81,18 @@ bool NextStore::hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& ar
     return hasNextStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
 }
 
-void NextStore::dfsNextStar(StmtNum start, StmtNum current, std::unordered_set<StmtNum>& result,
-                            std::unordered_set<StmtNum>& visited,
-                            const std::unordered_map<StmtNum, std::unordered_set<StmtNum>>& nextMap) {
-    if (visited.find(current) != visited.end()) {
-        return;
-    }
-
-    visited.insert(current);
-
-    auto nexterSet = nextMap.find(current);
-    if (nexterSet != nextMap.end()) {
-        for (StmtNum nextee : nexterSet->second) {
-            dfsNextStar(start, nextee, result, visited, nextMap);
-        }
-    }
-
-    if (current != start) {
-        result.insert(current);
-    }
-}
-
 std::unordered_set<StmtNum> NextStore::computeNextStar(
     StmtNum start, const std::unordered_map<StmtNum, std::unordered_set<StmtNum>>& nextMap) {
     std::unordered_set<StmtNum> result;
-    std::unordered_set<StmtNum> visited;
 
-    dfsNextStar(start, start, result, visited, nextMap);
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> closureMap = nextMap;
+
+    TransitiveClosureUtility::computeTransitiveClosure(closureMap);
+
+    auto it = closureMap.find(start);
+    if (it != closureMap.end()) {
+        result.insert(it->second.begin(), it->second.end());
+    }
 
     return result;
 }
