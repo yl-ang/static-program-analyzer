@@ -13,6 +13,7 @@ void ParentExtractor::visitPrint(PrintNode* node) {}
 void ParentExtractor::visitAssign(AssignmentNode* node) {}
 void ParentExtractor::visitVariable(VariableNode* node) {}
 void ParentExtractor::visitConstant(ConstantNode* node) {}
+void ParentExtractor::visitCall(CallNode* node) {}
 
 void ParentExtractor::visitWhile(WhileNode* node) {
     int parentStmtNum = node->getStmtNumber();

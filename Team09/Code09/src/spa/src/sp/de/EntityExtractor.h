@@ -6,6 +6,7 @@
 #include "../../PKB/PKBClient/PKBFacadeWriter.h"
 #include "../../PKB/utils/DataTypes.h"
 #include "AstVisitor.h"
+#include "sp/ast/grammar_nodes/statements/CallNode.h"
 
 enum class DesignEntityStatementType {
     READ,
@@ -48,6 +49,7 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
+    void visitCall(CallNode* node) override;
 
     std::unordered_set<std::string> getVariables();
     std::unordered_set<std::string> getConstants();

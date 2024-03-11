@@ -24,6 +24,7 @@ public:
     void visitTerm(TermNode* node) override;
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
+    void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
     void dfsVisitHelper(std::shared_ptr<ASTNode> node, ModifiesExtractor* visitor);

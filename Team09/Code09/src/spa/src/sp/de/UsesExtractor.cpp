@@ -11,6 +11,7 @@ void UsesExtractor::visitProcedure(ProcedureNode* node) {}
 void UsesExtractor::visitRead(ReadNode* node) {}
 void UsesExtractor::visitVariable(VariableNode* node) {}
 void UsesExtractor::visitConstant(ConstantNode* node) {}
+void UsesExtractor::visitCall(CallNode* node) {}
 
 void UsesExtractor::visitAssign(AssignmentNode* node) {
     int userStmtNum = node->getStmtNumber();
