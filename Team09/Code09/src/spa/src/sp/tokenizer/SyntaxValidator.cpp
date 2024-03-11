@@ -18,21 +18,29 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
         // Terminal at top of stack, and token match
         if (std::holds_alternative<LEXICAL_TOKEN_TYPE>(stackTop) &&
             std::get<LEXICAL_TOKEN_TYPE>(stackTop) == currToken) {
+#ifdef DEBUG_BUILD
             std::cout << "top of stack terminal: " << input[index].value << std::endl;
+#endif
+
             index++;
             // Non terminal at top of stack, find relevant grammar rule from parsing table and replace
         } else if (std::holds_alternative<NonTerminal>(stackTop)) {
             auto ite = parsingTable.find({std::get<NonTerminal>(stackTop), currToken});
             if (ite == parsingTable.end()) {
+#ifdef DEBUG_BUILD
                 std::cout << "top of stack non terminal ERROR: " << std::get<NonTerminal>(stackTop) << std::endl;
                 std::cout << "curr token: " << input[index].value << std::endl;
                 std::cout << "next token: " << input[index + 1].value << std::endl;
                 std::cout << "next next token: " << input[index + 2].value << std::endl;
+#endif
 
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
             }
+#ifdef DEBUG_BUILD
             std::cout << "top of stack non terminal: " << std::get<NonTerminal>(stackTop) << std::endl;
             std::cout << "top of stack token: " << input[index].value << std::endl;
+#endif
+
             std::vector<SyntaxValidator::Symbol> grammarRule = ite->second;
             // Handles epsilon in the first follows set
             if (grammarRule.empty()) {
@@ -40,9 +48,11 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             }
 
             // Handle special case cond_expr
-
             if ((std::get<NonTerminal>(stackTop) == NT_COND_EXPR) && (currToken == LEXICAL_TOKEN_TYPE::OPEN_BRACKET)) {
+#ifdef DEBUG_BUILD
                 std::cout << "Disambiguate" << std::endl;
+#endif
+
                 grammarRule = disambiguateCondExprRule(index, input, grammarRule);
             }
 
@@ -50,20 +60,24 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             for (auto elem = grammarRule.rbegin(); elem != grammarRule.rend(); ++elem) {
                 parsingStack.push(*elem);
             }
-
         } else {
-            // lexical token type but not = currtoken
+// lexical token type but not = currtoken
+#ifdef DEBUG_BUILD
             std::cout << "top of stack terminal ERROR: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << std::endl;
             std::cout << "curr token: " << input[index].value << " in " << input[index - 2].value
                       << input[index - 1].value << input[index].value << input[index + 1].value
                       << input[index + 2].value << std::endl;
+#endif
+
             throw SyntaxError("Unexpected grammar rule");
         }
     }
     if (!parsingStack.empty() || index != input.size()) {
         throw SyntaxError(" Unexpected end of input");
     }
+#ifdef DEBUG_BUILD
     std::cout << "Syntax is valid" << std::endl;
+#endif
     return true;
 }
 
@@ -71,14 +85,19 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
     int index, std::vector<Token> input, std::vector<SyntaxValidator::Symbol> grammarRule) {
     std::stack<char> bracketStack;
 
+#ifdef DEBUG_BUILD
     std::cout << "BracketStack size: " << bracketStack.size() << std::endl;
+#endif
+
     int i = index;
 
     auto dupl = std::find(grammarRule.begin(), grammarRule.end(), SyntaxValidator::Symbol{NonTerminal::DUPL});
 
+#ifdef DEBUG_BUILD
     if (dupl == grammarRule.end()) {
         std::cout << "ERROR: Could not find DUPL while trying to disambiguate" << std::endl;
     }
+#endif
 
     // Perform bracket matching until the first closing parenthesis
     for (; i < input.size(); ++i) {
@@ -94,16 +113,25 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 // Check the next element after closing parenthesis
                 if (i + 1 < input.size() &&
                     (input[i + 1].type == LEXICAL_TOKEN_TYPE::ANDAND || input[i + 1].type == LEXICAL_TOKEN_TYPE::OR)) {
-                    // Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
+// Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
+#ifdef DEBUG_BUILD
                     std::cout << "Using Grammar Rule ( cond expr ) _cond_expr" << std::endl;
+#endif
+
                     grammarRule.erase(grammarRule.begin(), std::next(dupl));
                 } else {
-                    // Grammar rule cond_expr: rel_expr
+// Grammar rule cond_expr: rel_expr
+#ifdef DEBUG_BUILD
                     std::cout << "Using Grammar Rule rel_expr" << std::endl;
+#endif
+
                     grammarRule.erase(dupl, grammarRule.end());
                 }
 
+#ifdef DEBUG_BUILD
                 std::cout << "Disambiguated Grammar Rule" << std::endl;
+#endif
+
                 return grammarRule;
             }
         }
