@@ -158,5 +158,102 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(1, 10) == true);
         REQUIRE(nextStore.hasNextStarRelationship(1, 11) == true);
         REQUIRE(nextStore.hasNextStarRelationship(1, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(2, 1));
+        REQUIRE(nextStore.hasNextStarRelationship(2, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 6) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(2, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(3, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(3, 2));
+        REQUIRE(nextStore.hasNextStarRelationship(3, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 6) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(3, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(4, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(4, 2));
+        REQUIRE(nextStore.hasNextStarRelationship(4, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 6) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(4, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(5, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(5, 2));
+        REQUIRE(nextStore.hasNextStarRelationship(5, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 6) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(5, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(6, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(6, 2));
+        REQUIRE(nextStore.hasNextStarRelationship(6, 3) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 4) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 5) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 7) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(6, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 2));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 3));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 4));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 5));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 6));
+        REQUIRE(nextStore.hasNextStarRelationship(7, 8) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(7, 9) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(7, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(7, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(7, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 2));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 3));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 4));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 5));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 6));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 7));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 9));
+        REQUIRE(nextStore.hasNextStarRelationship(8, 10) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(8, 11) == true);
+        REQUIRE(nextStore.hasNextStarRelationship(8, 12) == true);
+
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 1));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 2));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 3));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 4));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 5));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 6));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 7));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 8));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 9));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 10));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 11));
+        REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 12));
     }
 }
