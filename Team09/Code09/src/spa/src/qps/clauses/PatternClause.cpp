@@ -27,9 +27,9 @@ bool PatternClause::equals(const QueryClause& other) const {
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     bool isFirstSynonym = firstArg.isSynonym();
     if (isFirstSynonym) {
-        return evaluateSynonym(reader);
+        return evaluateArgSyn(reader);
     } else {
-        return evaluateOthers(reader);
+        return evaluateArgNonSyns(reader);
     }
 
     return {{}, {}};
@@ -58,11 +58,11 @@ std::vector<Synonym> PatternClause::getSynonyms() const {
     return synonyms;
 }
 
-ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
+ClauseResult PatternClause::evaluateArgSyn(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable
 
-    std::unordered_set<Stmt> allStmts = reader.getStmts();
+    std::unordered_set<Stmt> allStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::unordered_set<Variable> allVars = reader.getVariables();
 
     std::vector<std::string> stmtNumbers = {};
@@ -100,7 +100,7 @@ ClauseResult PatternClause::evaluateSynonym(PKBFacadeReader& reader) {
     return {returnSyn, returnSynValues};
 }
 
-ClauseResult PatternClause::evaluateOthers(PKBFacadeReader& reader) {
+ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     std::unordered_set<Stmt> allStmts = reader.getStmts();
     std::vector<std::string> stmtNumbers = {};

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "sp/ast/AstNode.h"
+#include "sp/ast/SemanticValidator.h"
 #include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
 #include "sp/ast/grammar_nodes/FactorNode.h"
@@ -14,6 +15,7 @@
 #include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/CallNode.h"
 #include "sp/ast/grammar_nodes/statements/IfNode.h"
 #include "sp/ast/grammar_nodes/statements/PrintNode.h"
 #include "sp/ast/grammar_nodes/statements/ReadNode.h"
@@ -28,6 +30,8 @@ const std::unordered_set<LEXICAL_TOKEN_TYPE> RelationalOperators = {
     LEXICAL_TOKEN_TYPE::GREATER_THAN, LEXICAL_TOKEN_TYPE::GREATER_THAN_OR_EQUAL_TO,
     LEXICAL_TOKEN_TYPE::EQUAL_CHECK,  LEXICAL_TOKEN_TYPE::NOT_EQUAL_CHECK};
 class AST {
+    SemanticValidator semanticValidator;
+
 public:
     std::shared_ptr<VariableNode> buildVarNameAST(Token token);
     std::shared_ptr<ConstantNode> buildIntAST(Token token);
@@ -52,4 +56,5 @@ public:
     std::shared_ptr<ExpressionNode> handleBracketedCondExpr(std::queue<Token>& tokens);
     std::shared_ptr<WhileNode> buildWhileAST(std::queue<Token>& tokens);
     std::shared_ptr<IfNode> buildIfAST(std::queue<Token>& tokens);
+    std::shared_ptr<CallNode> buildCallAST(std::queue<Token>& tokens);
 };

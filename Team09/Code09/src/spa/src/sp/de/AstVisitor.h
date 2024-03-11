@@ -1,5 +1,6 @@
 #pragma once
 
+class CallNode;
 class ProgramNode;
 class ProcedureNode;
 class StatementListNode;
@@ -30,4 +31,5 @@ public:
     virtual void visitTerm(TermNode* node) = 0;
     virtual void visitVariable(VariableNode* node) = 0;
     virtual void visitConstant(ConstantNode* node) = 0;
+    virtual void visitCall(CallNode* node) = 0;
 };

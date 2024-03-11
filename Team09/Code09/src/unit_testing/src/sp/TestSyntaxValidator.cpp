@@ -262,6 +262,7 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(IF, "if", 1),
                                      Token(OPEN_BRACKET, "(", 1),
                                      Token(OPEN_BRACKET, "(", 1),
+
                                      Token(NAME, "x", 1),
                                      Token(ADD, "+", 1),
                                      Token(INTEGER, "2", 1),
@@ -284,6 +285,7 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(PRINT, "print", 2),
                                      Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
+
                                      Token(CLOSE_CURLY_BRACE, "}", -1),
                                      Token(CLOSE_CURLY_BRACE, "}", -1)};
 
@@ -328,6 +330,64 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(PRINT, "print", 2),
                                      Token(NAME, "y", 2),
                                      Token(SEMICOLON, ";", 2),
+
+                                     Token(CLOSE_CURLY_BRACE, "}", -1),
+                                     Token(CLOSE_CURLY_BRACE, "}", -1)};
+
+        bool result = syntaxValidator.validateSyntax(tokens);
+        REQUIRE(result);
+    }
+
+    SECTION("Handle correct nested cond expr with rel expr") {
+        /*
+         if ( (x + 2) > 1) then {
+            while ((x) > 1) {
+                read x;
+            }
+        } else {
+            print y;
+        }
+        */
+        std::vector<Token> tokens = {Token(PROCEDURE, "procedure", -1),
+                                     Token(NAME, "procedure", -1),
+                                     Token(OPEN_CURLY_BRACE, "{", -1),
+
+                                     Token(IF, "if", 1),
+                                     Token(OPEN_BRACKET, "(", 1),
+                                     Token(OPEN_BRACKET, "(", 1),
+                                     Token(NAME, "x", 1),
+                                     Token(ADD, "+", 1),
+                                     Token(INTEGER, "2", 1),
+                                     Token(CLOSE_BRACKET, ")", 1),
+                                     Token(GREATER_THAN, ">", 1),
+                                     Token(INTEGER, "1", 1),
+                                     Token(CLOSE_BRACKET, ")", 1),
+
+                                     Token(THEN, "then", 1),
+                                     Token(OPEN_CURLY_BRACE, "{", 1),
+
+                                     Token(WHILE, "while", 2),
+                                     Token(OPEN_BRACKET, "(", 2),
+                                     Token(OPEN_BRACKET, "(", 2),
+                                     Token(NAME, "x", 2),
+                                     Token(CLOSE_BRACKET, ")", 2),
+                                     Token(GREATER_THAN, ">", 2),
+                                     Token(INTEGER, "1", 2),
+                                     Token(CLOSE_BRACKET, ")", 2),
+                                     Token(OPEN_CURLY_BRACE, "{", 2),
+
+                                     Token(READ, "read", 3),
+                                     Token(NAME, "x", 3),
+                                     Token(SEMICOLON, ";", 3),
+                                     Token(CLOSE_CURLY_BRACE, "}", -1),
+
+                                     Token(CLOSE_CURLY_BRACE, "}", -1),
+                                     Token(ELSE, "else", -1),
+                                     Token(OPEN_CURLY_BRACE, "{", -1),
+
+                                     Token(PRINT, "print", 2),          Token(NAME, "y", 2),
+                                     Token(SEMICOLON, ";", 2),
+
                                      Token(CLOSE_CURLY_BRACE, "}", -1),
                                      Token(CLOSE_CURLY_BRACE, "}", -1)};
 

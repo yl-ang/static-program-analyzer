@@ -6,9 +6,12 @@
 #include "qps/exceptions/QPSSemanticError.h"
 #include "qps/exceptions/QPSSyntaxError.h"
 
-class AssignPatternValidator : public ArgumentsValidator {
+class PatternValidator : public ArgumentsValidator {
+private:
+    std::string syn;
+
 public:
-    AssignPatternValidator(const std::vector<std::string>& args);
+    PatternValidator(const std::string& syn, const std::vector<std::string>& args);
     virtual void validateSyntax() override;
     virtual void validateSemantic(SynonymStore* store) override;
 };

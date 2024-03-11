@@ -23,8 +23,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return {};
     }
 
-    if (const TableManager newEmptyTm = TableManager{};
-        !evaluateAndJoinClauses(newEmptyTm, ac.nonSelectConnectedClauses, pkb)) {
+    if (!evaluateAndJoinClauses(tableManager, ac.nonSelectConnectedClauses, pkb)) {
         // There were empty results after evaluating the non-select clauses. Return empty result.
         return {};
     }

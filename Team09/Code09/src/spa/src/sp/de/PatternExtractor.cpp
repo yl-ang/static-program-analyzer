@@ -14,6 +14,7 @@ void PatternExtractor::visitProcedure(ProcedureNode* node) {}
 void PatternExtractor::visitRead(ReadNode* node) {}
 void PatternExtractor::visitVariable(VariableNode* node) {}
 void PatternExtractor::visitConstant(ConstantNode* node) {}
+void PatternExtractor::visitCall(CallNode* node) {}
 
 void PatternExtractor::visitAssign(AssignmentNode* node) {
     int stmtNum = node->getStmtNumber();

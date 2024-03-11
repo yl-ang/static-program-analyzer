@@ -33,7 +33,11 @@ std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
         children.push_back((procedure));
     }
 
-    return std::make_shared<ProgramNode>((children));
+    std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>((children));
+
+    semanticValidator.validateSemantics(programNode);
+
+    return programNode;
 }
 /*
 Grammar: 'procedure' proc_name { stmtList }
@@ -80,6 +84,8 @@ std::shared_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
         return buildPrintAST(tokens);
     } else if (first_token.type == WHILE) {
         return buildWhileAST(tokens);
+    } else if (first_token.type == CALL) {
+        return buildCallAST(tokens);
     }
     return buildIfAST(tokens);
 }
@@ -123,6 +129,15 @@ std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
     children.push_back((nameNode));
     tokens.pop();
     return std::make_shared<ReadNode>((children), readToken.line_number);
+}
+
+std::shared_ptr<CallNode> AST::buildCallAST(std::queue<Token>& tokens) {
+    Token callToken = tokens.front();
+    tokens.pop();
+    Token procedureToken = tokens.front();
+    tokens.pop();
+    tokens.pop();
+    return std::make_shared<CallNode>(procedureToken.value, callToken.line_number);
 }
 
 std::shared_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {

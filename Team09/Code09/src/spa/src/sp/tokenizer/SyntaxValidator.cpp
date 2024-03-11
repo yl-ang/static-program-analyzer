@@ -75,6 +75,7 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
     if (!parsingStack.empty() || index != input.size()) {
         throw SyntaxError(" Unexpected end of input");
     }
+  
 #ifdef DEBUG_BUILD
     std::cout << "Syntax is valid" << std::endl;
 #endif
@@ -113,6 +114,7 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
                 // Check the next element after closing parenthesis
                 if (i + 1 < input.size() &&
                     (input[i + 1].type == LEXICAL_TOKEN_TYPE::ANDAND || input[i + 1].type == LEXICAL_TOKEN_TYPE::OR)) {
+
 // Grammar rule cond_expr: '(' cond_expr ')' _cond_expr
 #ifdef DEBUG_BUILD
                     std::cout << "Using Grammar Rule ( cond expr ) _cond_expr" << std::endl;

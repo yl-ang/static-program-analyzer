@@ -1,18 +1,35 @@
 #include "Validator.h"
 
 void Validator::validate(std::vector<std::string> statementList) {
-    // statement example: variable v / stmt s1, s2 / Select v
+    // statement example: {variable v; stmt s1, s2; Select v}
+    // Ensure that Select is the last input
+    if (statementList.empty()) {
+        throw QPSSyntaxError();
+    }
+
+    if (!isSelectStatement(statementList[statementList.size() - 1])) {
+        throw QPSSyntaxError();
+    }
+
+    bool hasSemanticError = false;
     for (std::string statement : statementList) {
-        if (isDeclarationStatement(statement)) {
-            validateDeclarationStatement(statement);
-            synonymStore.storeSynonymWithStatement(statement);
-        } else if (isSelectStatement(statement)) {
-            validateSelectStatement(statement);
-        } else {
-            // NOTE: This is thrown when and empty string is made here
-            // TODO(Han Qin): Add test case to test this
-            throw QPSSyntaxError();
+        try {
+            if (isDeclarationStatement(statement)) {
+                validateDeclarationStatement(statement);
+                synonymStore.storeSynonymWithStatement(statement);
+            } else if (isSelectStatement(statement)) {
+                validateSelectStatement(statement);
+            } else {
+                // NOTE: This is thrown when and empty string is made here
+                // TODO(Han Qin): Add test case to test this
+                throw QPSSyntaxError();
+            }
+        } catch (QPSSemanticError e) {
+            hasSemanticError = true;
         }
+    }
+    if (hasSemanticError) {
+        throw QPSSemanticError();
     }
 }
 
@@ -27,7 +44,7 @@ void Validator::validateDeclarationStatement(const std::string& statement) {
     std::tie(designEntityWord, remainingStatement) = substringUntilDelimiter(newStatement, SPACE);
 
     std::vector<std::string> synonymList = splitByDelimiter(trim(remainingStatement), ",");
-    if (synonymList.size() == 0) {
+    if (synonymList.size() == 1 && synonymList[0].empty()) {
         throw QPSSyntaxError();
     }
 
@@ -125,12 +142,6 @@ void Validator::validateRelRef(const std::string& relRefWord) {
 }
 
 void Validator::validatePatternClause(const std::string& patternClause) {
-    bool hasProperStructure =
-        std::regex_match(patternClause, std::regex("^" + QPSConstants::PATTERN + " .*\\([^)]*\\)$"));
-    if (!hasProperStructure) {
-        throw QPSSyntaxError();
-    }
-
     // Remove "pattern"
     std::string removedPatternClause = trim(patternClause.substr(QPSConstants::PATTERN.size()));
 
@@ -144,9 +155,6 @@ void Validator::validatePattern(const std::string& pattern) {
     std::tie(synString, parameterString) = substringUntilDelimiter(pattern, "(");
 
     synString = trim(synString);
-    if (!isSynonym(synString)) {
-        throw QPSSyntaxError();
-    }
 
     // ('entRef', 'expression-spec')
     parameterString = trim(parameterString);
@@ -177,9 +185,5 @@ std::unique_ptr<ArgumentsValidator> Validator::buildArgValidator(const std::stri
 
 std::unique_ptr<ArgumentsValidator> Validator::buildPatternValidator(const std::string& synonymString,
                                                                      const std::vector<std::string>& arguments) {
-    if (synonymStore.containsSynonym(synonymString, QPSConstants::ASSIGN)) {
-        return std::make_unique<AssignPatternValidator>(arguments);
-    } else {
-        throw QPSSemanticError();
-    }
+    return std::make_unique<PatternValidator>(synonymString, arguments);
 }
