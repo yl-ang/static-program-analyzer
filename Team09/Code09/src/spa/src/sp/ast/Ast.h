@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "sp/ast/AstNode.h"
+#include "sp/ast/SemanticValidator.h"
 #include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
 #include "sp/ast/grammar_nodes/FactorNode.h"
@@ -28,6 +29,8 @@ const std::unordered_set<LEXICAL_TOKEN_TYPE> RelationalOperators = {
     LEXICAL_TOKEN_TYPE::GREATER_THAN, LEXICAL_TOKEN_TYPE::GREATER_THAN_OR_EQUAL_TO,
     LEXICAL_TOKEN_TYPE::EQUAL_CHECK,  LEXICAL_TOKEN_TYPE::NOT_EQUAL_CHECK};
 class AST {
+    SemanticValidator semanticValidator;
+
 public:
     std::shared_ptr<VariableNode> buildVarNameAST(Token token);
     std::shared_ptr<ConstantNode> buildIntAST(Token token);

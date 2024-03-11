@@ -33,7 +33,11 @@ std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
         children.push_back((procedure));
     }
 
-    return std::make_shared<ProgramNode>((children));
+    std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>((children));
+
+    semanticValidator.validateSemantics(programNode);
+
+    return programNode;
 }
 /*
 Grammar: 'procedure' proc_name { stmtList }
