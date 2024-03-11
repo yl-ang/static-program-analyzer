@@ -11,23 +11,25 @@ void Validator::validate(std::vector<std::string> statementList) {
         throw QPSSyntaxError();
     }
 
-    int selectStatementCounter = 0;
+    bool hasSemanticError = false;
     for (std::string statement : statementList) {
-        if (isDeclarationStatement(statement)) {
-            validateDeclarationStatement(statement);
-            synonymStore.storeSynonymWithStatement(statement);
-        } else if (isSelectStatement(statement)) {
-            validateSelectStatement(statement);
-            selectStatementCounter++;
-        } else {
-            // NOTE: This is thrown when and empty string is made here
-            // TODO(Han Qin): Add test case to test this
-            throw QPSSyntaxError();
+        try {
+            if (isDeclarationStatement(statement)) {
+                validateDeclarationStatement(statement);
+                synonymStore.storeSynonymWithStatement(statement);
+            } else if (isSelectStatement(statement)) {
+                validateSelectStatement(statement);
+            } else {
+                // NOTE: This is thrown when and empty string is made here
+                // TODO(Han Qin): Add test case to test this
+                throw QPSSyntaxError();
+            }
+        } catch (QPSSemanticError e) {
+            hasSemanticError = true;
         }
     }
-
-    if (selectStatementCounter != 1) {
-        throw QPSSyntaxError();
+    if (hasSemanticError) {
+        throw QPSSemanticError();
     }
 }
 

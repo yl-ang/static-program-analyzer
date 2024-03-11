@@ -353,6 +353,12 @@ TEST_CASE("validate") {
         REQUIRE_THROW_SEMANTIC_ERROR(validator.isValidValidate(inputStatements));
     }
 
+    SECTION("Duplicate synonym different line and syntax error in select_ThrowSyntaxError") {
+        std::vector<std::string> inputStatements = {"variable v;", "assign a;", "variable v;",
+                                                    "Select v such that Follows(v,2) pattern a(v,_\"2\"_);"};
+        REQUIRE_THROW_SYNTAX_ERROR(validator.isValidValidate(inputStatements));
+    }
+
     SECTION("Select before declaration_ThrowSyntaxError") {
         std::vector<std::string> inputStatements = {"Select v such that Follows(1,2) pattern a(v,_\"2\"_)", "assign a;",
                                                     "variable v, v;"};
