@@ -84,6 +84,8 @@ std::shared_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
         return buildPrintAST(tokens);
     } else if (first_token.type == WHILE) {
         return buildWhileAST(tokens);
+    } else if (first_token.type == CALL) {
+        return buildCallAST(tokens);
     }
     return buildIfAST(tokens);
 }
@@ -127,6 +129,15 @@ std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
     children.push_back((nameNode));
     tokens.pop();
     return std::make_shared<ReadNode>((children), readToken.line_number);
+}
+
+std::shared_ptr<CallNode> AST::buildCallAST(std::queue<Token>& tokens) {
+    Token callToken = tokens.front();
+    tokens.pop();
+    Token procedureToken = tokens.front();
+    tokens.pop();
+    tokens.pop();
+    return std::make_shared<CallNode>(procedureToken.value, callToken.line_number);
 }
 
 std::shared_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
