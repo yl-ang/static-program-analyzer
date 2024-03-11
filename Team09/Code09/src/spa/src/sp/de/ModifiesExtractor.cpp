@@ -11,6 +11,7 @@ void ModifiesExtractor::visitProcedure(ProcedureNode* node) {}
 void ModifiesExtractor::visitPrint(PrintNode* node) {}
 void ModifiesExtractor::visitVariable(VariableNode* node) {}
 void ModifiesExtractor::visitConstant(ConstantNode* node) {}
+void ModifiesExtractor::visitCall(CallNode* node) {}
 
 void ModifiesExtractor::visitRead(ReadNode* node) {
     int modifierStmtNum = node->getStmtNumber();
