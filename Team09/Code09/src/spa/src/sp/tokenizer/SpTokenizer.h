@@ -26,6 +26,11 @@ public:
     std::vector<Token> tokenize(std::vector<std::string>);
 
     /**
+     * @brief Tokenizes, but does not validate the syntax of the input. Primarily used for pattern
+     */
+    std::vector<Token> tokenizeWithoutValidation(std::vector<std::string> input);
+
+    /**
      * @brief Assign specific token types and statement numbers to each token.
      * Procedure definitions, else keywords on a line and close brackets are assigned
      * statement number -1.

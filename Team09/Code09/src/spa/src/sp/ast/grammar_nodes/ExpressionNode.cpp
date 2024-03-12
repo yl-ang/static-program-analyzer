@@ -50,3 +50,36 @@ void ExpressionNode::findConstants(const std::vector<std::shared_ptr<ASTNode>>& 
         findConstants(child->getChildren());
     }
 }
+
+bool ExpressionNode::match(std::shared_ptr<Matchable> input) {
+    // Check if the input is of type ExpressionNode
+    if (auto expressionNodePtr = std::dynamic_pointer_cast<ExpressionNode>(input)) {
+        if (this->getType() != expressionNodePtr->getType() || this->getValue() != expressionNodePtr->getValue() ||
+            this->getChildren().size() != expressionNodePtr->getChildren().size()) {
+            return false;
+        }
+
+        // Match all its children.
+        for (size_t i = 0; i < this->getChildren().size(); ++i) {
+            const std::shared_ptr<ASTNode>& thisChild = this->getChildren()[i];
+            const std::shared_ptr<ASTNode>& otherChild = expressionNodePtr->getChildren()[i];
+
+            std::shared_ptr<ExpressionNode> thisChildPtr = std::static_pointer_cast<ExpressionNode>(thisChild);
+            std::shared_ptr<ExpressionNode> otherChildPtr = std::static_pointer_cast<ExpressionNode>(otherChild);
+
+            if (!thisChildPtr || !otherChildPtr) {
+                // For some strange reason, one of the children is not an expression node. This should not happen.
+                throw std::exception(
+                    "ExpressionNode has a child that is not an ExpressionNode or some other derived class of "
+                    "itself.");
+            }
+
+            if (!(thisChildPtr->match(otherChildPtr))) {
+                return false;
+            }
+        }
+        return this->getChildren().size() == expressionNodePtr->getChildren().size();
+    }
+
+    return false;
+}
