@@ -1,5 +1,7 @@
 #include "ExpressionNode.h"
 
+#include <stdexcept>
+
 #include "ConstantNode.h"
 #include "VariableNode.h"
 
@@ -69,7 +71,7 @@ bool ExpressionNode::match(std::shared_ptr<Matchable> input) {
 
             if (!thisChildPtr || !otherChildPtr) {
                 // For some strange reason, one of the children is not an expression node. This should not happen.
-                throw std::exception(
+                throw std::runtime_error(
                     "ExpressionNode has a child that is not an ExpressionNode or some other derived class of "
                     "itself.");
             }
