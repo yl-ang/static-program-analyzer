@@ -7,7 +7,16 @@
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
 
-enum class RelationshipType { FOLLOWS, FOLLOWS_STAR, PARENT, PARENT_STAR, MODIFIES, USES, NEXT };  // update here
+enum class RelationshipType {
+    FOLLOWS,
+    FOLLOWS_STAR,
+    PARENT,
+    PARENT_STAR,
+    MODIFIES,
+    USES,
+    NEXT,
+    NEXT_STAR,
+};  // update here
 
 static std::unordered_map<DesignEntityType, StatementType> DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP = {
     {DesignEntityType::ASSIGN, StatementType::ASSIGN}, {DesignEntityType::WHILE, StatementType::WHILE},
