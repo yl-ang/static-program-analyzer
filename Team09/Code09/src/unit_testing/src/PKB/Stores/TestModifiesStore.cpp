@@ -5,7 +5,7 @@
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/Wildcard.h"
 
-TEST_CASE("ModifiesStore - All Tests") {
+TEST_CASE("ModifiesStore (Statements) - All Tests") {
     ModifiesStore modifiesStore;
 
     SECTION("Test hasStatementVariableModifiesRelationship") {
@@ -130,4 +130,53 @@ TEST_CASE("ModifiesStore - All Tests") {
         delete integerArg1;
         delete synonymArg2;
     }
+}
+
+TEST_CASE("ModifiesStore (Procedures) - All Tests") {
+    /*
+    procedure main {
+            flag = 0;
+            flag = flag + 1;
+            call computeCentroid;
+            call printResults;
+    }
+    procedure readPoint {
+            read x;
+            read y;
+    }
+    procedure printResults {
+            print flag;
+            print cenX;
+            print cenY;
+            print normSq;
+    }
+    procedure computeCentroid {
+            01      count = 0;
+            02      cenX = 0;
+            03      cenY = 0;
+            04      call readPoint;
+            05      while ((x != 0) && (y != 0)) {
+            06          count = count + 1;
+            07          cenX = cenX + x;
+            08          cenY = cenY + y;
+            09          call readPoint;
+    }
+            10      if (count == 0) then {
+            11          flag = 1;
+    } else {
+            12          cenX = cenX / count;
+            13          cenY = cenY / count;
+    }
+            14      normSq = cenX * cenX + cenY * cenY;
+    }
+    */
+
+    ModifiesStore modifiesStore;
+    modifiesStore.setProcedureModifiesStore({{"main", "flag"},
+                                             {"computeCentroid", "y"},
+                                             {"computeCentroid", "count"},
+                                             {"computeCentroid", "cenX"},
+                                             {"computeCentroid", "cenY"},
+                                             {"computeCentroid", "flag"},
+                                             {"computeCentroid", "normSq"}});
 }
