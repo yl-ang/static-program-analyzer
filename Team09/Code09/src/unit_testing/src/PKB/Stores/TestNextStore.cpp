@@ -133,8 +133,8 @@ TEST_CASE("NextStore - NextStar Tests") {
     nextStore.setNextStore(
         {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 3}, {3, 7}, {7, 8}, {7, 9}, {8, 10}, {9, 10}, {10, 11}, {11, 12}});
 
-    SECTION("Test hasNextStarRelationship with Integer arg1 and Integer arg2") {
-        // Self Reflectivity Checks (3, 4, 5, 6 are in a loop should accept self reflectivity)
+    SECTION("Test hasNextStarRelationship Self Reflectivity ") {
+        // Checks (3, 4, 5, 6 are in a loop should accept self reflectivity)
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(1, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(2, 2));
         REQUIRE(nextStore.hasNextStarRelationship(3, 3));
@@ -147,7 +147,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(10, 10));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(11, 11));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 1, number") {
         REQUIRE(nextStore.hasNextStarRelationship(1, 3));
         REQUIRE(nextStore.hasNextStarRelationship(1, 4));
         REQUIRE(nextStore.hasNextStarRelationship(1, 5));
@@ -158,7 +160,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(1, 10));
         REQUIRE(nextStore.hasNextStarRelationship(1, 11));
         REQUIRE(nextStore.hasNextStarRelationship(1, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 2, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(2, 1));
         REQUIRE(nextStore.hasNextStarRelationship(2, 3));
         REQUIRE(nextStore.hasNextStarRelationship(2, 4));
@@ -170,7 +174,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(2, 10));
         REQUIRE(nextStore.hasNextStarRelationship(2, 11));
         REQUIRE(nextStore.hasNextStarRelationship(2, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 3, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(3, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(3, 2));
         REQUIRE(nextStore.hasNextStarRelationship(3, 4));
@@ -182,7 +188,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(3, 10));
         REQUIRE(nextStore.hasNextStarRelationship(3, 11));
         REQUIRE(nextStore.hasNextStarRelationship(3, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 4, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(4, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(4, 2));
         REQUIRE(nextStore.hasNextStarRelationship(4, 3));
@@ -194,7 +202,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(4, 10));
         REQUIRE(nextStore.hasNextStarRelationship(4, 11));
         REQUIRE(nextStore.hasNextStarRelationship(4, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 5, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(5, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(5, 2));
         REQUIRE(nextStore.hasNextStarRelationship(5, 3));
@@ -206,7 +216,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(5, 10));
         REQUIRE(nextStore.hasNextStarRelationship(5, 11));
         REQUIRE(nextStore.hasNextStarRelationship(5, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 6, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(6, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(6, 2));
         REQUIRE(nextStore.hasNextStarRelationship(6, 3));
@@ -218,7 +230,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(6, 10));
         REQUIRE(nextStore.hasNextStarRelationship(6, 11));
         REQUIRE(nextStore.hasNextStarRelationship(6, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 7, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 2));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(7, 3));
@@ -230,7 +244,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(7, 10));
         REQUIRE(nextStore.hasNextStarRelationship(7, 11));
         REQUIRE(nextStore.hasNextStarRelationship(7, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 8, number") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 2));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(8, 3));
@@ -242,7 +258,9 @@ TEST_CASE("NextStore - NextStar Tests") {
         REQUIRE(nextStore.hasNextStarRelationship(8, 10));
         REQUIRE(nextStore.hasNextStarRelationship(8, 11));
         REQUIRE(nextStore.hasNextStarRelationship(8, 12));
+    }
 
+    SECTION("Test hasNextStarRelationship for 12, number ") {
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 1));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 2));
         REQUIRE_FALSE(nextStore.hasNextStarRelationship(12, 3));
