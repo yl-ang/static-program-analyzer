@@ -18,14 +18,11 @@
 #include "qps/exceptions/Exception.h"
 
 static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE_MAP = {
-    {QPSConstants::FOLLOWS, RelationshipType::FOLLOWS},
-    {QPSConstants::FOLLOWS_STAR, RelationshipType::FOLLOWS_STAR},
-    {QPSConstants::PARENT, RelationshipType::PARENT},
-    {QPSConstants::PARENT_STAR, RelationshipType::PARENT_STAR},
-    {QPSConstants::USES, RelationshipType::USES},
-    {QPSConstants::MODIFIES, RelationshipType::MODIFIES},
-    {QPSConstants::NEXT, RelationshipType::NEXT},
-    {QPSConstants::NEXT_STAR, RelationshipType::NEXT_STAR}};  // update here
+    {QPSConstants::FOLLOWS, RelationshipType::FOLLOWS}, {QPSConstants::FOLLOWS_STAR, RelationshipType::FOLLOWS_STAR},
+    {QPSConstants::PARENT, RelationshipType::PARENT},   {QPSConstants::PARENT_STAR, RelationshipType::PARENT_STAR},
+    {QPSConstants::USES, RelationshipType::USES},       {QPSConstants::MODIFIES, RelationshipType::MODIFIES},
+    {QPSConstants::NEXT, RelationshipType::NEXT},       {QPSConstants::NEXT_STAR, RelationshipType::NEXT_STAR},
+    {QPSConstants::AFFECTS, RelationshipType::AFFECTS}};  // update here
 
 class RelationshipBuilder {
 public:

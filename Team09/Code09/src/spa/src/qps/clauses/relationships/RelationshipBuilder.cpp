@@ -27,6 +27,8 @@ std::unique_ptr<Relationship> RelationshipBuilder::createRelationship(Relationsh
         return std::make_unique<Next>(firstArg, secondArg);
     case (RelationshipType::NEXT_STAR):
         return std::make_unique<NextStar>(firstArg, secondArg);
+    case (RelationshipType::AFFECTS):
+        return std::make_unique<NextStar>(firstArg, secondArg);
     }
     throw Exception("Cannot create relationship");
 }

@@ -29,6 +29,7 @@ struct QPSConstants {
     inline static const std::string NEXT = "Next";
     inline static const std::string NEXT_STAR = "Next*";
     inline static const std::string NEXT_STAR_REGEX = "Next\\*";
+    inline static const std::string AFFECTS = "Affects";
 
     inline static const std::string REL_REF_REGEX = FOLLOWS + '|' + FOLLOWS_STAR_REGEX + '|' + PARENT + '|' +
                                                     PARENT_STAR_REGEX + '|' + USES + '|' + MODIFIES + '|' + NEXT + '|' +
