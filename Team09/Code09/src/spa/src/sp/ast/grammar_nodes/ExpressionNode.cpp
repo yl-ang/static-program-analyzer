@@ -78,7 +78,8 @@ bool ExpressionNode::match(std::shared_ptr<Matchable> input) {
                 return false;
             }
         }
-        return this->getChildren().size() == expressionNodePtr->getChildren().size();
+
+        return true;
     }
 
     return false;
