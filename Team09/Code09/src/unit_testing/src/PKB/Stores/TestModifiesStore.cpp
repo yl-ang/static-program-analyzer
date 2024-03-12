@@ -8,18 +8,6 @@
 TEST_CASE("ModifiesStore (Statements) - All Tests") {
     ModifiesStore modifiesStore;
 
-    SECTION("Test hasStatementVariableModifiesRelationship") {
-        modifiesStore.setStatementModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
-
-        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(1, "x"));
-        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(2, "y"));
-        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(3, "x"));
-
-        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(1, "y"));
-        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(2, "x"));
-        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(3, "y"));
-    }
-
     SECTION("Test getVariablesByStatement") {
         modifiesStore.setStatementModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
 
@@ -35,6 +23,18 @@ TEST_CASE("ModifiesStore (Statements) - All Tests") {
         REQUIRE(modifiesStore.getStatementsByVariable("x") == std::unordered_set<StmtNum>{1, 3});
         REQUIRE(modifiesStore.getStatementsByVariable("y") == std::unordered_set<StmtNum>{2});
         REQUIRE(modifiesStore.getStatementsByVariable("z").empty());
+    }
+
+    SECTION("Test hasStatementVariableModifiesRelationship") {
+        modifiesStore.setStatementModifiesStore({{1, "x"}, {2, "y"}, {3, "x"}});
+
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(1, "x"));
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(2, "y"));
+        REQUIRE(modifiesStore.hasStatementVariableModifiesRelationship(3, "x"));
+
+        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(1, "y"));
+        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(2, "x"));
+        REQUIRE_FALSE(modifiesStore.hasStatementVariableModifiesRelationship(3, "y"));
     }
 
     SECTION(
@@ -133,50 +133,117 @@ TEST_CASE("ModifiesStore (Statements) - All Tests") {
 }
 
 TEST_CASE("ModifiesStore (Procedures) - All Tests") {
-    /*
-    procedure main {
-            flag = 0;
-            flag = flag + 1;
-            call computeCentroid;
-            call printResults;
-    }
-    procedure readPoint {
-            read x;
-            read y;
-    }
-    procedure printResults {
-            print flag;
-            print cenX;
-            print cenY;
-            print normSq;
-    }
-    procedure computeCentroid {
-            01      count = 0;
-            02      cenX = 0;
-            03      cenY = 0;
-            04      call readPoint;
-            05      while ((x != 0) && (y != 0)) {
-            06          count = count + 1;
-            07          cenX = cenX + x;
-            08          cenY = cenY + y;
-            09          call readPoint;
-    }
-            10      if (count == 0) then {
-            11          flag = 1;
-    } else {
-            12          cenX = cenX / count;
-            13          cenY = cenY / count;
-    }
-            14      normSq = cenX * cenX + cenY * cenY;
-    }
-    */
-
     ModifiesStore modifiesStore;
     modifiesStore.setProcedureModifiesStore({{"main", "flag"},
+                                             {"main", "x"},
+                                             {"computeCentroid", "x"},
                                              {"computeCentroid", "y"},
                                              {"computeCentroid", "count"},
                                              {"computeCentroid", "cenX"},
                                              {"computeCentroid", "cenY"},
                                              {"computeCentroid", "flag"},
-                                             {"computeCentroid", "normSq"}});
+                                             {"computeCentroid", "normSq"},
+                                             {"computeSquare", "x"},
+                                             {"computeSquare", "tempX"}});
+
+    SECTION("Test getVariablesByProcedure") {
+        REQUIRE(modifiesStore.getVariablesByProcedure("main") == std::unordered_set<Variable>{"x", "flag"});
+        REQUIRE(modifiesStore.getVariablesByProcedure("computeCentroid") ==
+                std::unordered_set<Variable>{"x", "y", "count", "cenX", "cenY", "flag", "normSq"});
+        REQUIRE(modifiesStore.getVariablesByProcedure("computeSquare") == std::unordered_set<Variable>{"x", "tempX"});
+    }
+
+    SECTION("Test getVariablesByProcedure") {
+        REQUIRE(modifiesStore.getProceduresByVariable("x") ==
+                std::unordered_set<Procedure>{"main", "computeCentroid", "computeSquare"});
+        REQUIRE(modifiesStore.getProceduresByVariable("flag") ==
+                std::unordered_set<Procedure>{"main", "computeCentroid"});
+        REQUIRE(modifiesStore.getProceduresByVariable("tempX") == std::unordered_set<Procedure>{"computeSquare"});
+    }
+
+    SECTION("Test hasProcedureVariableModifiesRelationship") {
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship("main", "x"));
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship("computeCentroid", "y"));
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship("computeSquare", "tempX"));
+
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship("main", "tempX"));
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship("computeCentroid", "test"));
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship("computeSquare", "y"));
+    }
+
+    SECTION("Test hasProcedureVariableModifiesRelationship with Wildcard arg1 and Synonym arg2 (Expecting True)") {
+        // Argument 1 is wildcard
+        // Argument 2 is synonym with variable modifies ("y")
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "y");
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship(*wildcardArg1, *synonymArg2));
+
+        delete wildcardArg1;
+        delete synonymArg2;
+    }
+
+    SECTION("Test hasProcedureVariableModifiesRelationship with Wildcard arg1 and Synonym arg2 (Expecting False)") {
+        // Argument 1 is wildcard
+        // Argument 2 is synonym with no variable modifies
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "w");
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship(*wildcardArg1, *synonymArg2));
+
+        delete wildcardArg1;
+        delete synonymArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableModifiesRelationship with procedure Synonym arg1 and Wildcard arg2 (Expecting "
+        "True)") {
+        // Argument 1 is procedure ("main") that modified variables
+        // Argument 2 is wildcard
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship(*procedureArg1, *wildcardArg2));
+
+        delete procedureArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableModifiesRelationship with procedure Synonym arg1 and Wildcard arg2 (Expecting "
+        "false)") {
+        // Argument 1 is procedure ("home") without modifying any variables
+        // Argument 2 is wildcard
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "home");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship(*procedureArg1, *wildcardArg2));
+
+        delete procedureArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableModifiesRelationship with procedure Synonym arg1 and variable Synonym arg2 "
+        "(Expecting "
+        "True)") {
+        // Argument 1 is procedure ("main") that modified variables
+        // Argument 2 is synonym with variable modifies ("x")
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* variableArg2 = new Synonym(DesignEntityType::VARIABLE, "x");
+        REQUIRE(modifiesStore.hasProcedureVariableModifiesRelationship(*procedureArg1, *variableArg2));
+
+        delete procedureArg1;
+        delete variableArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableModifiesRelationship with procedure Synonym arg1 and variable Synonym arg2 "
+        "(Expecting "
+        "false)") {
+        // Argument 1 is procedure ("main")
+        // Argument 2 is synonym with variable modifies ("tempX")
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* variableArg2 = new Synonym(DesignEntityType::VARIABLE, "tempX");
+        REQUIRE_FALSE(modifiesStore.hasProcedureVariableModifiesRelationship(*procedureArg1, *variableArg2));
+
+        delete procedureArg1;
+        delete variableArg2;
+    }
 }
