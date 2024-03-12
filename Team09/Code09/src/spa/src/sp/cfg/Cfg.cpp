@@ -1,8 +1,6 @@
 #include "Cfg.h"
 
 #include <memory>
-#include <unordered_set>
-#include <utility>
 
 #include "sp/ast/AstNode.h"
 // builds the CFG for a single procedure.
@@ -13,11 +11,13 @@ void CFG::buildCFG(std::shared_ptr<ASTNode> procedure) {
 
 void CFG::buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int loopLineStart) {
     std::vector<std::shared_ptr<ASTNode>> statementLists = statementListNode->getChildren();
+    int lastStatementNumber = statementLists.back()->getStmtNumber();
     // we need to look at the next statement number in case the current we are at is a while loop
     for (int i = 0; i < statementLists.size(); i++) {
         std::shared_ptr<ASTNode> currentNode = statementLists[i];
         int currentStatementNumber = currentNode->getStmtNumber();
-        int nextStatementNumber = i + 1 == statementLists.size() ? 0 : statementLists[i + 1]->getStmtNumber();
+        int nextStatementNumber =
+            lastStatementNumber == currentStatementNumber ? 0 : statementLists[i + 1]->getStmtNumber();
         if (currentNode->getType() == "if") {
             std::shared_ptr<ASTNode> thenNode = currentNode->getChildren()[1];
             std::shared_ptr<ASTNode> elseNode = currentNode->getChildren()[2];
@@ -33,10 +33,9 @@ void CFG::buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int 
             insertIntoCFGMap(currentStatementNumber, currentNode->getChildren()[1]->getChildren()[0]->getStmtNumber());
             // if there is a statement that is after the while loop, we need to add it to the cfg as well
             //
-            if (nextStatementNumber) {
+            if (nextStatementNumber != 0) {
                 insertIntoCFGMap(currentStatementNumber, nextStatementNumber);
-            }
-            if (loopLineStart) {
+            } else if (loopLineStart != 0) {
                 insertIntoCFGMap(currentStatementNumber, loopLineStart);
             }
             // for while, pass the currentStatementNumber as loopLineStart because that is the start of the loop.
