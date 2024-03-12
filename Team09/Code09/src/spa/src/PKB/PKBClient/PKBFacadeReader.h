@@ -43,11 +43,15 @@ public:
     bool hasParentRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasParentStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
-    // Getters for ModifiesStore
+    // Getters for ModifiesStore (Statements)
     [[nodiscard]] std::unordered_set<Variable> getModifiesVariablesByStatement(StmtNum stmt) const;
     [[nodiscard]] std::unordered_set<StmtNum> getModifiesStatementsByVariable(const Variable& variable) const;
-    [[nodiscard]] bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
+
+    // Getters for ModifiesStore (Procedures)
+    [[nodiscard]] std::unordered_set<Variable> getVariablesByProcedure(const Procedure& procedure) const;
+    [[nodiscard]] std::unordered_set<Procedure> getProceduresByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasProcedureVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
     // Getters for UsesStore
     [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByStatement(StmtNum stmt) const;

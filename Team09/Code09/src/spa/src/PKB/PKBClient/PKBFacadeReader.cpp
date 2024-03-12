@@ -114,12 +114,20 @@ std::unordered_set<StmtNum> PKBFacadeReader::getModifiesStatementsByVariable(con
     return pkbReference->modifiesStore->getStatementsByVariable(variable);
 }
 
-bool PKBFacadeReader::hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable &variable) const {
-    return pkbReference->modifiesStore->hasStatementVariableModifiesRelationship(stmt, variable);
-}
-
 bool PKBFacadeReader::hasStatementVariableModifiesRelationship(ClauseArgument &arg1, ClauseArgument &arg2) const {
     return pkbReference->modifiesStore->hasStatementVariableModifiesRelationship(arg1, arg2);
+}
+
+std::unordered_set<Variable> PKBFacadeReader::getVariablesByProcedure(const Procedure &procedure) const {
+    return pkbReference->modifiesStore->getVariablesByProcedure(procedure);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getProceduresByVariable(const Variable &variable) const {
+    return pkbReference->modifiesStore->getProceduresByVariable(variable);
+}
+
+bool PKBFacadeReader::hasProcedureVariableModifiesRelationship(ClauseArgument &arg1, ClauseArgument &arg2) const {
+    return pkbReference->modifiesStore->hasProcedureVariableModifiesRelationship(arg1, arg2);
 }
 
 std::unordered_set<Variable> PKBFacadeReader::getUsesVariablesByStatement(StmtNum stmt) const {
