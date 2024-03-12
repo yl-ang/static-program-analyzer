@@ -7,10 +7,6 @@
 PatternClause::PatternClause(ClauseArgument* assign, ClauseArgument* f, ClauseArgument* s)
     : assignSynonym(*assign), firstArg(*f), secondArg(*s) {}
 
-ClauseType PatternClause::getType() const {
-    return ClauseType::PATTERN;
-}
-
 bool PatternClause::equals(const QueryClause& other) const {
     if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
         return firstArg.getValue() == (ptr->firstArg).getValue() &&

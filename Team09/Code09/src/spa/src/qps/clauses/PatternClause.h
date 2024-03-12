@@ -15,9 +15,7 @@ private:
 
 public:
     PatternClause(ClauseArgument* assign, ClauseArgument* f, ClauseArgument* s);
-    ClauseType getType() const override;
     bool equals(const QueryClause&) const override;
-    void print() const;
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;
     bool containsSynonym(const Synonym&) const override;

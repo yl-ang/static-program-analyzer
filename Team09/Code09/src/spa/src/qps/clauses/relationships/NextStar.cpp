@@ -3,11 +3,11 @@
 NextStar::NextStar(ClauseArgument& currentStmt, ClauseArgument& nextStmt)
     : currentStmt(currentStmt), nextStmt(nextStmt) {}
 
-bool Next::isSimpleResult() const {
+bool NextStar::isSimpleResult() const {
     return !currentStmt.isSynonym() && !nextStmt.isSynonym();
 }
 
-ClauseResult Next::evaluate(PKBFacadeReader& reader) {
+ClauseResult NextStar::evaluate(PKBFacadeReader& reader) {
     if (isSimpleResult()) {
         return {false};
     }
@@ -23,14 +23,14 @@ ClauseResult Next::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
-ClauseResult Next::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    return {};
+ClauseResult NextStar::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+    throw "Not implemented";
 }
 
-ClauseResult Next::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    return {};
+ClauseResult NextStar::evaluateSynonymInteger(PKBFacadeReader& reader) {
+    throw "Not implemented";
 }
 
-ClauseResult Next::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    return {};
+ClauseResult NextStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
+    throw "Not implemented";
 }

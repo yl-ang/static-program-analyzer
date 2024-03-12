@@ -4,14 +4,6 @@
 #include "qps/clauses/SuchThatClause.h"
 
 // ai-gen start(copilot, 0, e)
-// prompt: test suchthatclause gettype
-TEST_CASE("SuchThatClause getType") {
-    SuchThatClause suchThatClause(RelationshipType::FOLLOWS, new Integer("1"), new Integer("2"));
-    REQUIRE(suchThatClause.getType() == ClauseType::SUCH_THAT);
-}
-// ai-gen end
-
-// ai-gen start(copilot, 0, e)
 // prompt: test suchthat clause equals
 TEST_CASE("SuchThatClause equals") {
     SuchThatClause suchThatClause1(RelationshipType::FOLLOWS, new Integer("1"), new Integer("2"));
