@@ -5,9 +5,7 @@
 #include <queue>
 #include <stack>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 /*
 root node is fixed so we create that at the top first before traversing the
@@ -47,9 +45,9 @@ next token to see if its a name or not then finally we process statement lists,
 which is enclosed in {}
 */
 std::shared_ptr<ProcedureNode> AST::buildProcedureAST(std::queue<Token>& tokens) {
-    tokens.pop();
+    tokens.pop();  // remove 'procedure' keyword
     Token procName = tokens.front();
-    tokens.pop();
+    tokens.pop();  // remove proc_name
 
     std::shared_ptr<StatementListNode> statementList = buildStatementListAST(tokens);
     std::vector<std::shared_ptr<ASTNode>> children = {};
@@ -63,14 +61,14 @@ well.
 
 */
 std::shared_ptr<StatementListNode> AST::buildStatementListAST(std::queue<Token>& tokens) {
-    tokens.pop();
+    tokens.pop();  // remove {
     std::vector<std::shared_ptr<ASTNode>> children = {};
 
     while (tokens.size() && tokens.front().type != CLOSE_CURLY_BRACE) {
         children.push_back(buildStatementAST(tokens));
     }
 
-    tokens.pop();
+    tokens.pop();  // remove }
     return std::make_shared<StatementListNode>((children));
 }
 
@@ -104,7 +102,7 @@ std::shared_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
     children.push_back((conditionalExpression));
     children.push_back((thenStatementList));
     children.push_back((elseStatementList));
-    return std::make_shared<IfNode>((children), ifToken.line_number);
+    return std::make_shared<IfNode>(conditionalExpression, thenStatementList, elseStatementList, ifToken.line_number);
 }
 
 std::shared_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {

@@ -9,10 +9,10 @@
 class PrintNode : public StatementNode {
 public:
     explicit PrintNode(int statementNumber, std::vector<std::shared_ptr<ASTNode>> children)
-        : StatementNode("", "print", statementNumber, (children)) {
-    }
+        : StatementNode("", "print", statementNumber, (children)) {}
 
     void accept(AstVisitor* visitor) override;
+    std::string variable;
 
     std::string getVar();
 };

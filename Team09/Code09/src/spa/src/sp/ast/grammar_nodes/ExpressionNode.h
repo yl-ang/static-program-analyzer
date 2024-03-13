@@ -23,6 +23,8 @@ public:
     ExpressionNode(std::string value, std::string type, int stmtNumber) : ASTNode(value, type, {}, stmtNumber) {}
 
     void accept(AstVisitor* visitor) override;
+    std::shared_ptr<ExpressionNode> left;
+    std::shared_ptr<ExpressionNode> right;
 
     std::vector<std::string> getVars();
     std::vector<std::string> getConsts();

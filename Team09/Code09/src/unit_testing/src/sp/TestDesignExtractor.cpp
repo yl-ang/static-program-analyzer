@@ -140,7 +140,7 @@ TEST_CASE("Design Extractor Tests") {
     childrenI8.push_back(IstmtList);
     childrenI8.push_back(IstmtList2);
 
-    auto ifNode = std::make_shared<IfNode>(childrenI8, 6);
+    auto ifNode = std::make_shared<IfNode>(IandandNode, IstmtList, IstmtList2, 6);
 
     childrenI9.push_back(xNode2);
     childrenI9.push_back(constNode);

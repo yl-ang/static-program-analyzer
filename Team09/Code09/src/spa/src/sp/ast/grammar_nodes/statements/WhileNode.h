@@ -11,10 +11,11 @@
 class WhileNode : public StatementNode {
 public:
     explicit WhileNode(std::vector<std::shared_ptr<ASTNode>> children, int statementNumber)
-        : StatementNode("", "while", statementNumber, (children)) {
-    }
+        : StatementNode("", "while", statementNumber, (children)) {}
 
     void accept(AstVisitor* visitor) override;
+    std::shared_ptr<ExpressionNode> whileCondition;
+    std::shared_ptr<StatementListNode> whileStmtList;
 
     std::shared_ptr<ExpressionNode> getCond();
     std::shared_ptr<StatementListNode> getStmtLstNode();

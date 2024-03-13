@@ -9,10 +9,10 @@
 class ReadNode : public StatementNode {
 public:
     explicit ReadNode(std::vector<std::shared_ptr<ASTNode>> children, int statementNumber)
-        : StatementNode("", "read", statementNumber, (children)) {
-    }
+        : StatementNode("", "read", statementNumber, (children)) {}
 
     void accept(AstVisitor* visitor) override;
+    std::string variable;
 
     std::string getVar();
 };

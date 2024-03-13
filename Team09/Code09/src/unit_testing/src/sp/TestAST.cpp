@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "sp/ast/Ast.h"
 #include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
@@ -1163,26 +1164,26 @@ TEST_CASE("AST Build Tests") {
         auto moreThan = std::make_shared<ASTNode>("", ">", children2, 0);
         children3.push_back(lessThan);
         children3.push_back(moreThan);
-        auto andandNode = std::make_shared<ASTNode>("", "&&", children3, 0);
+        auto andandNode = std::make_shared<ExpressionNode>(ANDAND, children3, 0);
 
         children4.push_back(xNode2);
         children4.push_back(yNode2);
 
         auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
         children5.push_back(assign);
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children5);
+        auto stmtList = std::make_shared<StatementListNode>(children5);
 
         children6.push_back(aNode);
         children6.push_back(bNode);
         auto assign1 = std::make_shared<ASTNode>("", "assign", children6, 0);
         children7.push_back(assign1);
-        auto stmtList2 = std::make_shared<ASTNode>("", "stmtList", children7);
+        auto stmtList2 = std::make_shared<StatementListNode>(children7);
 
         children8.push_back(andandNode);
         children8.push_back(stmtList);
         children8.push_back(stmtList2);
 
-        auto expected = IfNode(children8, 0);
+        auto expected = IfNode(andandNode, stmtList, stmtList2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
