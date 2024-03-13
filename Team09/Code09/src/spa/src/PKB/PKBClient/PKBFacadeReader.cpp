@@ -130,10 +130,6 @@ std::unordered_set<StmtNum> PKBFacadeReader::getUsesStatementsByVariable(const V
     return pkbReference->usesStore->getStatementsByVariable(variable);
 }
 
-bool PKBFacadeReader::hasStatementVariableUseRelationship(StmtNum stmt, const Variable &variable) const {
-    return pkbReference->usesStore->hasStatementVariableUseRelationship(stmt, variable);
-}
-
 bool PKBFacadeReader::hasStatementVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->usesStore->hasStatementVariableUseRelationship(arg1, arg2);
 }

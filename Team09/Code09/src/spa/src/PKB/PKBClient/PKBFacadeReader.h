@@ -49,10 +49,9 @@ public:
     [[nodiscard]] bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
-    // Getters for UsesStore
+    // Getters for UsesStore (Statements)
     [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByStatement(StmtNum stmt) const;
     [[nodiscard]] std::unordered_set<StmtNum> getUsesStatementsByVariable(const Variable& variable) const;
-    [[nodiscard]] bool hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for PatternStore
