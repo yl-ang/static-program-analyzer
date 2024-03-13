@@ -9,8 +9,9 @@
 
 class AssignmentNode : public StatementNode {
 public:
-    explicit AssignmentNode(std::vector<std::shared_ptr<ASTNode>> children, int statementNumber)
-        : StatementNode("", "assign", statementNumber, (children)) {}
+    explicit AssignmentNode(std::shared_ptr<VariableNode> left, std::shared_ptr<ExpressionNode> right,
+                            int statementNumber)
+        : StatementNode("", "assign", statementNumber, {left, right}) {}
 
     std::shared_ptr<VariableNode> left;
     std::shared_ptr<ExpressionNode> right;

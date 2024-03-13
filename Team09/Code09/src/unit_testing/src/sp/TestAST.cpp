@@ -5,7 +5,9 @@
 #include "sp/ast/Ast.h"
 #include "sp/ast/AstNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
+#include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
+#include "sp/de/AstVisitor.h"
 #include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
@@ -49,17 +51,15 @@ TEST_CASE("AST Build Tests") {
         };
         auto queue = makeTokenQueue(inputTokenArray);
 
-        std::shared_ptr<ASTNode> nameNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> integerNode =
-            std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<ConstantNode> integerNode = std::make_shared<ConstantNode>("1", 0);
 
         std::vector<std::shared_ptr<ASTNode>> children = {};
 
         children.push_back(nameNode);
         children.push_back(integerNode);
 
-        ASTNode expectedNode = ASTNode("", "assign", children, 0);
+        auto expectedNode = AssignmentNode(nameNode, integerNode, 0);
 
         auto result = ast.buildAssignmentAST(queue);
         REQUIRE(expectedNode == *(result.get()));

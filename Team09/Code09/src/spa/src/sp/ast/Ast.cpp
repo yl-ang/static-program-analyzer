@@ -141,18 +141,13 @@ std::shared_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
 
 std::shared_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& tokens) {
     Token varName = tokens.front();
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-
     std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
-    tokens.pop();
+    tokens.pop();  // remove the variable name
     Token assignmentToken = tokens.front();
-    tokens.pop();
+    tokens.pop();  // remove =
     std::shared_ptr<ExpressionNode> expression = buildExpressionAST(tokens);
-    tokens.pop();
-
-    children.push_back((nameNode));
-    children.push_back((expression));
-    return std::make_shared<AssignmentNode>((children), assignmentToken.line_number);
+    tokens.pop();  // remove the expression part
+    return std::make_shared<AssignmentNode>(nameNode, expression, assignmentToken.line_number);
 }
 
 /*
