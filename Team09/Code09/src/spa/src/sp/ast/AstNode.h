@@ -2,13 +2,10 @@
 
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "AstNodeInterface.h"
-#include "sp/tokenizer/Token.h"
 
 class ASTNode : public AstNodeInterface {
     std::vector<std::shared_ptr<ASTNode>> children;
@@ -19,7 +16,7 @@ class ASTNode : public AstNodeInterface {
 public:
     ASTNode(std::string value, std::string type, std::vector<std::shared_ptr<ASTNode>> children = {},
             int stmtNumber = -1)
-        : value(value), type(type), children((children)), stmtNumber(stmtNumber) {}
+        : value(value), type(type), children(children), stmtNumber(stmtNumber) {}
 
     std::string getType() const {
         return type;
@@ -37,9 +34,7 @@ public:
         return children;
     }
 
-    void accept(AstVisitor* visitor) override {
-        // TODO: Implement this
-    }
+    void accept(AstVisitor* visitor) override {}
 
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members

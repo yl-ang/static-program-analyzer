@@ -1,16 +1,18 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementNode.h"
 
 class StatementListNode : public ASTNode {
 public:
-    explicit StatementListNode(std::vector<std::shared_ptr<ASTNode>> children)
-        : ASTNode("", "stmtList", std::move(children), -1) {}
+    StatementListNode(std::vector<std::shared_ptr<StatementNode>> children)
+        : ASTNode("", "stmtList", std::vector<std::shared_ptr<ASTNode>>(children.begin(), children.end()), -1),
+          children(children) {}
 
+    std::vector<std::shared_ptr<StatementNode>> children;
     void accept(AstVisitor* visitor) override;
 
     std::vector<int> getStmtsStmtNum();

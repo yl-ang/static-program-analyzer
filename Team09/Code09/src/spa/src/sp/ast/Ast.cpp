@@ -1,11 +1,12 @@
 #include <sp/ast/Ast.h>
 
-#include <iostream>
 #include <memory>
 #include <queue>
 #include <stack>
 #include <string>
 #include <unordered_set>
+
+#include "sp/de/AstVisitor.h"
 
 /*
 root node is fixed so we create that at the top first before traversing the
@@ -24,14 +25,14 @@ std::shared_ptr<ProgramNode> AST::buildAST(std::vector<Token> tokens) {
         token_queue.push(token);
     }
 
-    std::vector<std::shared_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<ProcedureNode>> children = {};
 
     while (token_queue.size()) {
         std::shared_ptr<ProcedureNode> procedure = buildProcedureAST(token_queue);
         children.push_back((procedure));
     }
 
-    std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>((children));
+    std::shared_ptr<ProgramNode> programNode = std::make_shared<ProgramNode>(children);
 
     semanticValidator.validateSemantics(programNode);
 
@@ -50,9 +51,7 @@ std::shared_ptr<ProcedureNode> AST::buildProcedureAST(std::queue<Token>& tokens)
     tokens.pop();  // remove proc_name
 
     std::shared_ptr<StatementListNode> statementList = buildStatementListAST(tokens);
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-    children.push_back((statementList));
-    return std::make_shared<ProcedureNode>(procName.value, (children));
+    return std::make_shared<ProcedureNode>(procName.value, statementList);
 }
 
 /*
@@ -62,14 +61,14 @@ well.
 */
 std::shared_ptr<StatementListNode> AST::buildStatementListAST(std::queue<Token>& tokens) {
     tokens.pop();  // remove {
-    std::vector<std::shared_ptr<ASTNode>> children = {};
+    std::vector<std::shared_ptr<StatementNode>> children = {};
 
     while (tokens.size() && tokens.front().type != CLOSE_CURLY_BRACE) {
         children.push_back(buildStatementAST(tokens));
     }
 
     tokens.pop();  // remove }
-    return std::make_shared<StatementListNode>((children));
+    return std::make_shared<StatementListNode>(children);
 }
 
 std::shared_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens) {
@@ -178,7 +177,7 @@ std::shared_ptr<ExpressionNode> AST::buildExpressionAST(std::queue<Token>& token
     happening: Expr -> term -> factor -> expr.
     */
     std::shared_ptr<ExpressionNode> term = buildTermAST(tokens);
-    return buildSubExpressionAST(tokens, (term));
+    return buildSubExpressionAST(tokens, term);
 }
 
 std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& tokens,
@@ -190,14 +189,8 @@ std::shared_ptr<ExpressionNode> AST::buildSubExpressionAST(std::queue<Token>& to
     if (front.type == ADD || front.type == SUB) {
         tokens.pop();
         std::shared_ptr<ExpressionNode> term = buildTermAST(tokens);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-
-        // ExpressionNode expressionNode = ExpressionNode(front.type, front.line_number);
-        children.push_back((node));
-        children.push_back((term));
-
         return buildSubExpressionAST(tokens,
-                                     std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
+                                     std::make_shared<ExpressionNode>(front.type, node, term, front.line_number));
     }
     return node;
 }
@@ -239,11 +232,8 @@ std::shared_ptr<ExpressionNode> AST::buildBinaryConditionalExpressionAST(std::qu
     Token logicalOperator = tokens.front();
     tokens.pop();  // pop the logical op
     std::shared_ptr<ExpressionNode> rightHandSide = handleBracketedCondExpr(tokens);
-
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-    children.push_back((leftHandSide));
-    children.push_back((rightHandSide));
-    return std::make_shared<ExpressionNode>(logicalOperator.type, (children), logicalOperator.line_number);
+    return std::make_shared<ExpressionNode>(logicalOperator.type, leftHandSide, rightHandSide,
+                                            logicalOperator.line_number);
 }
 
 std::shared_ptr<ExpressionNode> AST::handleBracketedCondExpr(std::queue<Token>& tokens) {
@@ -262,24 +252,11 @@ check for '!' first. otherwise check for open brackets. If there are no open bra
 its guaranteed to be a rel_expr
 */
 std::shared_ptr<ExpressionNode> AST::buildConditionalExpressionAST(std::queue<Token>& tokens) {
-    // if (tokens.front().type == NOT) {
-    //     Token notNode = tokens.front();
-    //     tokens.pop();
-    //     std::vector<std::unique_ptr<ASTNode>> children = {};
-    //     std::unique_ptr<ExpressionNode> conditionalExpr = buildConditionalExpressionAST(tokens);
-    //     children.push_back(std::move(conditionalExpr));
-    //     return std::make_unique<ExpressionNode>(notNode.type, std::move(children), notNode.line_number);
-    // } else if (tokens.front().type == OPEN_BRACKET) {
-    //     return buildBinaryConditionalExpressionAST(tokens);
-    // }
-
     if (tokens.front().type == NOT) {
         Token notNode = tokens.front();
         tokens.pop();
-        std::vector<std::shared_ptr<ASTNode>> children = {};
         std::shared_ptr<ExpressionNode> conditionalExpr = handleBracketedCondExpr(tokens);
-        children.push_back((conditionalExpr));
-        return std::make_shared<ExpressionNode>(notNode.type, (children), notNode.line_number);
+        return std::make_shared<ExpressionNode>(notNode.type, conditionalExpr, notNode.line_number);
     } else if (tokens.front().type == OPEN_BRACKET) {
         return buildBinaryConditionalExpressionAST(tokens);
     }
@@ -293,15 +270,11 @@ Grammar: rel_factor '>' rel_factor | rel_factor '>=' rel_factor |
           rel_factor '==' rel_factor | rel_factor '!=' rel_factor
 */
 std::shared_ptr<ExpressionNode> AST::buildRelationalExpressionAST(std::queue<Token>& tokens) {
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-
     std::shared_ptr<ExpressionNode> leftHandNode = buildRelationalFactorAST(tokens);
     Token conditionalOp = tokens.front();
     tokens.pop();
     std::shared_ptr<ExpressionNode> rightHandNode = buildRelationalFactorAST(tokens);
-    children.push_back((leftHandNode));
-    children.push_back((rightHandNode));
-    return std::make_shared<ExpressionNode>(conditionalOp.type, (children), conditionalOp.line_number);
+    return std::make_shared<ExpressionNode>(conditionalOp.type, leftHandNode, rightHandNode, conditionalOp.line_number);
 }
 
 /*
@@ -318,26 +291,22 @@ those are actually the case, we can attempt to build a var/const. Otherwise we b
 */
 std::shared_ptr<ExpressionNode> AST::buildRelationalFactorAST(std::queue<Token>& tokens) {
     // create a temporary queue to access the following elements in the tokens queue
-    try {
-        std::queue<Token> temp = tokens;
-        temp.pop();
-        if (temp.size() == 0) {
-            return buildExpressionAST(tokens);
-        }
-        Token followingToken = temp.front();
-        Token token = tokens.front();
-        if (followingToken.type == CLOSE_BRACKET ||
-            RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
-            tokens.pop();
-            if (token.type == NAME) {
-                return buildVarNameAST(token);
-            }
-            return buildIntAST(token);
-        }
+    std::queue<Token> temp = tokens;
+    temp.pop();
+    if (temp.size() == 0) {
         return buildExpressionAST(tokens);
-    } catch (std::exception& e) {
-        std::cout << "Exception caught: " << e.what() << std::endl;
     }
+    Token followingToken = temp.front();
+    Token token = tokens.front();
+    if (followingToken.type == CLOSE_BRACKET ||
+        RelationalOperators.find(followingToken.type) != RelationalOperators.end()) {
+        tokens.pop();
+        if (token.type == NAME) {
+            return buildVarNameAST(token);
+        }
+        return buildIntAST(token);
+    }
+    return buildExpressionAST(tokens);
 }
 
 /*
@@ -351,7 +320,7 @@ A' : '*' BA' | '/' BA' | '%' BA' | e
 */
 std::shared_ptr<ExpressionNode> AST::buildTermAST(std::queue<Token>& tokens) {
     std::shared_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
-    return buildSubTermAST(tokens, (factorNode));
+    return buildSubTermAST(tokens, factorNode);
 }
 
 std::shared_ptr<ExpressionNode> AST::buildSubTermAST(std::queue<Token>& tokens, std::shared_ptr<ExpressionNode> node) {
@@ -361,12 +330,10 @@ std::shared_ptr<ExpressionNode> AST::buildSubTermAST(std::queue<Token>& tokens, 
     }
     Token front = tokens.front();
     if (front.type == MUL || front.type == MOD || front.type == DIV) {
-        std::vector<std::shared_ptr<ASTNode>> children = {};
         tokens.pop();
         std::shared_ptr<ExpressionNode> factorNode = buildFactorAST(tokens);
-        children.push_back((node));
-        children.push_back((factorNode));
-        return buildSubTermAST(tokens, std::make_shared<ExpressionNode>(front.type, (children), front.line_number));
+        return buildSubTermAST(tokens,
+                               std::make_shared<ExpressionNode>(front.type, node, factorNode, front.line_number));
     }
 
     return node;

@@ -7,10 +7,13 @@
 class PrintNode : public StatementNode {
 public:
     explicit PrintNode(std::shared_ptr<VariableNode> variable, int statementNumber)
-        : StatementNode("", "print", statementNumber, {variable}), variable(variable) {}
+        : StatementNode("", "print", statementNumber, {variable}),
+          variable(variable),
+          statementNumber(statementNumber) {}
 
     void accept(AstVisitor* visitor) override;
     std::shared_ptr<VariableNode> variable;
+    int statementNumber;
 
     std::string getVar();
 };
