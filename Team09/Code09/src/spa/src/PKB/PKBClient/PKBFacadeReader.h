@@ -54,6 +54,11 @@ public:
     [[nodiscard]] std::unordered_set<StmtNum> getUsesStatementsByVariable(const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
+    // Getters for UsesStore (Procedures)
+    [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByProcedure(const Procedure& procedure) const;
+    [[nodiscard]] std::unordered_set<Procedure> getUsesProceduresByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasProcedureVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
     // Getters for PatternStore
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
