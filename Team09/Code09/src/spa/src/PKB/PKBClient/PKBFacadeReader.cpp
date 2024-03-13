@@ -193,3 +193,15 @@ bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
 bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
 }
+
+std::unordered_set<Procedure> PKBFacadeReader::getCaller(Procedure callee) {
+    return pkbReference->callStore->getCaller(callee);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCallee(Procedure caller) {
+    return pkbReference->callStore->getCallee(caller);
+}
+
+bool PKBFacadeReader::hasCallRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->callStore->hasCallRelationship(arg1, arg2);
+}

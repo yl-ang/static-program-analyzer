@@ -77,6 +77,11 @@ public:
     [[nodiscard]] bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
+    // Getters for CallStore
+    [[nodiscard]] std::unordered_set<Procedure> getCaller(Procedure callee);
+    [[nodiscard]] std::unordered_set<Procedure> getCallee(Procedure caller);
+    [[nodiscard]] bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
 private:
     PKB* pkbReference = nullptr;
 };
