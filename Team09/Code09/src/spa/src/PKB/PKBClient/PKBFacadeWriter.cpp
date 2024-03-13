@@ -30,8 +30,14 @@ void PKBFacadeWriter::setParentStore(const std::unordered_set<std::pair<StmtNum,
     this->pkbReference->parentStore->setParentStore(parentPairs);
 }
 
-void PKBFacadeWriter::setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const {
-    this->pkbReference->usesStore->setStatementUsesStore(usesPairs);
+void PKBFacadeWriter::setStatementUsesStore(
+    const std::unordered_set<std::pair<StmtNum, Variable>> &usesStatementPairs) const {
+    this->pkbReference->usesStore->setStatementUsesStore(usesStatementPairs);
+}
+
+void PKBFacadeWriter::setProcedureUsesStore(
+    const std::unordered_set<std::pair<Procedure, Variable>> &usesProcedurePairs) const {
+    this->pkbReference->usesStore->setProcedureUsesStore(usesProcedurePairs);
 }
 
 void PKBFacadeWriter::setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesPairs) const {
