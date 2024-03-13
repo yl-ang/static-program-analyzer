@@ -153,7 +153,7 @@ TEST_CASE("ModifiesStore (Procedures) - All Tests") {
         REQUIRE(modifiesStore.getVariablesByProcedure("computeSquare") == std::unordered_set<Variable>{"x", "tempX"});
     }
 
-    SECTION("Test getVariablesByProcedure") {
+    SECTION("Test getProceduresByVariable") {
         REQUIRE(modifiesStore.getProceduresByVariable("x") ==
                 std::unordered_set<Procedure>{"main", "computeCentroid", "computeSquare"});
         REQUIRE(modifiesStore.getProceduresByVariable("flag") ==
