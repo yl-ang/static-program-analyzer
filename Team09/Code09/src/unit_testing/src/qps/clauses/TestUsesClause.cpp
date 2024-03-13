@@ -12,28 +12,28 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with no synonyms") {
 
     SECTION("Uses(Integer, Variable)") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         UsesTester{pfr, new Integer("1"), new Literal("x")}.testBoolean(true);
         UsesTester{pfr, new Integer("2"), new Literal("x")}.testBoolean(false);
         UsesTester{pfr, new Integer("1"), new Literal("y")}.testBoolean(false);
     }
 
     SECTION("Uses(Integer, Variable) / empty store") {
-        pfw.setUsesStore({});
+        pfw.setStatementUsesStore({});
         UsesTester{pfr, new Integer("1"), new Literal("x")}.testBoolean(false);
     }
 
     SECTION("Uses(Integer, Wildcard)") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{2, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         UsesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
         UsesTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(true);
         UsesTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(false);
     }
 
     SECTION("Uses(Integer, Wildcard) / empty store") {
-        pfw.setUsesStore({});
+        pfw.setStatementUsesStore({});
         UsesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
         UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
@@ -41,7 +41,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with no synonyms") {
     SECTION("Uses(Wildcard, Variable)") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{2, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         UsesTester{pfr, new Wildcard(), new Literal("x")}.testBoolean(true);
         UsesTester{pfr, new Wildcard(), new Literal("y")}.testBoolean(true);
         UsesTester{pfr, new Wildcard(), new Literal("z")}.testBoolean(false);
@@ -50,12 +50,12 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with no synonyms") {
     SECTION("Uses(Wildcard, Wildcard)") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{2, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
     }
 
     SECTION("Uses(Wildcard, Wildcard) / empty store") {
-        pfw.setUsesStore({});
+        pfw.setStatementUsesStore({});
         UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
 }
@@ -69,7 +69,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{2, "y"},
                                                                          std::pair<int, std::string>{3, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
 
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::READ, 1}, Stmt{StatementType::ASSIGN, 2},
                                           Stmt{StatementType::READ, 3}, Stmt{StatementType::PRINT, 4}};
@@ -95,7 +95,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{1, "y"},
                                                                          std::pair<int, std::string>{2, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
 
         // Select s such that Uses(1, s)
@@ -113,7 +113,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
                                                                          std::pair<int, std::string>{2, "y"},
                                                                          std::pair<int, std::string>{3, "y"}};
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
 
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::READ, 1}, Stmt{StatementType::ASSIGN, 2},
                                           Stmt{StatementType::READ, 3}, Stmt{StatementType::PRINT, 4}};
@@ -142,7 +142,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         pfw.setVariables(variables);
 
         pfw.setStmts(stmts);
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
 
         // Select s such that Uses(_, s)
@@ -167,7 +167,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 2 synonyms") {
         pfw.setVariables(variables);
 
         pfw.setStmts(stmts);
-        pfw.setUsesStore(usesStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
         Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s1");
         Synonym* varSyn = new Synonym(DesignEntityType::VARIABLE, "v");
 

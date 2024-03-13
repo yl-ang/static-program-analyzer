@@ -11,7 +11,7 @@
 
 class UsesStore {
 public:
-    void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet);
+    void setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet);
     bool hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const;
     bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     std::unordered_set<Variable> getVariablesByStatement(StmtNum stmt) const;

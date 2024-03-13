@@ -29,8 +29,8 @@ public:
     void setProcedureModifiesStore(
         const std::unordered_set<std::pair<Procedure, Variable>> &modifiesProcedureSet) const;
 
-    // Setter for UsesStore
-    void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
+    // Setter for UsesStore (Statements)
+    void setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
 
     void setPatternStore(
         const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;

@@ -1,6 +1,6 @@
 #include "UsesStore.h"
 
-void UsesStore::setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
+void UsesStore::setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
     for (const auto& use : usesSet) {
         StmtNum stmt = use.first;
         Variable variable = use.second;
