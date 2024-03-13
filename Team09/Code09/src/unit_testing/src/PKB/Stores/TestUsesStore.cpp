@@ -4,7 +4,7 @@
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/Wildcard.h"
 
-TEST_CASE("UsesStore - All Tests") {
+TEST_CASE("UsesStore (Statements) - All Tests") {
     UsesStore usesStore;
 
     SECTION("Test hasStatementVariableUseRelationship") {
@@ -126,5 +126,117 @@ TEST_CASE("UsesStore - All Tests") {
 
         delete integerArg1;
         delete synonymArg2;
+    }
+}
+
+TEST_CASE("UsesStore (Procedures) - All Tests") {
+    UsesStore usesStore;
+
+    usesStore.setProcedureUsesStore({{"main", "flag"},
+                                     {"main", "x"},
+                                     {"computeCentroid", "x"},
+                                     {"computeCentroid", "y"},
+                                     {"computeCentroid", "count"},
+                                     {"computeCentroid", "cenX"},
+                                     {"computeCentroid", "cenY"},
+                                     {"computeCentroid", "flag"},
+                                     {"computeCentroid", "normSq"},
+                                     {"computeSquare", "x"},
+                                     {"computeSquare", "tempX"}});
+
+    SECTION("Test getVariablesByProcedure") {
+        REQUIRE(usesStore.getVariablesByProcedure("main") == std::unordered_set<Variable>{"x", "flag"});
+        REQUIRE(usesStore.getVariablesByProcedure("computeCentroid") ==
+                std::unordered_set<Variable>{"x", "y", "count", "cenX", "cenY", "flag", "normSq"});
+        REQUIRE(usesStore.getVariablesByProcedure("computeSquare") == std::unordered_set<Variable>{"x", "tempX"});
+    }
+
+    SECTION("Test getProceduresByVariable") {
+        REQUIRE(usesStore.getProceduresByVariable("x") ==
+                std::unordered_set<Procedure>{"main", "computeCentroid", "computeSquare"});
+        REQUIRE(usesStore.getProceduresByVariable("flag") == std::unordered_set<Procedure>{"main", "computeCentroid"});
+        REQUIRE(usesStore.getProceduresByVariable("tempX") == std::unordered_set<Procedure>{"computeSquare"});
+    }
+
+    SECTION("Test hasProcedureVariableUseRelationship") {
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship("main", "x"));
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship("computeCentroid", "y"));
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship("computeSquare", "tempX"));
+
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship("main", "tempX"));
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship("computeCentroid", "test"));
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship("computeSquare", "y"));
+    }
+
+    SECTION("Test hasProcedureVariableUseRelationship with Wildcard arg1 and Synonym arg2 (Expecting True)") {
+        // Argument 1 is wildcard
+        // Argument 2 is synonym with variable uses ("y")
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "y");
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship(*wildcardArg1, *synonymArg2));
+
+        delete wildcardArg1;
+        delete synonymArg2;
+    }
+
+    SECTION("Test hasProcedureVariableUseRelationship with Wildcard arg1 and Synonym arg2 (Expecting False)") {
+        // Argument 1 is wildcard
+        // Argument 2 is synonym with no variable uses
+        ClauseArgument* wildcardArg1 = new Wildcard();
+        ClauseArgument* synonymArg2 = new Synonym(DesignEntityType::VARIABLE, "w");
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship(*wildcardArg1, *synonymArg2));
+
+        delete wildcardArg1;
+        delete synonymArg2;
+    }
+
+    SECTION("Test hasProcedureVariableUseRelationship with procedure Synonym arg1 and Wildcard arg2 (Expecting True)") {
+        // Argument 1 is procedure ("main") that modified variables
+        // Argument 2 is wildcard
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship(*procedureArg1, *wildcardArg2));
+
+        delete procedureArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableUseRelationship with procedure Synonym arg1 and Wildcard arg2 (Expecting false)") {
+        // Argument 1 is procedure ("home") without modifying any variables
+        // Argument 2 is wildcard
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "home");
+        ClauseArgument* wildcardArg2 = new Wildcard();
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship(*procedureArg1, *wildcardArg2));
+
+        delete procedureArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableUseRelationship with procedure Synonym arg1 and variable Synonym arg2 "
+        "(Expecting "
+        "True)") {
+        // Argument 1 is procedure ("main") that modified variables
+        // Argument 2 is synonym with variable uses ("x")
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* variableArg2 = new Synonym(DesignEntityType::VARIABLE, "x");
+        REQUIRE(usesStore.hasProcedureVariableUseRelationship(*procedureArg1, *variableArg2));
+
+        delete procedureArg1;
+        delete variableArg2;
+    }
+
+    SECTION(
+        "Test hasProcedureVariableUseRelationship with procedure Synonym arg1 and variable Synonym arg2 (Expecting "
+        "false)") {
+        // Argument 1 is procedure ("main")
+        // Argument 2 is synonym with variable uses ("tempX")
+        ClauseArgument* procedureArg1 = new Synonym(DesignEntityType::PROCEDURE, "main");
+        ClauseArgument* variableArg2 = new Synonym(DesignEntityType::VARIABLE, "tempX");
+        REQUIRE_FALSE(usesStore.hasProcedureVariableUseRelationship(*procedureArg1, *variableArg2));
+
+        delete procedureArg1;
+        delete variableArg2;
     }
 }
