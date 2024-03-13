@@ -37,9 +37,7 @@ TEST_CASE("Design Extractor Tests") {
 
     // print z;
     std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>(VariableNode("z", 3));
-    std::vector<std::shared_ptr<ASTNode>> childrenP = {};
-    childrenP.push_back(zNode);
-    auto printNode = std::make_shared<PrintNode>(3, childrenP);
+    auto printNode = std::make_shared<PrintNode>(zNode, 3);
 
     // while ((c < d) && (e > f)) {
     //     g = h;

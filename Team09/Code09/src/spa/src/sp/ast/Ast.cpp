@@ -122,23 +122,21 @@ std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
 
 std::shared_ptr<CallNode> AST::buildCallAST(std::queue<Token>& tokens) {
     Token callToken = tokens.front();
-    tokens.pop();
+    tokens.pop();  // remove call
     Token procedureToken = tokens.front();
-    tokens.pop();
-    tokens.pop();
+    tokens.pop();  // remove the variable
+    tokens.pop();  // remove the semicolon
     return std::make_shared<CallNode>(procedureToken.value, callToken.line_number);
 }
 
 std::shared_ptr<PrintNode> AST::buildPrintAST(std::queue<Token>& tokens) {
-    std::vector<std::shared_ptr<ASTNode>> children = {};
     Token printToken = tokens.front();
-    tokens.pop();
+    tokens.pop();  // remove print
     Token varName = tokens.front();
     std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
-    tokens.pop();
-    children.push_back((nameNode));
-    tokens.pop();
-    return std::make_shared<PrintNode>(printToken.line_number, (children));
+    tokens.pop();  // remove variable
+    tokens.pop();  // remove semicolon
+    return std::make_shared<PrintNode>(nameNode, varName.line_number);
 }
 
 std::shared_ptr<AssignmentNode> AST::buildAssignmentAST(std::queue<Token>& tokens) {

@@ -8,7 +8,7 @@
 class ReadNode : public StatementNode {
 public:
     explicit ReadNode(std::shared_ptr<VariableNode> variable, int statementNumber)
-        : StatementNode("", "read", statementNumber, {variable}) {}
+        : StatementNode("", "read", statementNumber, {variable}), variable(variable) {}
 
     void accept(AstVisitor* visitor) override;
     std::shared_ptr<VariableNode> variable;
