@@ -19,8 +19,10 @@ public:
     bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
 private:
-    // Each caller (Procedure) can have 0 or more direct callees (Procedure)
     std::unordered_map<Procedure, std::unordered_set<Procedure>> callerMap;
-    // Each callee (Procedure) can only have 0 or more direct callers (Procedure)
     std::unordered_map<Procedure, std::unordered_set<Procedure>> calleeMap;
+    std::unordered_map<Procedure, std::unordered_set<Procedure>> callerStarMap;
+    std::unordered_map<Procedure, std::unordered_set<Procedure>> calleeStarMap;
+
+    void computeTransitiveClosure();
 };

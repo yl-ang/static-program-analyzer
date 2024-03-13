@@ -9,7 +9,19 @@ void CallStore::setCallStore(const std::unordered_set<std::pair<Procedure, Proce
         calleeMap[callee].insert(caller);
     }
 
-    // TODO(yl-ang): call* pre-computation
+    computeTransitiveClosure();
+}
+
+// TODO(yl-ang): computeTransitiveClosure
+void CallStore::computeTransitiveClosure() {
+    // Initialize the matrices
+    callerStarMap.clear();
+    calleeStarMap.clear();
+
+    // Update the matrices with transitive closure using the utility class
+    // TransitiveClosureUtility might need to support generic type to prevent DRY violation
+    //    TransitiveClosureUtility::computeTransitiveClosure(callerStarMap);
+    //    TransitiveClosureUtility::computeTransitiveClosure(calleeStarMap);
 }
 
 std::unordered_set<Procedure> CallStore::getCaller(Procedure callee) {
