@@ -58,3 +58,7 @@ void PKBFacadeWriter::setPatternStore(
 void PKBFacadeWriter::setNextStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &nextPairs) const {
     this->pkbReference->nextStore->setNextStore(nextPairs);
 }
+
+void PKBFacadeWriter::setCallStore(const std::unordered_set<std::pair<Procedure, Procedure>> &callPairs) const {
+    this->pkbReference->callStore->setCallStore(callPairs);
+}
