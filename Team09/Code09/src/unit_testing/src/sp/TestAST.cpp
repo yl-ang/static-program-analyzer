@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "sp/ast/Ast.h"
 #include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/ExpressionNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/tokenizer/Token.h"
 
@@ -1079,15 +1080,15 @@ TEST_CASE("AST Build Tests") {
 
         children7.push_back(andandNode);
 
-        auto notNode = std::make_shared<ASTNode>("", "!", children7, 0);
+        auto notNode = std::make_shared<ExpressionNode>(NOT, children7, 0);
 
         auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
         children6.push_back(assign);
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children6);
+        auto stmtList = std::make_shared<StatementListNode>(children6);
 
         children5.push_back(notNode);
         children5.push_back(stmtList);
-        auto expected = WhileNode(children5, 0);
+        auto expected = WhileNode(notNode, stmtList, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 

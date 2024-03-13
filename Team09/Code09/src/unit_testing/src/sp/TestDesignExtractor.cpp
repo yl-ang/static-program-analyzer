@@ -82,7 +82,7 @@ TEST_CASE("Design Extractor Tests") {
     childrenW5.push_back(WandandNode);
     childrenW5.push_back(WstmtList);
 
-    auto whileNode = std::make_shared<WhileNode>(childrenW5, 4);
+    auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 4);
 
     // if (( i < j ) && ( k > l )) then {
     //       i = j;

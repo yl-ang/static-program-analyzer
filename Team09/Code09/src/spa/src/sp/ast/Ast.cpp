@@ -90,7 +90,6 @@ std::shared_ptr<StatementNode> AST::buildStatementAST(std::queue<Token>& tokens)
 
 std::shared_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
     Token ifToken = tokens.front();
-    std::vector<std::shared_ptr<ASTNode>> children = {};
 
     tokens.pop();  // remove if
     std::shared_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
@@ -99,22 +98,16 @@ std::shared_ptr<IfNode> AST::buildIfAST(std::queue<Token>& tokens) {
     tokens.pop();  // remove else
     std::shared_ptr<StatementListNode> elseStatementList = buildStatementListAST(tokens);
 
-    children.push_back((conditionalExpression));
-    children.push_back((thenStatementList));
-    children.push_back((elseStatementList));
     return std::make_shared<IfNode>(conditionalExpression, thenStatementList, elseStatementList, ifToken.line_number);
 }
 
 std::shared_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
-    std::vector<std::shared_ptr<ASTNode>> children = {};
     // remove the keyword
     Token whileToken = tokens.front();
     tokens.pop();
-    std::shared_ptr<ExpressionNode> conditionalExpression = handleBracketedCondExpr(tokens);
+    std::shared_ptr<ExpressionNode> whileCondition = handleBracketedCondExpr(tokens);
     std::shared_ptr<StatementListNode> statements = buildStatementListAST(tokens);
-    children.push_back((conditionalExpression));
-    children.push_back((statements));
-    return std::make_shared<WhileNode>((children), whileToken.line_number);
+    return std::make_shared<WhileNode>(whileCondition, statements, whileToken.line_number);
 }
 
 std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
