@@ -85,7 +85,7 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setFollowsStore(followsStoreEntries);
     pfw.setParentStore(parentStoreEntries);
     pfw.setStatementModifiesStore(modifiesStoreEntries);
-    pfw.setUsesStore(usesStoreEntries);
+    pfw.setStatementUsesStore(usesStoreEntries);
     pfw.setPatternStore(patternStoreEntries);
 
     return PKBFacadeReader{pkb};
