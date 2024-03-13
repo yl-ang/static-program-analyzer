@@ -118,11 +118,11 @@ bool PKBFacadeReader::hasStatementVariableModifiesRelationship(ClauseArgument &a
     return pkbReference->modifiesStore->hasStatementVariableModifiesRelationship(arg1, arg2);
 }
 
-std::unordered_set<Variable> PKBFacadeReader::getVariablesByProcedure(const Procedure &procedure) const {
+std::unordered_set<Variable> PKBFacadeReader::getModifiesVariablesByProcedure(const Procedure &procedure) const {
     return pkbReference->modifiesStore->getVariablesByProcedure(procedure);
 }
 
-std::unordered_set<Procedure> PKBFacadeReader::getProceduresByVariable(const Variable &variable) const {
+std::unordered_set<Procedure> PKBFacadeReader::getModifiesProceduresByVariable(const Variable &variable) const {
     return pkbReference->modifiesStore->getProceduresByVariable(variable);
 }
 

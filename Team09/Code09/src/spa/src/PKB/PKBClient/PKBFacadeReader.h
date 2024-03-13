@@ -49,8 +49,8 @@ public:
     [[nodiscard]] bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
     // Getters for ModifiesStore (Procedures)
-    [[nodiscard]] std::unordered_set<Variable> getVariablesByProcedure(const Procedure& procedure) const;
-    [[nodiscard]] std::unordered_set<Procedure> getProceduresByVariable(const Variable& variable) const;
+    [[nodiscard]] std::unordered_set<Variable> getModifiesVariablesByProcedure(const Procedure& procedure) const;
+    [[nodiscard]] std::unordered_set<Procedure> getModifiesProceduresByVariable(const Variable& variable) const;
     [[nodiscard]] bool hasProcedureVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
     // Getters for UsesStore
