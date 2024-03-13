@@ -33,9 +33,7 @@ TEST_CASE("Design Extractor Tests") {
 
     // read a;
     std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>(VariableNode("a", 2));
-    std::vector<std::shared_ptr<ASTNode>> childrenR = {};
-    childrenR.push_back(aNode);
-    auto readNode = std::make_shared<ReadNode>(childrenR, 2);
+    auto readNode = std::make_shared<ReadNode>(aNode, 2);
 
     // print z;
     std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>(VariableNode("z", 3));
@@ -170,9 +168,7 @@ TEST_CASE("Design Extractor Tests") {
    }
     */
     auto variableA = std::make_shared<VariableNode>("a", 1);
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-    children.push_back(variableA);
-    auto readA = std::make_shared<ReadNode>(children, 1);
+    auto readA = std::make_shared<ReadNode>(variableA, 1);
     std::vector<std::shared_ptr<ASTNode>> children2 = {};
     children2.push_back(readA);
     auto stmtListProc1 = std::make_shared<StatementListNode>(children2);

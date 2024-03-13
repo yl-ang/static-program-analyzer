@@ -111,15 +111,13 @@ std::shared_ptr<WhileNode> AST::buildWhileAST(std::queue<Token>& tokens) {
 }
 
 std::shared_ptr<ReadNode> AST::buildReadAST(std::queue<Token>& tokens) {
-    std::vector<std::shared_ptr<ASTNode>> children = {};
     Token readToken = tokens.front();
-    tokens.pop();
+    tokens.pop();  // remove read
     Token varName = tokens.front();
     std::shared_ptr<VariableNode> nameNode = buildVarNameAST(varName);
-    tokens.pop();
-    children.push_back((nameNode));
-    tokens.pop();
-    return std::make_shared<ReadNode>((children), readToken.line_number);
+    tokens.pop();  // remove the variable
+    tokens.pop();  // remove the semicolon
+    return std::make_shared<ReadNode>(nameNode, readToken.line_number);
 }
 
 std::shared_ptr<CallNode> AST::buildCallAST(std::queue<Token>& tokens) {
