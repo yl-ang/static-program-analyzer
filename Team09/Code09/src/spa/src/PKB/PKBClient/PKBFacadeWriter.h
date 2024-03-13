@@ -25,7 +25,9 @@ public:
     void setParentStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &parentPairs) const;
 
     // Setter for ModifiesStore
-    void setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesPairs) const;
+    void setStatementModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesStatementSet) const;
+    void setProcedureModifiesStore(
+        const std::unordered_set<std::pair<Procedure, Variable>> &modifiesProcedureSet) const;
 
     // Setter for UsesStore
     void setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const;
