@@ -20,6 +20,8 @@ private:
     /**
      * Sentinel table indicates that this is a dummy table that can be joined on.
      * It must NOT be confused with an empty table -- an empty table has headers but no rows.
+     * Joining to an EMPTY TABLE will result in an empty table, while joining to a SENTINEL TABLE will result in the
+     * other table.
      */
     bool isSentinel = false;
     std::vector<Synonym> headers;
