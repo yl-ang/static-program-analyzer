@@ -28,6 +28,14 @@ bool UsesStore::hasStatementVariableUseRelationship(StmtNum stmt, const Variable
     return false;
 }
 
+bool UsesStore::hasProcedureVariableUseRelationship(const Procedure& procedure, const Variable& variable) const {
+    auto procedureIt = procedureToUsedVariables.find(procedure);
+    if (procedureIt != procedureToUsedVariables.end()) {
+        return procedureIt->second.count(variable) > 0;
+    }
+    return false;
+}
+
 std::unordered_set<Variable> UsesStore::getVariablesByStatement(StmtNum stmt) const {
     auto stmtIt = stmtToUsedVariables.find(stmt);
     if (stmtIt != stmtToUsedVariables.end()) {
@@ -39,6 +47,22 @@ std::unordered_set<Variable> UsesStore::getVariablesByStatement(StmtNum stmt) co
 std::unordered_set<StmtNum> UsesStore::getStatementsByVariable(const Variable& variable) const {
     auto variableIt = variableToUsingStatements.find(variable);
     if (variableIt != variableToUsingStatements.end()) {
+        return variableIt->second;
+    }
+    return {};
+}
+
+std::unordered_set<Variable> UsesStore::getVariablesByProcedure(const Procedure& procedure) const {
+    auto procedureIt = procedureToUsedVariables.find(procedure);
+    if (procedureIt != procedureToUsedVariables.end()) {
+        return procedureIt->second;
+    }
+    return {};
+}
+
+std::unordered_set<Procedure> UsesStore::getProceduresByVariable(const Variable& variable) const {
+    auto variableIt = variableToUsingProcedures.find(variable);
+    if (variableIt != variableToUsingProcedures.end()) {
         return variableIt->second;
     }
     return {};
@@ -60,4 +84,22 @@ bool UsesStore::hasStatementVariableUseRelationship(ClauseArgument& arg1, Clause
     }
 
     return hasStatementVariableUseRelationship(std::stoi(arg1.getValue()), arg2.getValue());
+}
+
+bool UsesStore::hasProcedureVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !procedureToUsedVariables.empty();
+    }
+
+    // if arg1 is wildcard, find out if arg2 is used by procedures(s)
+    if (arg1.isWildcard()) {
+        return !getProceduresByVariable(arg2.getValue()).empty();
+    }
+
+    // if arg2 is wildcard, find out if arg1 uses any variables
+    if (arg2.isWildcard()) {
+        return !getVariablesByProcedure(arg1.getValue()).empty();
+    }
+
+    return hasProcedureVariableUseRelationship(arg1.getValue(), arg2.getValue());
 }
