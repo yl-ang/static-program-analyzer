@@ -1,12 +1,22 @@
 #include "UsesStore.h"
 
-void UsesStore::setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesSet) {
-    for (const auto& use : usesSet) {
+void UsesStore::setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>>& usesStatementPairs) {
+    for (const auto& use : usesStatementPairs) {
         StmtNum stmt = use.first;
         Variable variable = use.second;
 
         stmtToUsedVariables[stmt].insert(variable);
         variableToUsingStatements[variable].insert(stmt);
+    }
+}
+
+void UsesStore::setProcedureUsesStore(const std::unordered_set<std::pair<Procedure, Variable>>& usesProcedurePairs) {
+    for (const auto& use : usesProcedurePairs) {
+        Procedure procedure = use.first;
+        Variable variable = use.second;
+
+        procedureToUsedVariables[procedure].insert(variable);
+        variableToUsingProcedures[variable].insert(procedure);
     }
 }
 
