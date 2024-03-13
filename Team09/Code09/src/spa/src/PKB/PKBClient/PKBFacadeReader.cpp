@@ -138,12 +138,20 @@ std::unordered_set<StmtNum> PKBFacadeReader::getUsesStatementsByVariable(const V
     return pkbReference->usesStore->getStatementsByVariable(variable);
 }
 
-bool PKBFacadeReader::hasStatementVariableUseRelationship(StmtNum stmt, const Variable &variable) const {
-    return pkbReference->usesStore->hasStatementVariableUseRelationship(stmt, variable);
-}
-
 bool PKBFacadeReader::hasStatementVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->usesStore->hasStatementVariableUseRelationship(arg1, arg2);
+}
+
+std::unordered_set<Variable> PKBFacadeReader::getUsesVariablesByProcedure(const Procedure &procedure) const {
+    return pkbReference->usesStore->getVariablesByProcedure(procedure);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getUsesProceduresByVariable(const Variable &variable) const {
+    return pkbReference->usesStore->getProceduresByVariable(variable);
+}
+
+bool PKBFacadeReader::hasProcedureVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->usesStore->hasProcedureVariableUseRelationship(arg1, arg2);
 }
 
 bool PKBFacadeReader::hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs) {
