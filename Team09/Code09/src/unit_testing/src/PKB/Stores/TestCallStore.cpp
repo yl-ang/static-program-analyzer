@@ -137,4 +137,81 @@ TEST_CASE("CallStore - CallStar Tests") {
         REQUIRE(callStore.getCalleeStar("Seven").empty());
         REQUIRE(callStore.getCalleeStar("Eight").empty());
     }
+
+    SECTION("Test hasCallStarRelationship") {
+        REQUIRE(callStore.hasCallStarRelationship("One", "Eight"));
+        REQUIRE(callStore.hasCallStarRelationship("Two", "Five"));
+        REQUIRE(callStore.hasCallStarRelationship("Two", "Seven"));
+        REQUIRE(callStore.hasCallStarRelationship("Three", "Six"));
+        REQUIRE(callStore.hasCallStarRelationship("Three", "Seven"));
+
+        REQUIRE_FALSE(callStore.hasCallStarRelationship("Eight", "One"));
+        REQUIRE_FALSE(callStore.hasCallStarRelationship("Three", "Four"));
+        REQUIRE_FALSE(callStore.hasCallStarRelationship("Seven", "Eight"));
+        REQUIRE_FALSE(callStore.hasCallStarRelationship("Seven", "Second"));
+        REQUIRE_FALSE(callStore.hasCallStarRelationship("Six", "First"));
+    }
+
+    SECTION("Test hasCallStarRelationship with Wildcards arg1 and arg2, non-empty nextStore (Expecting True)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE(callStore.hasCallStarRelationship(*wildcardArg1, *wildcardArg2));
+
+        delete wildcardArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with Wildcard arg1 and PROCEDURE arg2 (Expecting True)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *SynonymArg2 = new Synonym(DesignEntityType::PROCEDURE, "Eight");
+        REQUIRE(callStore.hasCallStarRelationship(*wildcardArg1, *SynonymArg2));
+
+        delete wildcardArg1;
+        delete SynonymArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with Wildcard arg1 and PROCEDURE arg2 (Expecting False)") {
+        ClauseArgument *wildcardArg1 = new Wildcard();
+        ClauseArgument *SynonymArg2 = new Synonym(DesignEntityType::PROCEDURE, "One");
+        REQUIRE_FALSE(callStore.hasCallStarRelationship(*wildcardArg1, *SynonymArg2));
+
+        delete wildcardArg1;
+        delete SynonymArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with PROCEDURE arg1 and Wildcard arg2 (Expecting True)") {
+        ClauseArgument *SynonymArg1 = new Synonym(DesignEntityType::PROCEDURE, "Four");
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE(callStore.hasCallStarRelationship(*SynonymArg1, *wildcardArg2));
+
+        delete SynonymArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with PROCEDURE arg1 and Wildcard arg2 (Expecting False)") {
+        ClauseArgument *SynonymArg1 = new Synonym(DesignEntityType::PROCEDURE, "Eight");
+        ClauseArgument *wildcardArg2 = new Wildcard();
+        REQUIRE_FALSE(callStore.hasCallStarRelationship(*SynonymArg1, *wildcardArg2));
+
+        delete SynonymArg1;
+        delete wildcardArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with PROCEDURE arg1 and PROCEDURE arg2 (Expecting True)") {
+        ClauseArgument *SynonymArg1 = new Synonym(DesignEntityType::PROCEDURE, "One");
+        ClauseArgument *SynonymArg2 = new Synonym(DesignEntityType::PROCEDURE, "Eight");
+        REQUIRE(callStore.hasCallStarRelationship(*SynonymArg1, *SynonymArg2));
+
+        delete SynonymArg1;
+        delete SynonymArg2;
+    }
+
+    SECTION("Test hasCallStarRelationship with PROCEDURE arg1 and PROCEDURE arg2 (Expecting False)") {
+        ClauseArgument *SynonymArg1 = new Synonym(DesignEntityType::PROCEDURE, "Three");
+        ClauseArgument *SynonymArg2 = new Synonym(DesignEntityType::PROCEDURE, "Four");
+        REQUIRE_FALSE(callStore.hasCallStarRelationship(*SynonymArg1, *SynonymArg2));
+
+        delete SynonymArg1;
+        delete SynonymArg2;
+    }
 }
