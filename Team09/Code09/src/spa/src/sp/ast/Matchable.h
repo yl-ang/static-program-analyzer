@@ -13,5 +13,5 @@ public:
 
 class MatchableBuilder {
 public:
-    static std::shared_ptr<Matchable> fromExpressionString(const std::vector<std::string>& input);
+    static std::shared_ptr<Matchable> fromExpressionString(const std::string& input);
 };
