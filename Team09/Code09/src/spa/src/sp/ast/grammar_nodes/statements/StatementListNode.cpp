@@ -13,3 +13,7 @@ std::vector<int> StatementListNode::getStmtsStmtNum() {
     }
     return stmtNums;
 }
+
+int StatementListNode::firstChildStatementNumber() {
+    return this->children[0]->statementNumber;
+}

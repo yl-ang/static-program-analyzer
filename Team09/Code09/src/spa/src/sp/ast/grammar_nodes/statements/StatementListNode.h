@@ -16,4 +16,5 @@ public:
     void accept(AstVisitor* visitor) override;
 
     std::vector<int> getStmtsStmtNum();
+    int firstChildStatementNumber();
 };
