@@ -8,7 +8,7 @@
 
 class Modifies : public Relationship {
 private:
-    ClauseArgument& stmt;
+    ClauseArgument& modifier;
     ClauseArgument& var;
 
     /**
@@ -18,9 +18,8 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult statementsModifyLiteral(PKBFacadeReader&);
     ClauseResult allModifiedVariables(PKBFacadeReader&);
-    ClauseResult allStmtsThatModifySomeVar(PKBFacadeReader&);
+    ClauseResult evaluateModifierSynonym(PKBFacadeReader&);
     ClauseResult variablesModifedByStatement(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
     std::unordered_set<StmtNum> filterStatementsByType(PKBFacadeReader&, DesignEntityType, std::unordered_set<StmtNum>);

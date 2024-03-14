@@ -87,7 +87,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         Synonym* readStmtSyn = new Synonym(DesignEntityType::READ, "s1");
         // Select s such that Modifies(s, "x")
         ModifiesTester{pfr, readStmtSyn, new Literal("x")}.testSynonyms({*readStmtSyn}).testSynonymValues({{"1"}});
-        // Select s such that Modifies(s, "y") -- should not match stmt#2 since it is not correct type
+        // Select s such that Modifies(s, "y") -- should not match modifier#2 since it is not correct type
         ModifiesTester{pfr, readStmtSyn, new Literal("y")}.testSynonyms({*readStmtSyn}).testSynonymValues({{"3"}});
     }
 
