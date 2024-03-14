@@ -100,12 +100,12 @@ bool CallStore::hasCallStarRelationship(ClauseArgument& arg1, ClauseArgument& ar
     }
 
     // if arg 1 is wildcard, check if arg2 has caller Stars
-    if (arg2.isWildcard()) {
+    if (arg1.isWildcard()) {
         return !getCallerStar(arg2.getValue()).empty();
     }
 
     // if arg 2 is wildcard, check if arg1 has callee Stars
-    if (arg1.isWildcard()) {
+    if (arg2.isWildcard()) {
         return !getCalleeStar(arg1.getValue()).empty();
     }
 
