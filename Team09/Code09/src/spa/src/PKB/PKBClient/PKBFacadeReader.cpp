@@ -205,3 +205,15 @@ std::unordered_set<Procedure> PKBFacadeReader::getCallee(Procedure caller) {
 bool PKBFacadeReader::hasCallRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->callStore->hasCallRelationship(arg1, arg2);
 }
+
+std::unordered_set<Procedure> PKBFacadeReader::getCallerStar(Procedure callee) {
+    return pkbReference->callStore->getCallerStar(callee);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCalleeStar(Procedure caller) {
+    return pkbReference->callStore->getCalleeStar(caller);
+}
+
+bool PKBFacadeReader::hasCallStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->callStore->hasCallStarRelationship(arg1, arg2);
+}
