@@ -88,7 +88,7 @@ std::unordered_set<StmtNum> NextStore::computeNextStar(
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> closureMap = nextMap;
 
     // Re-compute on the go whenever incoming queries for nextT comes in
-    TransitiveClosureUtility::computeTransitiveClosure(closureMap);
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&closureMap);
 
     auto it = closureMap.find(start);
     if (it != closureMap.end()) {
