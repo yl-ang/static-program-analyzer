@@ -61,7 +61,7 @@ std::unordered_set<Procedure> CallStore::getCallerStar(Procedure callee) {
 }
 
 std::unordered_set<Procedure> CallStore::getCalleeStar(Procedure caller) {
-    return callerToCalleeMap.count(caller) ? callerToCalleeMap[caller] : std::unordered_set<Procedure>();
+    return callerToCalleeStarMap.count(caller) ? callerToCalleeStarMap[caller] : std::unordered_set<Procedure>();
 }
 
 bool CallStore::hasCallRelationship(Procedure caller, Procedure callee) {
