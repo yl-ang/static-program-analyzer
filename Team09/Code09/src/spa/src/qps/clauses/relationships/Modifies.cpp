@@ -17,9 +17,9 @@ ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {
             return variablesModifedByStatement(reader);
         }
 
-        // Wildcard, Synonym
-        if (modifier.isWildcard()) {
-            return allModifiedVariables(reader);
+        // Literal, Synonym
+        if (modifier.isLiteral()) {
+            return variablesModifiedByProcedure(reader);
         }
     }
 
@@ -28,22 +28,30 @@ ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(modifier);
+    Synonym modifierSyn = static_cast<Synonym&>(modifier);
     Synonym varSyn = static_cast<Synonym&>(var);
 
-    SynonymValues stmtValues{};
+    SynonymValues modifierValues{};
     SynonymValues varValues{};
 
     for (Variable var : reader.getVariables()) {
-        std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
-        for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), stmts)) {
-            stmtValues.push_back(std::to_string(currStmt));
-            varValues.push_back(var);
+        if (modifierSyn.getType() == DesignEntityType::PROCEDURE) {
+            std::unordered_set<Procedure> procs = reader.getModifiesProceduresByVariable(var);
+            for (Procedure proc : procs) {
+                modifierValues.push_back(proc);
+                varValues.push_back(var);
+            }
+        } else {
+            std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
+            for (StmtNum currStmt : filterStatementsByType(reader, modifierSyn.getType(), stmts)) {
+                modifierValues.push_back(std::to_string(currStmt));
+                varValues.push_back(var);
+            }
         }
     }
 
-    std::vector<Synonym> headers = {stmtSyn, varSyn};
-    std::vector<SynonymValues> values = {stmtValues, varValues};
+    std::vector<Synonym> headers = {modifierSyn, varSyn};
+    std::vector<SynonymValues> values = {modifierValues, varValues};
     return {headers, values};
 }
 
@@ -59,13 +67,12 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
 
     SynonymValues values{};
     if (stmtSyn.getType() == DesignEntityType::PROCEDURE) {
-        std::unordered_set<Procedure> allProcs{};
         for (Variable var : vars) {
             auto procs = reader.getModifiesProceduresByVariable(var);
-            allProcs.insert(procs.begin(), procs.end());
+            for (Procedure proc : procs) {
+                values.push_back(proc);
+            }
         }
-
-        values.insert(values.end(), allProcs.begin(), allProcs.end());
     } else {
         std::unordered_set<StmtNum> allStmts{};
         for (Variable var : vars) {
@@ -81,25 +88,22 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
     return {stmtSyn, values};
 }
 
-ClauseResult Modifies::allModifiedVariables(PKBFacadeReader& reader) {
+ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getVariables()) {
-        if (!reader.getModifiesStatementsByVariable(currVar).empty()) {
-            values.push_back(currVar);
-        }
+    for (Variable currVar : reader.getModifiesVariablesByProcedure(modifier.getValue())) {
+        values.push_back(currVar);
     }
 
     return {varSyn, values};
 }
 
 ClauseResult Modifies::variablesModifedByStatement(PKBFacadeReader& reader) {
-    Integer stmtInt = static_cast<Integer&>(modifier);
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getModifiesVariablesByStatement(std::stoi(stmtInt.getValue()))) {
+    for (Variable currVar : reader.getModifiesVariablesByStatement(std::stoi(modifier.getValue()))) {
         values.push_back(currVar);
     }
 

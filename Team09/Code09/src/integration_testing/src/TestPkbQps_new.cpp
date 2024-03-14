@@ -34,8 +34,10 @@ const std::unordered_set<std::pair<int, int>> followsStoreEntries = {{1, 2}, {2,
 const std::unordered_set<std::pair<int, int>> parentStoreEntries = {{3, 4},  {3, 5},  {7, 8}, {7, 9},
                                                                     {7, 12}, {9, 10}, {9, 11}};
 
-const std::unordered_set<std::pair<StmtNum, Variable>> modifiesStoreEntries = {{1, "num1"}, {2, "num2"}, {3, "num2"},
-                                                                               {5, "num2"}, {8, "num2"}, {7, "num2"}};
+const std::unordered_set<std::pair<StmtNum, Variable>> stmtModifiesStoreEntries = {
+    {1, "num1"}, {2, "num2"}, {3, "num2"}, {5, "num2"}, {6, "num2"}, {8, "num2"}, {7, "num2"}};
+const std::unordered_set<std::pair<Procedure, Variable>> procModifiesStoreEntries = {
+    {"main", "num1"}, {"main", "num2"}, {"next", "num2"}};
 const std::unordered_set<std::pair<StmtNum, Variable>> usesStoreEntries = {
     {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"},  {7, "num1"},
     {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
@@ -84,7 +86,8 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setProcedures(procs);
     pfw.setFollowsStore(followsStoreEntries);
     pfw.setParentStore(parentStoreEntries);
-    pfw.setStatementModifiesStore(modifiesStoreEntries);
+    pfw.setStatementModifiesStore(stmtModifiesStoreEntries);
+    pfw.setProcedureModifiesStore(procModifiesStoreEntries);
     pfw.setStatementUsesStore(usesStoreEntries);
     pfw.setPatternStore(patternStoreEntries);
 
@@ -568,19 +571,26 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Modifies(Wildcard, Variable)") {
-                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Modifies(_, \"num2\")"));
+            SECTION("Modifies(Integer: [call stmt], Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(6, \"num2\")");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Ezekiel): Enable this test when we support procedure for modifies
-            SECTION("Modifies(Procedure, Variable)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Modifies(p, \"num2\")");
-                QPSResult expected = {"main", "next"};
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Modifies(Literal: [procedure name], Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(\"main\", \"num1\")");
+                QPSResult expected = {allStmts};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
             */
+
+            SECTION("Modifies(Wildcard, Variable)") {
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Modifies(_, \"num2\")"));
+            }
         }
 
+        QPSResult allModifyingStatements = {"1", "2", "3", "5", "6", "7", "8"};
         SECTION("1 synonym") {
             SECTION("Modifies(Integer, synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(1, v)");
@@ -588,32 +598,46 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Modifies(Synonym, Variable)") {
+            SECTION("Modifies(Synonym: Stmt, Variable)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, \"num2\")");
-                QPSResult expected = {"2", "3", "5", "7", "8"};
+                QPSResult expected = {"2", "3", "5", "6", "7", "8"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("Modifies(Synonym, Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, _)");
-                QPSResult expected = {"1", "2", "3", "5", "7", "8"};
-                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
             }
 
-            /* TODO(Ezekiel): Enable this test when we support procedure for modifies
+            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Modifies(Procedure, synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
             */
+
+            SECTION("Modifies(Procedure, Variable)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Modifies(p, \"num2\")");
+                QPSResult expected = {"main", "next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Modifies(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, _)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
+            }
         }
 
         SECTION("2 synonyms") {
             SECTION("Modifies(StmtSyn, VariableSyn)") {
                 QPSResult result = qps.processQueries("stmt s; variable v; Select s such that Modifies(s, v)");
-                QPSResult expected = {"1", "2", "3", "5", "7", "8"};
-                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
+            }
+
+            SECTION("Modifies(ProcSyn, VariableSyn)") {
+                QPSResult result = qps.processQueries("procedure p; variable v; Select p such that Modifies(p, v)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allProcs);
             }
 
             SECTION("Modifies(assignSyn, VariableSyn)") {
