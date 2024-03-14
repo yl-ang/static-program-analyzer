@@ -5,8 +5,15 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 message (STATUS "${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}")
+
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(FATAL_ERROR "In-source builds are forbidden.")
+endif()
+
+if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE MATCHES "Debug|Release")
+    message(SEND_ERROR "ERROR: UNKNOWN BUILD TYPE - ${CMAKE_BUILD_TYPE}")
+    set(CMAKE_BUILD_TYPE "" CACHE STRING "Forcibly remove an unknown build type from cache" FORCE)
+    message(FATAL_ERROR "REMOVING UNKNOWN BUILD TYPE FROM CMAKE CACHE. ABORTING...")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -24,6 +31,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(AUTOTESTER_ROOT "${CMAKE_CURRENT_LIST_DIR}/lib/autotester/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
 
 list(APPEND CMAKE_PREFIX_PATH "${AUTOTESTER_ROOT}")
+
+include(Exposebuildtype)
+
 find_package(autotester REQUIRED)
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")#include catch.hpp
 
