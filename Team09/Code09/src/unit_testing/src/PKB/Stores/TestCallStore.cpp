@@ -99,3 +99,42 @@ TEST_CASE("CallStore - Call Tests") {
         delete SynonymArg2;
     }
 }
+TEST_CASE("CallStore - CallStar Tests") {
+    CallStore callStore;
+    callStore.setCallStore({{"One", "Two"},
+                            {"Two", "Three"},
+                            {"Two", "Four"},
+                            {"Three", "Five"},
+                            {"Four", "Five"},
+                            {"Five", "Six"},
+                            {"Six", "Seven"},
+                            {"Six", "Eight"},
+                            {"Five", "Seven"},
+                            {"Five", "Eight"}});
+
+    SECTION("Test getCallerStar") {
+        REQUIRE(callStore.getCallerStar("One").empty());
+        REQUIRE(callStore.getCallerStar("Two") == std::unordered_set<Procedure>{"One"});
+        REQUIRE(callStore.getCallerStar("Three") == std::unordered_set<Procedure>{"Two", "One"});
+        REQUIRE(callStore.getCallerStar("Four") == std::unordered_set<Procedure>{"Two", "One"});
+        REQUIRE(callStore.getCallerStar("Five") == std::unordered_set<Procedure>{"Four", "Three", "Two", "One"});
+        REQUIRE(callStore.getCallerStar("Six") == std::unordered_set<Procedure>{"Five", "Four", "Three", "Two", "One"});
+        REQUIRE(callStore.getCallerStar("Seven") ==
+                std::unordered_set<Procedure>{"Six", "Three", "Five", "Four", "Two", "One"});
+        REQUIRE(callStore.getCallerStar("Eight") ==
+                std::unordered_set<Procedure>{"Six", "Three", "Five", "Four", "Two", "One"});
+    }
+
+    SECTION("Test getCalleeStar") {
+        REQUIRE(callStore.getCalleeStar("One") ==
+                std::unordered_set<Procedure>{"Two", "Three", "Six", "Four", "Five", "Seven", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Two") ==
+                std::unordered_set<Procedure>{"Three", "Six", "Four", "Five", "Seven", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Three") == std::unordered_set<Procedure>{"Five", "Seven", "Six", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Four") == std::unordered_set<Procedure>{"Five", "Seven", "Six", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Five") == std::unordered_set<Procedure>{"Seven", "Six", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Six") == std::unordered_set<Procedure>{"Seven", "Eight"});
+        REQUIRE(callStore.getCalleeStar("Seven").empty());
+        REQUIRE(callStore.getCalleeStar("Eight").empty());
+    }
+}
