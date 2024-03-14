@@ -13,7 +13,7 @@ void CallStore::setCallStore(const std::unordered_set<std::pair<Procedure, Proce
 }
 
 void CallStore::computeTransitiveClosure() {
-    callerToCalleeMap.clear();
+    callerToCalleeStarMap.clear();
     calleeToCallerStarMap.clear();
 
     // Initialize the matrices
