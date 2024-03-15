@@ -2,6 +2,23 @@
 
 Follows::Follows(ClauseArgument& followee, ClauseArgument& follower) : followee(followee), follower(follower) {}
 
+void Follows::checkSemantic() {
+    if (followee.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(followee);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
+            first.getType() == DesignEntityType::PROCEDURE) {
+            throw QPSSemanticError();
+        }
+    }
+    if (follower.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(follower);
+        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
+            second.getType() == DesignEntityType::PROCEDURE) {
+            throw QPSSemanticError();
+        }
+    }
+}
+
 ClauseResult Follows::evaluate(PKBFacadeReader& reader) {
     if (isSimpleResult()) {
         return {reader.hasFollowRelationship(followee, follower)};

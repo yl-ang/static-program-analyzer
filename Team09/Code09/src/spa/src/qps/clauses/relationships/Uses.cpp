@@ -2,6 +2,24 @@
 
 Uses::Uses(ClauseArgument& user, ClauseArgument& var) : user(user), var(var) {}
 
+void Uses::checkSemantic() {
+    if (stmt.isWildcard()) {
+        throw QPSSemanticError();
+    }
+    if (stmt.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(stmt);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
+            throw QPSSemanticError();
+        }
+    }
+    if (var.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(var);
+        if (second.getType() != DesignEntityType::VARIABLE) {
+            throw QPSSemanticError();
+        }
+    }
+}
+
 ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
     if (user.isSynonym() && var.isSynonym()) {
         return evaluateBothSynonyms(reader);

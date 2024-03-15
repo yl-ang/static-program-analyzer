@@ -2,6 +2,23 @@
 
 Parent::Parent(ClauseArgument& parent, ClauseArgument& child) : parent(parent), child(child) {}
 
+void Parent::checkSemantic() {
+    if (parent.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(parent);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
+            first.getType() == DesignEntityType::PROCEDURE) {
+            throw QPSSemanticError();
+        }
+    }
+    if (child.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(child);
+        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
+            second.getType() == DesignEntityType::PROCEDURE) {
+            throw QPSSemanticError();
+        }
+    }
+}
+
 ClauseResult Parent::evaluate(PKBFacadeReader& reader) {
     if (isSimpleResult()) {
         return {reader.hasParentRelationship(parent, child)};

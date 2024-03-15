@@ -13,7 +13,7 @@ void UsesValidator::validateSyntax() {
     }
 }
 
-void UsesValidator::validateSemantic(SynonymStore* store) {
+void UsesValidator::validateSemantic(ValidatorSynonymStore* store) {
     std::string arg1 = args[0];
     std::string arg2 = args[1];
 

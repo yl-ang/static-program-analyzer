@@ -2,6 +2,24 @@
 
 Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : modifier(stmt), var(var) {}
 
+void Modifies::checkSemantic() {
+    if (stmt.isWildcard()) {
+        throw QPSSemanticError();
+    }
+    if (stmt.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(stmt);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
+            throw QPSSemanticError();
+        }
+    }
+    if (var.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(var);
+        if (second.getType() != DesignEntityType::VARIABLE) {
+            throw QPSSemanticError();
+        }
+    }
+}
+
 ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {
     if (modifier.isSynonym() && var.isSynonym()) {
         return evaluateBothSynonyms(reader);

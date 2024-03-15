@@ -1,8 +1,12 @@
 #pragma once
 
+#include <qps/parser/SynonymStore.h>
+
 #include <string>
 
 #include "ClauseArgument.h"
+
+class SynonymStore;
 
 enum class DesignEntityType {
     STMT,
@@ -15,6 +19,7 @@ enum class DesignEntityType {
     VARIABLE,
     CONSTANT,
     PROCEDURE,
+    UNKNOWN,
 };
 
 class Synonym : public ClauseArgument {
@@ -32,6 +37,7 @@ public:
     DesignEntityType getType() const;
     std::string getValue() const override;
     static std::string entityTypeToString(DesignEntityType);
+    bool updateType(SynonymStore* synonyms);
     void print();
     bool operator==(const ClauseArgument& other) const override;
 };

@@ -1,6 +1,6 @@
-#include "SynonymStore.h"
+#include "ValidatorSynonymStore.h"
 
-void SynonymStore::storeSynonymWithStatement(const std::string& declarationStatement) {
+void ValidatorSynonymStore::storeSynonymWithStatement(const std::string& declarationStatement) {
     std::string synType;
     std::string remainingString;
     std::tie(synType, remainingString) = substringUntilDelimiter(declarationStatement, " ");
@@ -19,7 +19,7 @@ void SynonymStore::storeSynonymWithStatement(const std::string& declarationState
     }
 }
 
-bool SynonymStore::containsSynonym(const std::string& synName, const std::string& synType) {
+bool ValidatorSynonymStore::containsSynonym(const std::string& synName, const std::string& synType) {
     auto variable = storage.find(synName);
     if (variable == storage.end()) {
         return false;
@@ -28,7 +28,7 @@ bool SynonymStore::containsSynonym(const std::string& synName, const std::string
     return variable->second == synType;
 }
 
-bool SynonymStore::containsSynonymName(const std::string& synName) {
+bool ValidatorSynonymStore::containsSynonymName(const std::string& synName) {
     auto variable = storage.find(synName);
     return !(variable == storage.end());
 }

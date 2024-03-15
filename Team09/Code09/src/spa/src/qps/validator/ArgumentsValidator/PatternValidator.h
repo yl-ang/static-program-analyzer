@@ -13,5 +13,5 @@ private:
 public:
     PatternValidator(const std::string& syn, const std::vector<std::string>& args);
     virtual void validateSyntax() override;
-    virtual void validateSemantic(SynonymStore* store) override;
+    virtual void validateSemantic(ValidatorSynonymStore* store) override;
 };

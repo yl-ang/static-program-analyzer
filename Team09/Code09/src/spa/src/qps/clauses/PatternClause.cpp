@@ -119,3 +119,5 @@ ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
 
     return {aSyn, stmtNumbers};
 }
+
+void PatternClause::checkSemantic(SynonymStore* store) {}

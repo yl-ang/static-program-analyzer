@@ -11,5 +11,5 @@ public:
     ParentValidator(const std::vector<std::string>& args);
     ParentValidator() = default;
     virtual void validateSyntax() override;
-    virtual void validateSemantic(SynonymStore* store) override;
+    virtual void validateSemantic(ValidatorSynonymStore* store) override;
 };
