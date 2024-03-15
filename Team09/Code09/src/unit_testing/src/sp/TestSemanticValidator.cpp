@@ -65,20 +65,31 @@ TEST_CASE("Semantic Validation Tests") {
     }
     SECTION("Calling procedure does not throw error") {
         auto callStatement = std::make_shared<CallNode>("a", 0);
-        std::vector<std::shared_ptr<ASTNode>> procBChildren = {callStatement};
-        auto procedure1 = std::make_shared<ProcedureNode>("a", std::vector<std::shared_ptr<ASTNode>>());
-        auto procedure2 = std::make_shared<ProcedureNode>("b", procBChildren);
-        std::vector<std::shared_ptr<ASTNode>> children = {procedure1, procedure2};
+        auto xVar = std::make_shared<VariableNode>("x", 0);
+        auto readNode = std::make_shared<ReadNode>(xVar, 0);
+        std::vector<std::shared_ptr<StatementNode>> children2 = {readNode};
+        auto stmtList1 = std::make_shared<StatementListNode>(children2);
+        std::vector<std::shared_ptr<StatementNode>> procBChildren = {callStatement};
+        auto stmtList2 = std::make_shared<StatementListNode>(procBChildren);
+
+        auto procedure1 = std::make_shared<ProcedureNode>("a", stmtList1);
+        auto procedure2 = std::make_shared<ProcedureNode>("b", stmtList2);
+        std::vector<std::shared_ptr<ProcedureNode>> children = {procedure1, procedure2};
         auto program = std::make_shared<ProgramNode>(children);
         REQUIRE_NOTHROW(validator.validateSemantics(program));
     }
 
     SECTION("Calling non procedure throws error") {
         auto callStatement = std::make_shared<CallNode>("c", 0);
-        std::vector<std::shared_ptr<ASTNode>> procBChildren = {callStatement};
-        auto procedure1 = std::make_shared<ProcedureNode>("a", std::vector<std::shared_ptr<ASTNode>>());
-        auto procedure2 = std::make_shared<ProcedureNode>("b", procBChildren);
-        std::vector<std::shared_ptr<ASTNode>> children = {procedure1, procedure2};
+        auto xVar = std::make_shared<VariableNode>("x", 0);
+        auto readNode = std::make_shared<ReadNode>(xVar, 0);
+        std::vector<std::shared_ptr<StatementNode>> children2 = {readNode};
+        auto stmtList1 = std::make_shared<StatementListNode>(children2);
+        std::vector<std::shared_ptr<StatementNode>> procBChildren = {callStatement};
+        auto stmtList2 = std::make_shared<StatementListNode>(procBChildren);
+        auto procedure1 = std::make_shared<ProcedureNode>("a", stmtList1);
+        auto procedure2 = std::make_shared<ProcedureNode>("b", stmtList2);
+        std::vector<std::shared_ptr<ProcedureNode>> children = {procedure1, procedure2};
         auto program = std::make_shared<ProgramNode>(children);
         REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Attempted to call: c, which is not a procedure.");
     }
