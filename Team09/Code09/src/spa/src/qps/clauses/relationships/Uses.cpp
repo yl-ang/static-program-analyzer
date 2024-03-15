@@ -1,53 +1,49 @@
 #include "Uses.h"
 
-Uses::Uses(ClauseArgument& stmt, ClauseArgument& var) : stmt(stmt), var(var) {}
+Uses::Uses(ClauseArgument& user, ClauseArgument& var) : user(user), var(var) {}
 
 ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
-    if (isSimpleResult()) {
-        return {reader.hasStatementVariableUseRelationship(stmt, var)};
+    if (user.isSynonym() && var.isSynonym()) {
+        return evaluateBothSynonyms(reader);
     }
 
-    // Synonym, Literal
-    if (stmt.isSynonym() && var.isLiteral()) {
-        return statementsUseLiteral(reader);
+    if (user.isSynonym()) {
+        return evaluateUserSynonym(reader);
     }
 
-    // Synonym, Wildcard
-    if (stmt.isSynonym() && var.isWildcard()) {
-        return allStmtsThatUseSomeVar(reader);
+    if (var.isSynonym()) {
+        // Integer, Synonym
+        if (user.isInteger() && var.isSynonym()) {
+            return variablesUsedByStatement(reader);
+        }
+
+        // Wildcard, Synonym
+        if (user.isWildcard() && var.isSynonym()) {
+            return allVariablesBeingUsed(reader);
+        }
     }
 
-    // Integer, Synonym
-    if (stmt.isInteger() && var.isSynonym()) {
-        return variablesUsedByStatement(reader);
-    }
-
-    // Wildcard, Synonym
-    if (stmt.isWildcard() && var.isSynonym()) {
-        return allVariablesBeingUsed(reader);
-    }
-
-    // Synonym, Synonym
-    return evaluateBothSynonyms(reader);
+    return {reader.hasStatementVariableUseRelationship(user, var) ||
+            reader.hasProcedureVariableModifiesRelationship(user, var)};
 }
 
 ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
+    Synonym userSyn = static_cast<Synonym&>(user);
     Synonym varSyn = static_cast<Synonym&>(var);
 
-    SynonymValues stmtValues{};
+    SynonymValues userValues{};
     SynonymValues varValues{};
 
     for (Variable var : reader.getVariables()) {
-        std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(var);
-        for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), stmts)) {
-            stmtValues.push_back(std::to_string(currStmt));
+        std::unordered_set<StmtNum> users = reader.getUsesStatementsByVariable(var);
+        for (StmtNum curruser : filterStatementsByType(reader, userSyn.getType(), users)) {
+            userValues.push_back(std::to_string(curruser));
             varValues.push_back(var);
         }
     }
 
-    std::vector<Synonym> headers = {stmtSyn, varSyn};
-    std::vector<SynonymValues> values = {stmtValues, varValues};
+    std::vector<Synonym> headers = {userSyn, varSyn};
+    std::vector<SynonymValues> values = {userValues, varValues};
     return {headers, values};
 }
 
@@ -64,43 +60,45 @@ ClauseResult Uses::allVariablesBeingUsed(PKBFacadeReader& reader) {
     return {varSyn, values};
 }
 
-ClauseResult Uses::allStmtsThatUseSomeVar(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
+ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
+    Synonym userSyn = static_cast<Synonym&>(this->user);
 
-    std::unordered_set<Variable> vars = reader.getVariables();
-    std::unordered_set<StmtNum> allStmts{};
-    for (Variable var : vars) {
-        std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(var);
-        allStmts.insert(stmts.begin(), stmts.end());
+    std::unordered_set<Variable> vars{};
+    if (this->var.isWildcard()) {
+        vars = reader.getVariables();
+    } else {
+        vars.insert(this->var.getValue());
     }
 
     SynonymValues values{};
-    for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), allStmts)) {
-        values.push_back(std::to_string(currStmt));
+    if (userSyn.getType() == DesignEntityType::PROCEDURE) {
+        for (Variable var : vars) {
+            std::unordered_set<Procedure> users = reader.getUsesProceduresByVariable(var);
+            for (Procedure proc : users) {
+                values.push_back(proc);
+            }
+        }
+    } else {
+        std::unordered_set<StmtNum> allStmts{};
+        for (Variable var : vars) {
+            std::unordered_set<StmtNum> users = reader.getUsesStatementsByVariable(var);
+            allStmts.insert(users.begin(), users.end());
+        }
+
+        for (StmtNum stmt : filterStatementsByType(reader, userSyn.getType(), allStmts)) {
+            values.push_back(std::to_string(stmt));
+        }
     }
 
-    return {stmtSyn, values};
-}
-
-ClauseResult Uses::statementsUseLiteral(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
-    Literal varLit = static_cast<Literal&>(var);
-
-    SynonymValues values{};
-    std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(varLit.getValue());
-    for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), stmts)) {
-        values.push_back(std::to_string(currStmt));
-    }
-
-    return {stmtSyn, values};
+    return {userSyn, values};
 }
 
 ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
-    Integer stmtInt = static_cast<Integer&>(stmt);
+    Integer userInt = static_cast<Integer&>(user);
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getUsesVariablesByStatement(std::stoi(stmtInt.getValue()))) {
+    for (Variable currVar : reader.getUsesVariablesByStatement(std::stoi(userInt.getValue()))) {
         values.push_back(currVar);
     }
 
@@ -108,22 +106,22 @@ ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
 }
 
 std::unordered_set<StmtNum> Uses::filterStatementsByType(PKBFacadeReader& reader, DesignEntityType type,
-                                                         std::unordered_set<StmtNum> stmts) {
-    StatementType mappedStmtType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[type];
+                                                         std::unordered_set<StmtNum> users) {
+    StatementType mappeduserType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[type];
 
     if (type == DesignEntityType::STMT) {
-        return stmts;
+        return users;
     }
 
     std::unordered_set<StmtNum> filteredSet{};
-    for (StmtNum currStmt : stmts) {
-        if (reader.getStatementByStmtNum(currStmt)->type == mappedStmtType) {
-            filteredSet.insert(currStmt);
+    for (StmtNum curruser : users) {
+        if (reader.getStatementByStmtNum(curruser)->type == mappeduserType) {
+            filteredSet.insert(curruser);
         }
     }
     return filteredSet;
 }
 
 bool Uses::isSimpleResult() const {
-    return !stmt.isSynonym() && !var.isSynonym();
+    return !user.isSynonym() && !var.isSynonym();
 }

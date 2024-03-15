@@ -8,7 +8,7 @@
 
 class Uses : public Relationship {
 private:
-    ClauseArgument& stmt;
+    ClauseArgument& user;
     ClauseArgument& var;
 
     /**
@@ -18,7 +18,7 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult statementsUseLiteral(PKBFacadeReader&);
+    ClauseResult evaluateUserSynonym(PKBFacadeReader&);
     ClauseResult allVariablesBeingUsed(PKBFacadeReader&);
     ClauseResult allStmtsThatUseSomeVar(PKBFacadeReader&);
     ClauseResult variablesUsedByStatement(PKBFacadeReader&);
