@@ -35,10 +35,18 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues varValues{};
 
     for (Variable var : reader.getVariables()) {
-        std::unordered_set<StmtNum> users = reader.getUsesStatementsByVariable(var);
-        for (StmtNum curruser : filterStatementsByType(reader, userSyn.getType(), users)) {
-            userValues.push_back(std::to_string(curruser));
-            varValues.push_back(var);
+        if (userSyn.getType() == DesignEntityType::PROCEDURE) {
+            std::unordered_set<Procedure> procs = reader.getUsesProceduresByVariable(var);
+            for (Procedure proc : procs) {
+                userValues.push_back(proc);
+                varValues.push_back(var);
+            }
+        } else {
+            std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(var);
+            for (StmtNum currStmt : filterStatementsByType(reader, userSyn.getType(), stmts)) {
+                userValues.push_back(std::to_string(currStmt));
+                varValues.push_back(var);
+            }
         }
     }
 
