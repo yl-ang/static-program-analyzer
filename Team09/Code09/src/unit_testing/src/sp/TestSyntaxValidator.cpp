@@ -522,6 +522,7 @@ TEST_CASE("Syntax Validator Tests") {
                                      Token(LESS_THAN, "<", 1),
                                      Token(INTEGER, "10", 1),
                                      Token(CLOSE_BRACKET, ")", 1),
+                                     Token(CLOSE_BRACKET, ")", 1),
 
                                      Token(OPEN_CURLY_BRACE, "{", 1),
 
