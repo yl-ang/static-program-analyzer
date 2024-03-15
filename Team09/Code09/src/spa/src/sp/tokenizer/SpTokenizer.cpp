@@ -7,6 +7,12 @@ std::vector<Token> SpTokenizer::tokenize(std::vector<std::string> input) {
     return tokens;
 }
 
+std::vector<Token> SpTokenizer::tokenizeWithoutValidation(std::vector<std::string> input) {
+    std::vector<BasicToken*> basicTokens = lexicalAnalyzer.preprocess(input);
+    std::vector<Token> tokens = assignTokens(basicTokens);
+    return tokens;
+}
+
 std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken*> input) {
     std::vector<Token> tokens;
     for (size_t i = 0; i < input.size(); i++) {
