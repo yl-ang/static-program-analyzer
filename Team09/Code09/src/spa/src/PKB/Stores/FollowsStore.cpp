@@ -35,8 +35,8 @@ void FollowsStore::computeTransitiveClosure() {
     }
 
     // Update the matrices with transitive closure using the utility class
-    TransitiveClosureUtility::computeTransitiveClosure(followerStarMap);
-    TransitiveClosureUtility::computeTransitiveClosure(followeeStarMap);
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&followerStarMap);
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&followeeStarMap);
 }
 
 std::optional<StmtNum> FollowsStore::getFollower(StmtNum s1) {
