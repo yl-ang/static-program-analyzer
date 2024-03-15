@@ -22,6 +22,28 @@ void equalVectorContents(QPSResult result, QPSResult expected) {
 }
 
 // PKB Items
+//    procedure main {
+//  1   num1 = 1;
+//  2   read num2
+//  3   if (num1 == num2) then {
+//  4     print num1;
+//      } else {
+//  5     num2 = num1 + 4;
+//      }
+//  6   call next;
+//    }
+//
+//    procedure next {
+//  7   while (num1 < num2) {
+//  8     num2 = num2 - 1;
+//  9     if (num2 == 2) then {
+// 10       print num2;
+//        } else {
+// 11       print "0";
+//        }
+//      }
+// 12   print num2;
+//    }
 const std::unordered_set<Stmt> stmts = {
     {StatementType::ASSIGN, 1}, {StatementType::READ, 2},   {StatementType::IF, 3},     {StatementType::PRINT, 4},
     {StatementType::ASSIGN, 5}, {StatementType::CALL, 6},   {StatementType::WHILE, 7},  {StatementType::ASSIGN, 8},
@@ -38,9 +60,13 @@ const std::unordered_set<std::pair<StmtNum, Variable>> stmtModifiesStoreEntries 
     {1, "num1"}, {2, "num2"}, {3, "num2"}, {5, "num2"}, {6, "num2"}, {8, "num2"}, {7, "num2"}};
 const std::unordered_set<std::pair<Procedure, Variable>> procModifiesStoreEntries = {
     {"main", "num1"}, {"main", "num2"}, {"next", "num2"}};
-const std::unordered_set<std::pair<StmtNum, Variable>> usesStoreEntries = {
-    {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"},  {7, "num1"},
-    {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
+
+const std::unordered_set<std::pair<StmtNum, Variable>> stmtUsesStoreEntries = {
+    {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"}, {6, "num1"},  {6, "num2"},
+    {7, "num1"}, {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
+const std::unordered_set<std::pair<Procedure, Variable>> procUsesStoreEntries = {
+    {"main", "num1"}, {"main", "num2"}, {"next", "num1"}, {"next", "num2"}};
+
 const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
     {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
 
@@ -57,29 +83,6 @@ const QPSResult allChildren = {"4", "5", "8", "9", "12", "10", "11"};
 PKBFacadeReader buildPKBNew(PKB pkb) {
     PKBFacadeWriter pfw{pkb};
 
-    //    procedure main {
-    //  1   num1 = 1;
-    //  2   read num2
-    //  3   if (num1 == num2) then {
-    //  4     print num1;
-    //      } else {
-    //  5     num2 = num1 + 4;
-    //      }
-    //  6   call next;
-    //    }
-    //
-    //    procedure next {
-    //  7   while (num1 < num2) {
-    //  8     num2 = num2 - 1;
-    //  9     if (num2 == 2) then {
-    // 10       print num2;
-    //        } else {
-    // 11       print "0";
-    //        }
-    //      }
-    // 12   print num2;
-    //    }
-
     pfw.setStmts(stmts);
     pfw.setVariables(vars);
     pfw.setConstants(consts);
@@ -88,7 +91,8 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setParentStore(parentStoreEntries);
     pfw.setStatementModifiesStore(stmtModifiesStoreEntries);
     pfw.setProcedureModifiesStore(procModifiesStoreEntries);
-    pfw.setStatementUsesStore(usesStoreEntries);
+    pfw.setStatementUsesStore(stmtUsesStoreEntries);
+    pfw.setProcedureUsesStore(procUsesStoreEntries);
     pfw.setPatternStore(patternStoreEntries);
 
     return PKBFacadeReader{pkb};
@@ -652,6 +656,7 @@ TEST_CASE("Select with 1 such-that clause") {
     // ai-gen start(gpt-4, 2, e)
     // prompt: https://platform.openai.com/playground/p/WnxaYJxypfRzOt9jqsY1qk0d?mode=chat
     SECTION("Uses") {
+        QPSResult allUsingStatements = {"3", "4", "5", "6", "7", "8", "9", "10", "12"};
         SECTION("No synonyms") {
             SECTION("Uses(Integer, VariableName)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, \"num1\")");
@@ -663,54 +668,74 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Uses(_, \"num2\")"));
             }
 
-            /* TODO(Ezekiel): Enable this test when we support procedure for uses
-            SECTION("Uses(ProcedureName, VariableName)") {
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Uses(Literal: [procedure name], VariableName)") {
                 QPSResult result = qps.processQueries("procedure p; Select p such that Uses(\"main\", \"num1\")");
-                QPSResult expected = {"main"};
+                QPSResult expected = {"main", "next"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
             */
 
             SECTION("Uses(Integer, Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, _)");
-                QPSResult expected = {allStmts};  // 3 uses variables
+                QPSResult expected = {allStmts};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
+
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Uses(Literal: [procedure name], Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(\"main\", _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
         }
 
         SECTION("1 synonym") {
             SECTION("Uses(Synonym, VariableName)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, \"num1\")");
-                QPSResult expected = {"3", "4", "5", "7"};
+                QPSResult expected = {"3", "4", "5", "6", "7"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("Uses(Synonym, Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, _)");
                 // Assuming all statements that either use num1 or num2
-                QPSResult expected = {"3", "4", "5", "7", "8", "9", "10", "12"};
+                QPSResult expected = {allUsingStatements};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Ezekiel): Enable this test when we support procedure for uses
+            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Uses(ProcedureName, Synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Uses(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
             */
+
+            SECTION("Uses(Stmt, Synonym)") {
+                QPSResult result = qps.processQueries("variable v; Select v such that Uses(3, v)");
+                QPSResult expected = {"num1", "num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
 
         SECTION("2 synonyms") {
-            SECTION("Uses(Synonym, Synonym) - Stmt Variable pairing") {
+            SECTION("Uses(Synonym, Synonym)") {
                 QPSResult result = qps.processQueries("stmt s; variable v; Select s such that Uses(s, v)");
-                QPSResult expected = {"3", "4", "5", "7", "8", "9", "10", "12"};
+                QPSResult expected = {allUsingStatements};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Uses(Assign, Synonym) - Assign Variable pairing") {
+            SECTION("Uses(Synonym: Assign, Synonym)") {
                 QPSResult result = qps.processQueries("assign a; variable v; Select a such that Uses(a, v)");
                 QPSResult expected = {"5", "8"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Uses(Synonym: Procedure, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; variable v; Select p such that Uses(p, v)");
+                QPSResult expected = {allProcs};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
         }
