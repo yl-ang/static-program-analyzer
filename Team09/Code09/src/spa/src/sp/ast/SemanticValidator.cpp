@@ -37,13 +37,6 @@ void SemanticValidator::visitNode(std::shared_ptr<ASTNode>&& node, SemanticValid
     }
     node->accept(visitor);
 
-    // TODO(ben): casting pointer for every node is slow and impractical.
-    // A better way would be to have an enum of the different names and then perform a check on the
-    // value of the node instead.
-    if (auto procedure = std::dynamic_pointer_cast<ProcedureNode>(node)) {
-        currentProcedure = procedure->name;
-    }
-
     for (auto child : node->getChildren()) {
         visitNode((std::shared_ptr<ASTNode>&&)child, visitor);
     }

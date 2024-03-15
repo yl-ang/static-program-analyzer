@@ -9,7 +9,9 @@ void SemanticValidatorVisitor::visitStmtLst(StatementListNode* node) {}
 void SemanticValidatorVisitor::visitExpression(ExpressionNode* node) {}
 void SemanticValidatorVisitor::visitFactor(FactorNode* node) {}
 void SemanticValidatorVisitor::visitTerm(TermNode* node) {}
-void SemanticValidatorVisitor::visitProcedure(ProcedureNode* node) {}
+void SemanticValidatorVisitor::visitProcedure(ProcedureNode* node) {
+    currentProcedure = node->name;
+}
 void SemanticValidatorVisitor::visitPrint(PrintNode* node) {}
 void SemanticValidatorVisitor::visitVariable(VariableNode* node) {}
 void SemanticValidatorVisitor::visitConstant(ConstantNode* node) {}
@@ -28,4 +30,5 @@ void SemanticValidatorVisitor::visitCall(CallNode* node) {
     if (calledProcedure == currentProcedure) {
         throw NoRecursiveCallsAllowedError(calledProcedure);
     }
+    (*procedureNamesPtr.get())[currentProcedure].push_back(calledProcedure);
 }
