@@ -21,12 +21,22 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             throw QPSSyntaxError();
         }
     }
-    // ALL entities declared
-    std::vector<Synonym> entities = PQLParser::parseQueryEntities(unparsedEntities);
     // Select entities in select clause
-    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(entities, unparsedClauses);
-    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(entities, unparsedClauses);
-    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(entities, unparsedClauses);
+    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(unparsedClauses);
+    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(unparsedClauses);
+
+    // ALL entities declared
+    SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
+    for (Synonym syn : selectEntities) {
+        syn.updateType(&entities);
+    }
+    for (SuchThatClause clause : suchThatClauses) {
+        clause.checkSemantic(&entities);
+    }
+    for (PatternClause clause : patternClauses) {
+        clause.checkSemantic(&entities);
+    }
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
@@ -44,8 +54,9 @@ std::string PQLParser::getQueryClauses(UnparsedQueries unparsedQuery) {
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
 // Input "call c1, c2; assign a1; stmt s1, s2" at this point
 // Output "std::vector<QueryEntity, QueryEntity, ... >"
-std::vector<Synonym> PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
-    std::vector<Synonym> queryEntities = {};
+SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEntities) {
+    SynonymStore synonymStore = {};
+
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
@@ -70,36 +81,35 @@ std::vector<Synonym> PQLParser::parseQueryEntities(std::vector<std::string> unpa
             if (!isSynonym(synonym)) {
                 throw QPSSyntaxError();
             }
-            Synonym currQueryDeclaration = Synonym(entityType, trim(synonym));
-            queryEntities.push_back(currQueryDeclaration);
+        }
+
+        // Semantic checks begins here
+        for (std::string synonym : synonyms) {
+            synonymStore.storeSynonym(entityType, synonym);
         }
     }
-    return queryEntities;
+    return synonymStore;
 }
 
-std::vector<Synonym> PQLParser::findSelectClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     std::smatch match;
     std::string selectEntity;
     std::vector<Synonym> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
-        for (const Synonym& entity : entities) {
-            if (entity.getValue() == selectEntity) {
-                result.push_back(entity);
-            }
-        }
+        result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
     }
 
     return result;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::string unparsedClauses) {
     std::vector<SuchThatClause> result = {};  // if there is none
     for (std::string clauseString : searchClause(QPSRegexes::SUCHTHAT_CLAUSE, unparsedClauses)) {
         // replaced only the below line for strategy pattern refactor
         // SuchThatClause st = toSTClause(entities, clauseString);
         // UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
-        UnparsedClause unparsedClause = UnparsedClause(entities, clauseString, std::make_unique<SuchThatStrategy>());
+        UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
         std::unique_ptr<QueryClause> qc = unparsedClause.execute();
         SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
         if (stPtr) {
@@ -112,12 +122,12 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<Synonym> 
     return result;
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+std::vector<PatternClause> PQLParser::findPatternClauses(std::string unparsedClauses) {
     std::vector<PatternClause> result = {};  // if there is none
     for (std::string clauseString : searchClause(QPSRegexes::PATTERN_CLAUSE, unparsedClauses)) {
         // replaced only the below line for strategy pattern refactor
         // PatternClause st = toPatternClause(entities, clauseString);
-        UnparsedClause unparsedClause = UnparsedClause(entities, clauseString, std::make_unique<PatternStrategy>());
+        UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
         std::unique_ptr<QueryClause> qc = unparsedClause.execute();
         PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
         if (ptPtr) {

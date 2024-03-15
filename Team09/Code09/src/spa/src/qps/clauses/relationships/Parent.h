@@ -26,4 +26,5 @@ public:
     Parent(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    void checkSemantic() override;
 };

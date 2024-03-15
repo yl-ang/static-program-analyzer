@@ -11,5 +11,5 @@ public:
     UsesValidator(const std::vector<std::string>& args);
     UsesValidator() = default;
     virtual void validateSyntax() override;
-    virtual void validateSemantic(SynonymStore* store) override;
+    virtual void validateSemantic(ValidatorSynonymStore* store) override;
 };

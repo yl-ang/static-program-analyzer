@@ -38,6 +38,11 @@ std::string Synonym::getClauseType() const {
     return "Synonym";
 }
 
+bool Synonym::updateType(SynonymStore* store) {
+    type = store->getDesignEntityType(name);
+    return true;
+}
+
 std::string Synonym::entityTypeToString(DesignEntityType type) {
     switch (type) {
     case DesignEntityType::STMT:

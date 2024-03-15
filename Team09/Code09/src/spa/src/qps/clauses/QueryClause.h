@@ -14,4 +14,5 @@ public:
     virtual bool isBooleanResult() const = 0;
     virtual bool containsSynonym(const Synonym&) const = 0;
     virtual std::vector<Synonym> getSynonyms() const = 0;
+    virtual void checkSemantic(SynonymStore* store) = 0;
 };

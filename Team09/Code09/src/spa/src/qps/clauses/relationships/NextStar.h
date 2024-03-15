@@ -26,4 +26,5 @@ public:
     NextStar(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    void checkSemantic() override;
 };

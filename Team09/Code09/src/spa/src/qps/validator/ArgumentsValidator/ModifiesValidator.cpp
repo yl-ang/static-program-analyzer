@@ -13,7 +13,7 @@ void ModifiesValidator::validateSyntax() {
     }
 }
 
-void ModifiesValidator::validateSemantic(SynonymStore* store) {
+void ModifiesValidator::validateSemantic(ValidatorSynonymStore* store) {
     std::string arg1 = args[0];
     std::string arg2 = args[1];
 

@@ -6,7 +6,7 @@
 #include "qps/ParserUtils.h"
 #include "qps/exceptions/QPSSemanticError.h"
 
-class SynonymStore {
+class ValidatorSynonymStore {
     std::unordered_map<std::string, std::string> storage = {};
 
 public:

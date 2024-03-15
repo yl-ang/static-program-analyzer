@@ -17,7 +17,7 @@ void PatternValidator::validateSyntax() {
     }
 }
 
-void PatternValidator::validateSemantic(SynonymStore* store) {
+void PatternValidator::validateSemantic(ValidatorSynonymStore* store) {
     if (!store->containsSynonym(syn, QPSConstants::ASSIGN)) {
         throw QPSSemanticError();
     }
