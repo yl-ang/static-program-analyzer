@@ -8,32 +8,31 @@ Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& 
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (hasNoClauses() && isSelectBoolean()) {
-        return {TRUE_STRING};
+        return {QPSConstants::TRUE_STRING};
     }
 
     if (!evaluateBooleanClauses(pkb)) {
-        return {};
+        return getEmptyResult();
     }
 
     const TableManager tableManager{buildSelectTable(pkb)};
     if (tableManager.isEmpty()) {
         // There are no results to select at all. Return empty result.
-        return {};
+        return getEmptyResult();
     }
 
     ArrangedClauses ac = arrangeClauses();
-    if (!evaluateAndJoinClauses(tableManager, ac.selectConnectedClauses, pkb)) {
-        // There were empty results after evaluating the select clauses. Return empty result.
-        return {};
+    if (evaluateAndJoinClauses(tableManager, ac.selectConnectedClauses, pkb); tableManager.isEmpty()) {
+        return getEmptyResult();
     }
 
-    if (!evaluateAndJoinClauses(tableManager, ac.nonSelectConnectedClauses, pkb)) {
-        // There were empty results after evaluating the non-select clauses. Return empty result.
-        return {};
+    if (evaluateAndJoinClauses(tableManager, ac.nonSelectConnectedClauses, pkb); tableManager.isEmpty()) {
+        return getEmptyResult();
     }
 
     if (isSelectBoolean()) {
-        return tableManager.isEmpty() ? std::vector{FALSE_STRING} : std::vector{TRUE_STRING};
+        return tableManager.isEmpty() ? std::vector{QPSConstants::FALSE_STRING}
+                                      : std::vector{QPSConstants::TRUE_STRING};
     }
 
     return tableManager.extractResults(selectEntities);
@@ -45,6 +44,10 @@ bool Query::hasNoClauses() const {
 
 bool Query::isSelectBoolean() const {
     return selectEntities.empty();
+}
+
+std::vector<std::string> Query::getEmptyResult() const {
+    return this->isSelectBoolean() ? std::vector{QPSConstants::FALSE_STRING} : std::vector<std::string>{};
 }
 
 bool Query::evaluateAndJoinClauses(const TableManager& tm,
@@ -60,8 +63,6 @@ bool Query::evaluateAndJoinClauses(const TableManager& tm,
             return false;
         }
     }
-    // If there are no clauses at all, we will return true. Table X emptyTable = emptyTable, but if there
-    // are no tables at all, the table does not undergo any operations and remains the same.
     return true;
 }
 

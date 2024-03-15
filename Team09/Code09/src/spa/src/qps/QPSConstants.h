@@ -39,4 +39,7 @@ struct QPSConstants {
     inline static const std::string BOOLEAN = "BOOLEAN";
     inline static const std::string SUCH_THAT = "such that";
     inline static const std::string PATTERN = "pattern";
+
+    inline static const std::string TRUE_STRING = "TRUE";
+    inline static const std::string FALSE_STRING = "FALSE";
 };
