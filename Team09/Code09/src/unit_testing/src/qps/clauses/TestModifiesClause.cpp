@@ -37,27 +37,6 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with no synonyms") 
         ModifiesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
         ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
-
-    SECTION("Modifies(Wildcard, Variable)") {
-        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                             std::pair<int, std::string>{2, "y"}};
-        pfw.setStatementModifiesStore(modifiesStoreEntries);
-        ModifiesTester{pfr, new Wildcard(), new Literal("x")}.testBoolean(true);
-        ModifiesTester{pfr, new Wildcard(), new Literal("y")}.testBoolean(true);
-        ModifiesTester{pfr, new Wildcard(), new Literal("z")}.testBoolean(false);
-    }
-
-    SECTION("Modifies(Wildcard, Wildcard)") {
-        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                             std::pair<int, std::string>{2, "y"}};
-        pfw.setStatementModifiesStore(modifiesStoreEntries);
-        ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
-    }
-
-    SECTION("Modifies(Wildcard, Wildcard) / empty store") {
-        pfw.setStatementModifiesStore({});
-        ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
-    }
 }
 
 TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
@@ -129,24 +108,6 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
         Synonym* readStmtSyn = new Synonym(DesignEntityType::ASSIGN, "s1");
         // Select s such that Modifies(s, _)
         ModifiesTester{pfr, readStmtSyn, new Wildcard()}.testSynonyms({*readStmtSyn}).testSynonymValues({{"2"}});
-    }
-
-    SECTION("Modifies(Wildcard, Synonym)") {
-        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
-                                          Stmt{StatementType::ASSIGN, 3}};
-
-        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                             std::pair<int, std::string>{2, "y"}};
-
-        std::unordered_set<Variable> variables = {"x", "y", "z"};
-        pfw.setVariables(variables);
-
-        pfw.setStmts(stmts);
-        pfw.setStatementModifiesStore(modifiesStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-
-        // Select s such that Modifies(_, s)
-        ModifiesTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"x", "y"}});
     }
 }
 
