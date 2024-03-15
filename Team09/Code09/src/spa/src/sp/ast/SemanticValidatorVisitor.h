@@ -8,6 +8,7 @@
 class SemanticValidatorVisitor : public AstVisitor {
 public:
     std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNamesPtr;
+    std::string currentProcedure;
     SemanticValidatorVisitor(
         std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNames) {
         this->procedureNamesPtr = procedureNames;

@@ -8,6 +8,7 @@
 class SemanticValidator {
 public:
     void validateSemantics(std::shared_ptr<ProgramNode> programNode);
+    std::string currentProcedure;
     std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNames;
 
 private:
