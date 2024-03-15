@@ -13,8 +13,9 @@ bool isInteger(const std::string& str) {
 }
 
 // Assumption that there does not exist a synonym with the name BOOLEAN
+// EDIT: There might be, so removed the second condition
 bool isSynonym(const std::string& str) {
-    return isIdent(str) && !isBoolean(str);
+    return isIdent(str); // && !isBoolean(str);
 }
 
 bool isWildcard(const std::string& str) {

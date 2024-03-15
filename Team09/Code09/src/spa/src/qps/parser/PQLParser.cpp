@@ -20,10 +20,10 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     // ALL entities declared
     std::vector<Synonym> entities = PQLParser::parseQueryEntities(unparsedEntities);
     // Select entities in select clause
-    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(entities, unparsedClauses);
+    std::vector<std::shared_ptr<ClauseArgument>> selectEntities = PQLParser::findSelectClauses(entities, unparsedClauses);
     std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(entities, unparsedClauses);
     std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(entities, unparsedClauses);
-    return Query{selectEntities, suchThatClauses, patternClauses};
+    // return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
 std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
@@ -68,10 +68,36 @@ std::vector<std::shared_ptr<ClauseArgument>> PQLParser::findSelectClauses(std::v
     std::vector<std::shared_ptr<ClauseArgument>> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
-        for (const Synonym& entity : entities) {
-            if (entity.getValue() == selectEntity) {
-                result.push_back(std::make_shared<Synonym>(entity));
+
+        // if BOOLEAN, unless it is declared as a variable, will not be captured.
+        // Returns empty vector to indicate.
+        if (isBoolean(selectEntity)) {
+            // Empty if condition
+
+        // if single return, will return a vector with a single ClauseArgument.
+        } else if (isSynonym(selectEntity)) {
+            for (const Synonym& entity : entities) {
+                if (entity.getValue() == selectEntity) {
+                    result.push_back(std::make_shared<Synonym>(entity));
+                }
             }
+
+        // if multiple return, will return a vector with multiple ClauseArgument.
+        } else if (isTuple(selectEntity)) {
+            if (std::regex_match(selectEntity, match, QPSRegexes::TUPLE)) {
+                std::vector<std::string> splitResult = splitByDelimiter(match[1], ",");
+                // Push back the split results into a vector
+                for (const auto& str : splitResult) {
+                    for (const Synonym& entity : entities) {
+                        if (entity.getValue() == str) {
+                            result.push_back(std::make_shared<Synonym>(entity));
+                        }
+                    }
+                }
+            }
+
+        } else {
+            throw Exception("Issues with Select Parsing");
         }
     }
 

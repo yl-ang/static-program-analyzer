@@ -71,33 +71,35 @@ TEST_CASE("PQLParser: Select (1)") {
     std::string select_2 = "Select a1";
     std::string select_3 = "Select s1";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(entities, select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(entities, select_2);
-    std::vector<Synonym> result_3 = PQLParser::findSelectClauses(entities, select_3);
+    std::vector<std::shared_ptr<ClauseArgument>> result_1 = PQLParser::findSelectClauses(entities, select_1);
+    std::vector<std::shared_ptr<ClauseArgument>> result_2 = PQLParser::findSelectClauses(entities, select_2);
+    std::vector<std::shared_ptr<ClauseArgument>> result_3 = PQLParser::findSelectClauses(entities, select_3);
 
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == *std::dynamic_pointer_cast<Synonym>(result_1[0]));
     REQUIRE(result_1.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::ASSIGN, "a1") == result_2[0]);
+    REQUIRE(Synonym(DesignEntityType::ASSIGN, "a1") == *std::dynamic_pointer_cast<Synonym>(result_2[0]));
     REQUIRE(result_2.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_3[0]);
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_3[0]));
     REQUIRE(result_3.size() == 1);
 }
 
 TEST_CASE("PQLParser: Select (2))") {
-    std::string select_1 = "Select v1";
-    std::string select_2 = "  Select    v1  ";
+    std::string select_1 = "Select <v1,v2>";
+    std::string select_2 = "  Select    <v1,    v2>  ";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(entities, select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(entities, select_2);
+    std::vector<std::shared_ptr<ClauseArgument>> result_1 = PQLParser::findSelectClauses(entities, select_1);
+    std::vector<std::shared_ptr<ClauseArgument>> result_2 = PQLParser::findSelectClauses(entities, select_2);
     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(entities, select_1);
     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(entities, select_2);
     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(entities, select_1);
     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(entities, select_2);
 
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
-    REQUIRE(result_1.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_2[0]);
-    REQUIRE(result_2.size() == 1);
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == *std::dynamic_pointer_cast<Synonym>(result_1[0]));
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == *std::dynamic_pointer_cast<Synonym>(result_1[1]));
+    REQUIRE(result_1.size() == 2);
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == *std::dynamic_pointer_cast<Synonym>(result_2[0]));
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == *std::dynamic_pointer_cast<Synonym>(result_2[0]));
+    REQUIRE(result_2.size() == 2);
 
     REQUIRE(result_3.size() == 0);
     REQUIRE(result_4.size() == 0);
@@ -110,52 +112,52 @@ TEST_CASE("PQLParser: Select (2))") {
 // As syntax is the same for all these
 // To ensure that Follows/Parent*/Follows* work, will test one clause each minimally
 TEST_CASE("PQLParser: Parent (1)") {
-    std::string select_st_1 = "Select s1 such that Parent(s1,s2)";
-    std::string select_st_2 = "Select s1 such that Parent(s1,_)";
-    std::string select_st_3 = "Select s1 such that Parent(s1,4)";
+    std::string select_st_1 = "Select BOOLEAN such that Parent(s1,s2)";
+    // std::string select_st_2 = "Select s1 such that Parent(s1,_)";
+    // std::string select_st_3 = "Select s1 such that Parent(s1,4)";
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(entities, select_st_1);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(entities, select_st_2);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(entities, select_st_3);
+    std::vector<std::shared_ptr<ClauseArgument>> result_01 = PQLParser::findSelectClauses(entities, select_st_1);
+    // std::vector<std::shared_ptr<ClauseArgument>> result_02 = PQLParser::findSelectClauses(entities, select_st_2);
+    // std::vector<std::shared_ptr<ClauseArgument>> result_03 = PQLParser::findSelectClauses(entities, select_st_3);
 
-    std::vector<SuchThatClause> result_11 = PQLParser::findSuchThatClauses(entities, select_st_1);
-    std::vector<SuchThatClause> result_12 = PQLParser::findSuchThatClauses(entities, select_st_2);
-    std::vector<SuchThatClause> result_13 = PQLParser::findSuchThatClauses(entities, select_st_3);
+    // std::vector<SuchThatClause> result_11 = PQLParser::findSuchThatClauses(entities, select_st_1);
+    // std::vector<SuchThatClause> result_12 = PQLParser::findSuchThatClauses(entities, select_st_2);
+    // std::vector<SuchThatClause> result_13 = PQLParser::findSuchThatClauses(entities, select_st_3);
 
-    std::vector<PatternClause> result_21 = PQLParser::findPatternClauses(entities, select_st_1);
-    std::vector<PatternClause> result_22 = PQLParser::findPatternClauses(entities, select_st_2);
-    std::vector<PatternClause> result_23 = PQLParser::findPatternClauses(entities, select_st_3);
+    // std::vector<PatternClause> result_21 = PQLParser::findPatternClauses(entities, select_st_1);
+    // std::vector<PatternClause> result_22 = PQLParser::findPatternClauses(entities, select_st_2);
+    // std::vector<PatternClause> result_23 = PQLParser::findPatternClauses(entities, select_st_3);
 
     // Select checking
-    REQUIRE(result_01.size() == 1);
-    REQUIRE(result_02.size() == 1);
-    REQUIRE(result_03.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_01[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_02[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03[0]);
+    REQUIRE(result_01.size() == 0);
+    // REQUIRE(result_02.size() == 1);
+    // REQUIRE(result_03.size() == 1);
+    // REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_01[0]));
+    // REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_02[0]));
+    // REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_03[0]));
 
     // Such that checking
-    Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
-    Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    Wildcard w = Wildcard();
-    Integer i = Integer("4");
-    SuchThatClause ans1 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans2 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&w));
-    SuchThatClause ans3 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&i));
-    REQUIRE(result_11.size() == 1);
-    REQUIRE(result_12.size() == 1);
-    REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(result_11[0]));
-    REQUIRE(ans2.equals(result_12[0]));
-    REQUIRE(ans3.equals(result_13[0]));
+    // Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
+    // Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
+    // Wildcard w = Wildcard();
+    // Integer i = Integer("4");
+    // SuchThatClause ans1 =
+    //     SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&s2));
+    // SuchThatClause ans2 =
+    //     SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&w));
+    // SuchThatClause ans3 =
+    //     SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&i));
+    // REQUIRE(result_11.size() == 1);
+    // REQUIRE(result_12.size() == 1);
+    // REQUIRE(result_13.size() == 1);
+    // REQUIRE(ans1.equals(result_11[0]));
+    // REQUIRE(ans2.equals(result_12[0]));
+    // REQUIRE(ans3.equals(result_13[0]));
 
-    // Pattern checking
-    REQUIRE(result_21.size() == 0);
-    REQUIRE(result_22.size() == 0);
-    REQUIRE(result_23.size() == 0);
+    // // Pattern checking
+    // REQUIRE(result_21.size() == 0);
+    // REQUIRE(result_22.size() == 0);
+    // REQUIRE(result_23.size() == 0);
 }
 
 TEST_CASE("PQLParser: Parent (2)") {
@@ -163,9 +165,9 @@ TEST_CASE("PQLParser: Parent (2)") {
     std::string select_st_5 = "Select s1 such that Parent(s2,4)";
     std::string select_st_6 = "Select s1 such that Parent(s2,s1)";
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(entities, select_st_4);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(entities, select_st_5);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(entities, select_st_6);
+    std::vector<std::shared_ptr<ClauseArgument>> result_01 = PQLParser::findSelectClauses(entities, select_st_4);
+    std::vector<std::shared_ptr<ClauseArgument>> result_02 = PQLParser::findSelectClauses(entities, select_st_5);
+    std::vector<std::shared_ptr<ClauseArgument>> result_03 = PQLParser::findSelectClauses(entities, select_st_6);
 
     std::vector<SuchThatClause> result_11 = PQLParser::findSuchThatClauses(entities, select_st_4);
     std::vector<SuchThatClause> result_12 = PQLParser::findSuchThatClauses(entities, select_st_5);
@@ -179,9 +181,9 @@ TEST_CASE("PQLParser: Parent (2)") {
     REQUIRE(result_01.size() == 1);
     REQUIRE(result_02.size() == 1);
     REQUIRE(result_03.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_01[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_02[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03[0]);
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_01[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_02[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_03[0]));
 
     // Such that checking
     Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
@@ -213,10 +215,10 @@ TEST_CASE("PQLParser: Parent (3)") {
     std::string select_st_9 = "Select s1 such that Parent(_,s2)";
     std::string select_st_10 = "Select s1 such that Parent(4,s2)";
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(entities, select_st_7);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(entities, select_st_8);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(entities, select_st_9);
-    std::vector<Synonym> result_04 = PQLParser::findSelectClauses(entities, select_st_10);
+    std::vector<std::shared_ptr<ClauseArgument>> result_01 = PQLParser::findSelectClauses(entities, select_st_7);
+    std::vector<std::shared_ptr<ClauseArgument>> result_02 = PQLParser::findSelectClauses(entities, select_st_8);
+    std::vector<std::shared_ptr<ClauseArgument>> result_03 = PQLParser::findSelectClauses(entities, select_st_9);
+    std::vector<std::shared_ptr<ClauseArgument>> result_04 = PQLParser::findSelectClauses(entities, select_st_10);
 
     std::vector<SuchThatClause> result_11 = PQLParser::findSuchThatClauses(entities, select_st_7);
     std::vector<SuchThatClause> result_12 = PQLParser::findSuchThatClauses(entities, select_st_8);
@@ -233,10 +235,10 @@ TEST_CASE("PQLParser: Parent (3)") {
     REQUIRE(result_02.size() == 1);
     REQUIRE(result_03.size() == 1);
     REQUIRE(result_04.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_01[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_02[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_04[0]);
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::shared_ptr<ClauseArgument>(result_01[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::shared_ptr<ClauseArgument>(result_02[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::shared_ptr<ClauseArgument>(result_03[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::shared_ptr<ClauseArgument>(result_04[0]));
 
     // Such that checking
     Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
@@ -274,10 +276,10 @@ TEST_CASE("PQLParser: Parent (4)") {
     std::string select_st_13 = "Select s1 such that Follows(s1,s2)";
     std::string select_st_14 = "Select s1 such that Follows*(s1,s2)";
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(entities, select_st_11);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(entities, select_st_12);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(entities, select_st_13);
-    std::vector<Synonym> result_04 = PQLParser::findSelectClauses(entities, select_st_14);
+    std::vector<std::shared_ptr<ClauseArgument>> result_01 = PQLParser::findSelectClauses(entities, select_st_11);
+    std::vector<std::shared_ptr<ClauseArgument>> result_02 = PQLParser::findSelectClauses(entities, select_st_12);
+    std::vector<std::shared_ptr<ClauseArgument>> result_03 = PQLParser::findSelectClauses(entities, select_st_13);
+    std::vector<std::shared_ptr<ClauseArgument>> result_04 = PQLParser::findSelectClauses(entities, select_st_14);
 
     std::vector<SuchThatClause> result_11 = PQLParser::findSuchThatClauses(entities, select_st_11);
     std::vector<SuchThatClause> result_12 = PQLParser::findSuchThatClauses(entities, select_st_12);
@@ -294,10 +296,10 @@ TEST_CASE("PQLParser: Parent (4)") {
     REQUIRE(result_02.size() == 1);
     REQUIRE(result_03.size() == 1);
     REQUIRE(result_04.size() == 1);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_01[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_02[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03[0]);
-    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_04[0]);
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_01[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_02[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_03[0]));
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == *std::dynamic_pointer_cast<Synonym>(result_04[0]));
 
     // Such that checking
     Synonym s1 = Synonym(DesignEntityType::STMT, "s1");

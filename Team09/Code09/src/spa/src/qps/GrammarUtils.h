@@ -5,6 +5,7 @@
 
 #include "ParserUtils.h"
 #include "QPSConstants.h"
+#include "QPSRegexes.h"
 
 bool isIdent(const std::string&);
 bool isName(const std::string&);
