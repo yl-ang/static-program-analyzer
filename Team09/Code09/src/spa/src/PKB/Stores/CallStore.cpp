@@ -5,6 +5,8 @@ void CallStore::setCallStore(const std::unordered_set<std::pair<Procedure, Proce
         Procedure caller = pair.first;
         Procedure callee = pair.second;
 
+        const auto map = callerToCalleeMap.find(caller);
+
         callerToCalleeMap[caller].insert(callee);
         calleeToCallerMap[callee].insert(caller);
     }
