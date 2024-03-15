@@ -4,7 +4,7 @@
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/SuchThatClause.h"
 
-TEST_CASE("SuchThatClause evaluate for Next relationship with no synonyms") {
+TEST_CASE("SuchThatClause evaluate for NextStar relationship with no synonyms") {
     PKB pkb{};
     PKBFacadeWriter pfw{pkb};
     PKBFacadeReader pfr{pkb};
@@ -46,7 +46,7 @@ TEST_CASE("SuchThatClause evaluate for Next relationship with no synonyms") {
     }
 }
 
-TEST_CASE("SuchThatClause evaluate for Next relationship with 1 synonym") {
+TEST_CASE("SuchThatClause evaluate for NextStar relationship with 1 synonym") {
     PKB pkb{};
     PKBFacadeWriter pfw{pkb};
     PKBFacadeReader pfr{pkb};
@@ -94,7 +94,7 @@ TEST_CASE("SuchThatClause evaluate for Next relationship with 1 synonym") {
     }
 }
 
-TEST_CASE("SuchThatClause evaluate for Next relationship with 2 synonyms") {
+TEST_CASE("SuchThatClause evaluate for NextStar relationship with 2 synonyms") {
     PKB pkb{};
     PKBFacadeWriter pfw{pkb};
     PKBFacadeReader pfr{pkb};
