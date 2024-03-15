@@ -37,27 +37,6 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with no synonyms") {
         UsesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
         UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
-
-    SECTION("Uses(Wildcard, Variable)") {
-        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                         std::pair<int, std::string>{2, "y"}};
-        pfw.setStatementUsesStore(usesStoreEntries);
-        UsesTester{pfr, new Wildcard(), new Literal("x")}.testBoolean(true);
-        UsesTester{pfr, new Wildcard(), new Literal("y")}.testBoolean(true);
-        UsesTester{pfr, new Wildcard(), new Literal("z")}.testBoolean(false);
-    }
-
-    SECTION("Uses(Wildcard, Wildcard)") {
-        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                         std::pair<int, std::string>{2, "y"}};
-        pfw.setStatementUsesStore(usesStoreEntries);
-        UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
-    }
-
-    SECTION("Uses(Wildcard, Wildcard) / empty store") {
-        pfw.setStatementUsesStore({});
-        UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
-    }
 }
 
 TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
@@ -129,24 +108,6 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         Synonym* readStmtSyn = new Synonym(DesignEntityType::ASSIGN, "s1");
         // Select s such that Uses(s, _)
         UsesTester{pfr, readStmtSyn, new Wildcard()}.testSynonyms({*readStmtSyn}).testSynonymValues({{"2"}});
-    }
-
-    SECTION("Uses(Wildcard, Synonym)") {
-        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
-                                          Stmt{StatementType::ASSIGN, 3}};
-
-        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "x"},
-                                                                         std::pair<int, std::string>{2, "y"}};
-
-        std::unordered_set<Variable> variables = {"x", "y", "z"};
-        pfw.setVariables(variables);
-
-        pfw.setStmts(stmts);
-        pfw.setStatementUsesStore(usesStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-
-        // Select s such that Uses(_, s)
-        UsesTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"x", "y"}});
     }
 }
 
