@@ -3,11 +3,11 @@
 Uses::Uses(ClauseArgument& user, ClauseArgument& var) : user(user), var(var) {}
 
 void Uses::checkSemantic() {
-    if (stmt.isWildcard()) {
+    if (this->stmt.isWildcard()) {
         throw QPSSemanticError();
     }
-    if (stmt.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(stmt);
+    if (this->stmt.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(this->stmt);
         if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
             throw QPSSemanticError();
         }
