@@ -30,6 +30,13 @@ bool isResultClause(const std::string&);
 bool isBoolean(const std::string&);
 bool isTuple(const std::string&);
 bool isElem(const std::string&);
+bool isAttrCond(const std::string&);
+bool isAttrCompare(const std::string&);
+bool isRef(const std::string&);
+bool isAttrRef(const std::string&);
+bool isAttrName(const std::string&);
+bool isNotRelation(const std::string&);
 
 bool containsSuchThatClause(const std::string&);
 bool containsPatternClause(const std::string&);
+bool containsWithClause(const std::string&);

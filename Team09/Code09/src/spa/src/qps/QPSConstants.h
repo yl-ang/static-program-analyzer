@@ -29,14 +29,29 @@ struct QPSConstants {
     inline static const std::string NEXT = "Next";
     inline static const std::string NEXT_STAR = "Next*";
     inline static const std::string NEXT_STAR_REGEX = "Next\\*";
+    inline static const std::string CALLS = "Calls";
+    inline static const std::string CALLS_STAR = "Calls*";
+    inline static const std::string CALLS_STAR_REGEX = "Calls\\*";
     inline static const std::string AFFECTS = "Affects";
 
-    inline static const std::string REL_REF_REGEX = FOLLOWS + '|' + FOLLOWS_STAR_REGEX + '|' + PARENT + '|' +
-                                                    PARENT_STAR_REGEX + '|' + USES + '|' + MODIFIES + '|' + NEXT + '|' +
-                                                    NEXT_STAR_REGEX;
+    inline static const std::string REL_REF_REGEX =
+        FOLLOWS + '|' + FOLLOWS_STAR_REGEX + '|' + PARENT + '|' + PARENT_STAR_REGEX + '|' + USES + '|' + MODIFIES +
+        '|' + NEXT + '|' + NEXT_STAR_REGEX + '|' + CALLS + '|' + CALLS_STAR_REGEX + '|' + AFFECTS;
 
     inline static const std::string SELECT = "Select";
     inline static const std::string BOOLEAN = "BOOLEAN";
     inline static const std::string SUCH_THAT = "such that";
     inline static const std::string PATTERN = "pattern";
+    inline static const std::string WITH = "with";
+
+    inline static const std::string AND = "and";
+    inline static const std::string NOT = "not";
+
+    inline static const std::string ATTR_PROC_NAME = "procName";
+    inline static const std::string ATTR_VAR_NAME = "varName";
+    inline static const std::string ATTR_VALUE = "value";
+    inline static const std::string ATTR_STMT_NO = "stmt#";
+
+    inline static const std::string ATTR_NAME =
+        ATTR_PROC_NAME + "|" + ATTR_VAR_NAME + "|" + ATTR_VALUE + "|" + ATTR_STMT_NO;
 };
