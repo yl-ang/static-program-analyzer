@@ -13,13 +13,13 @@ ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
 
     if (var.isSynonym()) {
         // Integer, Synonym
-        if (user.isInteger() && var.isSynonym()) {
+        if (user.isInteger()) {
             return variablesUsedByStatement(reader);
         }
 
         // Wildcard, Synonym
-        if (user.isWildcard() && var.isSynonym()) {
-            return allVariablesBeingUsed(reader);
+        if (user.isLiteral()) {
+            return variablesUsedByProcedure(reader);
         }
     }
 
@@ -45,19 +45,6 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
     std::vector<Synonym> headers = {userSyn, varSyn};
     std::vector<SynonymValues> values = {userValues, varValues};
     return {headers, values};
-}
-
-ClauseResult Uses::allVariablesBeingUsed(PKBFacadeReader& reader) {
-    Synonym varSyn = static_cast<Synonym&>(var);
-
-    SynonymValues values{};
-    for (Variable currVar : reader.getVariables()) {
-        if (!reader.getUsesStatementsByVariable(currVar).empty()) {
-            values.push_back(currVar);
-        }
-    }
-
-    return {varSyn, values};
 }
 
 ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
@@ -93,12 +80,21 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
     return {userSyn, values};
 }
 
-ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
-    Integer userInt = static_cast<Integer&>(user);
+ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getUsesVariablesByStatement(std::stoi(userInt.getValue()))) {
+    for (Variable var : reader.getUsesVariablesByProcedure(user.getValue())) {
+        values.push_back(var);
+    }
+    return {varSyn, values};
+}
+
+ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
+    Synonym varSyn = static_cast<Synonym&>(var);
+
+    SynonymValues values{};
+    for (Variable currVar : reader.getUsesVariablesByStatement(std::stoi(user.getValue()))) {
         values.push_back(currVar);
     }
 
@@ -107,7 +103,7 @@ ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
 
 std::unordered_set<StmtNum> Uses::filterStatementsByType(PKBFacadeReader& reader, DesignEntityType type,
                                                          std::unordered_set<StmtNum> users) {
-    StatementType mappeduserType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[type];
+    StatementType mappedStmtType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[type];
 
     if (type == DesignEntityType::STMT) {
         return users;
@@ -115,7 +111,7 @@ std::unordered_set<StmtNum> Uses::filterStatementsByType(PKBFacadeReader& reader
 
     std::unordered_set<StmtNum> filteredSet{};
     for (StmtNum curruser : users) {
-        if (reader.getStatementByStmtNum(curruser)->type == mappeduserType) {
+        if (reader.getStatementByStmtNum(curruser)->type == mappedStmtType) {
             filteredSet.insert(curruser);
         }
     }

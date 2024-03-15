@@ -19,8 +19,7 @@ private:
     bool isSimpleResult() const;
 
     ClauseResult evaluateUserSynonym(PKBFacadeReader&);
-    ClauseResult allVariablesBeingUsed(PKBFacadeReader&);
-    ClauseResult allStmtsThatUseSomeVar(PKBFacadeReader&);
+    ClauseResult variablesUsedByProcedure(PKBFacadeReader&);
     ClauseResult variablesUsedByStatement(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
     std::unordered_set<StmtNum> filterStatementsByType(PKBFacadeReader&, DesignEntityType, std::unordered_set<StmtNum>);
