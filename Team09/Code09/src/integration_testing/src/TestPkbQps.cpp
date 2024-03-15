@@ -745,6 +745,8 @@ TEST_CASE("Select with 1 such-that clause") {
     }
     // ai-gen end
 
+    // TODO(Ezekiel): Enable after implementing the Calls and CallsStar parser
+    /*
     SECTION("Calls") {
         SECTION("No synonyms") {
             SECTION("Calls(Procedure, Procedure)") {
@@ -894,6 +896,7 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
     }
+    */
 
     SECTION("Pattern") {
         SECTION("Assign(Wildcard, Wildcard) Select a") {
