@@ -2,155 +2,86 @@
 #include "PKB/PKBClient/PKBFacadeWriter.h"
 #include "catch.hpp"
 #include "pkb/PKB.h"
-#include "qps/clauseArguments/Wildcard.h"
-#include "qps/clauses/SuchThatClause.h"
+#include "qps/QPS.h"
 
-class SuchThatTester {
-private:  // NOLINT
-    PKBFacadeReader pkb;
-    ClauseArgument* firstArg;
-    ClauseArgument* secondArg;
-    ClauseResult result;
+namespace {
+// TYPE DEFS
+using QPSResult = std::vector<std::string>;
 
-public:  // NOLINT
-    SuchThatTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg, RelationshipType rsType)
-        : pkb{pkb},
-          firstArg{firstArg},
-          secondArg{secondArg},
-          result{SuchThatClause(rsType, firstArg, secondArg).evaluate(pkb)} {}
+// CUSTOM TESTING MACROS
+#define REQUIRE_THROW_SEMANTIC_ERROR(expr) REQUIRE((expr)[0] == "SemanticError")
+#define REQUIRE_THROW_SYNTAX_ERROR(expr) REQUIRE((expr)[0] == "SyntaxError")
+#define REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected) equalVectorContents(result, expected)
+#define REQUIRE_EMPTY(result) REQUIRE((result).empty())
 
-    void testBoolean(bool expected) {
-        REQUIRE(result.isBoolean());
-        REQUIRE(result.getBoolean() == expected);
-    }
+// HELPER FUNCTIONS
+void equalVectorContents(QPSResult result, QPSResult expected) {
+    std::sort(result.begin(), result.end());
+    std::sort(expected.begin(), expected.end());
+    REQUIRE(result == expected);
+}
 
-    SuchThatTester testSynonyms(std::vector<Synonym> expectedSynonyms) {
-        REQUIRE(!result.isBoolean());
-        REQUIRE(result.getSynonyms() == expectedSynonyms);
-        return *this;
-    }
+// PKB Items
+//    procedure main {
+//  1   num1 = 1;
+//  2   read num2
+//  3   if (num1 == num2) then {
+//  4     print num1;
+//      } else {
+//  5     num2 = num1 + 4;
+//      }
+//  6   call next;
+//    }
+//
+//    procedure next {
+//  7   while (num1 < num2) {
+//  8     num2 = num2 - 1;
+//  9     if (num2 == 2) then {
+// 10       print num2;
+//        } else {
+// 11       print "0";
+//        }
+//      }
+// 12   print num2;
+//    }
+const std::unordered_set<Stmt> stmts = {
+    {StatementType::ASSIGN, 1}, {StatementType::READ, 2},   {StatementType::IF, 3},     {StatementType::PRINT, 4},
+    {StatementType::ASSIGN, 5}, {StatementType::CALL, 6},   {StatementType::WHILE, 7},  {StatementType::ASSIGN, 8},
+    {StatementType::IF, 9},     {StatementType::PRINT, 10}, {StatementType::PRINT, 11}, {StatementType::PRINT, 12}};
 
-    SuchThatTester testSynonymValues(std::vector<SynonymValues> expectedValues) {
-        REQUIRE(!result.isBoolean());
+const std::unordered_set<Variable> vars = {"num1", "num2", "num3"};
+const std::unordered_set<Constant> consts = {"4", "1", "0"};
+const std::unordered_set<Procedure> procs = {"main", "next"};
+const std::unordered_set<std::pair<int, int>> followsStoreEntries = {{1, 2}, {2, 3}, {3, 6}, {7, 12}, {8, 9}};
+const std::unordered_set<std::pair<int, int>> parentStoreEntries = {{3, 4},  {3, 5},  {7, 8}, {7, 9},
+                                                                    {7, 12}, {9, 10}, {9, 11}};
 
-        auto allSynonymValues = result.getAllSynonymValues();
+const std::unordered_set<std::pair<StmtNum, Variable>> stmtModifiesStoreEntries = {
+    {1, "num1"}, {2, "num2"}, {3, "num2"}, {5, "num2"}, {6, "num2"}, {8, "num2"}, {7, "num2"}};
+const std::unordered_set<std::pair<Procedure, Variable>> procModifiesStoreEntries = {
+    {"main", "num1"}, {"main", "num2"}, {"next", "num2"}};
 
-        REQUIRE(allSynonymValues.size() == expectedValues.size());
+const std::unordered_set<std::pair<StmtNum, Variable>> stmtUsesStoreEntries = {
+    {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"}, {6, "num1"},  {6, "num2"},
+    {7, "num1"}, {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
+const std::unordered_set<std::pair<Procedure, Variable>> procUsesStoreEntries = {
+    {"main", "num1"}, {"main", "num2"}, {"next", "num1"}, {"next", "num2"}};
 
-        if (allSynonymValues.empty()) {
-            return *this;
-        }
+const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
+    {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
 
-        REQUIRE(allSynonymValues[0].size() == expectedValues[0].size());
+// Common results
+const QPSResult allStmts = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+const QPSResult allVars = {"num1", "num2", "num3"};
+const QPSResult allConsts = {"4", "1", "0"};
+const QPSResult allProcs = {"main", "next"};
+const QPSResult allFollowers = {"2", "3", "6", "12", "9"};
+const QPSResult allFollowees = {"1", "2", "3", "7", "8"};
+const QPSResult allParents = {"3", "7", "9"};
+const QPSResult allChildren = {"4", "5", "8", "9", "12", "10", "11"};
 
-        std::unordered_set<std::string> entries{};
-        for (int i = 0; i < allSynonymValues[0].size(); i++) {
-            std::string entry = "";
-            for (int j = 0; j < allSynonymValues.size(); j++) {
-                entry += allSynonymValues[j][i] + ",";
-            }
-            auto it = entries.find(entry);
-            if (it == entries.end()) {
-                entries.insert(entry);
-            } else {
-                FAIL("Duplicate entry found in synonym values: " + entry);
-            }
-        }
-
-        for (int i = 0; i < expectedValues[0].size(); i++) {
-            std::string entry = "";
-            for (int j = 0; j < expectedValues.size(); j++) {
-                entry += expectedValues[j][i] + ",";
-            }
-            auto it = entries.find(entry);
-            if (it == entries.end()) {
-                FAIL("Missing entry in synonym values: " + entry);
-            }
-        }
-
-        return *this;
-    }
-};
-
-class FollowsTester : public SuchThatTester {
-public:  // NOLINT
-    FollowsTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS) {}
-};
-
-class FollowsStarTester : public SuchThatTester {
-public:  // NOLINT
-    FollowsStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS_STAR) {}
-};
-
-class ParentTester : public SuchThatTester {
-public:  // NOLINT
-    ParentTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT) {}
-};
-
-class ParentStarTester : public SuchThatTester {
-public:  // NOLINT
-    ParentStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT_STAR) {}
-};
-
-class UsesTester : public SuchThatTester {
-public:  // NOLINT
-    UsesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::USES) {}
-};
-
-class ModifiesTester : public SuchThatTester {
-public:  // NOLINT
-    ModifiesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::MODIFIES) {}
-};
-
-PKBFacadeReader buildPKB(PKB pkb) {
+PKBFacadeReader buildPKBNew(PKB pkb) {
     PKBFacadeWriter pfw{pkb};
-
-    //    procedure main {
-    //  1   num1 = 1;
-    //  2   read num2
-    //  3   if (num1 == num2) then {
-    //  4     print num1;
-    //      } else {
-    //  5     num2 = num1 + 4;
-    //      }
-    //  6   call next;
-    //    }
-    //
-    //    procedure next {
-    //  7   while (num1 < num2) {
-    //  8     num2 = num2 - 1;
-    //  9     if (num2 == 2) then {
-    // 10       print num2;
-    //        } else {
-    // 11       print "0";
-    //        }
-    //      }
-    // 12   print num2;
-    //    }
-
-    const std::unordered_set<Stmt> stmts = {
-        {StatementType::ASSIGN, 1}, {StatementType::READ, 2},   {StatementType::IF, 3},     {StatementType::PRINT, 4},
-        {StatementType::ASSIGN, 5}, {StatementType::CALL, 6},   {StatementType::WHILE, 7},  {StatementType::ASSIGN, 8},
-        {StatementType::IF, 9},     {StatementType::PRINT, 10}, {StatementType::PRINT, 11}, {StatementType::PRINT, 12}};
-
-    const std::unordered_set<Variable> vars = {"num1", "num2", "num3"};
-    const std::unordered_set<Constant> consts = {"4", "1", "0"};
-    const std::unordered_set<Procedure> procs = {"main", "next"};
-    const std::unordered_set<std::pair<int, int>> followsStoreEntries = {{1, 2}, {2, 3}, {3, 6}, {7, 12}, {8, 9}};
-    const std::unordered_set<std::pair<int, int>> parentStoreEntries = {{3, 4},  {3, 5},  {7, 8}, {7, 9},
-                                                                        {7, 12}, {9, 10}, {9, 11}};
-
-    const std::unordered_set<std::pair<StmtNum, Variable>> modifiesStoreEntries = {
-        {1, "num1"}, {2, "num2"}, {3, "num2"}, {5, "num2"}, {8, "num2"}, {7, "num2"}};
-    const std::unordered_set<std::pair<StmtNum, Variable>> usesStoreEntries = {
-        {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"},  {7, "num1"},
-        {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
 
     pfw.setStmts(stmts);
     pfw.setVariables(vars);
@@ -158,568 +89,771 @@ PKBFacadeReader buildPKB(PKB pkb) {
     pfw.setProcedures(procs);
     pfw.setFollowsStore(followsStoreEntries);
     pfw.setParentStore(parentStoreEntries);
-    pfw.setStatementModifiesStore(modifiesStoreEntries);
-    pfw.setStatementUsesStore(usesStoreEntries);
+    pfw.setStatementModifiesStore(stmtModifiesStoreEntries);
+    pfw.setProcedureModifiesStore(procModifiesStoreEntries);
+    pfw.setStatementUsesStore(stmtUsesStoreEntries);
+    pfw.setProcedureUsesStore(procUsesStoreEntries);
+    pfw.setPatternStore(patternStoreEntries);
+
     return PKBFacadeReader{pkb};
 }
+}  // namespace
 
-TEST_CASE("SuchThatClause evaluate for Uses relationship") {
+TEST_CASE("Only select") {
     PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
 
-    SECTION("No synonyms") {
-        SECTION("Uses(Integer, Variable)") {
-            UsesTester{pfr, new Integer("3"), new Literal("num1")}.testBoolean(true);
-            UsesTester{pfr, new Integer("1"), new Literal("num1")}.testBoolean(false);
-            UsesTester{pfr, new Integer("3"), new Literal("y")}.testBoolean(false);
+    SECTION("Select statement") {
+        QPSResult result = qps.processQueries("stmt s; Select s");
+        QPSResult expected = {allStmts};
+        REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+    }
+
+    SECTION("Select variable") {
+        QPSResult result = qps.processQueries("variable v; Select v");
+        QPSResult expected = {allVars};
+        REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+    }
+
+    SECTION("Select constants") {
+        QPSResult result = qps.processQueries("constant c; Select c");
+        QPSResult expected = {allConsts};
+        REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+    }
+
+    SECTION("Select procedures") {
+        QPSResult result = qps.processQueries("procedure p; Select p");
+        QPSResult expected = {allProcs};
+        REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+    }
+
+    SECTION("Semantic Errors") {
+        SECTION("Missing declaration") {
+            REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("Select a"));
         }
 
-        SECTION("Uses(Integer, Wildcard)") {
-            UsesTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(true);
-            UsesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-            UsesTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
-        }
-
-        SECTION("Uses(Wildcard, Variable)") {
-            UsesTester{pfr, new Wildcard(), new Literal("num1")}.testBoolean(true);
-            UsesTester{pfr, new Wildcard(), new Literal("num2")}.testBoolean(true);
-            UsesTester{pfr, new Wildcard(), new Literal("num3")}.testBoolean(false);
-        }
-
-        SECTION("Uses(Wildcard, Wildcard)") {
-            UsesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+        SECTION("Incorrect declaration") {
+            REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s1; Select a"));
         }
     }
 
-    SECTION("1 synonym") {
-        SECTION("Uses(Synonym, Integer)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            UsesTester{pfr, stmtSyn, new Literal("num1")}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"3", "4", "5", "7"}});
-            UsesTester{pfr, stmtSyn, new Literal("z")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* readStmtSyn = new Synonym(DesignEntityType::PRINT, "s1");
-            UsesTester{pfr, readStmtSyn, new Literal("num1")}.testSynonyms({*readStmtSyn}).testSynonymValues({{"4"}});
-            UsesTester{pfr, readStmtSyn, new Literal("y")}.testSynonyms({*readStmtSyn}).testSynonymValues({{}});
+    SECTION("Syntax Errors") {
+        SECTION("Missing semicolon") {
+            REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("stmt s Select s"));
         }
 
-        SECTION("Uses(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-
-            UsesTester{pfr, new Integer("7"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"num1", "num2"}});
-            UsesTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        SECTION("Missing semicolon") {
+            REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("stmt s Select s; stmt s2"));
         }
-
-        SECTION("Uses(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            UsesTester{pfr, stmtSyn, new Wildcard()}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"3", "4", "5", "7", "8", "9", "10", "12"}});
-
-            Synonym* readStmtSyn = new Synonym(DesignEntityType::ASSIGN, "s1");
-            UsesTester{pfr, readStmtSyn, new Wildcard()}.testSynonyms({*readStmtSyn}).testSynonymValues({{"5", "8"}});
-        }
-
-        SECTION("Uses(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-
-            UsesTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"num1", "num2"}});
-        }
-    }
-
-    SECTION("2 synonyms") {
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* varSyn = new Synonym(DesignEntityType::VARIABLE, "v");
-
-        UsesTester{pfr, stmtSyn, varSyn}
-            .testSynonyms({*stmtSyn, *varSyn})
-            .testSynonymValues({{"3", "3", "4", "5", "7", "7", "8", "9", "10", "12"},
-                                {"num1", "num2", "num1", "num1", "num1", "num2", "num2", "num2", "num2", "num2"}});
-
-        Synonym* readStmtSyn = new Synonym(DesignEntityType::PRINT, "s2");
-        UsesTester{pfr, readStmtSyn, varSyn}
-            .testSynonyms({*readStmtSyn, *varSyn})
-            .testSynonymValues({{"4", "10", "12"}, {"num1", "num2", "num2"}});
     }
 }
 
-TEST_CASE("Parent* relationship with no synonyms") {
+TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
 
-    SECTION("No synonyms") {
-        SECTION("ParentT(Integer, Integer)") {
-            ParentStarTester{pfr, new Integer("7"), new Integer("12")}.testBoolean(true);
-            ParentStarTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
-            ParentStarTester{pfr, new Integer("50"), new Integer("51")}.testBoolean(false);
+    SECTION("Follows") {
+        SECTION("No synonyms") {
+            SECTION("Follows(Integer, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(1, 2)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(1, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Integer, Wildcard) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(12, _)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("Follows(Wildcard, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(_, 2)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Wildcard, Integer) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(_, 1)");
+                REQUIRE_EMPTY(result);
+            }
         }
 
-        SECTION("ParentT(Integer, Wildcard)") {
-            ParentStarTester{pfr, new Integer("7"), new Wildcard()}.testBoolean(true);
-            ParentStarTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
-            ParentStarTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
+        SECTION("1 synonym") {
+            SECTION("Follows(Integer, synonym") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(1, s)");
+                QPSResult expected = {"2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Integer, Synonym: READ)") {
+                QPSResult result = qps.processQueries("read r; Select r such that Follows(1, r)");
+                QPSResult expected = {"2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Integer, Synonym: other types)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Follows(1, a)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("Follows(Synonym, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(s, 12)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Synonym: WHILE, Integer)") {
+                QPSResult result = qps.processQueries("while w; Select w such that Follows(w, 12)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Synonym: OTHERS, Integer)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Follows(a, 12)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("Follows(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(s, _)");
+                QPSResult expected = {allFollowees};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Follows(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows(_, s)");
+                QPSResult expected = {allFollowers};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
 
-        SECTION("ParentT(Wildcard, Integer)") {
-            ParentStarTester{pfr, new Wildcard(), new Integer("12")}.testBoolean(true);
-            ParentStarTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(false);
-            ParentStarTester{pfr, new Wildcard(), new Integer("50")}.testBoolean(false);
-        }
+        SECTION("2 Synonyms") {
+            SECTION("Follows(StmtSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("stmt s1, s2; Select s1 such that Follows(s1, s2)");
+                QPSResult expected = {allFollowees};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        SECTION("ParentT(Wildcard, Wildcard)") {
-            ParentStarTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
-        }
-    }
+            SECTION("Follows(WhileSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("while w; stmt s; Select w such that Follows(w, s)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-    SECTION("1 synonym") {
-        SECTION("ParentT(Synonym, Integer)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
-            ParentStarTester{pfr, stmtSyn, new Integer("10")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7", "9"}});
-            ParentStarTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            ParentStarTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
-            ParentStarTester{pfr, whileSyn, new Integer("10")}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
-
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            ParentStarTester{pfr, assignSyn, new Integer("10")}.testSynonyms({*assignSyn}).testSynonymValues({{}});
-        }
-
-        SECTION("ParentT(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ParentStarTester{pfr, new Integer("7"), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"8", "9", "10", "11", "12"}});
-            ParentStarTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            ParentStarTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            ParentStarTester{pfr, new Integer("7"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{"8"}});
-        }
-
-        SECTION("ParentT(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
-            ParentStarTester{pfr, stmtSyn, new Wildcard()}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"3", "7", "9"}});
-
-            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
-            ParentStarTester{pfr, whileSyn, new Wildcard()}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
-        }
-
-        SECTION("ParentT(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-
-            ParentStarTester{pfr, new Wildcard(), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"4", "5", "8", "9", "12", "10", "11"}});
-
-            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
-            ParentStarTester{pfr, new Wildcard(), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"9"}});
-        }
-    }
-
-    SECTION("2 Synonyms") {
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
-
-        ParentStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
-
-        ParentStarTester{pfr, stmtSyn1, stmtSyn2}
-            .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues(
-                {{"3", "3", "7", "7", "7", "7", "7", "9", "9"}, {"4", "5", "8", "9", "12", "10", "11", "10", "11"}});
-
-        Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
-        ParentStarTester{pfr, whileSyn, stmtSyn2}
-            .testSynonyms({*whileSyn, *stmtSyn2})
-            .testSynonymValues({{"7", "7", "7", "7", "7"}, {"8", "9", "12", "10", "11"}});
-
-        Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-        ParentStarTester{pfr, stmtSyn1, assignSyn}
-            .testSynonyms({*stmtSyn1, *assignSyn})
-            .testSynonymValues({{"3", "7"}, {"5", "8"}});
-    }
-}
-
-TEST_CASE("SuchThatClause evaluate for parent relationship") {
-    PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
-
-    SECTION("No synonyms") {
-        SECTION("Parent(Integer, Integer)") {
-            ParentTester{pfr, new Integer("7"), new Integer("9")}.testBoolean(true);
-            ParentTester{pfr, new Integer("7"), new Integer("10")}.testBoolean(false);
-            ParentTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-            ParentTester{pfr, new Integer("10"), new Integer("11")}.testBoolean(false);
-        }
-
-        SECTION("Parent(Integer, Wildcard)") {
-            ParentTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(true);
-            ParentTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-            ParentTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
-        }
-
-        SECTION("Parent(Wildcard, Integer)") {
-            ParentTester{pfr, new Wildcard(), new Integer("4")}.testBoolean(true);
-            ParentTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
-            ParentTester{pfr, new Wildcard(), new Integer("50")}.testBoolean(false);
-        }
-
-        SECTION("Parent(Wildcard, Wildcard)") {
-            ParentTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+            SECTION("Follows(StmtSyn, IfSyn") {
+                QPSResult result = qps.processQueries("stmt s; if ifs; Select ifs such that Follows(s, ifs)");
+                QPSResult expected = {"3", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
     }
 
-    SECTION("1 Synonym") {
-        SECTION("Parent(Synonym, Integer)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ParentTester{pfr, stmtSyn, new Integer("4")}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
-            ParentTester{pfr, stmtSyn, new Integer("8")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7"}});
-            ParentTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            ParentTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+    SECTION("FollowsStar") {
+        SECTION("No synonyms") {
+            SECTION("FollowsStar(Integer, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(1, 2)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
-            ParentTester{pfr, ifSyn, new Integer("4")}.testSynonyms({*ifSyn}).testSynonymValues({{"3"}});
-            ParentTester{pfr, ifSyn, new Integer("8")}.testSynonyms({*ifSyn}).testSynonymValues({{}});
+            SECTION("FollowsStar(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(1, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("FollowsStar(Integer, Wildcard) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(12, _)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("FollowsStar(Wildcard, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(_, 2)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("FollowsStar(Wildcard, Integer) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(_, 1)");
+                REQUIRE_EMPTY(result);
+            }
         }
 
-        SECTION("Parent(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        SECTION("1 synonym") {
+            SECTION("FollowsStar(Integer, synonym") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(1, s)");
+                QPSResult expected = {"2", "3", "6"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            ParentTester{pfr, new Integer("7"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"8", "9", "12"}});
-            ParentTester{pfr, new Integer("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            ParentTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+            SECTION("FollowsStar(Integer, Synonym: READ)") {
+                QPSResult result = qps.processQueries("read r; Select r such that Follows*(1, r)");
+                QPSResult expected = {"2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            ParentTester{pfr, new Integer("7"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{"8"}});
-            ParentTester{pfr, new Integer("9"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
+            SECTION("FollowsStar(Integer, Synonym: other types)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Follows*(1, a)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("FollowsStar(Synonym, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(s, 12)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("FollowsStar(Synonym: WHILE, Integer)") {
+                QPSResult result = qps.processQueries("while w; Select w such that Follows*(w, 12)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("FollowsStar(Synonym: OTHERS, Integer)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Follows*(a, 12)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("FollowsStar(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(s, _)");
+                QPSResult expected = {allFollowees};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("FollowsStar(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(_, s)");
+                QPSResult expected = {allFollowers};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
 
-        SECTION("Parent(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ParentTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"3", "7", "9"}});
+        SECTION("2 synonyms") {
+            SECTION("FollowsStar(StmtSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("stmt s1, s2; Select s1 such that Follows*(s1, s2)");
+                QPSResult expected = {allFollowees};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
-            ParentTester{pfr, whileSyn, new Wildcard()}.testSynonyms({*whileSyn}).testSynonymValues({{"7"}});
-        }
+            SECTION("FollowsStar(WhileSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("while w; stmt s; Select w such that Follows*(w, s)");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        SECTION("Parent(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ParentTester{pfr, new Wildcard(), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"4", "5", "8", "9", "12", "10", "11"}});
-
-            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
-            ParentTester{pfr, new Wildcard(), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"9"}});
-        }
-    }
-
-    SECTION("2 Synonyms") {
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
-
-        ParentTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
-
-        ParentTester{pfr, stmtSyn1, stmtSyn2}
-            .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues({{"3", "3", "7", "7", "7", "9", "9"}, {"4", "5", "8", "9", "12", "10", "11"}});
-
-        Synonym* whileSyn = new Synonym(DesignEntityType::WHILE, "w");
-        ParentTester{pfr, whileSyn, stmtSyn2}
-            .testSynonyms({*whileSyn, *stmtSyn2})
-            .testSynonymValues({{"7", "7", "7"}, {"8", "9", "12"}});
-
-        Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-        ParentTester{pfr, stmtSyn1, assignSyn}
-            .testSynonyms({*stmtSyn1, *assignSyn})
-            .testSynonymValues({{"3", "7"}, {"5", "8"}});
-    }
-}
-
-TEST_CASE("SuchThatClause evaluate for Modifies relationship") {
-    PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
-
-    SECTION("No synonyms") {
-        SECTION("Modifies(Integer, Variable)") {
-            ModifiesTester{pfr, new Integer("1"), new Literal("num1")}.testBoolean(true);
-            ModifiesTester{pfr, new Integer("2"), new Literal("num1")}.testBoolean(false);
-            ModifiesTester{pfr, new Integer("1"), new Literal("y")}.testBoolean(false);
-        }
-
-        SECTION("Modifies(Integer, Wildcard)") {
-            ModifiesTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-            ModifiesTester{pfr, new Integer("4"), new Wildcard()}.testBoolean(false);
-            ModifiesTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
-        }
-
-        SECTION("Modifies(Wildcard, Variable)") {
-            ModifiesTester{pfr, new Wildcard(), new Literal("num1")}.testBoolean(true);
-            ModifiesTester{pfr, new Wildcard(), new Literal("num2")}.testBoolean(true);
-            ModifiesTester{pfr, new Wildcard(), new Literal("num3")}.testBoolean(false);
-        }
-
-        SECTION("Modifies(Wildcard, Wildcard)") {
-            ModifiesTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
-        }
-    }
-
-    SECTION("1 synonym") {
-        SECTION("Modifies(Synonym, Variable)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ModifiesTester{pfr, stmtSyn, new Literal("num1")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
-            ModifiesTester{pfr, stmtSyn, new Literal("num2")}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"2", "3", "5", "8", "7"}});
-            ModifiesTester{pfr, stmtSyn, new Literal("z")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* readStmtSyn = new Synonym(DesignEntityType::READ, "s1");
-            ModifiesTester{pfr, readStmtSyn, new Literal("num1")}.testSynonyms({*readStmtSyn}).testSynonymValues({{}});
-            ModifiesTester{pfr, readStmtSyn, new Literal("num2")}
-                .testSynonyms({*readStmtSyn})
-                .testSynonymValues({{"2"}});
-        }
-
-        SECTION("Modifies(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-            ModifiesTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"num1"}});
-            ModifiesTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"num2"}});
-            ModifiesTester{pfr, new Integer("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            ModifiesTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-        }
-
-        SECTION("Modifies(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            ModifiesTester{pfr, stmtSyn, new Wildcard()}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"1", "2", "3", "5", "7", "8"}});
-
-            Synonym* readStmtSyn = new Synonym(DesignEntityType::ASSIGN, "s1");
-            ModifiesTester{pfr, readStmtSyn, new Wildcard()}
-                .testSynonyms({*readStmtSyn})
-                .testSynonymValues({{"1", "5", "8"}});
-        }
-
-        SECTION("Modifies(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::VARIABLE, "s");
-            ModifiesTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"num1", "num2"}});
+            SECTION("FollowsStar(StmtSyn, IfSyn") {
+                QPSResult result = qps.processQueries("stmt s; if ifs; Select ifs such that Follows*(s, ifs)");
+                QPSResult expected = {"3", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
     }
 
-    SECTION("SuchThatClause evaluate for Modifies relationship with 2 synonyms") {
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* varSyn = new Synonym(DesignEntityType::VARIABLE, "v");
+    // ai-gen start(gpt, 2, e)
+    // prompt: https://platform.openai.com/playground/p/F3Qq2w6nZHvWBlW3a5TuHUlH?model=gpt-3.5-turbo&mode=chat
+    SECTION("Parent") {
+        SECTION("No synonyms") {
+            SECTION("Parent(Integer, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(3, 4)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        ModifiesTester{pfr, stmtSyn, varSyn}
-            .testSynonyms({*stmtSyn, *varSyn})
-            .testSynonymValues({{"1", "2", "3", "5", "7", "8"}, {"num1", "num2", "num2", "num2", "num2", "num2"}});
+            SECTION("Parent(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(3, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        Synonym* readStmtSyn = new Synonym(DesignEntityType::READ, "s2");
-        ModifiesTester{pfr, readStmtSyn, varSyn}
-            .testSynonyms({*readStmtSyn, *varSyn})
-            .testSynonymValues({{"2"}, {"num2"}});
-    }
-}
+            SECTION("Parent(Integer, Wildcard) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(8, _)");
+                REQUIRE_EMPTY(result);
+            }
 
-TEST_CASE("SuchThatClause evaluate for follows* relationship") {
-    PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
+            SECTION("Parent(Wildcard, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(_, 10)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-    SECTION("FollowsT with no synonyms") {
-        SECTION("FollowsT(Integer, Integer)") {
-            FollowsStarTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(true);
-            FollowsStarTester{pfr, new Integer("1"), new Integer("6")}.testBoolean(true);
-            FollowsStarTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
-            FollowsStarTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-            FollowsStarTester{pfr, new Integer("1"), new Integer("8")}.testBoolean(false);
+            SECTION("Parent(Wildcard, Integer) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(_, 1)");
+                REQUIRE_EMPTY(result);
+            }
         }
 
-        SECTION("FollowsT(Integer, Wildcard)") {
-            FollowsStarTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-            FollowsStarTester{pfr, new Integer("5"), new Wildcard()}.testBoolean(false);
-            FollowsStarTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
+        SECTION("1 synonym") {
+            SECTION("Parent(Integer, synonym") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(3, s)");
+                QPSResult expected = {"4", "5"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Parent(Integer, Synonym: PRINT") {
+                QPSResult result = qps.processQueries("print p; Select p such that Parent(3, p)");
+                QPSResult expected = {"4"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Parent(Integer, Synonym: other types)") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs such that Parent(3, ifs)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("Parent(Synonym, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(s, 10)");
+                QPSResult expected = {"9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Parent(Synonym: IF, Integer)") {
+                QPSResult result = qps.processQueries("if i; Select i such that Parent(i, 10)");
+                QPSResult expected = {"9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Parent(Synonym: OTHERS, Integer)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Parent(a, 10)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("Parent(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(s, _)");
+                QPSResult expected = {allParents};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Parent(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent(_, s)");
+                QPSResult expected = {allChildren};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
 
-        SECTION("FollowsT(Wildcard, Integer)") {
-            FollowsStarTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(true);
-            FollowsStarTester{pfr, new Wildcard(), new Integer("5")}.testBoolean(false);
-            FollowsStarTester{pfr, new Wildcard(), new Integer("50")}.testBoolean(false);
-        }
+        SECTION("2 synonyms") {
+            SECTION("Parent(StmtSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("stmt s1, s2; Select s1 such that Parent(s1, s2)");
+                QPSResult expected = {allParents};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        SECTION("FollowsT(Wildcard, Wildcard)") {
-            FollowsStarTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
-        }
-    }
+            SECTION("Parent(IfSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("if i; stmt s; Select i such that Parent(i, s)");
+                QPSResult expected = {"3", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-    SECTION("FollowsT with 1 synonym") {
-        SECTION("FollowsT(Synonym, Integer)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsStarTester{pfr, stmtSyn, new Integer("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "2"}});
-            FollowsStarTester{pfr, stmtSyn, new Integer("12")}.testSynonyms({*stmtSyn}).testSynonymValues({{"7"}});
-            FollowsStarTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            FollowsStarTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsStarTester{pfr, readSyn, new Integer("2")}.testSynonyms({*readSyn}).testSynonymValues({{}});
-            FollowsStarTester{pfr, readSyn, new Integer("3")}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
-        }
-
-        SECTION("FollowsT(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsStarTester{pfr, new Integer("1"), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"2", "3", "6"}});
-            FollowsStarTester{pfr, new Integer("7"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"12"}});
-            FollowsStarTester{pfr, new Integer("12"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            FollowsStarTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            FollowsStarTester{pfr, new Integer("1"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
-
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsStarTester{pfr, new Integer("1"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
-        }
-
-        SECTION("FollowsT(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsStarTester{pfr, stmtSyn, new Wildcard()}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"1", "2", "3", "7", "8"}});
-
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            FollowsStarTester{pfr, assignSyn, new Wildcard()}
-                .testSynonyms({*assignSyn})
-                .testSynonymValues({{"1", "8"}});
-        }
-
-        SECTION("FollowsT(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsStarTester{pfr, new Wildcard(), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"2", "3", "6", "12", "9"}});
-
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsStarTester{pfr, readSyn, new Wildcard()}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
-        }
-    }
-
-    SECTION("FollowsT with 2 synonyms") {
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
-        FollowsStarTester{pfr, stmtSyn1, stmtSyn2}
-            .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues({{"1", "1", "1", "2", "2", "3", "7", "8"}, {"2", "3", "6", "3", "6", "6", "12", "9"}});
-
-        FollowsStarTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
-
-        Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-        // such that Follows(re, s2)
-        FollowsStarTester{pfr, readSyn, stmtSyn2}
-            .testSynonyms({*readSyn, *stmtSyn2})
-            .testSynonymValues({{"2", "2"}, {"3", "6"}});
-        // such that Follows(s1, re)
-        FollowsStarTester{pfr, stmtSyn1, readSyn}.testSynonyms({*stmtSyn1, *readSyn}).testSynonymValues({{"1"}, {"2"}});
-    }
-}
-
-TEST_CASE("SuchThatClause evaluate for follows relationship") {
-    PKB pkb{};
-    PKBFacadeReader pfr{buildPKB(pkb)};
-
-    SECTION("Follows with no synonyms") {
-        SECTION("Follows(Integer, Integer)") {
-            FollowsTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(true);
-            FollowsTester{pfr, new Integer("3"), new Integer("4")}.testBoolean(false);
-            FollowsTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
-            FollowsTester{pfr, new Integer("50"), new Integer("61")}.testBoolean(false);
-        }
-
-        SECTION("Follows(Integer, Wildcard)") {
-            FollowsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-            FollowsTester{pfr, new Integer("5"), new Wildcard()}.testBoolean(false);
-            FollowsTester{pfr, new Integer("50"), new Wildcard()}.testBoolean(false);
-        }
-
-        SECTION("Follows(Wildcard, Integer)") {
-            FollowsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(true);
-            FollowsTester{pfr, new Wildcard(), new Integer("7")}.testBoolean(false);
-            FollowsTester{pfr, new Wildcard(), new Integer("55")}.testBoolean(false);
-        }
-
-        SECTION("Follows(Wildcard, Wildcard)") {
-            FollowsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+            SECTION("Parent(AssignSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("assign a; stmt s; Select a such that Parent(a, s)");
+                REQUIRE_EMPTY(result);
+            }
         }
     }
+    // ai-gen end
 
-    SECTION("Follows with 1 synonym") {
-        SECTION("Follows(Synonym, Integer)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsTester{pfr, stmtSyn, new Integer("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
-            FollowsTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            FollowsTester{pfr, stmtSyn, new Integer("50")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+    // ai-gen start(gpt, 2, e)
+    // prompt: https://platform.openai.com/playground/p/F3Qq2w6nZHvWBlW3a5TuHUlH?mode=chat&model=gpt-4
+    SECTION("ParentStar") {
+        SECTION("No synonyms") {
+            SECTION("ParentStar(Integer, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, 5)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsTester{pfr, readSyn, new Integer("2")}.testSynonyms({*readSyn}).testSynonymValues({{}});
-            FollowsTester{pfr, readSyn, new Integer("3")}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
+            SECTION("ParentStar(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("ParentStar(Integer, Wildcard) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(1, _)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("ParentStar(Wildcard, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(_, 5)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("ParentStar(Wildcard, Integer) / False") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(_, 1)");
+                REQUIRE_EMPTY(result);
+            }
         }
 
-        SECTION("Follows(Integer, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
-            FollowsTester{pfr, new Integer("11"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
-            FollowsTester{pfr, new Integer("50"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        SECTION("1 synonym") {
+            SECTION("ParentStar(Integer, synonym)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, s)");
+                QPSResult expected = {"4", "5"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            FollowsTester{pfr, new Integer("1"), assignSyn}.testSynonyms({*assignSyn}).testSynonymValues({{}});
+            SECTION("ParentStar(Integer, Synonym: ASSIGN)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Parent*(3, a)");
+                QPSResult expected = {"5"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsTester{pfr, new Integer("1"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
+            SECTION("ParentStar(Integer, Synonym: other types)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, s)");
+                QPSResult expected = {"4", "5"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* ifSyn = new Synonym(DesignEntityType::IF, "ifs");
-            FollowsTester{pfr, new Integer("2"), ifSyn}.testSynonyms({*ifSyn}).testSynonymValues({{"3"}});
-            FollowsTester{pfr, new Integer("2"), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{}});
+            SECTION("ParentStar(Synonym, Integer)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(s, 5)");
+                QPSResult expected = {"3"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("ParentStar(Synonym: IF, Integer)") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs such that Parent*(ifs, 5)");
+                QPSResult expected = {"3"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("ParentStar(Synonym: OTHERS, Integer)") {
+                QPSResult result = qps.processQueries("assign a; Select a such that Parent*(a, 5)");
+                REQUIRE_EMPTY(result);
+            }
+
+            SECTION("ParentStar(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(s, _)");
+                QPSResult expected = {allParents};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("ParentStar(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(_, s)");
+                QPSResult expected = {allChildren};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
 
-        SECTION("Follows(Synonym, Wildcard)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsTester{pfr, stmtSyn, new Wildcard()}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"1", "2", "3", "7", "8"}});
+        SECTION("2 synonyms") {
+            SECTION("ParentStar(StmtSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("stmt s1, s2; Select s1 such that Parent*(s1, s2)");
+                QPSResult expected = {"3", "7", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-            Synonym* assignSyn = new Synonym(DesignEntityType::ASSIGN, "a");
-            FollowsTester{pfr, assignSyn, new Wildcard()}.testSynonyms({*assignSyn}).testSynonymValues({{"1", "8"}});
-        }
+            SECTION("ParentStar(IfSyn, StmtSyn)") {
+                QPSResult result = qps.processQueries("if ifs; stmt s; Select ifs such that Parent*(ifs, s)");
+                QPSResult expected = {"3", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        SECTION("Follows(Wildcard, Synonym)") {
-            Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
-            FollowsTester{pfr, new Wildcard(), stmtSyn}
-                .testSynonyms({*stmtSyn})
-                .testSynonymValues({{"2", "3", "6", "9", "12"}});
-
-            Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-            FollowsTester{pfr, new Wildcard(), readSyn}.testSynonyms({*readSyn}).testSynonymValues({{"2"}});
+            SECTION("ParentStar(StmtSyn, IfSyn)") {
+                QPSResult result = qps.processQueries("stmt s; if ifs; Select ifs such that Parent*(s, ifs)");
+                QPSResult expected = {"9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
         }
     }
 
-    SECTION("Follows with 2 synonyms") {
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+    // ai-gen start(gpt-4, 2, e)
+    // prompt: https://platform.openai.com/playground/p/HbpIECxH0yuJoveu3X8TOOpU
+    SECTION("Modifies") {
+        SECTION("No synonyms") {
+            SECTION("Modifies(Integer, Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(1, \"num1\")");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        FollowsTester{pfr, stmtSyn1, stmtSyn1}.testSynonyms({*stmtSyn1, *stmtSyn1}).testSynonymValues({});
+            SECTION("Modifies(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(1, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        // such that Follows(s1, s2)
-        FollowsTester{pfr, stmtSyn1, stmtSyn2}
-            .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues({{"1", "2", "3", "7", "8"}, {"2", "3", "6", "12", "9"}});
+            SECTION("Modifies(Integer: [call stmt], Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(6, \"num2\")");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
 
-        Synonym* readSyn = new Synonym(DesignEntityType::READ, "re");
-        // such that Follows(re, s2)
-        FollowsTester{pfr, readSyn, stmtSyn2}.testSynonyms({*readSyn, *stmtSyn2}).testSynonymValues({{"2"}, {"3"}});
-        // such that Follows(s1, re)
-        FollowsTester{pfr, stmtSyn1, readSyn}.testSynonyms({*stmtSyn1, *readSyn}).testSynonymValues({{"1"}, {"2"}});
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Modifies(Literal: [procedure name], Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(\"main\", \"num1\")");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
+
+            SECTION("Modifies(Wildcard, Variable)") {
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Modifies(_, \"num2\")"));
+            }
+        }
+
+        QPSResult allModifyingStatements = {"1", "2", "3", "5", "6", "7", "8"};
+        SECTION("1 synonym") {
+            SECTION("Modifies(Integer, synonym)") {
+                QPSResult result = qps.processQueries("variable v; Select v such that Modifies(1, v)");
+                QPSResult expected = {"num1"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Modifies(Synonym: Stmt, Variable)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, \"num2\")");
+                QPSResult expected = {"2", "3", "5", "6", "7", "8"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Modifies(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, _)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
+            }
+
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Modifies(Procedure, synonym)") {
+                QPSResult result = qps.processQueries("variable v; Select v such that Modifies(\"main\", v)");
+                QPSResult expected = {"num1", "num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
+
+            SECTION("Modifies(Procedure, Variable)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Modifies(p, \"num2\")");
+                QPSResult expected = {"main", "next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Modifies(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(s, _)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
+            }
+        }
+
+        SECTION("2 synonyms") {
+            SECTION("Modifies(StmtSyn, VariableSyn)") {
+                QPSResult result = qps.processQueries("stmt s; variable v; Select s such that Modifies(s, v)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
+            }
+
+            SECTION("Modifies(ProcSyn, VariableSyn)") {
+                QPSResult result = qps.processQueries("procedure p; variable v; Select p such that Modifies(p, v)");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allProcs);
+            }
+
+            SECTION("Modifies(assignSyn, VariableSyn)") {
+                QPSResult result = qps.processQueries("assign a; variable v; Select a such that Modifies(a, v)");
+                QPSResult expected = {"1", "5", "8"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+        }
     }
-}
+    // ai-gen end
+
+    // ai-gen start(gpt-4, 2, e)
+    // prompt: https://platform.openai.com/playground/p/WnxaYJxypfRzOt9jqsY1qk0d?mode=chat
+    SECTION("Uses") {
+        QPSResult allUsingStatements = {"3", "4", "5", "6", "7", "8", "9", "10", "12"};
+        SECTION("No synonyms") {
+            SECTION("Uses(Integer, VariableName)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, \"num1\")");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Uses(Wildcard, VariableName)") {
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Uses(_, \"num2\")"));
+            }
+
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Uses(Literal: [procedure name], VariableName)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Uses(\"main\", \"num1\")");
+                QPSResult expected = {"main", "next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
+
+            SECTION("Uses(Integer, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Uses(Literal: [procedure name], Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(\"main\", _)");
+                QPSResult expected = {allStmts};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
+        }
+
+        SECTION("1 synonym") {
+            SECTION("Uses(Synonym, VariableName)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, \"num1\")");
+                QPSResult expected = {"3", "4", "5", "6", "7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Uses(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, _)");
+                // Assuming all statements that either use num1 or num2
+                QPSResult expected = {allUsingStatements};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            /* TODO(Hanqin): Enable after fixing validation error
+            SECTION("Uses(ProcedureName, Synonym)") {
+                QPSResult result = qps.processQueries("variable v; Select v such that Uses(\"main\", v)");
+                QPSResult expected = {"num1", "num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+            */
+
+            SECTION("Uses(Stmt, Synonym)") {
+                QPSResult result = qps.processQueries("variable v; Select v such that Uses(3, v)");
+                QPSResult expected = {"num1", "num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+        }
+
+        SECTION("2 synonyms") {
+            SECTION("Uses(Synonym, Synonym)") {
+                QPSResult result = qps.processQueries("stmt s; variable v; Select s such that Uses(s, v)");
+                QPSResult expected = {allUsingStatements};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Uses(Synonym: Assign, Synonym)") {
+                QPSResult result = qps.processQueries("assign a; variable v; Select a such that Uses(a, v)");
+                QPSResult expected = {"5", "8"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Uses(Synonym: Procedure, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; variable v; Select p such that Uses(p, v)");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+        }
+    }
+    // ai-gen end
+
+    SECTION("Pattern") {
+        SECTION("Assign(Wildcard, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(_,_)");
+            QPSResult expected = {"1", "5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Wildcard, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_,_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_)");
+            QPSResult expected = {"1", "5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(v,_)");
+            QPSResult expected = {"num1", "num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(\"num2\",_)");
+            QPSResult expected = {"5", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\",_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Wildcard) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\",_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(_, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(_,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(_, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_,_\"1\"_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select a, Empty Result") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v,_\"num3\"_)");
+            REQUIRE_EMPTY(result);
+        }
+
+        SECTION("Assign(Variable, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(v,_\"1\"_)");
+            QPSResult expected = {"num1", "num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Partial Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(\"num1\", _\"1\"_)");
+            QPSResult expected = {"1"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(VarName, Partial Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num1\", _\"1\"_)");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        // Exact Matching not implemented in Milestone 1
+        // SECTION("Assign(_, Exact Matching) Select a") {
+        //    QPSResult result = qps.processQueries("assign a; Select a pattern a(_, \"1\")");
+        //    QPSResult expected = {"1"};
+        //    REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        //}
+
+        // SECTION("Assign(_, Exact Matching) Select v") {
+        //     QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_, \"1\")");
+        //     QPSResult expected = {allVars};
+        //     REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        // }
+
+        // SECTION("Assign(Variable, Exact Matching) Select a") {
+        // }
+
+        // SECTION("Assign(Variable, Exact Matching) Select v") {
+        // }
+
+        // SECTION("Assign(VarName, Exact Matching) Select a") {
+        // }
+
+        // SECTION("Assign(VarName, Exact Matching) Select v") {
+        // }
+
+        SECTION("Assign(Variable, Partial Matching) Missing variable, Semantic Error") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(v,_\"1\"_)");
+            REQUIRE_THROW_SEMANTIC_ERROR(result);
+        }
+    }
+};

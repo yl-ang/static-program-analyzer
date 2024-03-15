@@ -1,15 +1,18 @@
 #pragma once
+#include <memory>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
-#include "AbstractionExtractor.h"
+#include "sp/de/AstVisitor.h"
 
-class PatternExtractor : public AbstractionExtractor {
+class SemanticValidatorVisitor : public AstVisitor {
 public:
-    PatternExtractor() {}
+    std::shared_ptr<std::unordered_set<std::string>> procedureNamesPtr;
+    SemanticValidatorVisitor(std::shared_ptr<std::unordered_set<std::string>> procedureNames) {
+        this->procedureNamesPtr = procedureNames;
+    }
+
+protected:
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
@@ -24,7 +27,4 @@ public:
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
     void visitCall(CallNode* node) override;
-
-    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
-    std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>> getMatchablePattern();
 };
