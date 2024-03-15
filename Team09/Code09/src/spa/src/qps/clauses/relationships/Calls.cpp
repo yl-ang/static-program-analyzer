@@ -1,6 +1,6 @@
 #include "Calls.h"
 
-Calls::Calls(ClauseArgument& callee, ClauseArgument& caller) : callee(callee), caller(caller) {}
+Calls::Calls(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
 
 ClauseResult Calls::evaluate(PKBFacadeReader& reader) {
     if (callee.isSynonym() && caller.isSynonym()) {
