@@ -16,6 +16,7 @@ TEST_CASE("Grammar Utils") {
     REQUIRE_FALSE(isIdent("with_underscore"));
     REQUIRE_FALSE(isIdent("with\"Quotes\""));
     REQUIRE_FALSE(isIdent("\"startsWithQuotes\""));
+    REQUIRE_FALSE(isIdent(""));
 
     // check integer
     REQUIRE(isInteger("0"));

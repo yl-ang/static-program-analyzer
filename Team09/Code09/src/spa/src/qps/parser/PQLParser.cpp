@@ -4,17 +4,21 @@
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
 
-Query PQLParser::parse(UnparsedQuery unparsedQuery) {
+Query PQLParser::parse(UnparsedQueries unparsedQueries) {
+    if (unparsedQueries.empty()) {
+        throw QPSSyntaxError();
+    }
+
     std::vector<std::string> unparsedEntities = {};
     std::string unparsedClauses;
 
-    for (std::string queryStatement : unparsedQuery) {
+    unparsedClauses = PQLParser::getQueryClauses(unparsedQueries);
+    unparsedQueries.pop_back();  // Remove Select statement in unparsedQueries, left with the declarations
+    for (std::string queryStatement : unparsedQueries) {
         if (isDeclarationStatement(queryStatement)) {
             unparsedEntities.push_back(queryStatement);
-        } else if (isSelectStatement(queryStatement)) {
-            unparsedClauses = PQLParser::getQueryClauses(unparsedQuery);
         } else {
-            throw Exception("Syntax Error");
+            throw QPSSyntaxError();
         }
     }
     // ALL entities declared
@@ -26,8 +30,15 @@ Query PQLParser::parse(UnparsedQuery unparsedQuery) {
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
-std::string PQLParser::getQueryClauses(UnparsedQuery unparsedQuery) {
-    return unparsedQuery[unparsedQuery.size() - 1];
+std::string PQLParser::getQueryClauses(UnparsedQueries unparsedQuery) {
+    std::string selectClause = unparsedQuery.back();
+    if (!isSelectStatement(selectClause)) {
+        throw QPSSyntaxError();
+    }
+    if (selectClause.back() == ';') {
+        throw QPSSyntaxError();
+    }
+    return selectClause;
 }
 
 // Parse query entities from UnparsedQuery (std::vector<std::string>)
@@ -38,23 +49,27 @@ std::vector<Synonym> PQLParser::parseQueryEntities(std::vector<std::string> unpa
     for (std::string synonymTypeList : unparsedEntities) {
         // synonymTypeList should look something like "call cl, c2;"
         // splitting up synonyms individually
+        if (synonymTypeList.back() != ';') {
+            throw QPSSyntaxError();
+        }
         synonymTypeList.pop_back();  // remove semi-colon
-        std::vector<std::string> typeAndSynonyms = splitByDelimiter(synonymTypeList, ",");
-        std::vector<std::string> typeAndFirstSynonym = splitByDelimiter(typeAndSynonyms[0], " ");
 
-        // first synonym and type
-        std::string type = typeAndFirstSynonym[0];
-        std::string firstArg = trim(typeAndFirstSynonym[1]);
+        std::string type;
+        std::string synonymsString;
+        std::tie(type, synonymsString) = substringUntilDelimiter(synonymTypeList, SPACE);
+        std::vector<std::string> synonyms = splitByDelimiter(synonymsString, ",");
+
+        if (synonyms.empty()) {
+            throw QPSSyntaxError();
+        }
 
         // Determine entity type and make appropriate QueryEntity
         DesignEntityType entityType = Synonym::determineType(type);
-        Synonym firstQueryDeclaration = Synonym(entityType, firstArg);
-        queryEntities.push_back(firstQueryDeclaration);
 
-        // skip first element for other synonyms
-        std::vector<std::string> sublist = std::vector(typeAndSynonyms.begin() + 1, typeAndSynonyms.end());
-
-        for (std::string synonym : sublist) {
+        for (std::string synonym : synonyms) {
+            if (!isSynonym(synonym)) {
+                throw QPSSyntaxError();
+            }
             Synonym currQueryDeclaration = Synonym(entityType, trim(synonym));
             queryEntities.push_back(currQueryDeclaration);
         }

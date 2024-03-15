@@ -12,9 +12,8 @@ bool isInteger(const std::string& str) {
     return std::regex_match(str, std::regex("^(?:0|[1-9][0-9]*)$"));
 }
 
-// Assumption that there does not exist a synonym with the name BOOLEAN
 bool isSynonym(const std::string& str) {
-    return isIdent(str) && !isBoolean(str);
+    return isIdent(str);
 }
 
 bool isWildcard(const std::string& str) {
