@@ -22,7 +22,7 @@ private:
 public:
     static Query parse(UnparsedQuery);
     static std::vector<Synonym> parseQueryEntities(std::vector<std::string>);
-    static std::vector<Synonym> findSelectClauses(std::vector<Synonym>, std::string);
+    static std::vector<std::shared_ptr<ClauseArgument>> findSelectClauses(std::vector<Synonym>, std::string);
     static std::vector<SuchThatClause> findSuchThatClauses(std::vector<Synonym>, std::string);
     static std::vector<PatternClause> findPatternClauses(std::vector<Synonym>, std::string);
 };

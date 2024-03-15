@@ -62,15 +62,15 @@ std::vector<Synonym> PQLParser::parseQueryEntities(std::vector<std::string> unpa
     return queryEntities;
 }
 
-std::vector<Synonym> PQLParser::findSelectClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
+std::vector<std::shared_ptr<ClauseArgument>> PQLParser::findSelectClauses(std::vector<Synonym> entities, std::string unparsedClauses) {
     std::smatch match;
     std::string selectEntity;
-    std::vector<Synonym> result = {};  // if there is none
+    std::vector<std::shared_ptr<ClauseArgument>> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
         for (const Synonym& entity : entities) {
             if (entity.getValue() == selectEntity) {
-                result.push_back(entity);
+                result.push_back(std::make_shared<Synonym>(entity));
             }
         }
     }
