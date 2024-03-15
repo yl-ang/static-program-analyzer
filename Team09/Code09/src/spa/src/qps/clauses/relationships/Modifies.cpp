@@ -3,11 +3,11 @@
 Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : modifier(stmt), var(var) {}
 
 void Modifies::checkSemantic() {
-    if (this->stmt.isWildcard()) {
+    if (stmt.isWildcard()) {
         throw QPSSemanticError();
     }
-    if (this->stmt.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(this->stmt);
+    if (stmt.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(stmt);
         if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
             throw QPSSemanticError();
         }
