@@ -32,8 +32,6 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 #ifdef DEBUG_BUILD
                 std::cout << "top of stack non terminal ERROR: " << std::get<NonTerminal>(stackTop) << std::endl;
                 std::cout << "curr token: " << input[index].value << std::endl;
-                std::cout << "next token: " << input[index + 1].value << std::endl;
-                std::cout << "next next token: " << input[index + 2].value << std::endl;
 #endif
 
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
@@ -66,9 +64,7 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 // lexical token type but not = currtoken
 #ifdef DEBUG_BUILD
             std::cout << "top of stack terminal ERROR: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << std::endl;
-            std::cout << "curr token: " << input[index].value << " in " << input[index - 2].value
-                      << input[index - 1].value << input[index].value << input[index + 1].value
-                      << input[index + 2].value << std::endl;
+            std::cout << "curr token: " << input[index].value << std::endl;
 #endif
 
             throw SyntaxError("Unexpected grammar rule");
