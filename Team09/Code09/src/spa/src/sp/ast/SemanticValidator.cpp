@@ -1,7 +1,8 @@
 #include "sp/ast/SemanticValidator.h"
 
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
+#include <utility>
 
 #include "sp/ast/SemanticValidatorVisitor.h"
 #include "sp/de/AstVisitor.h"
@@ -9,19 +10,20 @@
 #include "sp/exceptions/semantic/DuplicateProcError.h"
 
 void SemanticValidator::validateSemantics(const std::shared_ptr<ProgramNode> programNode) {
+    procedureNames = std::make_shared<std::unordered_map<std::string, std::vector<std::string>>>();
     checkDuplicateProcedureNames(programNode);
-    this->semanticValidatorVisitor =
-        new SemanticValidatorVisitor(std::make_shared<std::unordered_set<std::string>>(procedureNames));
+    this->semanticValidatorVisitor = new SemanticValidatorVisitor(
+        std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>>(procedureNames));
     checkCallingProcedure(programNode);
 }
 
 void SemanticValidator::checkDuplicateProcedureNames(std::shared_ptr<ProgramNode> programNode) {
     for (auto procedure : programNode->children) {
         std::string procedureName = procedure->name;
-        if (procedureNames.find(procedureName) != procedureNames.end()) {
+        if (procedureNames->find(procedureName) != procedureNames->end()) {
             throw DuplicateProcedureError(procedureName);
         }
-        procedureNames.insert(procedure->name);
+        procedureNames->insert(std::make_pair(procedureName, std::vector<std::string>{}));
     }
 }
 
