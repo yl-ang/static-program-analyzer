@@ -195,8 +195,8 @@ TEST_CASE("isResultClause") {
         REQUIRE_FALSE(isResultClause("10"));
     }
 
-    SECTION("tuple with boolean_false") {
-        REQUIRE_FALSE(isResultClause("<BOOLEAN>"));
+    SECTION("tuple with boolean_true") {
+        REQUIRE(isResultClause("<BOOLEAN>"));
     }
 
     SECTION("tuple missing angular bracket_false") {
@@ -241,8 +241,8 @@ TEST_CASE("isTuple") {
         REQUIRE_FALSE(isTuple("<var, ,x>"));
     }
 
-    SECTION("elem and BOOLEAN_false") {
-        REQUIRE_FALSE(isTuple("<var, BOOLEAN>"));
+    SECTION("elem and BOOLEAN_true") {
+        REQUIRE(isTuple("<var, BOOLEAN>"));
     }
 }
 
