@@ -114,12 +114,20 @@ std::unordered_set<StmtNum> PKBFacadeReader::getModifiesStatementsByVariable(con
     return pkbReference->modifiesStore->getStatementsByVariable(variable);
 }
 
-bool PKBFacadeReader::hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable &variable) const {
-    return pkbReference->modifiesStore->hasStatementVariableModifiesRelationship(stmt, variable);
-}
-
 bool PKBFacadeReader::hasStatementVariableModifiesRelationship(ClauseArgument &arg1, ClauseArgument &arg2) const {
     return pkbReference->modifiesStore->hasStatementVariableModifiesRelationship(arg1, arg2);
+}
+
+std::unordered_set<Variable> PKBFacadeReader::getModifiesVariablesByProcedure(const Procedure &procedure) const {
+    return pkbReference->modifiesStore->getVariablesByProcedure(procedure);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getModifiesProceduresByVariable(const Variable &variable) const {
+    return pkbReference->modifiesStore->getProceduresByVariable(variable);
+}
+
+bool PKBFacadeReader::hasProcedureVariableModifiesRelationship(ClauseArgument &arg1, ClauseArgument &arg2) const {
+    return pkbReference->modifiesStore->hasProcedureVariableModifiesRelationship(arg1, arg2);
 }
 
 std::unordered_set<Variable> PKBFacadeReader::getUsesVariablesByStatement(StmtNum stmt) const {
@@ -130,12 +138,20 @@ std::unordered_set<StmtNum> PKBFacadeReader::getUsesStatementsByVariable(const V
     return pkbReference->usesStore->getStatementsByVariable(variable);
 }
 
-bool PKBFacadeReader::hasStatementVariableUseRelationship(StmtNum stmt, const Variable &variable) const {
-    return pkbReference->usesStore->hasStatementVariableUseRelationship(stmt, variable);
-}
-
 bool PKBFacadeReader::hasStatementVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->usesStore->hasStatementVariableUseRelationship(arg1, arg2);
+}
+
+std::unordered_set<Variable> PKBFacadeReader::getUsesVariablesByProcedure(const Procedure &procedure) const {
+    return pkbReference->usesStore->getVariablesByProcedure(procedure);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getUsesProceduresByVariable(const Variable &variable) const {
+    return pkbReference->usesStore->getProceduresByVariable(variable);
+}
+
+bool PKBFacadeReader::hasProcedureVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->usesStore->hasProcedureVariableUseRelationship(arg1, arg2);
 }
 
 bool PKBFacadeReader::hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs) {
@@ -160,4 +176,44 @@ bool PKBFacadeReader::hasNextRelationship(StmtNum s1, StmtNum s2) {
 
 bool PKBFacadeReader::hasNextRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNexterStar(StmtNum nextee) {
+    return pkbReference->nextStore->getNexterStar(nextee);
+}
+
+std::unordered_set<StmtNum> PKBFacadeReader::getNexteeStar(StmtNum nexter) {
+    return pkbReference->nextStore->getNexteeStar(nexter);
+}
+
+bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCaller(Procedure callee) {
+    return pkbReference->callStore->getCaller(callee);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCallee(Procedure caller) {
+    return pkbReference->callStore->getCallee(caller);
+}
+
+bool PKBFacadeReader::hasCallRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->callStore->hasCallRelationship(arg1, arg2);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCallerStar(Procedure callee) {
+    return pkbReference->callStore->getCallerStar(callee);
+}
+
+std::unordered_set<Procedure> PKBFacadeReader::getCalleeStar(Procedure caller) {
+    return pkbReference->callStore->getCalleeStar(caller);
+}
+
+bool PKBFacadeReader::hasCallStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
+    return pkbReference->callStore->hasCallStarRelationship(arg1, arg2);
 }

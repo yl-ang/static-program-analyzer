@@ -158,9 +158,8 @@ PKBFacadeReader buildPKB(PKB pkb) {
     pfw.setProcedures(procs);
     pfw.setFollowsStore(followsStoreEntries);
     pfw.setParentStore(parentStoreEntries);
-    pfw.setModifiesStore(modifiesStoreEntries);
-    pfw.setUsesStore(usesStoreEntries);
-
+    pfw.setStatementModifiesStore(modifiesStoreEntries);
+    pfw.setStatementUsesStore(usesStoreEntries);
     return PKBFacadeReader{pkb};
 }
 

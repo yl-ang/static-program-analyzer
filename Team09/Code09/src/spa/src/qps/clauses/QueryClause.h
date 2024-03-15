@@ -9,7 +9,6 @@ enum class ClauseType { SELECT, SUCH_THAT, PATTERN };
 class QueryClause {
 public:
     virtual ~QueryClause(){};
-    virtual ClauseType getType() const = 0;
     virtual bool equals(const QueryClause& other) const = 0;
     virtual ClauseResult evaluate(PKBFacadeReader&) = 0;
     virtual bool isBooleanResult() const = 0;

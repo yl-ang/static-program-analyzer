@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "PKB/Stores/CallStore.h"
 #include "PKB/Stores/EntityStore.h"
 #include "PKB/Stores/FollowsStore.h"
 #include "PKB/Stores/ModifiesStore.h"
@@ -29,4 +30,5 @@ public:
     std::shared_ptr<PatternStore> patternStore;
 
     std::shared_ptr<NextStore> nextStore;
+    std::shared_ptr<CallStore> callStore;
 };

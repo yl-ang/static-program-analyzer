@@ -30,12 +30,24 @@ void PKBFacadeWriter::setParentStore(const std::unordered_set<std::pair<StmtNum,
     this->pkbReference->parentStore->setParentStore(parentPairs);
 }
 
-void PKBFacadeWriter::setUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesPairs) const {
-    this->pkbReference->usesStore->setUsesStore(usesPairs);
+void PKBFacadeWriter::setStatementUsesStore(
+    const std::unordered_set<std::pair<StmtNum, Variable>> &usesStatementPairs) const {
+    this->pkbReference->usesStore->setStatementUsesStore(usesStatementPairs);
 }
 
-void PKBFacadeWriter::setModifiesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesPairs) const {
-    this->pkbReference->modifiesStore->setModifiesStore(modifiesPairs);
+void PKBFacadeWriter::setProcedureUsesStore(
+    const std::unordered_set<std::pair<Procedure, Variable>> &usesProcedurePairs) const {
+    this->pkbReference->usesStore->setProcedureUsesStore(usesProcedurePairs);
+}
+
+void PKBFacadeWriter::setStatementModifiesStore(
+    const std::unordered_set<std::pair<StmtNum, Variable>> &modifiesStatementSet) const {
+    this->pkbReference->modifiesStore->setStatementModifiesStore(modifiesStatementSet);
+}
+
+void PKBFacadeWriter::setProcedureModifiesStore(
+    const std::unordered_set<std::pair<Procedure, Variable>> &modifiesProcedureSet) const {
+    this->pkbReference->modifiesStore->setProcedureModifiesStore(modifiesProcedureSet);
 }
 
 void PKBFacadeWriter::setPatternStore(
@@ -45,4 +57,8 @@ void PKBFacadeWriter::setPatternStore(
 
 void PKBFacadeWriter::setNextStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &nextPairs) const {
     this->pkbReference->nextStore->setNextStore(nextPairs);
+}
+
+void PKBFacadeWriter::setCallStore(const std::unordered_set<std::pair<Procedure, Procedure>> &callPairs) const {
+    this->pkbReference->callStore->setCallStore(callPairs);
 }

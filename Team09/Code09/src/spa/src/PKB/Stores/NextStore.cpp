@@ -24,6 +24,14 @@ std::unordered_set<StmtNum> NextStore::getNextee(StmtNum nexter) {
     return {};
 }
 
+std::unordered_set<StmtNum> NextStore::getNexterStar(StmtNum nextee) {
+    return computeNextStar(nextee, nexterMap);
+}
+
+std::unordered_set<StmtNum> NextStore::getNexteeStar(StmtNum nexter) {
+    return computeNextStar(nexter, nexteeMap);
+}
+
 bool NextStore::hasNextRelationship(StmtNum s1, StmtNum s2) {
     auto it = nexterMap.find(s1);
     if (it != nexterMap.end()) {
@@ -32,8 +40,13 @@ bool NextStore::hasNextRelationship(StmtNum s1, StmtNum s2) {
     return false;
 }
 
+bool NextStore::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
+    auto nexterSet = computeNextStar(s1, nexterMap);
+    return nexterSet.find(s2) != nexterSet.end();
+}
+
 bool NextStore::hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
-    if (arg1.isWildcard() & arg2.isWildcard()) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
         return !(nexterMap.empty());
     }
 
@@ -48,4 +61,39 @@ bool NextStore::hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2) 
     }
 
     return hasNextRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
+}
+
+bool NextStore::hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
+        return !(nexterMap.empty());
+    }
+
+    // if arg 1 is wildcard, check if arg2 has nexteeStar
+    if (arg1.isWildcard()) {
+        return !getNexteeStar(std::stoi(arg2.getValue())).empty();
+    }
+
+    // if arg2 is wildcard, check if arg1 has nextersStar
+    if (arg2.isWildcard()) {
+        return !getNexterStar(std::stoi(arg1.getValue())).empty();
+    }
+
+    return hasNextStarRelationship(std::stoi(arg1.getValue()), std::stoi(arg2.getValue()));
+}
+
+std::unordered_set<StmtNum> NextStore::computeNextStar(
+    StmtNum start, const std::unordered_map<StmtNum, std::unordered_set<StmtNum>>& nextMap) {
+    std::unordered_set<StmtNum> result;
+
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> closureMap = nextMap;
+
+    // Re-compute on the go whenever incoming queries for nextT comes in
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&closureMap);
+
+    auto it = closureMap.find(start);
+    if (it != closureMap.end()) {
+        result.insert(it->second.begin(), it->second.end());
+    }
+
+    return result;
 }

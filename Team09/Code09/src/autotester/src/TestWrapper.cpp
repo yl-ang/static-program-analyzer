@@ -14,8 +14,11 @@ volatile bool AbstractWrapper::GlobalStop = false;
 
 // a default constructor
 TestWrapper::TestWrapper() {
-    // create any objects here as instance variables of this class
-    // as well as any initialization required for your spa program
+// create any objects here as instance variables of this class
+// as well as any initialization required for your spa program
+#ifdef DEBUG_BUILD
+    std::cout << "Running debug build" << std::endl;
+#endif
 }
 
 // method for parsing the SIMPLE source

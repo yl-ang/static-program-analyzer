@@ -36,10 +36,9 @@ void ParentStore::computeTransitiveClosure() {
         childStarMap[parent].insert(child);
     }
 
-    // Use TransitiveClosureUtility to update the matrices with transitive
-    // closure
-    TransitiveClosureUtility::computeTransitiveClosure(parentStarMap);
-    TransitiveClosureUtility::computeTransitiveClosure(childStarMap);
+    // Use TransitiveClosureUtility to update the matrices with transitive closure
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&parentStarMap);
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&childStarMap);
 }
 
 std::optional<StmtNum> ParentStore::getParent(StmtNum child) {

@@ -1,8 +1,6 @@
 #include "Cfg.h"
 
 #include <memory>
-#include <unordered_set>
-#include <utility>
 
 #include "sp/ast/AstNode.h"
 // builds the CFG for a single procedure.
@@ -35,8 +33,7 @@ void CFG::buildStatementListCFG(std::shared_ptr<ASTNode> statementListNode, int 
             //
             if (nextStatementNumber) {
                 insertIntoCFGMap(currentStatementNumber, nextStatementNumber);
-            }
-            if (loopLineStart) {
+            } else if (loopLineStart) {
                 insertIntoCFGMap(currentStatementNumber, loopLineStart);
             }
             // for while, pass the currentStatementNumber as loopLineStart because that is the start of the loop.

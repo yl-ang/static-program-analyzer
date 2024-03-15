@@ -43,17 +43,25 @@ public:
     bool hasParentRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasParentStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
-    // Getters for ModifiesStore
+    // Getters for ModifiesStore (Statements)
     [[nodiscard]] std::unordered_set<Variable> getModifiesVariablesByStatement(StmtNum stmt) const;
     [[nodiscard]] std::unordered_set<StmtNum> getModifiesStatementsByVariable(const Variable& variable) const;
-    [[nodiscard]] bool hasStatementVariableModifiesRelationship(StmtNum stmt, const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
 
-    // Getters for UsesStore
+    // Getters for ModifiesStore (Procedures)
+    [[nodiscard]] std::unordered_set<Variable> getModifiesVariablesByProcedure(const Procedure& procedure) const;
+    [[nodiscard]] std::unordered_set<Procedure> getModifiesProceduresByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasProcedureVariableModifiesRelationship(ClauseArgument& arg1, ClauseArgument& arg2) const;
+
+    // Getters for UsesStore (Statements)
     [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByStatement(StmtNum stmt) const;
     [[nodiscard]] std::unordered_set<StmtNum> getUsesStatementsByVariable(const Variable& variable) const;
-    [[nodiscard]] bool hasStatementVariableUseRelationship(StmtNum stmt, const Variable& variable) const;
     [[nodiscard]] bool hasStatementVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
+    // Getters for UsesStore (Procedures)
+    [[nodiscard]] std::unordered_set<Variable> getUsesVariablesByProcedure(const Procedure& procedure) const;
+    [[nodiscard]] std::unordered_set<Procedure> getUsesProceduresByVariable(const Variable& variable) const;
+    [[nodiscard]] bool hasProcedureVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for PatternStore
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
@@ -62,8 +70,20 @@ public:
     // Getters for NextStore
     [[nodiscard]] std::unordered_set<StmtNum> getNexter(StmtNum nextee);
     [[nodiscard]] std::unordered_set<StmtNum> getNextee(StmtNum nexter);
+    [[nodiscard]] std::unordered_set<StmtNum> getNexterStar(StmtNum nextee);
+    [[nodiscard]] std::unordered_set<StmtNum> getNexteeStar(StmtNum nexter);
     [[nodiscard]] bool hasNextRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+    [[nodiscard]] bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
+    [[nodiscard]] bool hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
+    // Getters for CallStore
+    [[nodiscard]] std::unordered_set<Procedure> getCaller(Procedure callee);
+    [[nodiscard]] std::unordered_set<Procedure> getCallee(Procedure caller);
+    [[nodiscard]] std::unordered_set<Procedure> getCallerStar(Procedure callee);
+    [[nodiscard]] std::unordered_set<Procedure> getCalleeStar(Procedure caller);
+    [[nodiscard]] bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+    [[nodiscard]] bool hasCallStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
 private:
     PKB* pkbReference = nullptr;

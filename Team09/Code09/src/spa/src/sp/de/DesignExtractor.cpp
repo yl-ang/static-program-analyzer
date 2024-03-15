@@ -11,8 +11,8 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setStmts(getStatements());
     writer->setFollowsStore(getFollows());
     writer->setParentStore(getParent());
-    writer->setUsesStore(getUses());
-    writer->setModifiesStore(getModifies());
+    writer->setStatementModifiesStore(getModifies());
+    writer->setStatementUsesStore(getUses());
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
 }
