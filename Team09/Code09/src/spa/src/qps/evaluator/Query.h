@@ -16,6 +16,11 @@ struct ArrangedClauses {
     std::vector<std::vector<QueryClausePtr>> nonSelectConnectedClauses;
 };
 
+namespace {
+const std::string& TRUE_STRING = "TRUE";
+const std::string& FALSE_STRING = "FALSE";
+}  // namespace
+
 class Query {
 public:
     Query(const std::vector<Synonym>&, const std::vector<SuchThatClause>&, const std::vector<PatternClause>&);
@@ -36,4 +41,6 @@ private:
     bool containsSelectSynonyms(QueryClausePtr) const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
     ArrangedClauses arrangeClauses() const;
+    bool hasNoClauses() const;
+    bool isSelectBoolean() const;
 };

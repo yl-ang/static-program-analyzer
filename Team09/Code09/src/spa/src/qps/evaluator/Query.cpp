@@ -7,6 +7,10 @@ Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& 
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
+    if (hasNoClauses() && isSelectBoolean()) {
+        return {TRUE_STRING};
+    }
+
     if (!evaluateBooleanClauses(pkb)) {
         return {};
     }
@@ -28,7 +32,19 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return {};
     }
 
+    if (isSelectBoolean()) {
+        return tableManager.isEmpty() ? std::vector{FALSE_STRING} : std::vector{TRUE_STRING};
+    }
+
     return tableManager.extractResults(selectEntities);
+}
+
+bool Query::hasNoClauses() const {
+    return suchThatClauses.empty() && patternClauses.empty();
+}
+
+bool Query::isSelectBoolean() const {
+    return selectEntities.empty();
 }
 
 bool Query::evaluateAndJoinClauses(const TableManager& tm,
