@@ -3,6 +3,9 @@
 #include <string>
 
 struct QPSConstants {
+    inline static const std::string TRUE_STRING = "TRUE";
+    inline static const std::string FALSE_STRING = "FALSE";
+  
     inline static const std::string STMT = "stmt";
     inline static const std::string READ = "read";
     inline static const std::string PRINT = "print";
@@ -42,6 +45,7 @@ struct QPSConstants {
     inline static const std::string BOOLEAN = "BOOLEAN";
     inline static const std::string SUCH_THAT = "such that";
     inline static const std::string PATTERN = "pattern";
+  
     inline static const std::string WITH = "with";
 
     inline static const std::string AND = "and";
