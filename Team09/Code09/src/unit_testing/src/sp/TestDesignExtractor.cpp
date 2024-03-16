@@ -309,12 +309,21 @@ TEST_CASE("Design Extractor Tests") {
         REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
     }
 
-    SECTION("Modifies extracted correctly") {
+    SECTION("Modifies statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
         std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {
             {1, "x"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}};
         REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("Modifies procedures extracted correctly") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
+            {"main", "x"}, {"main", "a"}, {"main", "g"}, {"main", "g"}, {"main", "i"},
+            {"main", "a"}, {"main", "i"}, {"main", "a"}, {"main", "x"}};
+        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
     }
 
     SECTION("Single line procedure has modifies extracted correctly") {
@@ -324,12 +333,21 @@ TEST_CASE("Design Extractor Tests") {
         REQUIRE(expectedModifies == designExtractor->getModifies());
     }
 
-    SECTION("Multiple procedures modifies extracted correctly") {
+    SECTION("Multiple procedures modifies statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
         std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {
             {11, "a"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}, {1, "x"}};
         REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("Multiple procedures modifies procedures extracted correctly") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode3);
+        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
+            {"test", "a"}, {"main", "a"}, {"main", "g"}, {"main", "g"}, {"main", "i"}, {"main", "a"},
+            {"main", "i"}, {"main", "a"}, {"main", "x"}, {"main", "x"}, {"main", "a"}};
+        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
     }
 
     SECTION("Pattern extracted correctly") {
@@ -416,5 +434,13 @@ TEST_CASE("Design Extractor Tests") {
         std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureUses = {
             {"sad", "a"}, {"sad", "a"}, {"happy", "a"}};
         REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
+    }
+
+    SECTION("Modifies for procedures with call statements extracted correctly") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNodeCall);
+        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
+            {"sad", "b"}, {"happy", "b"}, {"sad", "b"}};
+        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
     }
 }

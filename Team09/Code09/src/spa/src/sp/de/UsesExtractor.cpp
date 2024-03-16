@@ -145,8 +145,3 @@ void UsesExtractor::dfsVisitHelper(ASTNode* node, UsesExtractor* visitor) {
         dfsVisitHelper(child.get(), visitor);
     }
 }
-
-// per procedure,
-// have a separate visitor that visits all the procedures, then stores the pointer to each procedure
-
-// then in visitcall, call uses extractor on the procedure node of the procedure being called recursively

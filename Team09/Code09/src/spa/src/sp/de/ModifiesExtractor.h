@@ -12,6 +12,7 @@
 class ModifiesExtractor : public AbstractionExtractor {
 public:
     std::unordered_map<std::string, ProcedureNode*> procs;
+    std::string currentProc;
 
     explicit ModifiesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
     void visitStmtLst(StatementListNode* node) override;
@@ -30,6 +31,8 @@ public:
     void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureModifies();
+
     void dfsVisitHelper(std::shared_ptr<ASTNode> node, ModifiesExtractor* visitor);
     void dfsVisitHelper(ASTNode* node, ModifiesExtractor* visitor);
 };

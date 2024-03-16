@@ -18,6 +18,7 @@ public:
     std::unordered_set<std::pair<StmtNum, StmtNum>> follows;
     std::unordered_set<std::pair<StmtNum, StmtNum>> parent;
     std::unordered_set<std::pair<StmtNum, Variable>> modifies;
+    std::unordered_set<std::pair<Procedure, Variable>> procedureModifies;
     std::unordered_set<std::pair<StmtNum, Variable>> uses;
     std::unordered_set<std::pair<Procedure, Variable>> procedureUses;
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> pattern;
