@@ -39,6 +39,12 @@ jobs:
           ./autotester.exe "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
             "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
             "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+      
+      - name: Output Autotester out.xml
+        shell: bash
+        run: |
+          cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+          
           passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           echo "Passed: $passed_count / $total_tests_count"
@@ -46,13 +52,7 @@ jobs:
           if [ $passed_count -ne $total_tests_count ]; then
             echo "Failed: $((total_tests_count - passed_count)) / $total_tests_count"
             exit 1
-          else
-            echo "Passed: $passed_count tests"
           fi
-      
-      - name: Output Autotester out.xml
-        shell: bash
-        run: cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
 
       - name: Unit Testing
         shell: bash
@@ -95,19 +95,19 @@ jobs:
           ./autotester.exe "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
             "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
             "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+      
+      - name: Output Autotester out.xml
+        shell: bash
+        run: |
+          cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+            
           passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
 
           if [ $passed_count -ne $total_tests_count ]; then
             echo "Failed: $((total_tests_count - passed_count)) / $total_tests_count"
             exit 1
-          else
-            echo "Passed: $passed_count tests"
           fi
-      
-      - name: Output Autotester out.xml
-        shell: bash
-        run: cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
 
       - name: Run Unit Tests
         working-directory: ${{runner.workspace}}/build
