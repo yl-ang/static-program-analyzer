@@ -28,20 +28,20 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // Returns such that, pattern, and
     std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
     std::string currClauseType;
-    for (std::string clause : clauseList) {
-        if (std::regex_match(clause, QPSRegexes::SUCHTHAT_CLAUSE)) {
+    for (size_t i = 0; i < clauseList.size(); ++i) {
+        if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
             currClauseType = QPSConstants::SUCH_THAT;
-        } else if (std::regex_match(clause, QPSRegexes::PATTERN_CLAUSE)) {
+        } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
             currClauseType = QPSConstants::PATTERN;
-        } else if (std::regex_match(clause, QPSRegexes::AND_CLAUSE)){
-            clause.replace(0, 2, currClauseType);
+        } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)){
+            clauseList[i].replace(0, 2, currClauseType);
         } else {
             // ignore
         }
     }
 
-    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(unparsedClauses);
-    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(unparsedClauses);
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(clauseList);
+    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(clauseList);
 
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
@@ -51,6 +51,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             selectEntities.erase(selectEntities.begin());
         } 
         // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
+        // Evaluator will know if BOOLEAN if vector is empty
         // Do not trigger a warning should it not be a Synonym type
     } else {
         for (Synonym syn : selectEntities) {
@@ -153,57 +154,44 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     return result;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::string unparsedClauses) {
+std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<std::string> clauseList) {
     std::vector<SuchThatClause> result = {};  // if there is none
-    for (std::string clauseString : searchClause(QPSRegexes::SUCHTHAT_CLAUSE, unparsedClauses)) {
-        // replaced only the below line for strategy pattern refactor
-        // SuchThatClause st = toSTClause(entities, clauseString);
-        // UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
-        UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
-        std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-        SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
-        if (stPtr) {
-            SuchThatClause stClause = std::move(*stPtr);
-            result.push_back(stClause);
-        } else {
-            throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+    for (std::string clauseString : clauseList) {
+        if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
+            // replaced only the below line for strategy pattern refactor
+            // SuchThatClause st = toSTClause(entities, clauseString);
+            // UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
+            UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
+            std::unique_ptr<QueryClause> qc = unparsedClause.execute();
+            SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
+            if (stPtr) {
+                SuchThatClause stClause = std::move(*stPtr);
+                result.push_back(stClause);
+            } else {
+                throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+            }
         }
     }
     return result;
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::string unparsedClauses) {
+std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<std::string> clauseList) {
     std::vector<PatternClause> result = {};  // if there is none
-    for (std::string clauseString : searchClause(QPSRegexes::PATTERN_CLAUSE, unparsedClauses)) {
-        // replaced only the below line for strategy pattern refactor
-        // PatternClause st = toPatternClause(entities, clauseString);
-        UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
-        std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-        PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
-        if (ptPtr) {
-            PatternClause ptClause = std::move(*ptPtr);
-            result.push_back(ptClause);
-        } else {
-            throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+    for (std::string clauseString : clauseList) {
+        if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
+            // replaced only the below line for strategy pattern refactor
+            // PatternClause st = toPatternClause(entities, clauseString);
+            UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
+            std::unique_ptr<QueryClause> qc = unparsedClause.execute();
+            PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
+            if (ptPtr) {
+                PatternClause ptClause = std::move(*ptPtr);
+                result.push_back(ptClause);
+            } else {
+                throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+            }
         }
     }
 
     return result;
-}
-
-/**
- * Helper function to findSuchThatClauses, findPatternClauses
- */
-std::vector<std::string> PQLParser::searchClause(const std::regex& pattern, const std::string& unparsedClauses) {
-    // ai-gen start(chatgpt, 2, e)
-    // prompt: https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat
-    std::vector<std::string> result = {};
-    std::smatch match;
-    std::string::const_iterator searchStart(unparsedClauses.cbegin());
-    while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
-        result.push_back(match.str(1));
-        searchStart = match.suffix().first;
-    }
-    return result;
-    // ai-gen end
 }
