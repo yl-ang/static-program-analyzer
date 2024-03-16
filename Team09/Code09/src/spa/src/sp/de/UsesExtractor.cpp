@@ -35,7 +35,7 @@ void UsesExtractor::visitCall(CallNode* node) {
         it = extractedUses.erase(it);
 
         // Create a new pair with the updated stmtNum value and insert it
-        uses.insert({userStmtNum, oldPair.second});
+        this->uses.insert({userStmtNum, oldPair.second});
     }
 }
 
