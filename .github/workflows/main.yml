@@ -10,6 +10,11 @@ on:
 
 env:
   BUILD_TYPE: Release
+  CURRENT_MILESTONE: milestone2
+  TESTS_09_DIR: "${GITHUB_WORKSPACE}/Team09/Tests09/${CURRENT_MILESTONE}"
+  SOURCE_FILEPATH: ${TESTS_09_DIR}/${CURRENT_MILESTONE}_source_1.txt
+  QUERIES_FILEPATH: ${TESTS_09_DIR}/${CURRENT_MILESTONE}_queries_1.txt
+  OUT_FILEPATH: ${TESTS_09_DIR}/out.xml
 
 jobs:
   build_windows:
@@ -43,9 +48,17 @@ jobs:
         run: |
           cd Team09/Code09/build/src/integration_testing/Release
           ./integration_testing.exe
-
-      # - TBC: System Testing
-
+          
+      - name: Autotester System Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/autotester/Release
+          ./autotester.exe "${SOURCE_FILEPATH}" "${QUERIES_FILEPATH}" "${OUT_FILEPATH}"
+      
+      - name: Output Autotester out.xml
+        shell: bash
+        run: cat "${OUT_FILEPATH}"
+          
   build_macos:
     runs-on: macos-latest
     timeout-minutes: 10
