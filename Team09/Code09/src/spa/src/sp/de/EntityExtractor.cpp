@@ -7,7 +7,12 @@ void EntityExtractor::visitStmtLst(StatementListNode* node) {}
 void EntityExtractor::visitExpression(ExpressionNode* node) {}
 void EntityExtractor::visitFactor(FactorNode* node) {}
 void EntityExtractor::visitTerm(TermNode* node) {}
-void EntityExtractor::visitCall(CallNode* node) {}
+
+void EntityExtractor::visitCall(CallNode* node) {
+    int stmtNum = node->statementNumber;
+    StatementType callStmt = DESIGN_ENTITY_STMT_TYPE_TO_STMT_TYPE_MAP[DesignEntityStatementType::CALL];
+    this->statements.insert(Stmt{callStmt, stmtNum});
+}
 
 void EntityExtractor::visitProcedure(ProcedureNode* node) {
     std::string procedure = node->name;

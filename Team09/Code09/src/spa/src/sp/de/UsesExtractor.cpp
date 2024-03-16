@@ -11,7 +11,33 @@ void UsesExtractor::visitProcedure(ProcedureNode* node) {}
 void UsesExtractor::visitRead(ReadNode* node) {}
 void UsesExtractor::visitVariable(VariableNode* node) {}
 void UsesExtractor::visitConstant(ConstantNode* node) {}
-void UsesExtractor::visitCall(CallNode* node) {}
+
+void UsesExtractor::visitCall(CallNode* node) {
+    int userStmtNum = node->statementNumber;
+    std::string calledProc = node->getCalledProcedure();
+#ifdef DEBUG_BUILD
+    std::cout << "I'm calling:" << calledProc << std::endl;
+#endif
+    ProcedureNode* procNode = this->procs.at(calledProc);
+
+    // Extract uses relationships from usesExtractorHelper and append to usesExtractor
+    // Each uses relationship will have the userStmtNum of the nested statement
+    // So we simply replace the userStmtNum from the extracted uses relationship
+    // with the current CallNode stmtNum
+
+    UsesExtractor* usesExtractorHelper = new UsesExtractor(this->procs);
+    dfsVisitHelper(procNode, usesExtractorHelper);
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
+
+    // Iterate over each element in the set and update stmtNum value
+    for (auto it = extractedUses.begin(); it != extractedUses.end();) {
+        auto oldPair = *it;
+        it = extractedUses.erase(it);
+
+        // Create a new pair with the updated stmtNum value and insert it
+        this->uses.insert({userStmtNum, oldPair.second});
+    }
+}
 
 void UsesExtractor::visitAssign(AssignmentNode* node) {
     int userStmtNum = node->statementNumber;
@@ -39,7 +65,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
     // So we simply replace the userStmtNum from the extracted uses relationship
     // with the current WhileNode stmtNum
 
-    UsesExtractor* usesExtractorHelper = new UsesExtractor();
+    UsesExtractor* usesExtractorHelper = new UsesExtractor(this->procs);
     dfsVisitHelper(node->whileStmtList, usesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
 
@@ -59,8 +85,8 @@ void UsesExtractor::visitIf(IfNode* node) {
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
     }
-    UsesExtractor* thenUsesExtractorHelper = new UsesExtractor();
-    UsesExtractor* elseUsesExtractorHelper = new UsesExtractor();
+    UsesExtractor* thenUsesExtractorHelper = new UsesExtractor(this->procs);
+    UsesExtractor* elseUsesExtractorHelper = new UsesExtractor(this->procs);
     dfsVisitHelper(node->thenStmtList, thenUsesExtractorHelper);
     dfsVisitHelper(node->elseStmtList, elseUsesExtractorHelper);
 
@@ -104,3 +130,8 @@ void UsesExtractor::dfsVisitHelper(ASTNode* node, UsesExtractor* visitor) {
         dfsVisitHelper(child.get(), visitor);
     }
 }
+
+// per procedure,
+// have a separate visitor that visits all the procedures, then stores the pointer to each procedure
+
+// then in visitcall, call uses extractor on the procedure node of the procedure being called recursively
