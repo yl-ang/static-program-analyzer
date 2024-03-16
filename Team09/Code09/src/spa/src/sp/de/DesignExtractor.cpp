@@ -33,7 +33,7 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
         dfsVisit(root, visitor);
     }
 
-    for (auto procedure : root->getChildren()) {
+    for (auto procedure : root->children) {
         this->nextExtractor->buildCFG(procedure);
     }
 }

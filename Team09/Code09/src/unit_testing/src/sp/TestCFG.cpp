@@ -1,9 +1,22 @@
 
 #include <memory>
+#include <vector>
 
 #include "catch.hpp"
-#include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/ConstantNode.h"
+#include "sp/ast/grammar_nodes/ExpressionNode.h"
+#include "sp/ast/grammar_nodes/ProcedureNode.h"
+#include "sp/ast/grammar_nodes/VariableNode.h"
+#include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/IfNode.h"
+#include "sp/ast/grammar_nodes/statements/PrintNode.h"
+#include "sp/ast/grammar_nodes/statements/ReadNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementListNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementNode.h"
+#include "sp/ast/grammar_nodes/statements/WhileNode.h"
 #include "sp/cfg/Cfg.h"
+#include "sp/de/AstVisitor.h"
+#include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
 
@@ -11,50 +24,30 @@ TEST_CASE("CFG Build Tests") {
     CFG cfg;
 
     SECTION("Build if CFG correctly") {
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
+        auto iNode = std::make_shared<VariableNode>("i", 1);
+        auto constNode = std::make_shared<ConstantNode>("1", 1);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode, constNode, 1);
 
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
+        auto xNode = std::make_shared<VariableNode>("x", 2);
+        auto twoNode = std::make_shared<ConstantNode>("2", 2);
 
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
+        auto ifConditionStatement = std::make_shared<AssignmentNode>(xNode, twoNode, 2);
+        auto ifConditionStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifConditionStatement}));
 
-        childrens[1].push_back(iNodes[1]);
-        childrens[1].push_back(constNodes[1]);
+        auto zNode = std::make_shared<VariableNode>("z", 3);
+        auto threeNode = std::make_shared<ConstantNode>("3", 3);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[1], 1);
+        auto thenStatements = std::make_shared<AssignmentNode>(zNode, threeNode, 3);
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({thenStatements}));
 
-        childrens[2].push_back(xNodes[2]);
-        childrens[2].push_back(constNodes[2]);
-        auto ifConditionStatement = std::make_shared<ASTNode>("", "assign", childrens[2], 2);
-        childrens[18].push_back(ifConditionStatement);
-        auto ifConditionStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[18], 0);
-        childrens[3].push_back(zNodes[3]);
-        childrens[3].push_back(constNodes[3]);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, ifConditionStmtList, thenStmtList, 1);
 
-        auto thenStatements = std::make_shared<ASTNode>("", "assign", childrens[3], 3);
-        childrens[19].push_back(thenStatements);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[19], 0);
-        childrens[13].push_back(ifCondition);
-        childrens[13].push_back(ifConditionStmtList);
-        childrens[13].push_back(thenStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[13], 1);
-        childrens[16].push_back(ifNode);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifNode}));
 
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[16], 0);
-
-        childrens[17].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[17], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
 
         cfg.buildCFG(proc);
 
@@ -65,54 +58,30 @@ TEST_CASE("CFG Build Tests") {
     }
 
     SECTION("Build while CFG correctly") {
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
+        auto iNode = std::make_shared<VariableNode>("i", 1);
+        auto constNode = std::make_shared<ConstantNode>("1", 1);
 
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, iNode, constNode, 1);
+        auto xNode = std::make_shared<VariableNode>("x", 2);
+        auto yNode = std::make_shared<VariableNode>("y", 2);
 
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
+        auto whileStatement1 = std::make_shared<AssignmentNode>(xNode, yNode, 2);
+        auto iNode2 = std::make_shared<VariableNode>("i", 3);
 
-        childrens[1].push_back(iNodes[1]);
-        childrens[1].push_back(constNodes[1]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[1], 1);
+        auto whileStatement2 = std::make_shared<ReadNode>(iNode2, 3);
+        auto iNode3 = std::make_shared<VariableNode>("i", 4);
+        auto constNode1 = std::make_shared<ConstantNode>("1", 4);
 
-        childrens[2].push_back(xNodes[2]);
-        childrens[2].push_back(yNodes[2]);
-        auto whileStatement1 = std::make_shared<ASTNode>("", "assign", childrens[2], 2);
+        auto whileStatement3 = std::make_shared<AssignmentNode>(iNode3, constNode1, 4);
 
-        childrens[3].push_back(iNodes[3]);
-        auto whileStatement2 = std::make_shared<ASTNode>("", "read", childrens[3], 3);
+        auto whileStmtList = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({whileStatement1, whileStatement2, whileStatement3}));
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 1);
 
-        childrens[4].push_back(iNodes[4]);
-        childrens[4].push_back(constNodes[4]);
-        auto whileStatement3 = std::make_shared<ASTNode>("", "assign", childrens[4], 4);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileNode}));
 
-        childrens[14].push_back(whileStatement1);
-        childrens[14].push_back(whileStatement2);
-        childrens[14].push_back(whileStatement3);
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[14], 0);
-
-        childrens[15].push_back(whileLoopCondition);
-        childrens[15].push_back(whileStmtList);
-
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[15], 1);
-        childrens[16].push_back(whileNode);
-
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[16], 0);
-
-        childrens[17].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[17], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
         cfg.buildCFG(proc);
 
         std::unordered_map<int, std::vector<int>> expected = {{1, {2}}, {2, {3}}, {3, {4}}, {4, {1}}};
@@ -140,107 +109,73 @@ TEST_CASE("CFG Build Tests") {
         12  x = 12;
 
         */
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
+        auto xNode = std::make_shared<VariableNode>("x", 1);
+        auto constNode = std::make_shared<ConstantNode>("0", 1);
+        auto xAssignToZero = std::make_shared<AssignmentNode>(xNode, constNode, 1);
 
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
+        auto iNode = std::make_shared<VariableNode>("i", 2);
+        auto constNode1 = std::make_shared<ConstantNode>("5", 2);
 
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
+        auto iAssignTo5 = std::make_shared<AssignmentNode>(iNode, constNode1, 2);
 
-        childrens[1].push_back(xNodes[1]);
-        childrens[1].push_back(constNodes[1]);
-        auto xAssignToZero = std::make_shared<ASTNode>("", "assign", childrens[1], 1);
+        auto iNode2 = std::make_shared<VariableNode>("i", 3);
+        auto constNode2 = std::make_shared<ConstantNode>("5", 3);
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, iNode2, constNode2, 3);
 
-        childrens[2].push_back(iNodes[2]);
-        childrens[2].push_back(constNodes[2]);
-        auto iAssignTo5 = std::make_shared<ASTNode>("", "assign", childrens[2], 2);
+        auto xNode1 = std::make_shared<VariableNode>("x", 4);
+        auto yNode1 = std::make_shared<VariableNode>("y", 4);
+        auto whileStatement1 = std::make_shared<AssignmentNode>(xNode1, yNode1, 4);
 
-        childrens[3].push_back(iNodes[3]);
-        childrens[3].push_back(constNodes[3]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[3], 3);
+        auto iNode3 = std::make_shared<VariableNode>("i", 5);
 
-        childrens[4].push_back(xNodes[4]);
-        childrens[4].push_back(yNodes[4]);
-        auto whileStatement1 = std::make_shared<ASTNode>("", "assign", childrens[4], 4);
+        auto whileStatement2 = std::make_shared<ReadNode>(iNode3, 5);
 
-        childrens[5].push_back(iNodes[5]);
-        auto whileStatement2 = std::make_shared<ASTNode>("", "read", childrens[5], 5);
+        auto iNode4 = std::make_shared<VariableNode>("i", 6);
+        auto constNode3 = std::make_shared<ConstantNode>("5", 6);
 
-        childrens[6].push_back(iNodes[6]);
-        childrens[6].push_back(constNodes[6]);
-        auto whileStatement3 = std::make_shared<ASTNode>("", "assign", childrens[6], 6);
+        auto whileStatement3 = std::make_shared<AssignmentNode>(iNode4, constNode3, 6);
 
-        childrens[7].push_back(iNodes[7]);
-        childrens[7].push_back(constNodes[7]);
+        auto iNode5 = std::make_shared<VariableNode>("i", 7);
+        auto constNode4 = std::make_shared<ConstantNode>("5", 7);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode5, constNode4, 7);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[7], 7);
+        auto xNode2 = std::make_shared<VariableNode>("x", 8);
+        auto constNode5 = std::make_shared<ConstantNode>("5", 8);
+        auto thenStmt = std::make_shared<AssignmentNode>(xNode2, constNode5, 8);
 
-        childrens[8].push_back(xNodes[8]);
-        childrens[8].push_back(constNodes[8]);
-        auto ifConditionStatement = std::make_shared<ASTNode>("", "assign", childrens[8], 8);
-        childrens[18].push_back(ifConditionStatement);
-        auto ifConditionStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[18], 0);
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({thenStmt}));
 
-        childrens[9].push_back(zNodes[9]);
-        childrens[9].push_back(constNodes[9]);
+        auto zNode2 = std::make_shared<VariableNode>("z", 9);
+        auto constNode6 = std::make_shared<ConstantNode>("5", 9);
+        auto elseStmt = std::make_shared<AssignmentNode>(zNode2, constNode6, 9);
 
-        auto thenStatements = std::make_shared<ASTNode>("", "assign", childrens[9], 9);
-        childrens[19].push_back(thenStatements);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[19], 0);
+        auto elseStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({elseStmt}));
 
-        childrens[10].push_back(zNodes[10]);
-        childrens[10].push_back(constNodes[10]);
+        auto zNode3 = std::make_shared<VariableNode>("z", 10);
+        auto constNode7 = std::make_shared<ConstantNode>("5", 10);
+        auto zEquals3 = std::make_shared<AssignmentNode>(zNode3, constNode7, 10);
 
-        auto zEquals3 = std::make_shared<ASTNode>("", "assign", childrens[10], 10);
+        auto yNode3 = std::make_shared<VariableNode>("y", 11);
+        auto constNode8 = std::make_shared<ConstantNode>("5", 11);
+        auto yEquals4 = std::make_shared<AssignmentNode>(yNode3, constNode8, 11);
 
-        childrens[11].push_back(yNodes[11]);
-        childrens[11].push_back(constNodes[11]);
+        auto yNode4 = std::make_shared<VariableNode>("y", 12);
+        auto constNode9 = std::make_shared<ConstantNode>("5", 12);
+        auto xEquals5 = std::make_shared<AssignmentNode>(yNode4, constNode9, 12);
 
-        auto yEquals4 = std::make_shared<ASTNode>("", "assign", childrens[11], 11);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, thenStmtList, elseStmtList, 7);
 
-        childrens[12].push_back(yNodes[12]);
-        childrens[12].push_back(constNodes[12]);
+        auto whileStmtList = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({whileStatement1, whileStatement2, whileStatement3}));
 
-        auto xEquals5 = std::make_shared<ASTNode>("", "assign", childrens[12], 12);
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 3);
 
-        childrens[13].push_back(ifCondition);
-        childrens[13].push_back(ifConditionStmtList);
-        childrens[13].push_back(thenStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[13], 7);
+        auto procStatementList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>(
+            {xAssignToZero, iAssignTo5, whileNode, ifNode, zEquals3, yEquals4, xEquals5}));
 
-        childrens[14].push_back(whileStatement1);
-        childrens[14].push_back(whileStatement2);
-        childrens[14].push_back(whileStatement3);
-
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[14], 0);
-        childrens[15].push_back(whileLoopCondition);
-        childrens[15].push_back(whileStmtList);
-
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[15], 3);
-
-        childrens[16].push_back(xAssignToZero);
-        childrens[16].push_back(iAssignTo5);
-        childrens[16].push_back(whileNode);
-        childrens[16].push_back(ifNode);
-        childrens[16].push_back(zEquals3);
-        childrens[16].push_back(yEquals4);
-        childrens[16].push_back(xEquals5);
-
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[16], 0);
-
-        childrens[17].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[17], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
 
         cfg.buildCFG(proc);
 
@@ -253,24 +188,6 @@ TEST_CASE("CFG Build Tests") {
     }
 
     SECTION("Build while in if CFG correctly") {
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
-
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
-
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
-
         /*
         01 if (i == 1) then {
         02    while (z != 2) {
@@ -280,46 +197,38 @@ TEST_CASE("CFG Build Tests") {
         04    read y;
             }
         */
+        auto iNode = std::make_shared<VariableNode>("i", 1);
+        auto constNode = std::make_shared<ConstantNode>("5", 1);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode, constNode, 1);
 
-        childrens[1].push_back(iNodes[1]);
-        childrens[1].push_back(constNodes[1]);
+        auto zNode = std::make_shared<VariableNode>("z", 2);
+        auto constNode1 = std::make_shared<ConstantNode>("5", 2);
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode, constNode1, 2);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[1], 1);
+        auto iNode2 = std::make_shared<VariableNode>("i", 3);
+        auto whileStatement1 = std::make_shared<ReadNode>(iNode2, 3);
 
-        childrens[2].push_back(zNodes[2]);
-        childrens[2].push_back(constNodes[2]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[2], 2);
+        auto whileStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileStatement1}));
 
-        childrens[3].push_back(iNodes[3]);
-        auto whileStatement1 = std::make_shared<ASTNode>("", "read", childrens[3], 3);
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 2);
 
-        childrens[5].push_back(whileStatement1);
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileNode}));
 
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[5], 0);
-        childrens[6].push_back(whileLoopCondition);
-        childrens[6].push_back(whileStmtList);
+        auto yNode = std::make_shared<VariableNode>("y", 4);
 
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[6], 2);
+        auto elseStatement = std::make_shared<ReadNode>(yNode, 4);
 
-        childrens[7].push_back(whileNode);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[7], 0);
+        auto elseStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({elseStatement}));
 
-        childrens[4].push_back(yNodes[4]);
-        auto elseStatement = std::make_shared<ASTNode>("", "read", childrens[4], 4);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, thenStmtList, elseStmtList, 1);
 
-        childrens[8].push_back(elseStatement);
-        auto elseStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[8], 0);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifNode}));
 
-        childrens[9].push_back(ifCondition);
-        childrens[9].push_back(thenStmtList);
-        childrens[9].push_back(elseStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[9], 1);
-        childrens[10].push_back(ifNode);
-
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[10], 0);
-
-        childrens[11].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[11], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
         cfg.buildCFG(proc);
 
         std::unordered_map<int, std::vector<int>> expected = {
@@ -332,24 +241,6 @@ TEST_CASE("CFG Build Tests") {
     }
 
     SECTION("Build if in while CFG correctly") {
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
-
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
-
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
-
         /*
         01    while (z != 2) {
         02        if (i == 0) then {
@@ -358,46 +249,37 @@ TEST_CASE("CFG Build Tests") {
         04            read a;
                 }
         */
+        auto zNode = std::make_shared<VariableNode>("z", 1);
+        auto constNode = std::make_shared<ConstantNode>("5", 1);
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode, constNode, 1);
 
-        childrens[1].push_back(zNodes[1]);
-        childrens[1].push_back(constNodes[1]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[1], 1);
+        auto iNode = std::make_shared<VariableNode>("z", 2);
+        auto constNode1 = std::make_shared<ConstantNode>("5", 2);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode, constNode1, 2);
 
-        childrens[2].push_back(iNodes[2]);
-        childrens[2].push_back(constNodes[2]);
+        auto iNode2 = std::make_shared<VariableNode>("z", 3);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[2], 2);
+        auto readStmt = std::make_shared<ReadNode>(iNode2, 3);
 
-        childrens[3].push_back(yNodes[3]);
-        auto readStmt = std::make_shared<ASTNode>("", "read", childrens[3], 3);
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readStmt}));
 
-        childrens[4].push_back(readStmt);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[4], 0);
+        auto iNode3 = std::make_shared<VariableNode>("z", 4);
 
-        childrens[5].push_back(yNodes[5]);
-        auto readStmt2 = std::make_shared<ASTNode>("", "read", childrens[5], 4);
+        auto readStmt2 = std::make_shared<ReadNode>(iNode3, 4);
 
-        childrens[11].push_back(readStmt2);
+        auto elseStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readStmt2}));
 
-        auto elseStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[11], 0);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, thenStmtList, elseStmtList, 2);
+        auto whileStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifNode}));
 
-        childrens[6].push_back(ifCondition);
-        childrens[6].push_back(thenStmtList);
-        childrens[6].push_back(elseStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[6], 2);
-        childrens[7].push_back(ifNode);
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[7], 0);
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 1);
 
-        childrens[8].push_back(whileLoopCondition);
-        childrens[8].push_back(whileStmtList);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileNode}));
 
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[8], 1);
-
-        childrens[9].push_back(whileNode);
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[9], 0);
-
-        childrens[10].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[10], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
         cfg.buildCFG(proc);
 
         std::unordered_map<int, std::vector<int>> expected = {
@@ -422,67 +304,40 @@ TEST_CASE("CFG Build Tests") {
         05      read x;
         }
         */
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
+        auto zNode = std::make_shared<VariableNode>("z", 1);
+        auto constNode = std::make_shared<ConstantNode>("5", 1);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, zNode, constNode, 1);
 
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
+        auto yNode = std::make_shared<VariableNode>("z", 2);
+        auto readStmt = std::make_shared<ReadNode>(yNode, 2);
 
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readStmt}));
 
-        childrens[1].push_back(iNodes[1]);
-        childrens[1].push_back(constNodes[1]);
+        auto yNode2 = std::make_shared<VariableNode>("z", 3);
+        auto readStmt2 = std::make_shared<ReadNode>(yNode2, 3);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[1], 1);
-        childrens[2].push_back(yNodes[2]);
-        auto readStmt = std::make_shared<ASTNode>("", "read", childrens[2], 2);
+        auto elseStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readStmt2}));
 
-        childrens[3].push_back(readStmt);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[3], 0);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, thenStmtList, elseStmtList, 1);
 
-        childrens[4].push_back(yNodes[4]);
-        auto readStmt2 = std::make_shared<ASTNode>("", "read", childrens[4], 3);
+        auto zNode2 = std::make_shared<VariableNode>("z", 4);
+        auto constNode2 = std::make_shared<ConstantNode>("5", 4);
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode2, constNode2, 4);
 
-        childrens[5].push_back(readStmt2);
+        auto zNode3 = std::make_shared<VariableNode>("z", 5);
+        auto readStmt3 = std::make_shared<ReadNode>(zNode3, 5);
 
-        auto elseStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[5], 0);
+        auto whileStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readStmt3}));
 
-        childrens[6].push_back(ifCondition);
-        childrens[6].push_back(thenStmtList);
-        childrens[6].push_back(elseStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[6], 1);
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 4);
 
-        childrens[7].push_back(zNodes[7]);
-        childrens[7].push_back(constNodes[7]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[7], 4);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifNode, whileNode}));
 
-        childrens[8].push_back(yNodes[8]);
-        auto readStmt3 = std::make_shared<ASTNode>("", "read", childrens[8], 5);
-
-        childrens[9].push_back(readStmt3);
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[9], 0);
-
-        childrens[10].push_back(whileLoopCondition);
-        childrens[10].push_back(whileStmtList);
-
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[10], 4);
-
-        childrens[11].push_back(ifNode);
-        childrens[11].push_back(whileNode);
-
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[11], 0);
-        childrens[12].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[12], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
 
         cfg.buildCFG(proc);
 
@@ -495,24 +350,6 @@ TEST_CASE("CFG Build Tests") {
     }
 
     SECTION("Build while in if then something CFG correctly") {
-        std::vector<std::shared_ptr<ASTNode>> childrens[20];
-
-        std::vector<std::shared_ptr<ASTNode>> constNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> xNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> yNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> zNodes = {};
-        std::vector<std::shared_ptr<ASTNode>> iNodes = {};
-
-        for (int i = 0; i < 20; i++) {
-            zNodes.push_back(std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            xNodes.push_back(std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            yNodes.push_back(std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            constNodes.push_back(
-                std::make_shared<ASTNode>(std::to_string(i), "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            iNodes.push_back(std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, i));
-            childrens[i] = {};
-        }
-
         /*
         01 if (i == 1) then {
         02    while (z != 2) {
@@ -523,50 +360,40 @@ TEST_CASE("CFG Build Tests") {
             }
         05  read x;
         */
+        auto zNode = std::make_shared<VariableNode>("z", 1);
+        auto constNode = std::make_shared<ConstantNode>("5", 1);
+        auto ifCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, zNode, constNode, 1);
 
-        childrens[1].push_back(iNodes[1]);
-        childrens[1].push_back(constNodes[1]);
+        auto zNode1 = std::make_shared<VariableNode>("z", 2);
+        auto constNode1 = std::make_shared<ConstantNode>("5", 2);
+        auto whileLoopCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode1, constNode1, 2);
 
-        auto ifCondition = std::make_shared<ASTNode>("", "==", childrens[1], 1);
+        auto zNode2 = std::make_shared<VariableNode>("z", 3);
+        auto whileStatement1 = std::make_shared<ReadNode>(zNode2, 3);
 
-        childrens[2].push_back(zNodes[2]);
-        childrens[2].push_back(constNodes[2]);
-        auto whileLoopCondition = std::make_shared<ASTNode>("", "!=", childrens[2], 2);
+        auto whileStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileStatement1}));
 
-        childrens[3].push_back(iNodes[3]);
-        auto whileStatement1 = std::make_shared<ASTNode>("", "read", childrens[3], 3);
+        auto whileNode = std::make_shared<WhileNode>(whileLoopCondition, whileStmtList, 2);
 
-        childrens[5].push_back(whileStatement1);
+        auto thenStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileNode}));
+        auto zNode3 = std::make_shared<VariableNode>("z", 4);
 
-        auto whileStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[5], 0);
-        childrens[6].push_back(whileLoopCondition);
-        childrens[6].push_back(whileStmtList);
+        auto elseStatement = std::make_shared<ReadNode>(zNode3, 4);
 
-        auto whileNode = std::make_shared<ASTNode>("", "while", childrens[6], 2);
+        auto elseStmtList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({elseStatement}));
 
-        childrens[7].push_back(whileNode);
-        auto thenStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[7], 0);
+        auto ifNode = std::make_shared<IfNode>(ifCondition, thenStmtList, elseStmtList, 1);
+        auto zNode4 = std::make_shared<VariableNode>("z", 5);
 
-        childrens[4].push_back(yNodes[4]);
-        auto elseStatement = std::make_shared<ASTNode>("", "read", childrens[4], 4);
+        auto readStatement = std::make_shared<ReadNode>(zNode4, 5);
 
-        childrens[8].push_back(elseStatement);
-        auto elseStmtList = std::make_shared<ASTNode>("", "stmtList", childrens[8], 0);
+        auto procStatementList =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifNode, readStatement}));
 
-        childrens[9].push_back(ifCondition);
-        childrens[9].push_back(thenStmtList);
-        childrens[9].push_back(elseStmtList);
-        auto ifNode = std::make_shared<ASTNode>("", "if", childrens[9], 1);
-
-        childrens[12].push_back(yNodes[12]);
-        auto readStatement = std::make_shared<ASTNode>("", "read", childrens[12], 5);
-        childrens[10].push_back(ifNode);
-        childrens[10].push_back(readStatement);
-
-        auto procStatementList = std::make_shared<ASTNode>("", "stmtList", childrens[10], 0);
-
-        childrens[11].push_back(procStatementList);
-        auto proc = std::make_shared<ASTNode>("Second", "proc", childrens[11], 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStatementList);
         cfg.buildCFG(proc);
 
         std::unordered_map<int, std::vector<int>> expected = {
@@ -592,51 +419,40 @@ TEST_CASE("CFG Build Tests") {
         */
 
         // ASTNode for if condition (i == 1)
-        auto iNode = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        auto constNode1 = std::make_shared<ASTNode>("1", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        std::vector<std::shared_ptr<ASTNode>> children1 = {iNode, constNode1};
-        auto ifCondition1 = std::make_shared<ASTNode>("", "==", children1, 1);
+        auto iNode = std::make_shared<VariableNode>("i", 1);
+        auto constNode1 = std::make_shared<ConstantNode>("1", 1);
+        auto ifCondition1 = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode, constNode1, 1);
 
         // ASTNode for then block (read y)
-        auto yNode = std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 2);
-        std::vector<std::shared_ptr<ASTNode>> readYChildren = {yNode};
-        auto readYNode = std::make_shared<ASTNode>("", "read", readYChildren, 2);
-        std::vector<std::shared_ptr<ASTNode>> thenStmts = {readYNode};
-        auto thenBlock = std::make_shared<ASTNode>("", "stmtList", thenStmts, 0);
+        auto yNode = std::make_shared<VariableNode>("y", 2);
+        auto readYNode = std::make_shared<ReadNode>(yNode, 2);
+        auto thenBlock = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readYNode}));
 
         // ASTNode for else block (while loop)
-        auto zNode = std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        auto constNode2 = std::make_shared<ASTNode>("2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        std::vector<std::shared_ptr<ASTNode>> children2 = {zNode, constNode2};
-        auto whileCondition = std::make_shared<ASTNode>("", "!=", children2, 3);
+        auto zNode = std::make_shared<VariableNode>("z", 3);
+        auto constNode2 = std::make_shared<ConstantNode>("2", 3);
+        auto whileCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode, constNode2, 3);
 
         // ASTNode for read i inside while loop
-        auto iNode2 = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 4);
-        std::vector<std::shared_ptr<ASTNode>> readChild = {iNode2};
-        auto readINode = std::make_shared<ASTNode>("", "read", readChild, 4);
-        std::vector<std::shared_ptr<ASTNode>> whileStmts = {readINode};
-        auto whileBlock = std::make_shared<ASTNode>("", "stmtList", whileStmts, 0);
+        auto iNode2 = std::make_shared<VariableNode>("i", 4);
+        auto readINode = std::make_shared<ReadNode>(iNode2, 4);
+        auto whileBlock = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readINode}));
 
-        std::vector<std::shared_ptr<ASTNode>> whileChildren = {whileCondition, whileBlock};
-        auto whileNode = std::make_shared<ASTNode>("", "while", whileChildren, 3);
+        auto whileNode = std::make_shared<WhileNode>(whileCondition, whileBlock, 3);
 
         // Assemble the ASTNodes into the CFG
-        std::vector<std::shared_ptr<ASTNode>> elseBranchChildren = {whileNode};
-        auto elseBranch = std::make_shared<ASTNode>("", "stmtList", elseBranchChildren, 0);
+        auto elseBranch = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileNode}));
 
-        std::vector<std::shared_ptr<ASTNode>> ifThenElseChildren = {ifCondition1, thenBlock, elseBranch};
-        auto ifThenElseNode = std::make_shared<ASTNode>("", "if", ifThenElseChildren, 1);
+        auto ifThenElseNode = std::make_shared<IfNode>(ifCondition1, thenBlock, elseBranch, 1);
 
         // line 5
-        auto xNode2 = std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 5);
-        std::vector<std::shared_ptr<ASTNode>> readChild2 = {iNode2};
-        auto lastReadStatement = std::make_shared<ASTNode>("", "read", readChild2, 5);
+        auto xNode2 = std::make_shared<VariableNode>("x", 5);
+        auto lastReadStatement = std::make_shared<ReadNode>(iNode2, 5);
 
-        std::vector<std::shared_ptr<ASTNode>> stmtListChildren = {ifThenElseNode, lastReadStatement};
-        auto procStmtList = std::make_shared<ASTNode>("", "stmtList", stmtListChildren, 0);
+        auto procStmtList = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({ifThenElseNode, lastReadStatement}));
 
-        std::vector<std::shared_ptr<ASTNode>> procChildren = {procStmtList};
-        auto proc = std::make_shared<ASTNode>("Second", "proc", procChildren, 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStmtList);
         cfg.buildCFG(proc);
         std::unordered_map<int, std::vector<int>> expected = {
             {1, {2, 3}},
@@ -660,70 +476,56 @@ TEST_CASE("CFG Build Tests") {
         08  read x;
         */
         // ASTNode for if condition (i == 1)
-        auto iNode = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        auto constNode1 = std::make_shared<ASTNode>("1", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        std::vector<std::shared_ptr<ASTNode>> children1 = {iNode, constNode1};
-        auto ifCondition1 = std::make_shared<ASTNode>("", "==", children1, 1);
+        auto iNode = std::make_shared<VariableNode>("i", 1);
+        auto constNode1 = std::make_shared<ConstantNode>("1", 1);
+        auto ifCondition1 = std::make_shared<ExpressionNode>(EQUAL_CHECK, iNode, constNode1, 1);
 
         // ASTNode for then block (read y)
-        auto yNode = std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 2);
-        std::vector<std::shared_ptr<ASTNode>> readYChildren = {yNode};
-        auto readYNode = std::make_shared<ASTNode>("", "read", readYChildren, 2);
-        std::vector<std::shared_ptr<ASTNode>> thenStmts = {readYNode};
-        auto thenBlock = std::make_shared<ASTNode>("", "stmtList", thenStmts, 0);
+        auto yNode = std::make_shared<VariableNode>("y", 2);
+        auto readYNode = std::make_shared<ReadNode>(yNode, 2);
+        auto thenBlock = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readYNode}));
 
         // ASTNode for else block (while loop)
-        auto zNode = std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        auto constNode2 = std::make_shared<ASTNode>("2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        std::vector<std::shared_ptr<ASTNode>> children2 = {zNode, constNode2};
-        auto whileCondition = std::make_shared<ASTNode>("", "!=", children2, 3);
+        auto zNode = std::make_shared<VariableNode>("z", 3);
+        auto constNode2 = std::make_shared<ConstantNode>("2", 3);
+        auto whileCondition = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode, constNode2, 3);
 
         // ASTNode for read i inside while loop
-        auto iNode2 = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 4);
-        std::vector<std::shared_ptr<ASTNode>> readChild = {iNode2};
-        auto readINode = std::make_shared<ASTNode>("", "read", readChild, 4);
-        std::vector<std::shared_ptr<ASTNode>> whileStmts = {readINode};
-        auto whileBlock = std::make_shared<ASTNode>("", "stmtList", whileStmts, 0);
+        auto iNode2 = std::make_shared<VariableNode>("i", 4);
+        auto readINode = std::make_shared<ReadNode>(iNode2, 4);
+        auto whileBlock = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readINode}));
 
-        std::vector<std::shared_ptr<ASTNode>> whileChildren = {whileCondition, whileBlock};
-        auto whileNode = std::make_shared<ASTNode>("", "while", whileChildren, 3);
+        auto whileNode = std::make_shared<WhileNode>(whileCondition, whileBlock, 3);
 
-        auto zNode1 = std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 5);
-        auto constNode21 = std::make_shared<ASTNode>("2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 5);
-        std::vector<std::shared_ptr<ASTNode>> children21 = {zNode1, constNode21};
-        auto whileCondition1 = std::make_shared<ASTNode>("", "!=", children21, 5);
+        auto zNode1 = std::make_shared<VariableNode>("z", 5);
+        auto constNode21 = std::make_shared<ConstantNode>("2", 5);
+        auto whileCondition1 = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, zNode1, constNode21, 5);
 
         // ASTNode for read i inside while loop
-        auto iNode21 = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 6);
-        std::vector<std::shared_ptr<ASTNode>> readChild1 = {iNode21};
-        auto readINode1 = std::make_shared<ASTNode>("", "read", readChild1, 6);
-        std::vector<std::shared_ptr<ASTNode>> whileStmts1 = {readINode1};
-        auto whileBlock1 = std::make_shared<ASTNode>("", "stmtList", whileStmts1, 0);
+        auto iNode21 = std::make_shared<VariableNode>("i", 6);
+        auto readINode1 = std::make_shared<ReadNode>(iNode21, 6);
+        auto whileBlock1 =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readINode1}));
 
-        std::vector<std::shared_ptr<ASTNode>> whileChildren1 = {whileCondition1, whileBlock1};
-        auto whileNode1 = std::make_shared<ASTNode>("", "while", whileChildren1, 5);
+        auto whileNode1 = std::make_shared<WhileNode>(whileCondition1, whileBlock1, 5);
 
-        auto iNode22 = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 7);
-        std::vector<std::shared_ptr<ASTNode>> readChild2 = {iNode22};
-        auto readINode2 = std::make_shared<ASTNode>("", "read", readChild2, 7);
+        auto iNode22 = std::make_shared<VariableNode>("i", 7);
+        auto readINode2 = std::make_shared<ReadNode>(iNode22, 7);
 
         // Assemble the ASTNodes into the CFG
-        std::vector<std::shared_ptr<ASTNode>> elseBranchChildren = {whileNode, whileNode1, readINode2};
-        auto elseBranch = std::make_shared<ASTNode>("", "stmtList", elseBranchChildren, 0);
+        auto elseBranch = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({whileNode, whileNode1, readINode2}));
 
-        std::vector<std::shared_ptr<ASTNode>> ifThenElseChildren = {ifCondition1, thenBlock, elseBranch};
-        auto ifThenElseNode = std::make_shared<ASTNode>("", "if", ifThenElseChildren, 1);
+        auto ifThenElseNode = std::make_shared<IfNode>(ifCondition1, thenBlock, elseBranch, 1);
 
         // last read
-        auto iNode23 = std::make_shared<ASTNode>("i", "var", std::vector<std::shared_ptr<ASTNode>>{}, 8);
-        std::vector<std::shared_ptr<ASTNode>> readChild3 = {iNode23};
-        auto readINode3 = std::make_shared<ASTNode>("", "read", readChild3, 8);
+        auto iNode23 = std::make_shared<VariableNode>("i", 8);
+        auto readINode3 = std::make_shared<ReadNode>(iNode23, 8);
 
-        std::vector<std::shared_ptr<ASTNode>> stmtListChildren = {ifThenElseNode, readINode3};
-        auto procStmtList = std::make_shared<ASTNode>("", "stmtList", stmtListChildren, 0);
+        auto procStmtList = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({ifThenElseNode, readINode3}));
 
-        std::vector<std::shared_ptr<ASTNode>> procChildren = {procStmtList};
-        auto proc = std::make_shared<ASTNode>("Second", "proc", procChildren, 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", procStmtList);
 
         cfg.buildCFG(proc);
 
@@ -757,112 +559,100 @@ TEST_CASE("CFG Build Tests") {
 
         */
         // if (y7 < 10) 1
-        auto y7Node = std::make_shared<ASTNode>("y7", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        auto constNode1 = std::make_shared<ASTNode>("10", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        std::vector<std::shared_ptr<ASTNode>> children1 = {y7Node, constNode1};
-        auto outerCondition = std::make_shared<ASTNode>("", "<", children1, 1);
+        auto y7Node = std::make_shared<VariableNode>("y7", 1);
+        auto constNode1 = std::make_shared<ConstantNode>("10", 1);
+        auto outerCondition = std::make_shared<ExpressionNode>(LESS_THAN, y7Node, constNode1, 1);
 
         // read z 2
-        auto zNode = std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 2);
-        auto readZNode = std::make_shared<ASTNode>("", "read", std::vector<std::shared_ptr<ASTNode>>{zNode}, 2);
-        auto thenNode = std::make_shared<ASTNode>("", "stmtList", std::vector<std::shared_ptr<ASTNode>>{readZNode}, 0);
+        auto zNode = std::make_shared<VariableNode>("z", 2);
+        auto readZNode = std::make_shared<ReadNode>(zNode, 2);
+        auto thenNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readZNode}));
 
         //  while (z10 > 1) 3
-        auto z10Node = std::make_shared<ASTNode>("z10", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        auto constNode2 = std::make_shared<ASTNode>("1", "var", std::vector<std::shared_ptr<ASTNode>>{}, 3);
-        std::vector<std::shared_ptr<ASTNode>> children2 = {z10Node, constNode2};
-        auto whileCondition1 = std::make_shared<ASTNode>("", ">", children2, 3);
+        auto z10Node = std::make_shared<VariableNode>("z10", 3);
+        auto constNode2 = std::make_shared<ConstantNode>("1", 3);
+        auto whileCondition1 = std::make_shared<ExpressionNode>(GREATER_THAN, z10Node, constNode2, 3);
 
         // print z10; 4
-        auto z10Node2 = std::make_shared<ASTNode>("z10", "var", std::vector<std::shared_ptr<ASTNode>>{}, 4);
-        auto printNode = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{z10Node2}, 4);
+        auto z10Node2 = std::make_shared<VariableNode>("z10", 4);
+        auto printNode = std::make_shared<PrintNode>(z10Node2, 4);
 
         // read z1; 5
-        auto z1Node = std::make_shared<ASTNode>("z1", "var", std::vector<std::shared_ptr<ASTNode>>{}, 5);
-        auto readZ1Node = std::make_shared<ASTNode>("", "read", std::vector<std::shared_ptr<ASTNode>>{z1Node}, 5);
+        auto z1Node = std::make_shared<VariableNode>("z1", 5);
+        auto readZ1Node = std::make_shared<ReadNode>(z1Node, 5);
 
         // while (x2 < x3) 6
-        auto x2Node = std::make_shared<ASTNode>("x2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 6);
-        auto x3Node = std::make_shared<ASTNode>("x3", "var", std::vector<std::shared_ptr<ASTNode>>{}, 6);
-        std::vector<std::shared_ptr<ASTNode>> children3 = {x2Node, x3Node};
-        auto whileCondition2 = std::make_shared<ASTNode>("", "<", children3, 6);
+        auto x2Node = std::make_shared<VariableNode>("x2", 6);
+        auto x3Node = std::make_shared<VariableNode>("x3", 6);
+        auto whileCondition2 = std::make_shared<ExpressionNode>(LESS_THAN, x2Node, x3Node, 6);
 
         // print a; 7
-        auto aNode = std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 7);
-        auto printANode = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{aNode}, 7);
+        auto aNode = std::make_shared<VariableNode>("a", 7);
+        auto printANode = std::make_shared<PrintNode>(aNode, 7);
 
         // while (x2 < x4)  8
-        auto x2Node1 = std::make_shared<ASTNode>("x2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 8);
-        auto x4Node = std::make_shared<ASTNode>("x4", "var", std::vector<std::shared_ptr<ASTNode>>{}, 8);
-        std::vector<std::shared_ptr<ASTNode>> children4 = {x2Node1, x4Node};
-        auto whileCondition3 = std::make_shared<ASTNode>("", "<", children4, 8);
+        auto x2Node1 = std::make_shared<VariableNode>("x2", 8);
+        auto x4Node = std::make_shared<VariableNode>("x4", 8);
+        auto whileCondition3 = std::make_shared<ExpressionNode>(LESS_THAN, x2Node1, x4Node, 8);
 
         // read x 9
-        auto xNode = std::make_shared<ASTNode>("x4", "var", std::vector<std::shared_ptr<ASTNode>>{}, 9);
-        auto readXNode = std::make_shared<ASTNode>("", "read", std::vector<std::shared_ptr<ASTNode>>{xNode}, 9);
+        auto xNode = std::make_shared<VariableNode>("x4", 9);
+        auto readXNode = std::make_shared<ReadNode>(xNode, 9);
 
         //  if (x4 == 1) 10
-        auto constNode3 = std::make_shared<ASTNode>("1", "var", std::vector<std::shared_ptr<ASTNode>>{}, 10);
-        auto x4Node1 = std::make_shared<ASTNode>("x4", "var", std::vector<std::shared_ptr<ASTNode>>{}, 10);
+        auto constNode3 = std::make_shared<ConstantNode>("1", 10);
+        auto x4Node1 = std::make_shared<VariableNode>("x4", 10);
 
-        std::vector<std::shared_ptr<ASTNode>> children5 = {x4Node1, constNode3};
-        auto innerCondition = std::make_shared<ASTNode>("", "==", children5, 10);
+        auto innerCondition = std::make_shared<ExpressionNode>(EQUAL_CHECK, x4Node1, constNode3, 10);
 
         // print x4 11
-        auto x4Node2 = std::make_shared<ASTNode>("x4", "var", std::vector<std::shared_ptr<ASTNode>>{}, 11);
-        auto printX4Node = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{x4Node2}, 11);
+        auto x4Node2 = std::make_shared<VariableNode>("x4", 11);
+        auto printX4Node = std::make_shared<PrintNode>(x4Node2, 11);
         auto innerThenNode =
-            std::make_shared<ASTNode>("", "stmtList", std::vector<std::shared_ptr<ASTNode>>{printX4Node}, 0);
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({printX4Node}));
         //  print c2 12
-        auto c2Node = std::make_shared<ASTNode>("c2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 12);
+        auto c2Node = std::make_shared<VariableNode>("c2", 12);
 
-        auto printC2Node = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{c2Node}, 12);
+        auto printC2Node = std::make_shared<PrintNode>(c2Node, 12);
 
         // print x2 13
-        auto x2Node2 = std::make_shared<ASTNode>("x2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 13);
-        auto printX2Node = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{x2Node2}, 13);
-        auto innerElseNode = std::make_shared<ASTNode>(
-            "", "stmtList", std::vector<std::shared_ptr<ASTNode>>{printC2Node, printX2Node}, 0);
+        auto x2Node2 = std::make_shared<VariableNode>("x2", 13);
+        auto printX2Node = std::make_shared<PrintNode>(x2Node2, 13);
+        auto innerElseNode = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({printC2Node, printX2Node}));
 
         //  print c2 14
-        auto c2Node3 = std::make_shared<ASTNode>("c2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 14);
-        auto printC2Node2 = std::make_shared<ASTNode>("", "print", std::vector<std::shared_ptr<ASTNode>>{c2Node3}, 14);
+        auto c2Node3 = std::make_shared<VariableNode>("c2", 14);
+        auto printC2Node2 = std::make_shared<PrintNode>(c2Node3, 14);
 
         //  read x11 15
-        auto x11Node = std::make_shared<ASTNode>("c2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 15);
-        auto readX11Node = std::make_shared<ASTNode>("", "read", std::vector<std::shared_ptr<ASTNode>>{x11Node}, 15);
+        auto x11Node = std::make_shared<VariableNode>("c2", 15);
+        auto readX11Node = std::make_shared<ReadNode>(x11Node, 15);
 
         // Construct CFG
-        std::vector<std::shared_ptr<ASTNode>> whileStmts1 = {printNode, readZ1Node};
-        auto whileBlock1 = std::make_shared<ASTNode>("", "stmtList", whileStmts1, 0);
-        auto whileNode1 = std::make_shared<ASTNode>(
-            "", "while", std::vector<std::shared_ptr<ASTNode>>{whileCondition1, whileBlock1}, 3);
+        auto whileBlock1 =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({printNode, readZ1Node}));
+        auto whileNode1 = std::make_shared<WhileNode>(whileCondition1, whileBlock1, 3);
 
-        std::vector<std::shared_ptr<ASTNode>> whileStmts2 = {printANode};
-        auto whileBlock2 = std::make_shared<ASTNode>("", "stmtList", whileStmts2, 0);
-        auto whileNode2 = std::make_shared<ASTNode>(
-            "", "while", std::vector<std::shared_ptr<ASTNode>>{whileCondition2, whileBlock2}, 6);
+        auto whileBlock2 =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({printANode}));
+        auto whileNode2 = std::make_shared<WhileNode>(whileCondition2, whileBlock2, 6);
 
-        std::vector<std::shared_ptr<ASTNode>> whileStmts3 = {readXNode};
-        auto whileBlock3 = std::make_shared<ASTNode>("", "stmtList", whileStmts3, 0);
-        auto whileNode3 = std::make_shared<ASTNode>(
-            "", "while", std::vector<std::shared_ptr<ASTNode>>{whileCondition3, whileBlock3}, 8);
+        auto whileBlock3 =
+            std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readXNode}));
+        auto whileNode3 = std::make_shared<WhileNode>(whileCondition3, whileBlock3, 8);
 
-        auto innerConditional = std::make_shared<ASTNode>(
-            "", "if", std::vector<std::shared_ptr<ASTNode>>{innerCondition, innerThenNode, innerElseNode}, 10);
+        auto innerConditional = std::make_shared<IfNode>(innerCondition, innerThenNode, innerElseNode, 10);
 
-        auto outerElse = std::make_shared<ASTNode>(
-            "", "stmtList",
-            std::vector<std::shared_ptr<ASTNode>>{whileNode1, whileNode2, whileNode3, innerConditional, printC2Node2},
-            0);
-        auto outerThen = std::make_shared<ASTNode>("", "stmtList", std::vector<std::shared_ptr<ASTNode>>{readZNode}, 0);
-        auto outerConditional = std::make_shared<ASTNode>(
-            "", "if", std::vector<std::shared_ptr<ASTNode>>{outerCondition, outerThen, outerElse}, 1);
+        auto outerElse = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>(
+            {whileNode1, whileNode2, whileNode3, innerConditional, printC2Node2}));
+        auto outerThen = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({readZNode}));
+        auto outerConditional = std::make_shared<IfNode>(outerCondition, outerThen, outerElse, 1);
 
-        auto statements = std::make_shared<ASTNode>(
-            "", "stmtList", std::vector<std::shared_ptr<ASTNode>>{outerConditional, readX11Node}, 0);
+        auto statements = std::make_shared<StatementListNode>(
+            std::vector<std::shared_ptr<StatementNode>>({outerConditional, readX11Node}));
 
-        auto proc = std::make_shared<ASTNode>("parent", "proc", std::vector<std::shared_ptr<ASTNode>>{statements}, 0);
+        auto proc = std::make_shared<ProcedureNode>("proc", statements);
 
         cfg.buildCFG(proc);
 

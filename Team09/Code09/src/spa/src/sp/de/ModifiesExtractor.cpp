@@ -14,21 +14,21 @@ void ModifiesExtractor::visitConstant(ConstantNode* node) {}
 void ModifiesExtractor::visitCall(CallNode* node) {}
 
 void ModifiesExtractor::visitRead(ReadNode* node) {
-    int modifierStmtNum = node->getStmtNumber();
-    std::string modifiedVariable = node->getVar();
+    int modifierStmtNum = node->statementNumber;
+    std::string modifiedVariable = node->variable->value;
     this->modifies.insert({modifierStmtNum, modifiedVariable});
 }
 
 void ModifiesExtractor::visitAssign(AssignmentNode* node) {
-    int modifierStmtNum = node->getStmtNumber();
-    std::string modifiedVariable = node->getVar();
+    int modifierStmtNum = node->statementNumber;
+    std::string modifiedVariable = node->variable->value;
     this->modifies.insert({modifierStmtNum, modifiedVariable});
 }
 
 void ModifiesExtractor::visitWhile(WhileNode* node) {
-    int modifierStmtNum = node->getStmtNumber();
+    int modifierStmtNum = node->statementNumber;
     ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor();
-    dfsVisitHelper(node->getStmtLstNode(), modifiesExtractorHelper);
+    dfsVisitHelper(node->whileStmtList, modifiesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper->getModifies();
 
     // Iterate over each element in the set and update stmtNum value
@@ -42,11 +42,11 @@ void ModifiesExtractor::visitWhile(WhileNode* node) {
 }
 
 void ModifiesExtractor::visitIf(IfNode* node) {
-    int modifierStmtNum = node->getStmtNumber();
+    int modifierStmtNum = node->statementNumber;
     ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor();
     ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor();
-    dfsVisitHelper(node->getThenStmtLstNode(), thenModifiesExtractorHelper);
-    dfsVisitHelper(node->getElseStmtLstNode(), elseModifiesExtractorHelper);
+    dfsVisitHelper(node->thenStmtList, thenModifiesExtractorHelper);
+    dfsVisitHelper(node->elseStmtList, elseModifiesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper->getModifies();
     std::unordered_set<std::pair<StmtNum, Variable>> extractedElseModifies = elseModifiesExtractorHelper->getModifies();
 

@@ -17,11 +17,12 @@ void PatternExtractor::visitConstant(ConstantNode* node) {}
 void PatternExtractor::visitCall(CallNode* node) {}
 
 void PatternExtractor::visitAssign(AssignmentNode* node) {
-    int stmtNum = node->getStmtNumber();
-    std::string lhs = node->getVar();
-    std::shared_ptr<ExpressionNode> expr = node->getExpr();
+    int stmtNum = node->statementNumber;
+    std::string lhs = node->variable->value;
+    std::shared_ptr<ExpressionNode> expr = node->expression;
     std::vector<std::string> rhsVars = expr->getVars();
     std::vector<std::string> rhsConsts = expr->getConsts();
+
     for (int i = 0; i < rhsVars.size(); ++i) {
         this->pattern.insert({stmtNum, {lhs, rhsVars[i]}});
     }

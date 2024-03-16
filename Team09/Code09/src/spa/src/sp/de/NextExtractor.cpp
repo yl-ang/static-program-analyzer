@@ -1,4 +1,6 @@
 #include "NextExtractor.h"
+
+#include "sp/de/AstVisitor.h"
 std::unordered_set<std::pair<int, int>> NextExtractor::getNextRelationships() {
     std::unordered_set<std::pair<int, int>> nextRelationships;
 
@@ -10,6 +12,6 @@ std::unordered_set<std::pair<int, int>> NextExtractor::getNextRelationships() {
     return nextRelationships;
 }
 
-void NextExtractor::buildCFG(std::shared_ptr<ASTNode> procedure) {
+void NextExtractor::buildCFG(std::shared_ptr<ProcedureNode> procedure) {
     cfg.buildCFG(procedure);
 }

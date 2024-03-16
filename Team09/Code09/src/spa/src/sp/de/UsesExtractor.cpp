@@ -14,22 +14,22 @@ void UsesExtractor::visitConstant(ConstantNode* node) {}
 void UsesExtractor::visitCall(CallNode* node) {}
 
 void UsesExtractor::visitAssign(AssignmentNode* node) {
-    int userStmtNum = node->getStmtNumber();
-    std::vector<std::string> usedVariables = node->getExpr()->getVars();
+    int userStmtNum = node->statementNumber;
+    std::vector<std::string> usedVariables = node->expression->getVars();
     for (int i = 0; i < usedVariables.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariables[i]});
     }
 }
 
 void UsesExtractor::visitPrint(PrintNode* node) {
-    int userStmtNum = node->getStmtNumber();
-    std::string usedVariable = node->getVar();
+    int userStmtNum = node->statementNumber;
+    std::string usedVariable = node->variable->value;
     this->uses.insert({userStmtNum, usedVariable});
 }
 
 void UsesExtractor::visitWhile(WhileNode* node) {
-    int userStmtNum = node->getStmtNumber();
-    std::vector<std::string> usedVariablesInCond = node->getCond()->getVars();
+    int userStmtNum = node->statementNumber;
+    std::vector<std::string> usedVariablesInCond = node->whileCondition->getVars();
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
     }
@@ -40,7 +40,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
     // with the current WhileNode stmtNum
 
     UsesExtractor* usesExtractorHelper = new UsesExtractor();
-    dfsVisitHelper(node->getStmtLstNode(), usesExtractorHelper);
+    dfsVisitHelper(node->whileStmtList, usesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
 
     // Iterate over each element in the set and update stmtNum value
@@ -54,15 +54,15 @@ void UsesExtractor::visitWhile(WhileNode* node) {
 }
 
 void UsesExtractor::visitIf(IfNode* node) {
-    int userStmtNum = node->getStmtNumber();
-    std::vector<std::string> usedVariablesInCond = node->getCond()->getVars();
+    int userStmtNum = node->statementNumber;
+    std::vector<std::string> usedVariablesInCond = node->ifCondition->getVars();
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
     }
     UsesExtractor* thenUsesExtractorHelper = new UsesExtractor();
     UsesExtractor* elseUsesExtractorHelper = new UsesExtractor();
-    dfsVisitHelper(node->getThenStmtLstNode(), thenUsesExtractorHelper);
-    dfsVisitHelper(node->getElseStmtLstNode(), elseUsesExtractorHelper);
+    dfsVisitHelper(node->thenStmtList, thenUsesExtractorHelper);
+    dfsVisitHelper(node->elseStmtList, elseUsesExtractorHelper);
 
     std::unordered_set<std::pair<StmtNum, Variable>> extractedThenUses = thenUsesExtractorHelper->getUses();
     std::unordered_set<std::pair<StmtNum, Variable>> extractedElseUses = elseUsesExtractorHelper->getUses();

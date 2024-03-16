@@ -1,18 +1,14 @@
 #pragma once
 #include <memory>
 #include <queue>
-#include <string>
 #include <unordered_set>
 #include <vector>
 
-#include "sp/ast/AstNode.h"
 #include "sp/ast/SemanticValidator.h"
 #include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/ExpressionNode.h"
-#include "sp/ast/grammar_nodes/FactorNode.h"
 #include "sp/ast/grammar_nodes/ProcedureNode.h"
 #include "sp/ast/grammar_nodes/ProgramNode.h"
-#include "sp/ast/grammar_nodes/TermNode.h"
 #include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
 #include "sp/ast/grammar_nodes/statements/CallNode.h"
@@ -22,7 +18,6 @@
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
 #include "sp/ast/grammar_nodes/statements/WhileNode.h"
-#include "sp/exceptions/UnrecognisedTokenError.h"
 #include "sp/tokenizer/Token.h"
 
 const std::unordered_set<LEXICAL_TOKEN_TYPE> RelationalOperators = {
@@ -36,6 +31,8 @@ public:
     std::shared_ptr<VariableNode> buildVarNameAST(Token token);
     std::shared_ptr<ConstantNode> buildIntAST(Token token);
     std::shared_ptr<ExpressionNode> buildExprFromFactorAST(std::queue<Token>& tokens);
+    // its weird that buildFactorAST returns an ExpressionNode when ideally it should return a FactorNode.
+    // this is just how the grammar works...
     std::shared_ptr<ExpressionNode> buildFactorAST(std::queue<Token>& tokens);
     std::shared_ptr<ExpressionNode> buildSubTermAST(std::queue<Token>& tokens, std::shared_ptr<ExpressionNode> node);
     std::shared_ptr<ExpressionNode> buildTermAST(std::queue<Token>& tokens);

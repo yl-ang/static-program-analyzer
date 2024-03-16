@@ -16,12 +16,12 @@ void SemanticValidator::validateSemantics(const std::shared_ptr<ProgramNode> pro
 }
 
 void SemanticValidator::checkDuplicateProcedureNames(std::shared_ptr<ProgramNode> programNode) {
-    for (auto procedure : programNode->getChildren()) {
-        std::string procedureName = procedure->getValue();
+    for (auto procedure : programNode->children) {
+        std::string procedureName = procedure->name;
         if (procedureNames.find(procedureName) != procedureNames.end()) {
             throw DuplicateProcedureError(procedureName);
         }
-        procedureNames.insert(procedure->getValue());
+        procedureNames.insert(procedure->name);
     }
 }
 

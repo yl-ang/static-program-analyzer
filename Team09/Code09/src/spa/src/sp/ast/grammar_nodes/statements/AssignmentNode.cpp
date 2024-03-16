@@ -5,10 +5,9 @@ void AssignmentNode::accept(AstVisitor* visitor) {
 }
 
 std::shared_ptr<ExpressionNode> AssignmentNode::getExpr() {
-    auto exprNodePtr = std::dynamic_pointer_cast<ExpressionNode>(this->getChildren().at(1));
-    return exprNodePtr;
+    return this->expression;
 }
 
 std::string AssignmentNode::getVar() {
-    return this->getChildren().at(0)->getValue();
+    return this->variable->value;
 }

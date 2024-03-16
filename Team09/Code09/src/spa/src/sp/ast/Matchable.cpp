@@ -5,6 +5,7 @@
 #include "Ast.h"
 #include "sp/SourceLoader.h"
 #include "sp/tokenizer/SpTokenizer.h"
+#include "sstream"
 
 std::shared_ptr<Matchable> MatchableBuilder::fromExpressionString(const std::string& input) {
     std::stringstream ss{input};

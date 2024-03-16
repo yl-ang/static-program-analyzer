@@ -18,7 +18,7 @@ void SemanticValidatorVisitor::visitWhile(WhileNode* node) {}
 void SemanticValidatorVisitor::visitIf(IfNode* node) {}
 
 void SemanticValidatorVisitor::visitCall(CallNode* node) {
-    std::string procedureName = node->getCalledProcedure();
+    std::string procedureName = node->procedureName;
     // if procedure name of the call is not in the procedure name set, we throw an error
     if (procedureNamesPtr->find(procedureName) == procedureNamesPtr->end()) {
         throw NotCallingProcedureError(procedureName);

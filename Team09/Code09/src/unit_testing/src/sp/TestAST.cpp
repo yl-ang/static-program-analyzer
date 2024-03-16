@@ -1,9 +1,19 @@
 
+#include <memory>
 #include <queue>
 
 #include "catch.hpp"
 #include "sp/ast/Ast.h"
-#include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/ConstantNode.h"
+#include "sp/ast/grammar_nodes/ExpressionNode.h"
+#include "sp/ast/grammar_nodes/ProcedureNode.h"
+#include "sp/ast/grammar_nodes/VariableNode.h"
+#include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
+#include "sp/ast/grammar_nodes/statements/PrintNode.h"
+#include "sp/ast/grammar_nodes/statements/ReadNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementListNode.h"
+#include "sp/ast/grammar_nodes/statements/StatementNode.h"
+#include "sp/de/AstVisitor.h"
 #include "sp/tokenizer/Token.h"
 
 using namespace std;  // NOLINT
@@ -21,7 +31,7 @@ TEST_CASE("AST Build Tests") {
 
     SECTION("Build const factor ast correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
-        ASTNode expectedNode = ASTNode("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        ConstantNode expectedNode = ConstantNode("1", 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -31,7 +41,7 @@ TEST_CASE("AST Build Tests") {
 
     SECTION("Build variable factor ast correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0)};
-        ASTNode expectedNode = ASTNode("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        VariableNode expectedNode = VariableNode("a", 0);
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildFactorAST(queue);
@@ -47,17 +57,10 @@ TEST_CASE("AST Build Tests") {
         };
         auto queue = makeTokenQueue(inputTokenArray);
 
-        std::shared_ptr<ASTNode> nameNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> integerNode =
-            std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<ConstantNode> integerNode = std::make_shared<ConstantNode>("1", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-
-        children.push_back(nameNode);
-        children.push_back(integerNode);
-
-        ASTNode expectedNode = ASTNode("", "assign", children, 0);
+        auto expectedNode = AssignmentNode(nameNode, integerNode, 0);
 
         auto result = ast.buildAssignmentAST(queue);
         REQUIRE(expectedNode == *(result.get()));
@@ -71,18 +74,10 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildAssignmentAST(queue);  // Do this first
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::shared_ptr<ASTNode> nameNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> integerNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<VariableNode> integerNode = std::make_shared<VariableNode>("b", 0);
 
-        // Populating the children _after_ running the method
-        children.push_back(nameNode);
-        children.push_back(integerNode);
-
-        // Now we can create the expectedNode as children has been fully constructed.
-        ASTNode expectedNode = ASTNode("", "assign", children, 0);
+        AssignmentNode expectedNode = AssignmentNode(nameNode, integerNode, 0);
 
         REQUIRE(expectedNode == *(result.get()));  // Now this should work
     }
@@ -93,16 +88,10 @@ TEST_CASE("AST Build Tests") {
                                               Token(LEXICAL_TOKEN_TYPE::NAME, "c", 0)};
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> constNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> const2Node =
-            std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> constNode = std::make_shared<VariableNode>("b", 0);
+        std::shared_ptr<VariableNode> const2Node = std::make_shared<VariableNode>("c", 0);
 
-        children.push_back(constNode);
-        children.push_back(const2Node);
-
-        auto addNode = ASTNode("", "add", children, 0);
+        auto addNode = ExpressionNode(ADD, constNode, const2Node, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -114,25 +103,13 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0)};
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
-
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
-
-        children1.push_back(addNode);
-        children1.push_back(zNode);
-
-        auto addNode2 = ASTNode("", "add", children1, 0);
+        auto addNode2 = ExpressionNode(ADD, addNode, zNode, 0);
 
         REQUIRE(addNode2 == *(result.get()));
     }
@@ -144,16 +121,10 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildTermAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xtNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> xtNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
-        children.push_back(xtNode);
-        children.push_back(yNode);
-
-        auto mulNode = ASTNode("", "mul", children, 0);
+        auto mulNode = ExpressionNode(MUL, xtNode, yNode, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -166,24 +137,13 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, yNode, zNode, 0);
 
-        children.push_back(yNode);
-        children.push_back(zNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
-        children1.push_back(xNode);
-        children1.push_back(mulNode);
-
-        auto addNode = ASTNode("", "add", children1, 0);
+        auto addNode = ExpressionNode(ADD, xNode, mulNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -196,25 +156,13 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
-        children1.push_back(mulNode);
-
-        children1.push_back(zNode);
-
-        auto addNode = ASTNode("", "add", children1, 0);
+        auto addNode = ExpressionNode(ADD, mulNode, zNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -234,22 +182,17 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildProcedureAST(queue);
-        auto xNode = std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
-        auto yNode = std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 1);
+        auto xNode = std::make_shared<VariableNode>("x", 1);
+        auto yNode = std::make_shared<VariableNode>("y", 1);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
+        std::vector<std::shared_ptr<StatementNode>> children1 = {};
 
-        children.push_back(xNode);
-        children.push_back(yNode);
-        auto equalNode = std::make_shared<ASTNode>("", "assign", children, 1);
+        auto equalNode = std::make_shared<AssignmentNode>(xNode, yNode, 1);
 
-        children1.push_back((equalNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
+        children1.push_back(equalNode);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
 
-        children2.push_back(stmtList);
-        auto procedure = ASTNode("a", "proc", children2);
+        auto procedure = ProcedureNode("a", stmtList);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -263,12 +206,9 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildReadAST(queue);
 
-        std::shared_ptr<ASTNode> aNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
 
-        children.push_back(aNode);
-        auto expectedNode = ASTNode("", "read", children, 0);
+        auto expectedNode = ReadNode(aNode, 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -286,21 +226,16 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildProcedureAST(queue);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
+        std::vector<std::shared_ptr<StatementNode>> children1 = {};
 
-        children.push_back(yNode);
-        auto readNode = std::make_shared<ASTNode>("", "read", children, 0);
+        auto readNode = std::make_shared<ReadNode>(yNode, 0);
 
-        children1.push_back((readNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
+        children1.push_back(readNode);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
 
-        children2.push_back(stmtList);
-        auto procedure = ASTNode("a", "proc", children2);
+        auto procedure = ProcedureNode("a", stmtList);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -315,12 +250,9 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildPrintAST(queue);
 
-        std::shared_ptr<ASTNode> aNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
 
-        children.push_back(aNode);
-        auto expectedNode = ASTNode("", "print", children, 0);
+        auto expectedNode = PrintNode(aNode, 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -338,21 +270,16 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildProcedureAST(queue);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
+        std::vector<std::shared_ptr<StatementNode>> children1 = {};
 
-        children.push_back(yNode);
-        auto printNode = std::make_shared<ASTNode>("", "print", children, 0);
+        auto printNode = std::make_shared<PrintNode>(yNode, 0);
 
-        children1.push_back((printNode));
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children1);
+        children1.push_back(printNode);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
 
-        children2.push_back(stmtList);
-        auto procedure = ASTNode("a", "proc", children2);
+        auto procedure = ProcedureNode("a", stmtList);
 
         REQUIRE(procedure == *(result.get()));
     }
@@ -366,16 +293,10 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildFactorAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> constNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> const2Node =
-            std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> constNode = std::make_shared<VariableNode>("b", 0);
+        std::shared_ptr<VariableNode> const2Node = std::make_shared<VariableNode>("c", 0);
 
-        children.push_back((constNode));
-        children.push_back((const2Node));
-
-        auto addNode = ASTNode("", "add", children, 0);
+        auto addNode = ExpressionNode(ADD, constNode, const2Node, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -391,16 +312,10 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildFactorAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> constNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> const2Node =
-            std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> constNode = std::make_shared<VariableNode>("b", 0);
+        std::shared_ptr<VariableNode> const2Node = std::make_shared<VariableNode>("c", 0);
 
-        children.push_back((constNode));
-        children.push_back((const2Node));
-
-        auto addNode = ASTNode("", "add", children, 0);
+        auto addNode = ExpressionNode(ADD, constNode, const2Node, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -415,25 +330,22 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildFactorAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        std::vector<std::shared_ptr<ExpressionNode>> children = {};
+        std::vector<std::shared_ptr<ExpressionNode>> children1 = {};
 
         children.push_back(xNode);
         children.push_back(yNode);
 
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
         children1.push_back(mulNode);
 
         children1.push_back(zNode);
 
-        auto addNode = ASTNode("", "add", children1, 0);
+        auto addNode = ExpressionNode(ADD, mulNode, zNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -450,25 +362,13 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildFactorAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
-        children1.push_back(mulNode);
-
-        children1.push_back(zNode);
-
-        auto addNode = ASTNode("", "add", children1, 0);
+        auto addNode = ExpressionNode(ADD, mulNode, zNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -480,7 +380,7 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildFactorAST(queue);
-        ASTNode expectedNode = ASTNode("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        ConstantNode expectedNode = ConstantNode("1", 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -492,7 +392,7 @@ TEST_CASE("AST Build Tests") {
 
         auto result = ast.buildFactorAST(queue);
 
-        ASTNode expectedNode = ASTNode("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        VariableNode expectedNode = VariableNode("a", 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
@@ -507,25 +407,15 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        std::vector<std::shared_ptr<ExpressionNode>> children1 = {};
 
-        children.push_back(xNode);
-        children.push_back(yNode);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode, yNode, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
-        children1.push_back(addNode);
-
-        children1.push_back(zNode);
-
-        auto mulNode = ASTNode("", "mul", children1, 0);
+        auto mulNode = ExpressionNode(MUL, addNode, zNode, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -538,25 +428,13 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> aNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> bNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> cNode =
-            std::make_shared<ASTNode>("c", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<VariableNode> bNode = std::make_shared<VariableNode>("b", 0);
+        std::shared_ptr<VariableNode> cNode = std::make_shared<VariableNode>("c", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto addNode = std::make_shared<ExpressionNode>(ADD, bNode, cNode, 0);
 
-        children.push_back(bNode);
-        children.push_back(cNode);
-
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
-        children1.push_back(aNode);
-
-        children1.push_back(addNode);
-
-        auto mulNode = ASTNode("", "mul", children1, 0);
+        auto mulNode = ExpressionNode(MUL, aNode, addNode, 0);
 
         REQUIRE(mulNode == *(result.get()));
     }
@@ -572,31 +450,16 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildExpressionAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode2 =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> zNode2 = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, zNode, addNode, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
-        children1.push_back(zNode);
-        children1.push_back(addNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
-        children2.push_back(mulNode);
-        children2.push_back(zNode2);
-
-        auto addNode2 = ASTNode("", "add", children2, 0);
+        auto addNode2 = ExpressionNode(ADD, mulNode, zNode2, 0);
 
         REQUIRE(addNode2 == *(result.get()));
     }
@@ -607,7 +470,7 @@ TEST_CASE("AST Build Tests") {
         };
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildRelationalFactorAST(queue);
-        ASTNode aNode = ASTNode("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        VariableNode aNode = VariableNode("a", 0);
 
         REQUIRE(aNode == *(result.get()));
     }
@@ -618,7 +481,7 @@ TEST_CASE("AST Build Tests") {
         };
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildRelationalFactorAST(queue);
-        ASTNode oneNode = ASTNode("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        ConstantNode oneNode = ConstantNode("1", 0);
 
         REQUIRE(oneNode == *(result.get()));
     }
@@ -630,24 +493,13 @@ TEST_CASE("AST Build Tests") {
 
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildRelationalFactorAST(queue);  // Do this first
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, yNode, zNode, 0);
 
-        children.push_back(yNode);
-        children.push_back(zNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children, 0);
-        children1.push_back(xNode);
-        children1.push_back(mulNode);
-
-        auto addNode = ASTNode("", "add", children1, 0);
+        auto addNode = ExpressionNode(ADD, xNode, mulNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
@@ -662,15 +514,10 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> oneNode =
-            std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
 
-        children.push_back(zNode);
-        children.push_back(oneNode);
-        auto lessThan = ASTNode("", "<", children, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, zNode, oneNode, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -684,15 +531,11 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::vector<std::shared_ptr<ExpressionNode>> children = {};
 
-        children.push_back(zNode);
-        children.push_back(yNode);
-        auto lessThan = ASTNode("", "<", children, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, zNode, yNode, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -705,16 +548,10 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> oneNode =
-            std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        auto zNode = std::make_shared<VariableNode>("z", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
 
-        children.push_back(oneNode);
-        children.push_back(zNode);
-
-        auto lessThan = ASTNode("", "<", children, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, oneNode, zNode, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -723,21 +560,15 @@ TEST_CASE("AST Build Tests") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
             Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "2", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "2", 0),
         };
         auto queue = makeTokenQueue(inputTokenArray);
 
         auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<ASTNode> twoNode =
-            std::make_shared<ASTNode>("2", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> oneNode =
-            std::make_shared<ASTNode>("1", "const", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::vector<std::shared_ptr<ASTNode>> children = {};
+        auto twoNode = std::make_shared<ConstantNode>("2", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
 
-        children.push_back(oneNode);
-        children.push_back(twoNode);
-
-        auto lessThan = ASTNode("", "<", children, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, oneNode, twoNode, 0);
 
         REQUIRE(lessThan == *(result.get()));
     }
@@ -749,24 +580,13 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> zNode =
-            std::make_shared<ASTNode>("z", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
-
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
-        children1.push_back(zNode);
-        children1.push_back(addNode);
-
-        auto lessThan = ASTNode("", "<", children1, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, zNode, addNode, 0);
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildRelationalExpressionAST(queue);
         REQUIRE(lessThan == *(result.get()));
@@ -780,32 +600,16 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(xNode2);
-        children.push_back(yNode2);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children1.push_back(xNode);
-        children1.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
-
-        children2.push_back(mulNode);
-        children2.push_back(addNode);
-
-        auto lessThan = ASTNode("", "<", children2, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -822,32 +626,16 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(xNode2);
-        children.push_back(yNode2);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children1.push_back(xNode);
-        children1.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
-
-        children2.push_back(mulNode);
-        children2.push_back(addNode);
-
-        auto lessThan = ASTNode("", "<", children2, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -864,32 +652,16 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(xNode2);
-        children.push_back(yNode2);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children1.push_back(xNode);
-        children1.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
-
-        children2.push_back(mulNode);
-        children2.push_back(addNode);
-
-        auto lessThan = ASTNode("", "<", children2, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -906,32 +678,16 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
         };
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children1 = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        children.push_back(xNode2);
-        children.push_back(yNode2);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
 
-        auto addNode = std::make_shared<ASTNode>("", "add", children, 0);
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
 
-        children1.push_back(xNode);
-        children1.push_back(yNode);
-
-        auto mulNode = std::make_shared<ASTNode>("", "mul", children1, 0);
-
-        children2.push_back(mulNode);
-        children2.push_back(addNode);
-
-        auto lessThan = ASTNode("", "<", children2, 0);
+        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -947,22 +703,12 @@ TEST_CASE("AST Build Tests") {
 
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
 
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        std::vector<std::shared_ptr<ASTNode>> children3 = {};
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
 
-        children2.push_back(xNode);
-        children2.push_back(yNode);
-
-        auto lessThan = std::make_shared<ASTNode>("", "<", children2, 0);
-
-        children3.push_back(lessThan);
-
-        auto notNode = ASTNode("", "!", children3, 0);
+        auto notNode = ExpressionNode(NOT, lessThan, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -980,29 +726,16 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
 
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode1 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode1 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        std::vector<std::shared_ptr<ASTNode>> children3 = {};
-        children.push_back(xNode);
-        children.push_back(yNode);
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
 
-        auto lessThan = std::make_shared<ASTNode>("", "<", children, 0);
-        children2.push_back(xNode1);
-        children2.push_back(yNode1);
+        auto moreThan = std::make_shared<ExpressionNode>(GREATER_THAN, xNode1, yNode1, 0);
 
-        auto moreThan = std::make_shared<ASTNode>("", ">", children2, 0);
-        children3.push_back(lessThan);
-        children3.push_back(moreThan);
-        auto andandNode = ASTNode("", "&&", children3, 0);
+        auto andandNode = ExpressionNode(ANDAND, lessThan, moreThan, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -1040,53 +773,26 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
         };
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode1 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode1 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        std::vector<std::shared_ptr<ASTNode>> children3 = {};
-        std::vector<std::shared_ptr<ASTNode>> children4 = {};
-        std::vector<std::shared_ptr<ASTNode>> children5 = {};
-        std::vector<std::shared_ptr<ASTNode>> children6 = {};
-        std::vector<std::shared_ptr<ASTNode>> children7 = {};
+        auto lessThan = std::make_shared<ExpressionNode>(EQUAL_CHECK, xNode, yNode, 0);
 
-        children.push_back(xNode);
-        children.push_back(yNode);
+        auto moreThan = std::make_shared<ExpressionNode>(NOT_EQUAL_CHECK, xNode1, yNode1, 0);
 
-        auto lessThan = std::make_shared<ASTNode>("", "==", children, 0);
-        children2.push_back(xNode1);
-        children2.push_back(yNode1);
+        auto andandNode = std::make_shared<ExpressionNode>(ANDAND, lessThan, moreThan, 0);
 
-        auto moreThan = std::make_shared<ASTNode>("", "!=", children2, 0);
-        children3.push_back(lessThan);
-        children3.push_back(moreThan);
-        auto andandNode = std::make_shared<ASTNode>("", "&&", children3, 0);
+        auto notNode = std::make_shared<ExpressionNode>(NOT, andandNode, 0);
 
-        children4.push_back(xNode2);
-        children4.push_back(yNode2);
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
 
-        children7.push_back(andandNode);
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
 
-        auto notNode = std::make_shared<ASTNode>("", "!", children7, 0);
-
-        auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
-        children6.push_back(assign);
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children6);
-
-        children5.push_back(notNode);
-        children5.push_back(stmtList);
-        auto expected = WhileNode(children5, 0);
+        auto expected = WhileNode(notNode, stmtList, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -1127,62 +833,32 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
         };
-        std::shared_ptr<ASTNode> xNode =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode1 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode1 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> xNode2 =
-            std::make_shared<ASTNode>("x", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> yNode2 =
-            std::make_shared<ASTNode>("y", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> aNode =
-            std::make_shared<ASTNode>("a", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
-        std::shared_ptr<ASTNode> bNode =
-            std::make_shared<ASTNode>("b", "var", std::vector<std::shared_ptr<ASTNode>>{}, 0);
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<VariableNode> bNode = std::make_shared<VariableNode>("b", 0);
 
-        std::vector<std::shared_ptr<ASTNode>> children = {};
-        std::vector<std::shared_ptr<ASTNode>> children2 = {};
-        std::vector<std::shared_ptr<ASTNode>> children3 = {};
-        std::vector<std::shared_ptr<ASTNode>> children4 = {};
-        std::vector<std::shared_ptr<ASTNode>> children5 = {};
-        std::vector<std::shared_ptr<ASTNode>> children6 = {};
-        std::vector<std::shared_ptr<ASTNode>> children7 = {};
-        std::vector<std::shared_ptr<ASTNode>> children8 = {};
+        std::vector<std::shared_ptr<StatementNode>> children5 = {};
+        std::vector<std::shared_ptr<StatementNode>> children7 = {};
 
-        children.push_back(xNode);
-        children.push_back(yNode);
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
 
-        auto lessThan = std::make_shared<ASTNode>("", "<", children, 0);
-        children2.push_back(xNode1);
-        children2.push_back(yNode1);
+        auto moreThan = std::make_shared<ExpressionNode>(GREATER_THAN, xNode1, yNode1, 0);
+        auto andandNode = std::make_shared<ExpressionNode>(ANDAND, lessThan, moreThan, 0);
 
-        auto moreThan = std::make_shared<ASTNode>("", ">", children2, 0);
-        children3.push_back(lessThan);
-        children3.push_back(moreThan);
-        auto andandNode = std::make_shared<ASTNode>("", "&&", children3, 0);
-
-        children4.push_back(xNode2);
-        children4.push_back(yNode2);
-
-        auto assign = std::make_shared<ASTNode>("", "assign", children4, 0);
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
         children5.push_back(assign);
-        auto stmtList = std::make_shared<ASTNode>("", "stmtList", children5);
+        auto stmtList = std::make_shared<StatementListNode>(children5);
 
-        children6.push_back(aNode);
-        children6.push_back(bNode);
-        auto assign1 = std::make_shared<ASTNode>("", "assign", children6, 0);
+        auto assign1 = std::make_shared<AssignmentNode>(aNode, bNode, 0);
         children7.push_back(assign1);
-        auto stmtList2 = std::make_shared<ASTNode>("", "stmtList", children7);
+        auto stmtList2 = std::make_shared<StatementListNode>(children7);
 
-        children8.push_back(andandNode);
-        children8.push_back(stmtList);
-        children8.push_back(stmtList2);
-
-        auto expected = IfNode(children8, 0);
+        auto expected = IfNode(andandNode, stmtList, stmtList2, 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
@@ -1199,7 +875,7 @@ TEST_CASE("AST Build Tests") {
         auto queue = makeTokenQueue(inputTokenArray);
         auto result = ast.buildCallAST(queue);
 
-        auto expectedNode = ASTNode("a", "call", {}, 0);
+        auto expectedNode = CallNode("a", 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }

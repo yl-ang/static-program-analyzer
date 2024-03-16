@@ -1,10 +1,6 @@
 #include <memory>
 
 #include "catch.hpp"
-#include "sp/ast/AstNode.h"
-#include "sp/ast/grammar_nodes/ConstantNode.h"
-#include "sp/ast/grammar_nodes/VariableNode.h"
-#include "sp/ast/grammar_nodes/statements/ReadNode.h"
 #include "sp/de/DesignExtractor.h"
 
 TEST_CASE("Design Extractor Tests") {
@@ -26,22 +22,15 @@ TEST_CASE("Design Extractor Tests") {
     // x = y;
     std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>(VariableNode("x", 1));
     std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>(VariableNode("y", 1));
-    std::vector<std::shared_ptr<ASTNode>> childrenA = {};
-    childrenA.push_back(xNode);
-    childrenA.push_back(yNode);
-    auto equalNode = std::make_shared<AssignmentNode>(childrenA, 1);
+    auto equalNode = std::make_shared<AssignmentNode>(xNode, yNode, 1);
 
     // read a;
     std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>(VariableNode("a", 2));
-    std::vector<std::shared_ptr<ASTNode>> childrenR = {};
-    childrenR.push_back(aNode);
-    auto readNode = std::make_shared<ReadNode>(childrenR, 2);
+    auto readNode = std::make_shared<ReadNode>(aNode, 2);
 
     // print z;
     std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>(VariableNode("z", 3));
-    std::vector<std::shared_ptr<ASTNode>> childrenP = {};
-    childrenP.push_back(zNode);
-    auto printNode = std::make_shared<PrintNode>(3, childrenP);
+    auto printNode = std::make_shared<PrintNode>(zNode, 3);
 
     // while ((c < d) && (e > f)) {
     //     g = h;
@@ -53,36 +42,19 @@ TEST_CASE("Design Extractor Tests") {
     std::shared_ptr<VariableNode> gNode = std::make_shared<VariableNode>(VariableNode("g", 5));
     std::shared_ptr<VariableNode> hNode = std::make_shared<VariableNode>(VariableNode("h", 5));
 
-    std::vector<std::shared_ptr<ASTNode>> childrenW = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenW2 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenW3 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenW4 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenW5 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenW6 = {};
+    std::vector<std::shared_ptr<StatementNode>> childrenW6 = {};
 
-    childrenW.push_back(cNode);
-    childrenW.push_back(dNode);
+    auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, cNode, dNode, 4);
 
-    auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, childrenW, 4);
-    childrenW2.push_back(eNode);
-    childrenW2.push_back(fNode);
+    auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, eNode, fNode, 4);
 
-    auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, childrenW2, 4);
-    childrenW3.push_back(WlessThan);
-    childrenW3.push_back(WmoreThan);
-    auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, childrenW3, 4);
+    auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 4);
 
-    childrenW4.push_back(gNode);
-    childrenW4.push_back(hNode);
-
-    auto assign = std::make_shared<AssignmentNode>(childrenW4, 5);
+    auto assign = std::make_shared<AssignmentNode>(gNode, hNode, 5);
     childrenW6.push_back(assign);
     auto WstmtList = std::make_shared<StatementListNode>(childrenW6);
 
-    childrenW5.push_back(WandandNode);
-    childrenW5.push_back(WstmtList);
-
-    auto whileNode = std::make_shared<WhileNode>(childrenW5, 4);
+    auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 4);
 
     // if (( i < j ) && ( k > l )) then {
     //       i = j;
@@ -101,54 +73,28 @@ TEST_CASE("Design Extractor Tests") {
     std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>(VariableNode("x", 9));
     std::shared_ptr<ConstantNode> constNode = std::make_shared<ConstantNode>(ConstantNode("1", 9));
 
-    std::vector<std::shared_ptr<ASTNode>> childrenI = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI2 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI3 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI4 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI5 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI6 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI7 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI8 = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenI9 = {};
+    std::vector<std::shared_ptr<StatementNode>> childrenI5 = {};
+    std::vector<std::shared_ptr<StatementNode>> childrenI7 = {};
 
-    childrenI.push_back(iNode);
-    childrenI.push_back(jNode);
+    auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, iNode, jNode, 6);
 
-    auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, childrenI, 6);
-    childrenI2.push_back(kNode);
-    childrenI2.push_back(lNode);
+    auto ImoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, kNode, lNode, 6);
 
-    auto ImoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, childrenI2, 6);
-    childrenI3.push_back(IlessThan);
-    childrenI3.push_back(ImoreThan);
-    auto IandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, childrenI3, 6);
+    auto IandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, IlessThan, ImoreThan, 6);
 
-    childrenI4.push_back(iNode1);
-    childrenI4.push_back(jNode1);
-
-    auto Iassign = std::make_shared<AssignmentNode>(childrenI4, 7);
+    auto Iassign = std::make_shared<AssignmentNode>(iNode1, jNode1, 7);
     childrenI5.push_back(Iassign);
     auto IstmtList = std::make_shared<StatementListNode>(childrenI5);
 
-    childrenI6.push_back(aNode1);
-    childrenI6.push_back(bNode1);
-    auto Iassign1 = std::make_shared<AssignmentNode>(childrenI6, 8);
+    auto Iassign1 = std::make_shared<AssignmentNode>(aNode1, bNode1, 8);
     childrenI7.push_back(Iassign1);
     auto IstmtList2 = std::make_shared<StatementListNode>(childrenI7);
 
-    childrenI8.push_back(IandandNode);
-    childrenI8.push_back(IstmtList);
-    childrenI8.push_back(IstmtList2);
+    auto ifNode = std::make_shared<IfNode>(IandandNode, IstmtList, IstmtList2, 6);
 
-    auto ifNode = std::make_shared<IfNode>(childrenI8, 6);
+    auto xAssign = std::make_shared<AssignmentNode>(xNode2, constNode, 9);
 
-    childrenI9.push_back(xNode2);
-    childrenI9.push_back(constNode);
-
-    auto xAssign = std::make_shared<AssignmentNode>(childrenI9, 9);
-
-    std::vector<std::shared_ptr<ASTNode>> childrenProc = {};
-    std::vector<std::shared_ptr<ASTNode>> childrenProc1 = {};
+    std::vector<std::shared_ptr<StatementNode>> childrenProc = {};
     childrenProc.push_back(equalNode);
     childrenProc.push_back(readNode);
     childrenProc.push_back(printNode);
@@ -157,12 +103,11 @@ TEST_CASE("Design Extractor Tests") {
     childrenProc.push_back(xAssign);
 
     auto stmtListProc = std::make_shared<StatementListNode>(childrenProc);
-    childrenProc1.push_back(stmtListProc);
-    auto ProcNode = std::make_shared<ProcedureNode>("main", childrenProc1);
-    std::vector<std::shared_ptr<ASTNode>> childrenProg = {};
+    auto ProcNode = std::make_shared<ProcedureNode>("main", stmtListProc);
+    std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
     childrenProg.push_back(ProcNode);
 
-    auto ProgNode = std::make_shared<ProgramNode>((childrenProg));
+    auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
 
     /*
    procedure test {
@@ -170,26 +115,23 @@ TEST_CASE("Design Extractor Tests") {
    }
     */
     auto variableA = std::make_shared<VariableNode>("a", 1);
-    std::vector<std::shared_ptr<ASTNode>> children = {};
-    children.push_back(variableA);
-    auto readA = std::make_shared<ReadNode>(children, 1);
-    std::vector<std::shared_ptr<ASTNode>> children2 = {};
+    auto readA = std::make_shared<ReadNode>(variableA, 1);
+    std::vector<std::shared_ptr<StatementNode>> children2 = {};
     children2.push_back(readA);
     auto stmtListProc1 = std::make_shared<StatementListNode>(children2);
-    std::vector<std::shared_ptr<ASTNode>> children3 = {};
-    children3.push_back(stmtListProc1);
-    auto ProcNode2 = std::make_shared<ProcedureNode>("test", children3);
-    std::vector<std::shared_ptr<ASTNode>> childrenProg2 = {};
+
+    auto ProcNode2 = std::make_shared<ProcedureNode>("test", stmtListProc1);
+    std::vector<std::shared_ptr<ProcedureNode>> childrenProg2 = {};
 
     childrenProg2.push_back(ProcNode2);
-    auto ProgNode2 = std::make_shared<ProgramNode>((childrenProg2));
+    auto ProgNode2 = std::make_shared<ProgramNode>(childrenProg2);
 
-    std::vector<std::shared_ptr<ASTNode>> childrenProg3 = {};
+    std::vector<std::shared_ptr<ProcedureNode>> childrenProg3 = {};
 
     childrenProg3.push_back(ProcNode);
     childrenProg3.push_back(ProcNode2);
 
-    auto ProgNode3 = std::make_shared<ProgramNode>((childrenProg3));
+    auto ProgNode3 = std::make_shared<ProgramNode>(childrenProg3);
 
     SECTION("Variables extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
