@@ -12,7 +12,10 @@
 
 class UsesExtractor : public AbstractionExtractor {
 public:
-    UsesExtractor() {}
+    std::unordered_map<std::string, ProcedureNode*> procs;
+
+    explicit UsesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
+
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;

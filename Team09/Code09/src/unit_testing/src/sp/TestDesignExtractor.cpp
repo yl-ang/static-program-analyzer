@@ -17,7 +17,7 @@ TEST_CASE("Design Extractor Tests") {
     08      a = b;
         }
     09 a = 1;
-    10 call proc;
+    10 call test;
     */
 
     // x = y;

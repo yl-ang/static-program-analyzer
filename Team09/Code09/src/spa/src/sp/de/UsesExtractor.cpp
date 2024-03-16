@@ -15,14 +15,17 @@ void UsesExtractor::visitConstant(ConstantNode* node) {}
 void UsesExtractor::visitCall(CallNode* node) {
     int userStmtNum = node->statementNumber;
     std::string calledProc = node->getCalledProcedure();
-    ProcedureNode* procNode = this->procedures.at(calledProc);
+#ifdef DEBUG_BUILD
+    std::cout << "I'm calling:" << calledProc << std::endl;
+#endif
+    ProcedureNode* procNode = this->procs.at(calledProc);
 
     // Extract uses relationships from usesExtractorHelper and append to usesExtractor
     // Each uses relationship will have the userStmtNum of the nested statement
     // So we simply replace the userStmtNum from the extracted uses relationship
     // with the current CallNode stmtNum
 
-    UsesExtractor* usesExtractorHelper = new UsesExtractor();
+    UsesExtractor* usesExtractorHelper = new UsesExtractor(this->procs);
     dfsVisitHelper(procNode, usesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
 
@@ -62,7 +65,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
     // So we simply replace the userStmtNum from the extracted uses relationship
     // with the current WhileNode stmtNum
 
-    UsesExtractor* usesExtractorHelper = new UsesExtractor();
+    UsesExtractor* usesExtractorHelper = new UsesExtractor(this->procs);
     dfsVisitHelper(node->whileStmtList, usesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
 
@@ -82,8 +85,8 @@ void UsesExtractor::visitIf(IfNode* node) {
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
     }
-    UsesExtractor* thenUsesExtractorHelper = new UsesExtractor();
-    UsesExtractor* elseUsesExtractorHelper = new UsesExtractor();
+    UsesExtractor* thenUsesExtractorHelper = new UsesExtractor(this->procs);
+    UsesExtractor* elseUsesExtractorHelper = new UsesExtractor(this->procs);
     dfsVisitHelper(node->thenStmtList, thenUsesExtractorHelper);
     dfsVisitHelper(node->elseStmtList, elseUsesExtractorHelper);
 

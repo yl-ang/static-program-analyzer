@@ -6,9 +6,6 @@
 #include "AstVisitor.h"
 
 class ProcedureTracker : public AstVisitor {
-private:
-    std::unordered_map<std::string, ProcedureNode*> procedures;
-
 public:
     ProcedureTracker() {}
 
@@ -26,4 +23,7 @@ public:
     void visitVariable(VariableNode* node) override;
     void visitConstant(ConstantNode* node) override;
     void visitCall(CallNode* node) override;
+
+    std::unordered_map<std::string, ProcedureNode*> procedures;
+    std::unordered_map<std::string, ProcedureNode*> getProcedures();
 };

@@ -20,17 +20,18 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->procedureTracker = new ProcedureTracker();
+    dfsVisit(root, procedureTracker);
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
-    this->usesExtractor = new UsesExtractor();
+    this->usesExtractor = new UsesExtractor(procedureTracker->getProcedures());
     this->modifiesExtractor = new ModifiesExtractor();
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
     this->callsExtractor = new CallsExtractor();
 
-    std::vector<AstVisitor*> visitors{procedureTracker, entityExtractor,   followsExtractor, parentExtractor,
-                                      usesExtractor,    modifiesExtractor, patternExtractor, callsExtractor};
+    std::vector<AstVisitor*> visitors{entityExtractor,   followsExtractor, parentExtractor, usesExtractor,
+                                      modifiesExtractor, patternExtractor, callsExtractor};
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
