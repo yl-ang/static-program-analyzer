@@ -150,22 +150,22 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
         // Capture it like a synonym, for now.
 
         // if single return, will return a vector with a single ClauseArgument.
-        if (isSynonym(selectEntity) && isBoolean(selectEntity)) {
-            result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
+        if (isElem(selectEntity)) {
+            return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
+        }
 
         // if multiple return, will return a vector with multiple ClauseArgument.
-        } else if (isTuple(selectEntity)) {
-            if (std::regex_match(selectEntity, match, QPSRegexes::TUPLE)) {
-                std::vector<std::string> splitResult = splitByDelimiter(match[1], ",");
-                // Push back the split results into a vector
-                for (const auto& str : splitResult) {
-                    result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
-                }
+        if (isTuple(selectEntity)) {
+            std::string elems = selectEntity.substr(0, selectEntity.size() -2);
+            std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
+            // Push back the split results into a vector
+            for (const auto& str : splitResult) {
+                result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
             }
-
-        } else {
-            throw Exception("Issues with Select Parsing");
+            return result;
         }
+        throw QPSSyntaxError();
+
     }
 
     return result;
