@@ -28,28 +28,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
-    bool hasSemanticError = false;
-    if (!entities.isValidStore()) {
-        hasSemanticError = true;
-    }
-    for (Synonym& syn : selectEntities) {
-        if (!syn.updateType(&entities)) {
-            hasSemanticError = true;
-        }
-    }
-    for (SuchThatClause& clause : suchThatClauses) {
-        if (!clause.validateArguments(&entities)) {
-            hasSemanticError = true;
-        }
-    }
-    for (PatternClause& clause : patternClauses) {
-        if (!clause.validateArguments(&entities)) {
-            hasSemanticError = true;
-        }
-    }
-    if (hasSemanticError) {
-        throw QPSSemanticError();
-    }
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 

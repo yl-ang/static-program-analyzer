@@ -33,6 +33,33 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
     }
 }
 
+void Validator::validateClauses(SynonymStore* store, std::vector<Synonym>& selectEntities,
+                                std::vector<SuchThatClause>& suchThatClauses,
+                                std::vector<PatternClause>& patternClauses) {
+    bool hasSemanticError = false;
+    if (!store->isValidStore()) {
+        hasSemanticError = true;
+    }
+    for (Synonym& syn : selectEntities) {
+        if (!syn.updateType(store)) {
+            hasSemanticError = true;
+        }
+    }
+    for (SuchThatClause& clause : suchThatClauses) {
+        if (!clause.validateArguments(store)) {
+            hasSemanticError = true;
+        }
+    }
+    for (PatternClause& clause : patternClauses) {
+        if (!clause.validateArguments(store)) {
+            hasSemanticError = true;
+        }
+    }
+    if (hasSemanticError) {
+        throw QPSSemanticError();
+    }
+}
+
 void Validator::validatePatternTwoArg(const std::vector<std::string>& arguments) {
     if (!isEntRef(arguments[0]) || !isExpressionSpec(arguments[1])) {
         throw QPSSyntaxError();
