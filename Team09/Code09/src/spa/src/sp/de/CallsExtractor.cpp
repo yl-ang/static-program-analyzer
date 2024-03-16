@@ -18,13 +18,13 @@ void CallsExtractor::visitIf(IfNode* node) {}
 
 void CallsExtractor::visitProcedure(ProcedureNode* node) {
     std::string procedure = node->name;
-    std::vector<std::shared_ptr<CallNode>> callStmts = node->getStmtLstNode()->getCallStatements();
+    std::vector<std::shared_ptr<StatementNode>> callStmts = node->getStmtLstNode()->getCallStatements();
     if (callStmts.empty()) {
         // no call statements
         return;
     }
     for (auto callStmt : callStmts) {
-        this->calls.insert({procedure, callStmt->getCalledProcedure()});
+        this->calls.insert({procedure, callStmt->getValue()});
     }
 }
 
