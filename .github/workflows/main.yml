@@ -19,9 +19,6 @@ jobs:
       fail-fast: true
 
     steps:
-      - name: test
-        run: echo "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
-
       - uses: actions/checkout@v2
       - name: Build Project
         shell: bash
@@ -30,8 +27,8 @@ jobs:
           mkdir build
           cd build
           cmake -A x64 ..
-          #cmake --build . --target unit_testing --config Release
-          #cmake --build . --target integration_testing --config Release
+          cmake --build . --target unit_testing --config Release
+          cmake --build . --target integration_testing --config Release
           cmake --build . --target autotester --config Release
           cd ../..
           
@@ -45,10 +42,12 @@ jobs:
           passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           echo "Passed: $passed_count / $total_tests_count"
-
+          
           if [ $passed_count -ne $total_tests_count ]; then
             echo "Failed: $((total_tests_count - passed_count)) / $total_tests_count"
             exit 1
+          else
+            echo "Passed: $passed_count tests"
           fi
       
       - name: Output Autotester out.xml
@@ -74,9 +73,6 @@ jobs:
       fail-fast: true
 
     steps:
-      - name: test
-        run: echo "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
-
       - uses: actions/checkout@v2
 
       - name: Create Build Environment
@@ -101,11 +97,12 @@ jobs:
             "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
           passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
-          echo "Passed: $passed_count / $total_tests_count"
 
           if [ $passed_count -ne $total_tests_count ]; then
             echo "Failed: $((total_tests_count - passed_count)) / $total_tests_count"
             exit 1
+          else
+            echo "Passed: $passed_count tests"
           fi
       
       - name: Output Autotester out.xml
