@@ -70,6 +70,8 @@ const std::unordered_set<std::pair<Procedure, Variable>> procUsesStoreEntries = 
 const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
     {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
 
+const std::unordered_set<std::pair<Procedure, Procedure>> callsStoreEntries = {{"main", "next"}};
+
 // Common results
 const QPSResult allStmts = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
 const QPSResult allVars = {"num1", "num2", "num3"};
@@ -94,6 +96,7 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setStatementUsesStore(stmtUsesStoreEntries);
     pfw.setProcedureUsesStore(procUsesStoreEntries);
     pfw.setPatternStore(patternStoreEntries);
+    pfw.setCallStore(callsStoreEntries);
 
     return PKBFacadeReader{pkb};
 }
@@ -741,6 +744,159 @@ TEST_CASE("Select with 1 such-that clause") {
         }
     }
     // ai-gen end
+
+    // TODO(Ezekiel): Enable after implementing the Calls and CallsStar parser
+    /*
+    SECTION("Calls") {
+        SECTION("No synonyms") {
+            SECTION("Calls(Procedure, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", \"next\")");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Procedure, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", _)");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Wildcard, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, \"next\")");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Wildcard, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, _)");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Wildcard, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"next\", _)");
+                REQUIRE_EMPTY(result);
+            }
+        }
+
+        SECTION("1 Synonym") {
+            SECTION("Calls(Procedure, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", p)");
+                QPSResult expected = {"next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Synonym, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, \"next\")");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, _)");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, p)");
+                QPSResult expected = {"next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Calls(Procedure, Synonym: Stmt") {
+                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(\"main\", a)"));
+            }
+
+            SECTION("Calls(Synonym: Stmt, Procedure") {
+                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(a, \"next\")"));
+            }
+        }
+
+        SECTION("2 Synonyms") {
+            SECTION("Calls(ProcSyn, ProcSyn)") {
+                QPSResult result = qps.processQueries("procedure p1, p2; Select p1 such that Calls(p1, p2)");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+        }
+    }
+
+    SECTION("CallsStar") {
+        SECTION("No synonyms") {
+            SECTION("CallsStar(Procedure, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", \"next\")");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Procedure, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", _)");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Wildcard, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, \"next\")");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Wildcard, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, _)");
+                QPSResult expected = {allProcs};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Wildcard, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"next\", _)");
+                REQUIRE_EMPTY(result);
+            }
+        }
+
+        SECTION("1 Synonym") {
+            SECTION("CallsStar(Procedure, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", p)");
+                QPSResult expected = {"next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Synonym, Procedure)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, \"next\")");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Synonym, Wildcard)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, _)");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Wildcard, Synonym)") {
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, p)");
+                QPSResult expected = {"next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("CallsStar(Procedure, Synonym: Stmt") {
+                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(\"main\", a)"));
+            }
+
+            SECTION("CallsStar(Synonym: Stmt, Procedure") {
+                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(a, \"next\")"));
+            }
+        }
+
+        SECTION("2 Synonyms") {
+            SECTION("Calls(ProcSyn, ProcSyn)") {
+                QPSResult result = qps.processQueries("procedure p1, p2; Select p1 such that Calls(p1, p2)");
+                QPSResult expected = {"main"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+        }
+    }
+    */
 
     SECTION("Pattern") {
         SECTION("Assign(Wildcard, Wildcard) Select a") {
