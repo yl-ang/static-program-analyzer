@@ -12,28 +12,34 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setFollowsStore(getFollows());
     writer->setParentStore(getParent());
     writer->setStatementModifiesStore(getModifies());
+    writer->setProcedureModifiesStore(getProcedureModifies());
     writer->setStatementUsesStore(getUses());
+    writer->setProcedureUsesStore(getProcedureUses());
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
+    writer->setCallStore(getCalls());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
+    this->procedureTracker = new ProcedureTracker();
+    dfsVisit(root, procedureTracker);
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
-    this->usesExtractor = new UsesExtractor();
-    this->modifiesExtractor = new ModifiesExtractor();
+    this->usesExtractor = new UsesExtractor(procedureTracker->getProcedures());
+    this->modifiesExtractor = new ModifiesExtractor(procedureTracker->getProcedures());
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
+    this->callsExtractor = new CallsExtractor();
 
-    std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor,  parentExtractor,
-                                      usesExtractor,   modifiesExtractor, patternExtractor};
+    std::vector<AstVisitor*> visitors{entityExtractor,   followsExtractor, parentExtractor, usesExtractor,
+                                      modifiesExtractor, patternExtractor, callsExtractor};
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
     }
 
-    for (auto procedure : root->getChildren()) {
+    for (auto procedure : root->children) {
         this->nextExtractor->buildCFG(procedure);
     }
 }
@@ -78,8 +84,16 @@ std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getUses() {
     return usesExtractor->getUses();
 }
 
+std::unordered_set<std::pair<Procedure, Variable>> DesignExtractor::getProcedureUses() {
+    return usesExtractor->getProcedureUses();
+}
+
 std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getModifies() {
     return modifiesExtractor->getModifies();
+}
+
+std::unordered_set<std::pair<Procedure, Variable>> DesignExtractor::getProcedureModifies() {
+    return modifiesExtractor->getProcedureModifies();
 }
 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getPattern() {
@@ -88,4 +102,8 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Desi
 
 std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
     return nextExtractor->getNextRelationships();
+}
+
+std::unordered_set<std::pair<Procedure, Procedure>> DesignExtractor::getCalls() {
+    return callsExtractor->getCalls();
 }

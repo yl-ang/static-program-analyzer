@@ -1,14 +1,16 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 
 #include "sp/de/AstVisitor.h"
 
 class SemanticValidatorVisitor : public AstVisitor {
 public:
-    std::shared_ptr<std::unordered_set<std::string>> procedureNamesPtr;
-    SemanticValidatorVisitor(std::shared_ptr<std::unordered_set<std::string>> procedureNames) {
+    std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNamesPtr;
+    std::string currentProcedure;
+    SemanticValidatorVisitor(
+        std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNames) {
         this->procedureNamesPtr = procedureNames;
     }
 

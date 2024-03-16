@@ -1,25 +1,17 @@
 #pragma once
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
-#include "AbstractionExtractor.h"
-#include "NodeDeclarations.h"
-#include "ProcedureTracker.h"
+#include "AstVisitor.h"
 
-class UsesExtractor : public AbstractionExtractor {
+class ProcedureTracker : public AstVisitor {
 public:
-    std::unordered_map<std::string, ProcedureNode*> procs;
-    std::string currentProc;
+    ProcedureTracker() {}
 
-    explicit UsesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
-
-    void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
+    void visitStmtLst(StatementListNode* node) override;
     void visitRead(ReadNode* node) override;
     void visitPrint(PrintNode* node) override;
     void visitWhile(WhileNode* node) override;
@@ -32,8 +24,6 @@ public:
     void visitConstant(ConstantNode* node) override;
     void visitCall(CallNode* node) override;
 
-    std::unordered_set<std::pair<StmtNum, Variable>> getUses();
-    std::unordered_set<std::pair<Procedure, Variable>> getProcedureUses();
-    void dfsVisitHelper(std::shared_ptr<ASTNode> node, UsesExtractor* visitor);
-    void dfsVisitHelper(ASTNode* node, UsesExtractor* visitor);
+    std::unordered_map<std::string, ProcedureNode*> procedures;
+    std::unordered_map<std::string, ProcedureNode*> getProcedures();
 };

@@ -1,18 +1,19 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <utility>
-#include <vector>
 
-#include "sp/ast/AstNode.h"
+#include "sp/ast/grammar_nodes/VariableNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementNode.h"
 class PrintNode : public StatementNode {
 public:
-    explicit PrintNode(int statementNumber, std::vector<std::shared_ptr<ASTNode>> children)
-        : StatementNode("", "print", statementNumber, (children)) {
-    }
+    explicit PrintNode(std::shared_ptr<VariableNode> variable, int statementNumber)
+        : StatementNode("", "print", statementNumber, {variable}),
+          variable(variable),
+          statementNumber(statementNumber) {}
 
     void accept(AstVisitor* visitor) override;
+    std::shared_ptr<VariableNode> variable;
+    int statementNumber;
 
     std::string getVar();
 };

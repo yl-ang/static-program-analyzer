@@ -7,10 +7,14 @@
 
 #include "AbstractionExtractor.h"
 #include "NodeDeclarations.h"
+#include "ProcedureTracker.h"
 
 class ModifiesExtractor : public AbstractionExtractor {
 public:
-    ModifiesExtractor() {}
+    std::unordered_map<std::string, ProcedureNode*> procs;
+    std::string currentProc;
+
+    explicit ModifiesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
@@ -27,6 +31,8 @@ public:
     void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureModifies();
+
     void dfsVisitHelper(std::shared_ptr<ASTNode> node, ModifiesExtractor* visitor);
     void dfsVisitHelper(ASTNode* node, ModifiesExtractor* visitor);
 };

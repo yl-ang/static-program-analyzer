@@ -16,17 +16,17 @@ void ParentExtractor::visitConstant(ConstantNode* node) {}
 void ParentExtractor::visitCall(CallNode* node) {}
 
 void ParentExtractor::visitWhile(WhileNode* node) {
-    int parentStmtNum = node->getStmtNumber();
-    std::vector<int> childrenStmtNums = node->getStmtLstNode()->getStmtsStmtNum();
+    int parentStmtNum = node->statementNumber;
+    std::vector<int> childrenStmtNums = node->whileStmtList->getStmtsStmtNum();
     for (int i = 0; i < childrenStmtNums.size(); ++i) {
         this->parent.insert({parentStmtNum, childrenStmtNums[i]});
     }
 }
 
 void ParentExtractor::visitIf(IfNode* node) {
-    int parentStmtNum = node->getStmtNumber();
-    std::vector<int> thenStmtNums = node->getThenStmtLstNode()->getStmtsStmtNum();
-    std::vector<int> elseStmtNums = node->getElseStmtLstNode()->getStmtsStmtNum();
+    int parentStmtNum = node->statementNumber;
+    std::vector<int> thenStmtNums = node->thenStmtList->getStmtsStmtNum();
+    std::vector<int> elseStmtNums = node->elseStmtList->getStmtsStmtNum();
     for (int i = 0; i < thenStmtNums.size(); ++i) {
         this->parent.insert({parentStmtNum, thenStmtNums[i]});
     }

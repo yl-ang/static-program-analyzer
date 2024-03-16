@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "././PKB/PKBClient/PKBFacadeWriter.h"
+#include "CallsExtractor.h"
 #include "EntityExtractor.h"
 #include "FollowsExtractor.h"
 #include "ModifiesExtractor.h"
@@ -30,11 +31,15 @@ public:
     std::unordered_set<std::pair<StmtNum, StmtNum>> getFollows();
     std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();
     std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureUses();
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureModifies();
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
     std::unordered_set<std::pair<StmtNum, StmtNum>> getNext();
+    std::unordered_set<std::pair<Procedure, Procedure>> getCalls();
 
 private:
+    ProcedureTracker* procedureTracker;
     EntityExtractor* entityExtractor;
     FollowsExtractor* followsExtractor;
     ParentExtractor* parentExtractor;
@@ -42,4 +47,5 @@ private:
     ModifiesExtractor* modifiesExtractor;
     PatternExtractor* patternExtractor;
     NextExtractor* nextExtractor;
+    CallsExtractor* callsExtractor;
 };

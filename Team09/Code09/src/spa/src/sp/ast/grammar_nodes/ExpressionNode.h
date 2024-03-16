@@ -10,7 +10,8 @@
 #include "sp/ast/Matchable.h"
 
 /*
-Covers addition and subtraction
+Covers every expression including conditionals. Since NOT is a single conditional with 1 child, the right child becomes
+a nullptr when called with the appropriate constructor. In otherwords, expression node will always have a left child.
 */
 class ExpressionNode : public ASTNode, public Matchable {
 private:
@@ -18,11 +19,22 @@ private:
     std::vector<std::string> constants;
 
 public:
-    explicit ExpressionNode(LEXICAL_TOKEN_TYPE type, std::vector<std::shared_ptr<ASTNode>> children, int stmtNumber)
-        : ASTNode("", getLexicalEnumString(type), (children), stmtNumber) {}
+    // generic case
+    explicit ExpressionNode(LEXICAL_TOKEN_TYPE type, std::shared_ptr<ExpressionNode> left,
+                            std::shared_ptr<ExpressionNode> right, int stmtNumber)
+        : ASTNode("", getLexicalEnumString(type), {left, right}, stmtNumber), left(left), right(right) {}
+
+    // handle the case for NOT
+    ExpressionNode(LEXICAL_TOKEN_TYPE type, std::shared_ptr<ExpressionNode> singleExpression, int stmtNumber)
+        : ASTNode("", getLexicalEnumString(type), {singleExpression}, stmtNumber),
+          left(singleExpression),
+          right(nullptr) {}
+
     ExpressionNode(std::string value, std::string type, int stmtNumber) : ASTNode(value, type, {}, stmtNumber) {}
 
     void accept(AstVisitor* visitor) override;
+    std::shared_ptr<ExpressionNode> left;
+    std::shared_ptr<ExpressionNode> right;
 
     std::vector<std::string> getVars();
     std::vector<std::string> getConsts();
