@@ -7,14 +7,15 @@
 #include "sp/ast/SemanticValidatorVisitor.h"
 #include "sp/de/AstVisitor.h"
 #include "sp/de/NodeDeclarations.h"
+#include "sp/exceptions/semantic/CyclicProcedureCallsError.h"
 #include "sp/exceptions/semantic/DuplicateProcError.h"
 
 void SemanticValidator::validateSemantics(const std::shared_ptr<ProgramNode> programNode) {
     procedureNames = std::make_shared<std::unordered_map<std::string, std::vector<std::string>>>();
     checkDuplicateProcedureNames(programNode);
-    this->semanticValidatorVisitor = new SemanticValidatorVisitor(
-        std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>>(procedureNames));
+    this->semanticValidatorVisitor = new SemanticValidatorVisitor(procedureNames);
     checkCallingProcedure(programNode);
+    checkCyclicCalls();
 }
 
 void SemanticValidator::checkDuplicateProcedureNames(std::shared_ptr<ProgramNode> programNode) {
@@ -39,5 +40,33 @@ void SemanticValidator::visitNode(std::shared_ptr<ASTNode>&& node, SemanticValid
 
     for (auto child : node->getChildren()) {
         visitNode((std::shared_ptr<ASTNode>&&)child, visitor);
+    }
+}
+
+void SemanticValidator::checkCyclicCalls() {
+    std::unordered_map<std::string, bool> visited;
+    for (auto procedureName : *(procedureNames.get())) {
+        visited[procedureName.first] = false;
+    }
+
+    for (auto& [_, value] : *(procedureNames.get())) {
+        for (auto procedureName : value) {
+            visited[procedureName] = true;
+            std::string currentCall = procedureName;
+            checkCycle(std::make_shared<std::unordered_map<std::string, bool>>(visited), currentCall);
+            visited[procedureName] = false;
+        }
+    }
+}
+
+void SemanticValidator::checkCycle(std::shared_ptr<std::unordered_map<std::string, bool>> visited,
+                                   std::string currentProcedure) {
+    for (auto value : procedureNames->at(currentProcedure)) {
+        if (visited->at(value)) {
+            throw CyclicProcedureCallsError();
+        }
+        visited->at(value) = true;
+        checkCycle(visited, value);
+        visited->at(value) = false;
     }
 }

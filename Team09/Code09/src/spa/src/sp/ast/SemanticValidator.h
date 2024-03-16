@@ -15,5 +15,7 @@ private:
     void checkDuplicateProcedureNames(std::shared_ptr<ProgramNode>);
     void checkCallingProcedure(std::shared_ptr<ProgramNode>);
     void visitNode(std::shared_ptr<ASTNode>&& node, SemanticValidatorVisitor* visitor);
+    void checkCyclicCalls();
+    void checkCycle(std::shared_ptr<std::unordered_map<std::string, bool>> visited, std::string currentProcedure);
     SemanticValidatorVisitor* semanticValidatorVisitor;
 };

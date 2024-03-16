@@ -109,4 +109,20 @@ TEST_CASE("Semantic Validation Tests") {
         auto program = std::make_shared<ProgramNode>(children);
         REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Procedure with name: b called within b");
     }
+
+    SECTION("Calling procedure cyclicly throws error") {
+        auto callA = std::make_shared<CallNode>("a", 0);
+        auto callB = std::make_shared<CallNode>("b", 0);
+        std::vector<std::shared_ptr<StatementNode>> procBChildren = {callA};
+        std::vector<std::shared_ptr<StatementNode>> procAChildren = {callB};
+
+        auto stmtList2 = std::make_shared<StatementListNode>(procBChildren);
+        auto stmtList1 = std::make_shared<StatementListNode>(procAChildren);
+
+        auto procedure1 = std::make_shared<ProcedureNode>("a", stmtList1);
+        auto procedure2 = std::make_shared<ProcedureNode>("b", stmtList2);
+        std::vector<std::shared_ptr<ProcedureNode>> children = {procedure1, procedure2};
+        auto program = std::make_shared<ProgramNode>(children);
+        REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Cyclic procedure calls detected.");
+    }
 }
