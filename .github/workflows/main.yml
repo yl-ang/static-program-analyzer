@@ -36,6 +36,24 @@ jobs:
           cmake --build . --target integration_testing --config Release
           cmake --build . --target autotester --config Release
           cd ../..
+          
+      - name: Autotester System Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/autotester/Release
+          ./autotester.exe "${SOURCE_FILEPATH}" "${QUERIES_FILEPATH}" "${OUT_FILEPATH}"
+          passed_count=$(grep -c "<passed/>" "${OUT_FILEPATH}")
+          total_tests_count=$(grep -c "<id" "${OUT_FILEPATH}")
+          echo "Passed: $passed_count / $total_tests_count"
+
+          if [ $passed_count -ne $total_tests_count ]; then
+            echo "Failed: $((total_tests_count - passed_count)) / $total_tests_count"
+            exit 1
+          fi
+      
+      - name: Output Autotester out.xml
+        shell: bash
+        run: cat "${OUT_FILEPATH}"
 
       - name: Unit Testing
         shell: bash
@@ -48,16 +66,6 @@ jobs:
         run: |
           cd Team09/Code09/build/src/integration_testing/Release
           ./integration_testing.exe
-          
-      - name: Autotester System Testing
-        shell: bash
-        run: |
-          cd Team09/Code09/build/src/autotester/Release
-          ./autotester.exe "${SOURCE_FILEPATH}" "${QUERIES_FILEPATH}" "${OUT_FILEPATH}"
-      
-      - name: Output Autotester out.xml
-        shell: bash
-        run: cat "${OUT_FILEPATH}"
           
   build_macos:
     runs-on: macos-latest
