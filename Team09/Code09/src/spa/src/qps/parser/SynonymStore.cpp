@@ -1,10 +1,16 @@
 #include "SynonymStore.h"
 
+SynonymStore::SynonymStore(std::unordered_map<std::string, DesignEntityType> store) : storage(store) {}
+
 void SynonymStore::storeSynonym(DesignEntityType type, const std::string& synName) {
     if (hasSynonymName(synName)) {
-        throw QPSSemanticError();
+        isSemanticallyCorrect = false;
     }
     storage.insert({synName, type});
+}
+
+bool SynonymStore::isValidStore() {
+    return isSemanticallyCorrect;
 }
 
 bool SynonymStore::containsSynonym(Synonym syn) {
@@ -32,4 +38,8 @@ DesignEntityType SynonymStore::getDesignEntityType(const std::string& synName) {
         return DesignEntityType::UNKNOWN;
     }
     return storage[synName];
+}
+
+bool SynonymStore::operator==(const SynonymStore& other) const {
+    return storage == other.storage;
 }

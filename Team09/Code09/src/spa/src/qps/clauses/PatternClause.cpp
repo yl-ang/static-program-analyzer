@@ -121,7 +121,7 @@ ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
 }
 
 bool PatternClause::validateArguments(SynonymStore* store) {
-    Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
+    Synonym& aSyn = dynamic_cast<Synonym&>(assignSynonym);
     if (!aSyn.updateType(store)) {
         return false;
     }
@@ -130,7 +130,7 @@ bool PatternClause::validateArguments(SynonymStore* store) {
     }
 
     if (firstArg.isSynonym()) {
-        Synonym fSyn = dynamic_cast<Synonym&>(firstArg);
+        Synonym& fSyn = dynamic_cast<Synonym&>(firstArg);
         if (!fSyn.updateType(store)) {
             return false;
         }
@@ -139,4 +139,5 @@ bool PatternClause::validateArguments(SynonymStore* store) {
             return false;
         }
     }
+    return true;
 }

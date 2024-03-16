@@ -29,14 +29,23 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
     bool hasSemanticError = false;
-    for (Synonym syn : selectEntities) {
-        hasSemanticError = hasSemanticError || !syn.updateType(&entities);
+    if (!entities.isValidStore()) {
+        hasSemanticError = true;
     }
-    for (SuchThatClause clause : suchThatClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
+    for (Synonym& syn : selectEntities) {
+        if (!syn.updateType(&entities)) {
+            hasSemanticError = true;
+        }
     }
-    for (PatternClause clause : patternClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
+    for (SuchThatClause& clause : suchThatClauses) {
+        if (!clause.validateArguments(&entities)) {
+            hasSemanticError = true;
+        }
+    }
+    for (PatternClause& clause : patternClauses) {
+        if (!clause.validateArguments(&entities)) {
+            hasSemanticError = true;
+        }
     }
     if (hasSemanticError) {
         throw QPSSemanticError();
@@ -87,7 +96,6 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
             }
         }
 
-        // Semantic checks begins here
         for (std::string synonym : synonyms) {
             synonymStore.storeSynonym(entityType, synonym);
         }
@@ -101,7 +109,11 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     std::vector<Synonym> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
-        result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
+        if (isSynonym(selectEntity)) {
+            result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
+        } else {
+            throw QPSSyntaxError();
+        }
     }
 
     return result;
