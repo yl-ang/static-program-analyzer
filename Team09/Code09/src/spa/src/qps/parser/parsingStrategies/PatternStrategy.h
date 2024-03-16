@@ -2,6 +2,7 @@
 
 #include "../../clauses/PatternClause.h"
 #include "ParsingStrategy.h"
+#include "qps/validator/Validator.h"
 
 class PatternStrategy : public ParsingStrategy {
 private:
