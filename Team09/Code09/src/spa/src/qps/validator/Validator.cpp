@@ -42,7 +42,7 @@ void Validator::validateClauses(SynonymStore* store, std::vector<Synonym>& selec
     }
 
     if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
-        if (!selectEntities[0].updateType(&entities)) {
+        if (!selectEntities[0].updateType(store)) {
             selectEntities.erase(selectEntities.begin());
         }
         // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
