@@ -10,10 +10,6 @@ on:
 
 env:
   BUILD_TYPE: Release
-  TESTS_09_DIR: "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2"
-  SOURCE_FILENAME: milestone2_source_1.txt
-  QUERIES_FILENAME: milestone2_queries_1.txt
-  OUT_FILENAME: out.xml
 
 jobs:
   build_windows:
@@ -23,6 +19,9 @@ jobs:
       fail-fast: true
 
     steps:
+      - name: test
+        run: echo "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+
       - uses: actions/checkout@v2
       - name: Build Project
         shell: bash
@@ -40,9 +39,11 @@ jobs:
         shell: bash
         run: |
           cd Team09/Code09/build/src/autotester/Release
-          ./autotester.exe "${TESTS_09_DIR}/${SOURCE_FILENAME}" "${TESTS_09_DIR}/${QUERIES_FILENAME}" "${TESTS_09_DIR}/${OUT_FILENAME}"
-          passed_count=$(grep -c "<passed/>" "${TESTS_09_DIR}/${OUT_FILENAME}")
-          total_tests_count=$(grep -c "<id" "${TESTS_09_DIR}/${OUT_FILENAME}")
+          ./autotester.exe "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
+            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
+            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+          passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
+          total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           echo "Passed: $passed_count / $total_tests_count"
 
           if [ $passed_count -ne $total_tests_count ]; then
@@ -52,7 +53,7 @@ jobs:
       
       - name: Output Autotester out.xml
         shell: bash
-        run: cat "${TESTS_09_DIR}/${OUT_FILENAME}"
+        run: cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
 
       - name: Unit Testing
         shell: bash
@@ -73,6 +74,9 @@ jobs:
       fail-fast: true
 
     steps:
+      - name: test
+        run: echo "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+
       - uses: actions/checkout@v2
 
       - name: Create Build Environment
@@ -87,14 +91,16 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
-
+        
       - name: Autotester System Testing
         shell: bash
         run: |
           cd Team09/Code09/build/src/autotester/Release
-          ./autotester.exe "${TESTS_09_DIR}/${SOURCE_FILENAME}" "${TESTS_09_DIR}/${QUERIES_FILENAME}" "${TESTS_09_DIR}/${OUT_FILENAME}"
-          passed_count=$(grep -c "<passed/>" "${TESTS_09_DIR}/${OUT_FILENAME}")
-          total_tests_count=$(grep -c "<id" "${TESTS_09_DIR}/${OUT_FILENAME}")
+          ./autotester.exe "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
+            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
+            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+          passed_count=$(grep -c "<passed/>" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
+          total_tests_count=$(grep -c "<id" "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml")
           echo "Passed: $passed_count / $total_tests_count"
 
           if [ $passed_count -ne $total_tests_count ]; then
@@ -104,7 +110,7 @@ jobs:
       
       - name: Output Autotester out.xml
         shell: bash
-        run: cat "${TESTS_09_DIR}/${OUT_FILENAME}"
+        run: cat "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
 
       - name: Run Unit Tests
         working-directory: ${{runner.workspace}}/build
