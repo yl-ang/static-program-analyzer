@@ -37,6 +37,7 @@ public:
     std::unordered_set<std::pair<Procedure, Procedure>> getCalls();
 
 private:
+    ProcedureTracker* procedureTracker;
     EntityExtractor* entityExtractor;
     FollowsExtractor* followsExtractor;
     ParentExtractor* parentExtractor;
