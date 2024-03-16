@@ -47,9 +47,15 @@ std::shared_ptr<Relationship> SuchThatClause::getRelationship() {
 }
 
 bool SuchThatClause::validateArguments(SynonymStore* store) {
-    std::vector<Synonym> synonyms = getSynonyms();
-    for (Synonym syn : synonyms) {
-        if (!syn.updateType(store)) {
+    if (firstArg.isSynonym()) {
+        Synonym& first = dynamic_cast<Synonym&>(firstArg);
+        if (!first.updateType(store)) {
+            return false;
+        }
+    }
+    if (secondArg.isSynonym()) {
+        Synonym& second = dynamic_cast<Synonym&>(secondArg);
+        if (!second.updateType(store)) {
             return false;
         }
     }

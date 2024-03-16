@@ -1,14 +1,63 @@
-// #include <string>
-// #include <vector>
-//
-// #include "catch.hpp"
-// #include "qps/exceptions/QPSSemanticError.h"
-// #include "qps/exceptions/QPSSyntaxError.h"
-// #include "qps/validator/Validator.h"
-//
-//// CUSTOM TESTING MACROS
-// #define REQUIRE_THROW_SEMANTIC_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSemanticError)
-// #define REQUIRE_THROW_SYNTAX_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSyntaxError)
+#include <string>
+#include <vector>
+
+#include "catch.hpp"
+#include "qps/exceptions/QPSSemanticError.h"
+#include "qps/exceptions/QPSSyntaxError.h"
+#include "qps/validator/Validator.h"
+
+// CUSTOM TESTING MACROS
+#define REQUIRE_THROW_SEMANTIC_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSemanticError)
+#define REQUIRE_THROW_SYNTAX_ERROR(expression) REQUIRE_THROWS_AS(expression, QPSSyntaxError)
+
+// static void validateSuchThatSyntax(const std::string& relType, const std::string& arguments);
+
+TEST_CASE("validate pattern syntax") {
+    SECTION("valid syn, wildcard, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "_, _"));
+    }
+
+    SECTION("valid syn, wildcard, exact expression") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "_, \"x\""));
+    }
+
+    SECTION("valid syn, wildcard, partial expression") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "_, _\"x\"_"));
+    }
+
+    SECTION("valid syn, wildcard, complicated expression") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "_, _\"((x+ y) - x *(a+1))\"_"));
+    }
+
+    SECTION("valid syn, syn, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "var, _"));
+    }
+
+    SECTION("valid syn, ident, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "\"xx\", _"));
+    }
+
+    SECTION("valid syn, wildcard, wildcard, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "_, _,_"));
+    }
+
+    SECTION("valid syn, syn, wildcard, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "variable, _,_"));
+    }
+
+    SECTION("valid syn, ident, wildcard, wildcard") {
+        REQUIRE_NOTHROW(Validator::validatePatternSyntax("a", "\"xx\", _,_"));
+    }
+
+    SECTION("invalid syn, syn, syn") {
+        REQUIRE_THROW_SYNTAX_ERROR(Validator::validatePatternSyntax("a", "jlk, ajdf"));
+    }
+
+    SECTION("invalid syn, missing quote ident, wildcard") {
+        REQUIRE_THROW_SYNTAX_ERROR(Validator::validatePatternSyntax("a", "\"jlk, _"));
+    }
+}
+
 //
 // class TestValidator : public Validator {
 // public:  // NOLINT

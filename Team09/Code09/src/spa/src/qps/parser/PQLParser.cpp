@@ -28,19 +28,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
-    bool hasSemanticError = false;
-    for (Synonym syn : selectEntities) {
-        hasSemanticError = hasSemanticError || !syn.updateType(&entities);
-    }
-    for (SuchThatClause clause : suchThatClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-    for (PatternClause clause : patternClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-    if (hasSemanticError) {
-        throw QPSSemanticError();
-    }
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
@@ -87,7 +75,6 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
             }
         }
 
-        // Semantic checks begins here
         for (std::string synonym : synonyms) {
             synonymStore.storeSynonym(entityType, synonym);
         }
@@ -101,7 +88,11 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     std::vector<Synonym> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
-        result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
+        if (isSynonym(selectEntity)) {
+            result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
+        } else {
+            throw QPSSyntaxError();
+        }
     }
 
     return result;

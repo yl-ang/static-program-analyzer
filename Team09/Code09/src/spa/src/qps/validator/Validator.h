@@ -1,39 +1,29 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
-#include "ArgumentsValidator/ArgumentsValidator.h"
-#include "ArgumentsValidator/FollowsValidator.h"
-#include "ArgumentsValidator/ModifiesValidator.h"
-#include "ArgumentsValidator/NextValidator.h"
-#include "ArgumentsValidator/ParentValidator.h"
-#include "ArgumentsValidator/PatternValidator.h"
-#include "ArgumentsValidator/UsesValidator.h"
-#include "ValidatorSynonymStore.h"
 #include "qps/GrammarUtils.h"
 #include "qps/ParserUtils.h"
 #include "qps/QPSConstants.h"
-#include "qps/exceptions/QPSSemanticError.h"
+#include "qps/clauseArguments/Synonym.h"
+#include "qps/clauses/PatternClause.h"
+#include "qps/clauses/SuchThatClause.h"
 #include "qps/exceptions/QPSSyntaxError.h"
+#include "qps/parser/SynonymStore.h"
 
 class Validator {
 public:
-    void validate(std::vector<std::string>);
+    static void validatePatternSyntax(const std::string& synonym, const std::string& arguments);
+    static void validateSuchThatSyntax(const std::string& relType, const std::string& arguments);
+    static void validateClauses(SynonymStore* store, std::vector<Synonym>& selectEntities,
+                                std::vector<SuchThatClause>& suchThatClauses,
+                                std::vector<PatternClause>& patternClauses);
 
-protected:
-    ValidatorSynonymStore synonymStore = {};
-
-    void validateDeclarationStatement(const std::string& statement);
-    void validateSelectStatement(const std::string& statement);
-    void validateResultClause(const std::string& resultClause);
-
-    void validateSuchThatClause(const std::string& suchThatClause);
-    void validateRelRef(const std::string& relRef);
-
-    void validatePatternClause(const std::string& patternClause);
-    void validatePattern(const std::string& pattern);
-
-    std::unique_ptr<ArgumentsValidator> buildArgValidator(const std::string& relRefString,
-                                                          const std::vector<std::string>& arguments);
-    std::unique_ptr<ArgumentsValidator> buildPatternValidator(const std::string& relRefString,
-                                                              const std::vector<std::string>& arguments);
+private:
+    static void validatePatternTwoArg(const std::vector<std::string>& arguments);
+    static void validatePatternThreeArg(const std::vector<std::string>& arguments);
+    static void validateStmtStmt(const std::vector<std::string>& arguments);
+    static void validateStmtOREntEnt(const std::vector<std::string>& arguments);
+    static void validateEntEnt(const std::vector<std::string>& arguments);
 };
