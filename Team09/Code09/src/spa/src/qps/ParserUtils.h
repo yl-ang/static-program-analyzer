@@ -8,10 +8,6 @@
 
 #include "QPSConstants.h"
 
-const std::string WHITESPACES = " \n\r\t\b\f";
-const std::string SPACE = " ";
-const std::string QUOTATIONS = "\"";
-
 std::string replaceAllExtraWhitespaces(const std::string& str);
 std::string removeAllWhitespaces(const std::string& str);
 std::string removeAllQuotations(const std::string& str);

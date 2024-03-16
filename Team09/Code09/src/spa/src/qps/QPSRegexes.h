@@ -19,5 +19,5 @@ struct QPSRegexes {
     // {letters/digits}{>=0 whitespaces}{bracketed non-greedy}
     inline static const std::regex PATTERN_ARGS = std::regex("\\s*(\\w+)\\s*\\((.*?)\\)\\s*");
     // <{capturing group}>
-    inline static const std::regex TUPLE = std::regex("^<(.*?)>$");
+    inline static const std::regex TUPLE = std::regex("^<([^<>]*)>$");
 };

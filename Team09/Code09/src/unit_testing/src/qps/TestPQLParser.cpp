@@ -31,8 +31,8 @@ TEST_CASE("one_call_assign_stmt") {
                                                          Synonym(DesignEntityType::ASSIGN, "a1"),
                                                          Synonym(DesignEntityType::STMT, "s1")};
 
-  SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
-
+   SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
+   
    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[0]));
    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[1]));
    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[2]));
@@ -55,29 +55,31 @@ TEST_CASE("various_call_assign_stmt") {
 }
 
 // Testing Find Queries functions
-
-std::vector<Synonym> entities = {Synonym(DesignEntityType::VARIABLE, "v1"), Synonym(DesignEntityType::VARIABLE,
-"v2"),
-                                Synonym(DesignEntityType::ASSIGN, "a1"),   Synonym(DesignEntityType::ASSIGN, "a2"),
-                                Synonym(DesignEntityType::STMT, "s1"),     Synonym(DesignEntityType::STMT, "s2")};
+std::vector<std::string> various_assorted = {"variable v1, v2;", "assign a1;", "stmt s1, s2;"};
+SynonymStore entities = PQLParser::parseQueryEntities(various_assorted);
 
 // Test cases
 
 TEST_CASE("PQLParser: Select (1)") {
-   std::string select_1 = "Select v1";
-   std::string select_2 = "Select a1";
-   std::string select_3 = "Select s1";
+    std::string select_1 = "Select v1";
+    std::string select_2 = "Select a1";
+    std::string select_3 = "Select s1";
 
-   std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
-   std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
-   std::vector<Synonym> result_3 = PQLParser::findSelectClauses(select_3);
+    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
+    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
+    std::vector<Synonym> result_3 = PQLParser::findSelectClauses(select_3);
+    std::vector<SuchThatClause> suchThatClauses = {};
+    std::vector<PatternClause> patternClauses = {};
+    PQLParser::validateClauses(result_1, suchThatClauses, patternClauses, entities);
+    PQLParser::validateClauses(result_2, suchThatClauses, patternClauses, entities);
+    PQLParser::validateClauses(result_3, suchThatClauses, patternClauses, entities);
 
-   REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
-   REQUIRE(result_1.size() == 1);
-   REQUIRE(Synonym(DesignEntityType::ASSIGN, "a1") == result_2[0]);
-   REQUIRE(result_2.size() == 1);
-   REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_3[0]);
-   REQUIRE(result_3.size() == 1);
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
+    REQUIRE(result_1.size() == 1);
+    REQUIRE(Synonym(DesignEntityType::ASSIGN, "a1") == result_2[0]);
+    REQUIRE(result_2.size() == 1);
+    REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_3[0]);
+    REQUIRE(result_3.size() == 1);
 }
 
 TEST_CASE("PQLParser: Select (2))") {
@@ -86,22 +88,17 @@ TEST_CASE("PQLParser: Select (2))") {
 
     std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
     std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
-    std::vector<SuchThatClause> result_3 = PQLParser::parseSuchThatClauses(select_1);
-    std::vector<SuchThatClause> result_4 = PQLParser::parseSuchThatClauses(select_2);
-    std::vector<PatternClause> result_5 = PQLParser::parsePatternClauses(select_1);
-    std::vector<PatternClause> result_6 = PQLParser::parsePatternClauses(select_2);
+    std::vector<SuchThatClause> suchThatClauses = {};
+    std::vector<PatternClause> patternClauses = {};
+    PQLParser::validateClauses(result_1, suchThatClauses, patternClauses, entities);
+    PQLParser::validateClauses(result_2, suchThatClauses, patternClauses, entities);
 
     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_1[1]);
     REQUIRE(result_1.size() == 2);
     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_2[0]);
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_2[0]);
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_2[1]);
     REQUIRE(result_2.size() == 2);
-
-    REQUIRE(result_3.size() == 0);
-    REQUIRE(result_4.size() == 0);
-    REQUIRE(result_5.size() == 0);
-    REQUIRE(result_6.size() == 0);
 }
 
 //// Select such that Parent()

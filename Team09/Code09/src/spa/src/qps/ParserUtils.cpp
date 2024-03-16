@@ -3,11 +3,11 @@
 std::string replaceAllExtraWhitespaces(const std::string& str) {
     std::string replacedString;
 
-    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
-    std::regex consecutiveSpacePattern = std::regex(SPACE + "+");
+    std::regex whitespacePattern = std::regex("[" + QPSConstants::WHITESPACES + "]");
+    std::regex consecutiveSpacePattern = std::regex(QPSConstants::SPACE + "+");
 
-    replacedString = std::regex_replace(str, whitespacePattern, SPACE);
-    replacedString = std::regex_replace(replacedString, consecutiveSpacePattern, SPACE);
+    replacedString = std::regex_replace(str, whitespacePattern, QPSConstants::SPACE);
+    replacedString = std::regex_replace(replacedString, consecutiveSpacePattern, QPSConstants::SPACE);
 
     return trim(replacedString);
 }
@@ -15,7 +15,7 @@ std::string replaceAllExtraWhitespaces(const std::string& str) {
 std::string removeAllWhitespaces(const std::string& str) {
     std::string replacedString;
 
-    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
+    std::regex whitespacePattern = std::regex("[" + QPSConstants::WHITESPACES + "]");
     replacedString = std::regex_replace(str, whitespacePattern, "");
 
     return replacedString;
@@ -24,7 +24,7 @@ std::string removeAllWhitespaces(const std::string& str) {
 std::string removeAllQuotations(const std::string& str) {
     std::string replacedString;
 
-    std::regex quotationsPattern = std::regex("[" + QUOTATIONS + "]");
+    std::regex quotationsPattern = std::regex("[" + QPSConstants::QUOTATIONS + "]");
     replacedString = std::regex_replace(str, quotationsPattern, "");
 
     return replacedString;
@@ -83,13 +83,13 @@ std::vector<std::string> stringToWordList(const std::string& string) {
 }
 
 std::string trim(const std::string& str) {
-    size_t start = str.find_first_not_of(WHITESPACES);
+    size_t start = str.find_first_not_of(QPSConstants::WHITESPACES);
     std::string trimmedString;
     if (start != std::string::npos) {
         trimmedString = str.substr(start);
     }
 
-    size_t end = trimmedString.find_last_not_of(WHITESPACES);
+    size_t end = trimmedString.find_last_not_of(QPSConstants::WHITESPACES);
     if (end != std::string::npos) {
         trimmedString = trimmedString.substr(0, end + 1);
     }

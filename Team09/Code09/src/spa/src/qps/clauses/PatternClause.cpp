@@ -139,4 +139,5 @@ bool PatternClause::validateArguments(SynonymStore* store) {
             return false;
         }
     }
+    return true;
 }

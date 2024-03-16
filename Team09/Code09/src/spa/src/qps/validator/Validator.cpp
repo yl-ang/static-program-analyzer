@@ -41,7 +41,7 @@ void Validator::validateDeclarationStatement(const std::string& statement) {
 
     std::string designEntityWord;
     std::string remainingStatement;
-    std::tie(designEntityWord, remainingStatement) = substringUntilDelimiter(newStatement, SPACE);
+    std::tie(designEntityWord, remainingStatement) = substringUntilDelimiter(newStatement, QPSConstants::SPACE);
 
     std::vector<std::string> synonymList = splitByDelimiter(trim(remainingStatement), ",");
     if (synonymList.size() == 1 && synonymList[0].empty()) {
@@ -58,7 +58,7 @@ void Validator::validateDeclarationStatement(const std::string& statement) {
 void Validator::validateSelectStatement(const std::string& statement) {
     std::string selectWord;
     std::string remainingStatement;
-    std::tie(selectWord, remainingStatement) = substringUntilDelimiter(statement, SPACE);
+    std::tie(selectWord, remainingStatement) = substringUntilDelimiter(statement, QPSConstants::SPACE);
 
     std::string resultClause;
     std::string remainingClausesStatement;

@@ -113,7 +113,7 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
 
         std::string type;
         std::string synonymsString;
-        std::tie(type, synonymsString) = substringUntilDelimiter(synonymTypeList, SPACE);
+        std::tie(type, synonymsString) = substringUntilDelimiter(synonymTypeList, QPSConstants::SPACE);
         std::vector<std::string> synonyms = splitByDelimiter(synonymsString, ",");
 
         if (synonyms.empty()) {
@@ -154,15 +154,22 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
         }
 
         // if multiple return, will return a vector with multiple ClauseArgument.
-        if (isTuple(selectEntity)) {
-            std::string elems = selectEntity.substr(0, selectEntity.size() -2);
-            std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
-            // Push back the split results into a vector
-            for (const auto& str : splitResult) {
-                result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
+        else if (isTuple(selectEntity)) {
+            
+            std::smatch matches;
+            if (std::regex_match(selectEntity, matches, QPSRegexes::TUPLE)) {
+                std::string elems = matches[1];
+                std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
+                // Push back the split results into a vector
+                for (const auto& str : splitResult) {
+                    result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
+                }
+            } else {
+                throw QPSSyntaxError();
             }
+        } else {
+            throw QPSSyntaxError();
         }
-        throw QPSSyntaxError();
     }
     return result;
 }
@@ -202,7 +209,7 @@ std::vector<PatternClause> PQLParser::parsePatternClauses(std::vector<std::strin
                 PatternClause ptClause = std::move(*ptPtr);
                 result.push_back(ptClause);
             } else {
-                throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+                throw Exception("Issues with Strategy Pattern for PatternClauses");
             }
         }
     }
