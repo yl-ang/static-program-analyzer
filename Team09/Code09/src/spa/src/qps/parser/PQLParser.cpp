@@ -21,12 +21,27 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             throw QPSSyntaxError();
         }
     }
-    // Select entities in select clause
+    // Select entities in select clause (without checking declaration)
     std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
 
-    // Replace AND before processing
     // Returns such that, pattern, and
     std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
+    
+    // Replace 'and' clause with 'such that', 'pattern', etc. before processing
+    modifyClauseList(clauseList);
+
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
+    std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
+
+    // ALL entities declared
+    SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
+    
+    // Semantic Checking
+    validateClauses(selectEntities, suchThatClauses, patternClauses, entities);
+    return Query{selectEntities, suchThatClauses, patternClauses};
+}
+
+void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
     std::string currClauseType;
     for (size_t i = 0; i < clauseList.size(); ++i) {
         if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
@@ -40,13 +55,12 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             // ignore
         }
     }
+}
 
-    std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(clauseList);
-    std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(clauseList);
-
-    // ALL entities declared
-    SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
+void PQLParser::validateClauses(std::vector<Synonym>& selectEntities, std::vector<SuchThatClause>& suchThatClauses,
+                    std::vector<PatternClause>& patternClauses, SynonymStore& entities) {
     bool hasSemanticError = false;
+
     if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
         if (!selectEntities[0].updateType(&entities)) {
             selectEntities.erase(selectEntities.begin());
@@ -55,20 +69,22 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
         // Evaluator will know if BOOLEAN if vector is empty
         // Do not trigger a warning should it not be a Synonym type
     } else {
-        for (Synonym syn : selectEntities) {
+        for (Synonym& syn : selectEntities) {
             hasSemanticError = hasSemanticError || !syn.updateType(&entities);
         }
     }
-    for (SuchThatClause clause : suchThatClauses) {
+
+    for (SuchThatClause& clause : suchThatClauses) {
         hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
     }
-    for (PatternClause clause : patternClauses) {
+
+    for (PatternClause& clause : patternClauses) {
         hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
     }
+
     if (hasSemanticError) {
         throw QPSSemanticError();
     }
-    return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
 std::string PQLParser::getQueryClauses(UnparsedQueries unparsedQuery) {
@@ -155,7 +171,7 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     return result;
 }
 
-std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<std::string> clauseList) {
+std::vector<SuchThatClause> PQLParser::parseSuchThatClauses(std::vector<std::string> clauseList) {
     std::vector<SuchThatClause> result = {};  // if there is none
     for (std::string clauseString : clauseList) {
         if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
@@ -177,7 +193,7 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<std::stri
     return result;
 }
 
-std::vector<PatternClause> PQLParser::findPatternClauses(std::vector<std::string> clauseList) {
+std::vector<PatternClause> PQLParser::parsePatternClauses(std::vector<std::string> clauseList) {
     std::vector<PatternClause> result = {};  // if there is none
     for (std::string clauseString : clauseList) {
         if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
