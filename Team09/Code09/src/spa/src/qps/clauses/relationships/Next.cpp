@@ -6,6 +6,24 @@ bool Next::isSimpleResult() const {
     return !currentStmt.isSynonym() && !nextStmt.isSynonym();
 }
 
+bool Next::validateArguments() {
+    if (currentStmt.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(currentStmt);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
+            first.getType() == DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    if (nextStmt.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(nextStmt);
+        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
+            second.getType() == DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    return true;
+}
+
 ClauseResult Next::evaluate(PKBFacadeReader& reader) {
     if (isSimpleResult()) {
         return {reader.hasNextRelationship(currentStmt, nextStmt)};

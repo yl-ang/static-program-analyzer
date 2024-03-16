@@ -35,6 +35,26 @@ std::vector<Synonym> SuchThatClause::getSynonyms() const {
 }
 
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
-    auto relationship = RelationshipBuilder::createRelationship(type, firstArg, secondArg);
+    auto relationship = getRelationship();
     return relationship->evaluate(reader);
+}
+
+std::shared_ptr<Relationship> SuchThatClause::getRelationship() {
+    if (!relationship.has_value()) {
+        relationship = RelationshipBuilder::createRelationship(type, firstArg, secondArg);
+    }
+    return relationship.value();
+}
+
+bool SuchThatClause::validateArguments(SynonymStore* store) {
+    std::vector<Synonym> synonyms = getSynonyms();
+    for (Synonym syn : synonyms) {
+        if (!syn.updateType(store)) {
+            return false;
+        }
+    }
+    // Check semantic based on if there is synonyms and Relationship types
+    // Build relationship, check semantic in relationship
+    auto relationship = getRelationship();
+    return relationship->validateArguments();
 }

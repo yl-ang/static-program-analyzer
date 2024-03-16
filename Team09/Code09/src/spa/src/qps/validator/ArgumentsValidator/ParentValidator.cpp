@@ -13,7 +13,7 @@ void ParentValidator::validateSyntax() {
     }
 }
 
-void ParentValidator::validateSemantic(SynonymStore* store) {
+void ParentValidator::validateSemantic(ValidatorSynonymStore* store) {
     for (const std::string& arg : args) {
         // Ensure that synonym is in the store and statement subtype
         if (isSynonym(arg)) {

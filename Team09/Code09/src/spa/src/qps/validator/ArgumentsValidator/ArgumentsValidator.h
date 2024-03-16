@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "qps/validator/SynonymStore.h"
+#include "qps/validator/ValidatorSynonymStore.h"
 
 class ArgumentsValidator {
 protected:
@@ -11,6 +11,6 @@ protected:
 
 public:
     virtual void validateSyntax() = 0;
-    virtual void validateSemantic(SynonymStore* store) = 0;
+    virtual void validateSemantic(ValidatorSynonymStore* store) = 0;
     virtual ~ArgumentsValidator(){};
 };

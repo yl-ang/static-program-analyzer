@@ -2,6 +2,25 @@
 
 Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : modifier(stmt), var(var) {}
 
+bool Modifies::validateArguments() {
+    if (modifier.isWildcard()) {
+        return false;
+    }
+    if (modifier.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(modifier);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
+            return false;
+        }
+    }
+    if (var.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(var);
+        if (second.getType() != DesignEntityType::VARIABLE) {
+            return false;
+        }
+    }
+    return true;
+}
+
 ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {
     if (modifier.isSynonym() && var.isSynonym()) {
         return evaluateBothSynonyms(reader);

@@ -8,7 +8,7 @@
 #include "ArgumentsValidator/ParentValidator.h"
 #include "ArgumentsValidator/PatternValidator.h"
 #include "ArgumentsValidator/UsesValidator.h"
-#include "SynonymStore.h"
+#include "ValidatorSynonymStore.h"
 #include "qps/GrammarUtils.h"
 #include "qps/ParserUtils.h"
 #include "qps/QPSConstants.h"
@@ -20,7 +20,7 @@ public:
     void validate(std::vector<std::string>);
 
 protected:
-    SynonymStore synonymStore = {};
+    ValidatorSynonymStore synonymStore = {};
 
     void validateDeclarationStatement(const std::string& statement);
     void validateSelectStatement(const std::string& statement);

@@ -5,11 +5,11 @@ void Validator::validate(std::vector<std::string> statementList) {
     // Ensure that Select is the last input
     if (statementList.empty()) {
         throw QPSSyntaxError();
-    }
+    }  // DONE
 
     if (!isSelectStatement(statementList[statementList.size() - 1])) {
         throw QPSSyntaxError();
-    }
+    }  // DONE
 
     bool hasSemanticError = false;
     for (std::string statement : statementList) {
@@ -22,7 +22,7 @@ void Validator::validate(std::vector<std::string> statementList) {
             } else {
                 // NOTE: This is thrown when and empty string is made here
                 // TODO(Han Qin): Add test case to test this
-                throw QPSSyntaxError();
+                throw QPSSyntaxError();  // DONE
             }
         } catch (QPSSemanticError e) {
             hasSemanticError = true;
@@ -36,7 +36,7 @@ void Validator::validate(std::vector<std::string> statementList) {
 void Validator::validateDeclarationStatement(const std::string& statement) {
     if (statement.back() != ';') {
         throw QPSSyntaxError();
-    }
+    }  // DONE
     std::string newStatement = statement.substr(0, statement.size() - 1);
 
     std::string designEntityWord;
@@ -46,12 +46,12 @@ void Validator::validateDeclarationStatement(const std::string& statement) {
     std::vector<std::string> synonymList = splitByDelimiter(trim(remainingStatement), ",");
     if (synonymList.size() == 1 && synonymList[0].empty()) {
         throw QPSSyntaxError();
-    }
+    }  // NOT SURE WHAT THIS IS ACTUALLY
 
     for (std::string synonym : synonymList) {
         if (!isSynonym(synonym)) {
             throw QPSSyntaxError();
-        }
+        }  // DONE
     }
 }
 
