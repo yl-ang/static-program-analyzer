@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
 
 #include "SemanticValidatorVisitor.h"
 #include "sp/de/NodeDeclarations.h"
@@ -8,7 +8,8 @@
 class SemanticValidator {
 public:
     void validateSemantics(std::shared_ptr<ProgramNode> programNode);
-    std::unordered_set<std::string> procedureNames;
+    std::string currentProcedure;
+    std::shared_ptr<std::unordered_map<std::string, std::vector<std::string>>> procedureNames;
 
 private:
     void checkDuplicateProcedureNames(std::shared_ptr<ProgramNode>);

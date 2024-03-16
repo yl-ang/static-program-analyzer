@@ -93,4 +93,20 @@ TEST_CASE("Semantic Validation Tests") {
         auto program = std::make_shared<ProgramNode>(children);
         REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Attempted to call: c, which is not a procedure.");
     }
+
+    SECTION("Calling procedure recursively throws error") {
+        auto callStatement = std::make_shared<CallNode>("b", 0);
+        auto xVar = std::make_shared<VariableNode>("x", 0);
+        auto readNode = std::make_shared<ReadNode>(xVar, 0);
+        std::vector<std::shared_ptr<StatementNode>> children2 = {readNode};
+        auto stmtList1 = std::make_shared<StatementListNode>(children2);
+        std::vector<std::shared_ptr<StatementNode>> procBChildren = {callStatement};
+        auto stmtList2 = std::make_shared<StatementListNode>(procBChildren);
+
+        auto procedure1 = std::make_shared<ProcedureNode>("a", stmtList1);
+        auto procedure2 = std::make_shared<ProcedureNode>("b", stmtList2);
+        std::vector<std::shared_ptr<ProcedureNode>> children = {procedure1, procedure2};
+        auto program = std::make_shared<ProgramNode>(children);
+        REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Procedure with name: b called within b");
+    }
 }
