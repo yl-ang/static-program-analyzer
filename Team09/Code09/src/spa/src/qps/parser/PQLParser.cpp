@@ -21,10 +21,10 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             throw QPSSyntaxError();
         }
     }
-    
+
     // Returns such that, pattern, and
     std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
-    
+
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
 
@@ -35,7 +35,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
-    
+
     // Semantic Checking
     Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities, suchThatClauses, patternClauses};
@@ -123,7 +123,6 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
 
         // if multiple return, will return a vector with multiple ClauseArgument.
         } else if (isTuple(selectEntity)) {
-                
             std::smatch matches;
             if (std::regex_match(selectEntity, matches, QPSRegexes::TUPLE)) {
                 std::string elems = matches[1];
