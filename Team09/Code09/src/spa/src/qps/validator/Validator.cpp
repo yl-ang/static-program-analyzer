@@ -54,11 +54,7 @@ void Validator::validateClauses(SynonymStore* store, std::vector<Synonym>& selec
             }
         }
     }
-    for (Synonym& syn : selectEntities) {
-        if (!syn.updateType(store)) {
-            hasSemanticError = true;
-        }
-    }
+
     for (SuchThatClause& clause : suchThatClauses) {
         if (!clause.validateArguments(store)) {
             hasSemanticError = true;
