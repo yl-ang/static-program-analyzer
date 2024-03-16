@@ -202,10 +202,11 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<Stmt> expectedStatements = {
-            Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::READ, 2},   Stmt{StatementType::PRINT, 3},
-            Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5}, Stmt{StatementType::IF, 6},
-            Stmt{StatementType::ASSIGN, 7}, Stmt{StatementType::ASSIGN, 8}, Stmt{StatementType::ASSIGN, 9}};
+        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::READ, 2},
+                                                       Stmt{StatementType::PRINT, 3},  Stmt{StatementType::WHILE, 4},
+                                                       Stmt{StatementType::ASSIGN, 5}, Stmt{StatementType::IF, 6},
+                                                       Stmt{StatementType::ASSIGN, 7}, Stmt{StatementType::ASSIGN, 8},
+                                                       Stmt{StatementType::ASSIGN, 9}, Stmt{StatementType::CALL, 10}};
         REQUIRE(expectedStatements == designExtractor->getStatements());
     }
 
@@ -219,11 +220,11 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Multiple procedure statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
-        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 11},  Stmt{StatementType::ASSIGN, 1},
-                                                       Stmt{StatementType::READ, 2},   Stmt{StatementType::PRINT, 3},
-                                                       Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5},
-                                                       Stmt{StatementType::IF, 6},     Stmt{StatementType::ASSIGN, 7},
-                                                       Stmt{StatementType::ASSIGN, 8}, Stmt{StatementType::ASSIGN, 9}};
+        std::unordered_set<Stmt> expectedStatements = {
+            Stmt{StatementType::READ, 11},  Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::READ, 2},
+            Stmt{StatementType::PRINT, 3},  Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5},
+            Stmt{StatementType::IF, 6},     Stmt{StatementType::ASSIGN, 7}, Stmt{StatementType::ASSIGN, 8},
+            Stmt{StatementType::ASSIGN, 9}, Stmt{StatementType::CALL, 10}};
         REQUIRE(expectedStatements == designExtractor->getStatements());
     }
 
