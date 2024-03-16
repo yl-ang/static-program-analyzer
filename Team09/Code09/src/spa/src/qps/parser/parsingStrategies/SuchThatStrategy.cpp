@@ -6,6 +6,7 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
         std::string type = argMatch[1];
         std::string parameters = argMatch[2];
 
+        Validator::validateSuchThatSyntax(type, parameters);
         std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
         std::vector<ClauseArgument*> entityVector{buildSTParameters(parameterStringsToParse)};
         std::unique_ptr<SuchThatClause> suchThatClause{std::make_unique<SuchThatClause>(
@@ -13,7 +14,7 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
 
         return suchThatClause;
     } else {
-        throw Exception("Cannot convert string to SuchThatClause: " + str);
+        throw QPSSyntaxError();
     }
 }
 
@@ -35,7 +36,7 @@ std::vector<ClauseArgument*> SuchThatStrategy::buildSTParameters(const std::vect
         } else if (isSynonym(str)) {
             results.push_back(new Synonym(DesignEntityType::UNKNOWN, str));
         } else {
-            throw Exception("Issues determining if is literal, wildcard, integer or synonym: " + str);
+            throw QPSSyntaxError();
         }
     }
     return results;
