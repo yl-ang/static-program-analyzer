@@ -29,8 +29,16 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
     bool hasSemanticError = false;
-    for (Synonym syn : selectEntities) {
-        hasSemanticError = hasSemanticError || !syn.updateType(&entities);
+    if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
+        if (!selectEntities[0].updateType(&entities)) {
+            selectEntities.erase(selectEntities.begin());
+        } 
+        // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
+        // Do not trigger a warning should it not be a Synonym type
+    } else {
+        for (Synonym syn : selectEntities) {
+            hasSemanticError = hasSemanticError || !syn.updateType(&entities);
+        }
     }
     for (SuchThatClause clause : suchThatClauses) {
         hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
@@ -102,13 +110,12 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         selectEntity = match[1];
 
-        // if BOOLEAN, unless it is declared as a variable, will not be captured.
-        // Returns empty vector to indicate.
-        if (isBoolean(selectEntity)) {
-            // Empty if condition
+        // if BOOLEAN, since we have no idea if it is a variable or not now, will
+        // not perform any case on it. This will be done in semantic checking.
+        // * Capture it like a synonym, for now.
 
         // if single return, will return a vector with a single ClauseArgument.
-        } else if (isSynonym(selectEntity)) {
+        if (isSynonym(selectEntity) && isBoolean(selectEntity)) {
             result.push_back(Synonym(DesignEntityType::UNKNOWN, selectEntity));
 
         // if multiple return, will return a vector with multiple ClauseArgument.
