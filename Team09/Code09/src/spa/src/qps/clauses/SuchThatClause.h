@@ -20,5 +20,5 @@ public:
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;
     std::shared_ptr<Relationship> getRelationship();
-    void checkSemantic(SynonymStore* store) override;
+    bool validateArguments(SynonymStore* store) override;
 };

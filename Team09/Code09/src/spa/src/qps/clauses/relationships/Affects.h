@@ -15,5 +15,5 @@ public:
     Affects(ClauseArgument& affector, ClauseArgument& affected) : affector(affector), affected(affected) {}
 
     ClauseResult evaluate(PKBFacadeReader&) override;
-    void checkSemantic() override;
+    bool validateArguments() override;
 };

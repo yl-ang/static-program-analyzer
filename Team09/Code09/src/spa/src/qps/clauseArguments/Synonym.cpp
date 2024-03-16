@@ -40,7 +40,7 @@ std::string Synonym::getClauseType() const {
 
 bool Synonym::updateType(SynonymStore* store) {
     type = store->getDesignEntityType(name);
-    return true;
+    return type != DesignEntityType::UNKNOWN;
 }
 
 std::string Synonym::entityTypeToString(DesignEntityType type) {

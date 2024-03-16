@@ -31,5 +31,5 @@ class Relationship {
 public:
     virtual ~Relationship(){};
     virtual ClauseResult evaluate(PKBFacadeReader& reader) = 0;
-    virtual void checkSemantic() = 0;
+    virtual bool validateArguments() = 0;
 };

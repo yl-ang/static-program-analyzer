@@ -46,13 +46,15 @@ std::shared_ptr<Relationship> SuchThatClause::getRelationship() {
     return relationship.value();
 }
 
-void SuchThatClause::checkSemantic(SynonymStore* store) {
+bool SuchThatClause::validateArguments(SynonymStore* store) {
     std::vector<Synonym> synonyms = getSynonyms();
     for (Synonym syn : synonyms) {
-        syn.updateType(store);
+        if (!syn.updateType(store)) {
+            return false;
+        }
     }
     // Check semantic based on if there is synonyms and Relationship types
     // Build relationship, check semantic in relationship
     auto relationship = getRelationship();
-    relationship->checkSemantic();
+    return relationship->validateArguments();
 }

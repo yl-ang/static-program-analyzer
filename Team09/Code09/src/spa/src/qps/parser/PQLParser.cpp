@@ -28,14 +28,18 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
     // ALL entities declared
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
+    bool hasSemanticError = false;
     for (Synonym syn : selectEntities) {
-        syn.updateType(&entities);
+        hasSemanticError = hasSemanticError || !syn.updateType(&entities);
     }
     for (SuchThatClause clause : suchThatClauses) {
-        clause.checkSemantic(&entities);
+        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
     }
     for (PatternClause clause : patternClauses) {
-        clause.checkSemantic(&entities);
+        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
+    }
+    if (hasSemanticError) {
+        throw QPSSemanticError();
     }
     return Query{selectEntities, suchThatClauses, patternClauses};
 }

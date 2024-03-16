@@ -2,22 +2,23 @@
 
 Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : modifier(stmt), var(var) {}
 
-void Modifies::checkSemantic() {
+bool Modifies::validateArguments() {
     if (modifier.isWildcard()) {
-        throw QPSSemanticError();
+        return false;
     }
     if (modifier.isSynonym()) {
         Synonym first = dynamic_cast<Synonym&>(modifier);
         if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
-            throw QPSSemanticError();
+            return false;
         }
     }
     if (var.isSynonym()) {
         Synonym second = dynamic_cast<Synonym&>(var);
         if (second.getType() != DesignEntityType::VARIABLE) {
-            throw QPSSemanticError();
+            return false;
         }
     }
+    return true;
 }
 
 ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {

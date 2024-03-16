@@ -7,21 +7,22 @@ bool NextStar::isSimpleResult() const {
     return !currentStmt.isSynonym() && !nextStmt.isSynonym();
 }
 
-void NextStar::checkSemantic() {
+bool NextStar::validateArguments() {
     if (currentStmt.isSynonym()) {
         Synonym first = dynamic_cast<Synonym&>(currentStmt);
         if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
             first.getType() == DesignEntityType::PROCEDURE) {
-            throw QPSSemanticError();
+            return false;
         }
     }
     if (nextStmt.isSynonym()) {
         Synonym second = dynamic_cast<Synonym&>(nextStmt);
         if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
             second.getType() == DesignEntityType::PROCEDURE) {
-            throw QPSSemanticError();
+            return false;
         }
     }
+    return true;
 }
 
 ClauseResult NextStar::evaluate(PKBFacadeReader& reader) {

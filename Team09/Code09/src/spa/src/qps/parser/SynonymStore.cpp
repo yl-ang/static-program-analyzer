@@ -22,14 +22,14 @@ bool SynonymStore::hasSynonymName(const std::string& synName) {
 
 Synonym SynonymStore::getSynonym(const std::string& synName) {
     if (!hasSynonymName(synName)) {
-        throw QPSSemanticError();
+        return Synonym(DesignEntityType::UNKNOWN, synName);
     }
     return Synonym(storage[synName], synName);
 }
 
 DesignEntityType SynonymStore::getDesignEntityType(const std::string& synName) {
     if (!hasSynonymName(synName)) {
-        throw QPSSemanticError();
+        return DesignEntityType::UNKNOWN;
     }
     return storage[synName];
 }

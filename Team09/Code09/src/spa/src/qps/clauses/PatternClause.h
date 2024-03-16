@@ -20,5 +20,5 @@ public:
     bool isBooleanResult() const override;
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;
-    void checkSemantic(SynonymStore* store) override;
+    bool validateArguments(SynonymStore* store) override;
 };

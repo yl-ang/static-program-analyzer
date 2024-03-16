@@ -28,5 +28,5 @@ public:
     Uses(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
-    void checkSemantic() override;
+    bool validateArguments() override;
 };

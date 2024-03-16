@@ -2,21 +2,22 @@
 
 ParentStar::ParentStar(ClauseArgument& parent, ClauseArgument& child) : parent(parent), child(child) {}
 
-void ParentStar::checkSemantic() {
+bool ParentStar::validateArguments() {
     if (parent.isSynonym()) {
         Synonym first = dynamic_cast<Synonym&>(parent);
         if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
             first.getType() == DesignEntityType::PROCEDURE) {
-            throw QPSSemanticError();
+            return false;
         }
     }
     if (child.isSynonym()) {
         Synonym second = dynamic_cast<Synonym&>(child);
         if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
             second.getType() == DesignEntityType::PROCEDURE) {
-            throw QPSSemanticError();
+            return false;
         }
     }
+    return true;
 }
 
 ClauseResult ParentStar::evaluate(PKBFacadeReader& reader) {
