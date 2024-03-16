@@ -20,7 +20,7 @@ void UsesExtractor::visitCall(CallNode* node) {
     // Extract uses relationships from usesExtractorHelper and append to usesExtractor
     // Each uses relationship will have the userStmtNum of the nested statement
     // So we simply replace the userStmtNum from the extracted uses relationship
-    // with the current WhileNode stmtNum
+    // with the current CallNode stmtNum
 
     UsesExtractor* usesExtractorHelper = new UsesExtractor();
     dfsVisitHelper(procNode, usesExtractorHelper);
