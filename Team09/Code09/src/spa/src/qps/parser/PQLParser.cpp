@@ -51,8 +51,7 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
         } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)) {
             clauseList[i].replace(0, 2, currClauseType);
         } else {
-            // Will need to add WITH support in future
-            // ignore
+            throw QPSSyntaxError();
         }
     }
 }
@@ -164,7 +163,7 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
             }
 
         } else {
-            throw Exception("Issues with Select Parsing");
+            throw QPSSyntaxError();
         }
     }
 
