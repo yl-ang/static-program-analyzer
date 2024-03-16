@@ -14,30 +14,32 @@
 
 // Define non-terminals, no need to define terminals since LEXICAL_TOKEN_TYPES are terminals
 enum NonTerminal {
-    NT_PROGRAM, // 0
-    NT_PROCEDURE, // 1
-    NT_STMTLST, // 2
-    NT__STMTLST, // 3
-    NT_STMT, // 4
-    NT_READ, // 5
-    NT_PRINT, // 6
-    NT_WHILE, // 7
-    NT_IF, // 8
-    NT_ASSIGN, // 9
-    NT_COND_EXPR, // 10
-    NT__COND_EXPR, // 11
-    NT_REL_EXPR, // 12
-    NT_REL_OP, // 13
-    NT_REL_FACTOR, // 14
-    NT_EXPR, // 15
-    NT__EXPR, // 16
-    NT_TERM, // 17
-    NT__TERM, // 18
-    NT_FACTOR, // 19
-    NT_VAR_NAME, // 20
-    NT_PROC_NAME, // 21
-    NT_CONST_VALUE, // 22
-    DUPL // 23
+    NT_PROGRAM,  // 0
+    NT__PROGRAM,
+    NT_PROCEDURE,    // 1
+    NT_STMTLST,      // 2
+    NT__STMTLST,     // 3
+    NT_STMT,         //  4
+    NT_READ,         // 5
+    NT_PRINT,        // 6
+    NT_WHILE,        // 7
+    NT_IF,           // 8
+    NT_ASSIGN,       // 9
+    NT_COND_EXPR,    // 10
+    NT__COND_EXPR,   // 11
+    NT_REL_EXPR,     // 12
+    NT_REL_OP,       // 13
+    NT_REL_FACTOR,   // 14
+    NT_EXPR,         // 15
+    NT__EXPR,        // 16
+    NT_TERM,         // 17
+    NT__TERM,        // 18
+    NT_FACTOR,       // 19
+    NT_VAR_NAME,     // 20
+    NT_PROC_NAME,    // 21
+    NT_CONST_VALUE,  // 22
+    DUPL,            // 23
+    NT_CALL          // 24
 };
 
 /**

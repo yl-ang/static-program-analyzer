@@ -5,7 +5,9 @@
 bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
     // Initialise parsing table and stack
     SyntaxValidator::ParsingTable parsingTable = initialiseSIMPLEParsingTable();
+    input.push_back(Token(LEXICAL_TOKEN_TYPE::END_OF_FILE, "$", -1));
     std::stack<SyntaxValidator::Symbol> parsingStack;
+    parsingStack.push(LEXICAL_TOKEN_TYPE::END_OF_FILE);
     parsingStack.push(NonTerminal::NT_PROGRAM);
 
     size_t index = 0;
@@ -30,8 +32,6 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 #ifdef DEBUG_BUILD
                 std::cout << "top of stack non terminal ERROR: " << std::get<NonTerminal>(stackTop) << std::endl;
                 std::cout << "curr token: " << input[index].value << std::endl;
-                std::cout << "next token: " << input[index + 1].value << std::endl;
-                std::cout << "next next token: " << input[index + 2].value << std::endl;
 #endif
 
                 throw SyntaxError("Unexpected Token, no grammar rule can be applied");
@@ -64,9 +64,7 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
 // lexical token type but not = currtoken
 #ifdef DEBUG_BUILD
             std::cout << "top of stack terminal ERROR: " << std::get<LEXICAL_TOKEN_TYPE>(stackTop) << std::endl;
-            std::cout << "curr token: " << input[index].value << " in " << input[index - 2].value
-                      << input[index - 1].value << input[index].value << input[index + 1].value
-                      << input[index + 2].value << std::endl;
+            std::cout << "curr token: " << input[index].value << std::endl;
 #endif
 
             throw SyntaxError("Unexpected grammar rule");
@@ -142,7 +140,11 @@ std::vector<SyntaxValidator::Symbol> SyntaxValidator::disambiguateCondExprRule(
 
 SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
     SyntaxValidator::ParsingTable parsingTable = {
-        {{NonTerminal::NT_PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE}, {NonTerminal::NT_PROCEDURE}},
+        {{NonTerminal::NT_PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE},
+         {NonTerminal::NT_PROCEDURE, NonTerminal::NT__PROGRAM}},
+        {{NonTerminal::NT__PROGRAM, LEXICAL_TOKEN_TYPE::PROCEDURE},
+         {NonTerminal::NT_PROCEDURE, NonTerminal::NT__PROGRAM}},
+        {{NonTerminal::NT__PROGRAM, LEXICAL_TOKEN_TYPE::END_OF_FILE}, {}},
 
         {{NonTerminal::NT_PROCEDURE, LEXICAL_TOKEN_TYPE::PROCEDURE},
          {LEXICAL_TOKEN_TYPE::PROCEDURE, NonTerminal::NT_PROC_NAME, LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE,
@@ -150,6 +152,7 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
 
         {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::READ}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::PRINT}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
+        {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::CALL}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::WHILE}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::IF}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT_STMTLST, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
@@ -157,12 +160,14 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE}, {}},
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::READ}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::PRINT}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
+        {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::CALL}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::WHILE}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::IF}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
         {{NonTerminal::NT__STMTLST, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_STMT, NonTerminal::NT__STMTLST}},
 
         {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::READ}, {NonTerminal::NT_READ}},
         {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::PRINT}, {NonTerminal::NT_PRINT}},
+        {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::CALL}, {NonTerminal::NT_CALL}},
         {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::WHILE}, {NonTerminal::NT_WHILE}},
         {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::IF}, {NonTerminal::NT_IF}},
         {{NonTerminal::NT_STMT, LEXICAL_TOKEN_TYPE::NAME}, {NonTerminal::NT_ASSIGN}},
@@ -172,6 +177,9 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
 
         {{NonTerminal::NT_PRINT, LEXICAL_TOKEN_TYPE::PRINT},
          {LEXICAL_TOKEN_TYPE::PRINT, NonTerminal::NT_VAR_NAME, LEXICAL_TOKEN_TYPE::SEMICOLON}},
+
+        {{NonTerminal::NT_CALL, LEXICAL_TOKEN_TYPE::CALL},
+         {LEXICAL_TOKEN_TYPE::CALL, NonTerminal::NT_PROC_NAME, LEXICAL_TOKEN_TYPE::SEMICOLON}},
 
         {{NonTerminal::NT_WHILE, LEXICAL_TOKEN_TYPE::WHILE},
          {LEXICAL_TOKEN_TYPE::WHILE, LEXICAL_TOKEN_TYPE::OPEN_BRACKET, NonTerminal::NT_COND_EXPR,

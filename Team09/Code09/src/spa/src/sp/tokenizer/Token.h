@@ -36,6 +36,7 @@ enum LEXICAL_TOKEN_TYPE {
     MUL,
     DIV,
     MOD,
+    END_OF_FILE
 };
 
 class Token {

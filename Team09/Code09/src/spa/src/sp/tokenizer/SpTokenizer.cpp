@@ -78,6 +78,10 @@ Token SpTokenizer::assignKeyword(BasicToken* bt) {
         noStmtNumCounter = 1;
         return Token(LEXICAL_TOKEN_TYPE::ELSE, bt->value, NO_STMT_NUM);
 
+    } else if (bt->value == "call") {
+        stmtNumCounter++;
+        return Token(LEXICAL_TOKEN_TYPE::CALL, bt->value, stmtNumCounter);
+
     } else {
         throw SyntaxError("Invalid keyword!");
     }
