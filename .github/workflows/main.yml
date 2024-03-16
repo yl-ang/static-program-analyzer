@@ -38,11 +38,11 @@ jobs:
           cd Team09/Code09/build/src/unit_testing/Release
           ./unit_testing.exe
 
-      # - name: Integration Testing
-      #   shell: bash
-      #   run: |
-      #     cd Team09/Code09/build/src/integration_testing/Release
-      #     ./integration_testing.exe
+      - name: Integration Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/integration_testing/Release
+          ./integration_testing.exe
 
       # - TBC: System Testing
 
@@ -72,8 +72,8 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         run: ./src/unit_testing/unit_testing
 
-      # - name: Integration Testing
-      #   working-directory: ${{runner.workspace}}/build
-      #   run: ./src/integration_testing/integration_testing
+      - name: Integration Testing
+        working-directory: ${{runner.workspace}}/build
+        run: ./src/integration_testing/integration_testing
 
       # TBC: System Testing
