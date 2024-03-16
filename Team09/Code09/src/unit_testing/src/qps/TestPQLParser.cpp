@@ -447,49 +447,32 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
     REQUIRE(ans1.equals(result_4[0]));
 }
 
-TEST_CASE("PQLParser: Select ... pattern (3)") {
-    std::string select_pt_1 = "Select v1 pattern a1(v1,_\"x+y\"_)";
-    std::string select_pt_2 = "Select v1 pattern a1(_,_\"x + y\"_)";
-    std::string select_pt_3 = "Select v1 pattern a1(\"Whatever\",_\"x +y\"_)";
-    std::string select_pt_4 = "   Select v1   pattern  a1  (v1,   \"Whatever\")   ";
+TEST_CASE("PQLParser: Select ... pattern (4)") {
+    std::string select_pt_1 = "Select a such that Uses (a1, v) such that Uses (a, a1) pattern a (v, _\"temp\"_)";
+
+    // Testing Find Queries functions
+    std::vector<std::string> various_assorted_1 = {"assign a, a1;", "variable v;"};
+    SynonymStore entities_1 = PQLParser::parseQueryEntities(various_assorted_1);
+
     std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
-    std::vector<std::string> clauseList_2 = getAllClauses(select_pt_2);
-    std::vector<std::string> clauseList_3 = getAllClauses(select_pt_3);
-    std::vector<std::string> clauseList_4 = getAllClauses(select_pt_4);
+    std::vector<Synonym> selectClauses = {Synonym(DesignEntityType::ASSIGN, "a")};
+    std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList_1);
+    std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList_1);
 
-    std::vector<PatternClause> result_1 = PQLParser::parsePatternClauses(clauseList_1);
-    std::vector<PatternClause> result_2 = PQLParser::parsePatternClauses(clauseList_2);
-    std::vector<PatternClause> result_3 = PQLParser::parsePatternClauses(clauseList_3);
-    std::vector<PatternClause> result_4 = PQLParser::parsePatternClauses(clauseList_4);
+    Validator::validateClauses(&entities, selectClauses, suchThatClauses, patternClauses);
 
-    std::vector<SuchThatClause> suchThatClauses = {};
-    std::vector<Synonym> selectClauses = {};
-    Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_1);
-    Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_2);
-    Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_3);
-    Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_4);
-
+    Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-    Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    Synonym v2 = Synonym(DesignEntityType::VARIABLE, "v2");
-    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-    ExpressionSpec ew = ExpressionSpec("\"Whatever\"");
-    Literal lw = Literal("Whatever");
-    Wildcard w = Wildcard();
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&l));
-    PatternClause ans2 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&w),
-                                       static_cast<ClauseArgument*>(&l));
-    PatternClause ans3 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&lw),
-                                       static_cast<ClauseArgument*>(&l));
-    PatternClause ans4 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&ew));
-    REQUIRE(result_1.size() == 1);
-    REQUIRE(result_2.size() == 1);
-    REQUIRE(result_3.size() == 1);
-    REQUIRE(result_4.size() == 1);
-    REQUIRE(ans1.equals(result_1[0]));
-    REQUIRE(ans2.equals(result_2[0]));
-    REQUIRE(ans3.equals(result_3[0]));
-    REQUIRE(ans4.equals(result_4[0]));
+    Synonym v = Synonym(DesignEntityType::VARIABLE, "v");
+
+    ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
+
+    SuchThatClause s = SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
+    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
+                                       static_cast<ClauseArgument*>(&temp));
+    REQUIRE(suchThatClauses.size() == 1);
+    REQUIRE(patternClauses.size() == 1);
+    REQUIRE(s.equals(suchThatClauses[0]));
+    REQUIRE(p.equals(patternClauses[0]));
 }
+

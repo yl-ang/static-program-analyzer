@@ -120,11 +120,13 @@ std::tuple<std::string, std::string> splitResultAndClause(const std::string& str
 // str = "such that Follows(1, 2) pattern a("_", "_")"
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
-    std::vector<std::string> clauseStarts = {QPSConstants::SUCH_THAT, QPSConstants::PATTERN, QPSConstants::AND};
+    std::vector<std::regex> clausePatterns = {QPSRegexes::SUCHTHAT_CLAUSE,
+                                            QPSRegexes::PATTERN_CLAUSE,
+                                            QPSRegexes::AND_CLAUSE};
 
     std::vector<size_t> allClausesIndices = {};
-    for (std::string clauseString : clauseStarts) {
-        std::vector<size_t> clauseIndices = getClauseIndices(str, clauseString);
+    for (const auto& pattern : clausePatterns) {
+        std::vector<size_t> clauseIndices = getClauseIndices(str, pattern);
         allClausesIndices.insert(std::end(allClausesIndices), std::begin(clauseIndices), std::end(clauseIndices));
     }
 
@@ -136,8 +138,8 @@ std::vector<std::string> getAllClauses(const std::string& str) {
 
     std::vector<std::string> clauses = {};
     std::string clause;
-    for (int i = 0; i < allClausesIndices.size() - 1; i++) {
-        clause = str.substr(allClausesIndices.at(i), allClausesIndices.at(i + 1));
+    for (int i = 1; i < allClausesIndices.size(); i++) {
+        clause = str.substr(allClausesIndices.at(i - 1), allClausesIndices.at(i) - allClausesIndices.at(i - 1));
         clauses.push_back(trim(clause));
     }
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
@@ -164,4 +166,17 @@ std::vector<size_t> getClauseIndices(const std::string& str, const std::string& 
     }
 
     return clausePositionList;
+}
+
+std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {
+    std::vector<size_t> indices;
+    auto words_begin = std::sregex_iterator(str.begin(), str.end(), regexPattern);
+    auto words_end = std::sregex_iterator();
+
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+        std::smatch match = *i;
+        indices.push_back(match.position(0));
+    }
+
+    return indices;
 }
