@@ -136,34 +136,6 @@ TEST_CASE("Design Extractor Tests") {
 
     auto ProgNode3 = std::make_shared<ProgramNode>(childrenProg3);
 
-    /* THIS TEST IS FOR CALLS ONLY
-   procedure sad {
-    1 call happy;
-   }
-   procedure happy {
-    2 print a;
-   }
-    */
-
-    auto callNode = std::make_shared<CallNode>("happy", 1);
-    std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
-    childrenCall.push_back(callNode);
-    auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
-    auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
-
-    auto variableCall = std::make_shared<VariableNode>("a", 2);
-    auto printCall = std::make_shared<PrintNode>(variableCall, 2);
-    std::vector<std::shared_ptr<StatementNode>> childrenCall2 = {};
-    childrenCall2.push_back(printCall);
-    auto stmtListProcCall2 = std::make_shared<StatementListNode>(childrenCall2);
-    auto ProcNodeCall2 = std::make_shared<ProcedureNode>("happy", stmtListProcCall2);
-
-    std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
-
-    childrenProgCall.push_back(ProcNodeCall);
-    childrenProgCall.push_back(ProcNodeCall2);
-    auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
-
     SECTION("Variables extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
@@ -363,6 +335,40 @@ TEST_CASE("Design Extractor Tests") {
         REQUIRE(expectedPattern == designExtractor->getPattern());
     }
 
+    /* THIS TEST IS FOR CALLS ONLY
+       procedure sad {
+        1 call happy;
+       }
+       procedure happy {
+        2 print a;
+        3 read b;
+       }
+        */
+
+    auto callNode = std::make_shared<CallNode>("happy", 1);
+    std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
+    childrenCall.push_back(callNode);
+    auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
+    auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
+
+    auto variableCall = std::make_shared<VariableNode>("a", 2);
+    auto printCall = std::make_shared<PrintNode>(variableCall, 2);
+
+    auto variableCall2 = std::make_shared<VariableNode>("b", 3);
+    auto readCall = std::make_shared<ReadNode>(variableCall2, 3);
+
+    std::vector<std::shared_ptr<StatementNode>> childrenCall2 = {};
+    childrenCall2.push_back(printCall);
+    childrenCall2.push_back(readCall);
+    auto stmtListProcCall2 = std::make_shared<StatementListNode>(childrenCall2);
+    auto ProcNodeCall2 = std::make_shared<ProcedureNode>("happy", stmtListProcCall2);
+
+    std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
+
+    childrenProgCall.push_back(ProcNodeCall);
+    childrenProgCall.push_back(ProcNodeCall2);
+    auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
+
     SECTION("Calls extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNodeCall);
@@ -375,5 +381,12 @@ TEST_CASE("Design Extractor Tests") {
         designExtractor->extract(ProgNodeCall);
         std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "a"}, {2, "a"}};
         REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("Modifies extracted correctly for call statements") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNodeCall);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "b"}, {3, "b"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
     }
 }

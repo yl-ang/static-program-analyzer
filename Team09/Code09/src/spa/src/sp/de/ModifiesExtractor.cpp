@@ -11,7 +11,30 @@ void ModifiesExtractor::visitProcedure(ProcedureNode* node) {}
 void ModifiesExtractor::visitPrint(PrintNode* node) {}
 void ModifiesExtractor::visitVariable(VariableNode* node) {}
 void ModifiesExtractor::visitConstant(ConstantNode* node) {}
-void ModifiesExtractor::visitCall(CallNode* node) {}
+
+void ModifiesExtractor::visitCall(CallNode* node) {
+    int userStmtNum = node->statementNumber;
+    std::string calledProc = node->getCalledProcedure();
+    ProcedureNode* procNode = this->procs.at(calledProc);
+
+    // Extract modifies relationships from modifiesExtractorHelper and append to ModifiesExtractor
+    // Each modifies relationship will have the userStmtNum of the nested statement
+    // So we simply replace the userStmtNum from the extracted modifies relationship
+    // with the current CallNode stmtNum
+
+    ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor(this->procs);
+    dfsVisitHelper(procNode, modifiesExtractorHelper);
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper->getModifies();
+
+    // Iterate over each element in the set and update stmtNum value
+    for (auto it = extractedModifies.begin(); it != extractedModifies.end();) {
+        auto oldPair = *it;
+        it = extractedModifies.erase(it);
+
+        // Create a new pair with the updated stmtNum value and insert it
+        this->modifies.insert({userStmtNum, oldPair.second});
+    }
+}
 
 void ModifiesExtractor::visitRead(ReadNode* node) {
     int modifierStmtNum = node->statementNumber;
@@ -27,7 +50,7 @@ void ModifiesExtractor::visitAssign(AssignmentNode* node) {
 
 void ModifiesExtractor::visitWhile(WhileNode* node) {
     int modifierStmtNum = node->statementNumber;
-    ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor();
+    ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor(this->procs);
     dfsVisitHelper(node->whileStmtList, modifiesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper->getModifies();
 
@@ -43,8 +66,8 @@ void ModifiesExtractor::visitWhile(WhileNode* node) {
 
 void ModifiesExtractor::visitIf(IfNode* node) {
     int modifierStmtNum = node->statementNumber;
-    ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor();
-    ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor();
+    ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor(this->procs);
+    ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor(this->procs);
     dfsVisitHelper(node->thenStmtList, thenModifiesExtractorHelper);
     dfsVisitHelper(node->elseStmtList, elseModifiesExtractorHelper);
     std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper->getModifies();
