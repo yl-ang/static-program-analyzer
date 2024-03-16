@@ -17,5 +17,4 @@ public:
 
     std::vector<int> getStmtsStmtNum();
     int firstChildStatementNumber();
-    std::vector<std::shared_ptr<StatementNode>> getCallStatements();
 };

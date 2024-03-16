@@ -17,14 +17,3 @@ std::vector<int> StatementListNode::getStmtsStmtNum() {
 int StatementListNode::firstChildStatementNumber() {
     return this->children[0]->statementNumber;
 }
-
-std::vector<std::shared_ptr<StatementNode>> StatementListNode::getCallStatements() {
-    std::vector<std::shared_ptr<StatementNode>> callStmts;
-    const std::vector<std::shared_ptr<StatementNode>>& _children = this->children;
-    for (const auto& child : _children) {
-        if (child->getType() == "call") {
-            callStmts.push_back(child);
-        }
-    }
-    return callStmts;
-}

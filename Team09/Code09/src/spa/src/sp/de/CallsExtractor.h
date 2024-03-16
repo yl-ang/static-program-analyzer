@@ -12,6 +12,7 @@
 class CallsExtractor : public AbstractionExtractor {
 public:
     CallsExtractor() {}
+    std::string currentProc;
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;
