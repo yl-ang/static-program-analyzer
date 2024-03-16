@@ -39,4 +39,5 @@ bool isNotRelation(const std::string&);
 
 bool containsSuchThatClause(const std::string&);
 bool containsPatternClause(const std::string&);
+bool containsAndClause(const std::string&);
 bool containsWithClause(const std::string&);

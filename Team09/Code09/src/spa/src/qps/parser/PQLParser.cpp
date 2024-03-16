@@ -23,6 +23,23 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     }
     // Select entities in select clause
     std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
+
+    // Replace AND before processing
+    // Returns such that, pattern, and
+    std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
+    std::string clauseType;
+    for (std::string clause : clauseList) {
+        if (std::regex_match(clause, QPSRegexes::SUCHTHAT_CLAUSE)) {
+            clauseType = QPSConstants::SUCH_THAT;
+        } else if (std::regex_match(clause, QPSRegexes::PATTERN_CLAUSE)) {
+            clauseType = QPSConstants::PATTERN;
+        } else if (std::regex_match(clause, QPSRegexes::AND_CLAUSE)){
+            clause.replace(0, 2, clauseType);
+        } else {
+            // ignore
+        }
+    }
+
     std::vector<SuchThatClause> suchThatClauses = PQLParser::findSuchThatClauses(unparsedClauses);
     std::vector<PatternClause> patternClauses = PQLParser::findPatternClauses(unparsedClauses);
 

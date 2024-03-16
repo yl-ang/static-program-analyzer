@@ -12,10 +12,12 @@ struct QPSRegexes {
     // Pattern Clause
     inline static const std::regex PATTERN_CLAUSE = std::regex("\\s+pattern\\s+(\\w+\\s*\\(.*?\\))\\s*");
     
-    // <{letters/digits}{optional *}>{>=0 whitespaces}<{bracketed non-greedy}>
+    // {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
     inline static const std::regex SUCHTHAT_ARGS = std::regex("\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
-    // <{letters/digits}>{>=0 whitespaces}<{bracketed non-greedy}>
+    // {letters/digits}>{>=0 whitespaces}<{bracketed non-greedy}
     inline static const std::regex PATTERN_ARGS = std::regex("\\s*(\\w+)\\s*\\((.*?)\\)\\s*");
     // <{capturing group}>
     inline static const std::regex TUPLE = std::regex("^<(.*?)>$");
+    // and{letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
+    inline static const std::regex AND_CLAUSE = std::regex("^\\s*and\\s+(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
 };

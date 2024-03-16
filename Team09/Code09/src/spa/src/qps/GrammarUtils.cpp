@@ -234,6 +234,10 @@ bool containsPatternClause(const std::string& patternStatement) {
     return std::regex_search(patternStatement, std::regex(QPSConstants::PATTERN));
 }
 
+bool containsAndClause(const std::string& andStatement) {
+    return std::regex_search(andStatement, std::regex(QPSConstants::AND));
+}
+
 bool containsWithClause(const std::string& withStatement) {
     return std::regex_search(withStatement, std::regex(QPSConstants::WITH));
 }

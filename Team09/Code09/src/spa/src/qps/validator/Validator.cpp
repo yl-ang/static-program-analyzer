@@ -78,6 +78,8 @@ void Validator::validateSelectStatement(const std::string& statement) {
                 validateSuchThatClause(clause);
             } else if (containsPatternClause(clause)) {
                 validatePatternClause(clause);
+            } else if (containsAndClause(clause)) {
+                // ignore for now
             } else {
                 throw Exception("Not implemented: " + clause);
             }

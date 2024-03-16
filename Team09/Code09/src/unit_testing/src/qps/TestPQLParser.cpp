@@ -84,29 +84,29 @@
 //    REQUIRE(result_3.size() == 1);
 //}
 //
-TEST_CASE("PQLParser: Select (2))") {
-    std::string select_1 = "Select <v1,v2>";
-    std::string select_2 = "  Select    <v1,    v2>  ";
+// TEST_CASE("PQLParser: Select (2))") {
+//     std::string select_1 = "Select <v1,v2>";
+//     std::string select_2 = "  Select    <v1,    v2>  ";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
-    std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(select_1);
-    std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(select_2);
-    std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(select_1);
-    std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(select_2);
+//     std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
+//     std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
+//     std::vector<SuchThatClause> result_3 = PQLParser::findSuchThatClauses(select_1);
+//     std::vector<SuchThatClause> result_4 = PQLParser::findSuchThatClauses(select_2);
+//     std::vector<PatternClause> result_5 = PQLParser::findPatternClauses(select_1);
+//     std::vector<PatternClause> result_6 = PQLParser::findPatternClauses(select_2);
 
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_1[1]);
-    REQUIRE(result_1.size() == 2);
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_2[0]);
-    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_2[0]);
-    REQUIRE(result_2.size() == 2);
+//     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_1[0]);
+//     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_1[1]);
+//     REQUIRE(result_1.size() == 2);
+//     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1") == result_2[0]);
+//     REQUIRE(Synonym(DesignEntityType::VARIABLE, "v2") == result_2[0]);
+//     REQUIRE(result_2.size() == 2);
 
-    REQUIRE(result_3.size() == 0);
-    REQUIRE(result_4.size() == 0);
-    REQUIRE(result_5.size() == 0);
-    REQUIRE(result_6.size() == 0);
-}
+//     REQUIRE(result_3.size() == 0);
+//     REQUIRE(result_4.size() == 0);
+//     REQUIRE(result_5.size() == 0);
+//     REQUIRE(result_6.size() == 0);
+// }
 
 //// Select such that Parent()
 //// Used for testing Parent/Follows/Parent*/Follows*

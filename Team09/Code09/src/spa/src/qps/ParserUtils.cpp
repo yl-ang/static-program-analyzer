@@ -120,7 +120,7 @@ std::tuple<std::string, std::string> splitResultAndClause(const std::string& str
 // str = "such that Follows(1, 2) pattern a("_", "_")"
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
-    std::vector<std::string> clauseStarts = {QPSConstants::SUCH_THAT, QPSConstants::PATTERN};
+    std::vector<std::string> clauseStarts = {QPSConstants::SUCH_THAT, QPSConstants::PATTERN, QPSConstants::AND};
 
     std::vector<size_t> allClausesIndices = {};
     for (std::string clauseString : clauseStarts) {
