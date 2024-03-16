@@ -27,14 +27,14 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // Replace AND before processing
     // Returns such that, pattern, and
     std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
-    std::string clauseType;
+    std::string currClauseType;
     for (std::string clause : clauseList) {
         if (std::regex_match(clause, QPSRegexes::SUCHTHAT_CLAUSE)) {
-            clauseType = QPSConstants::SUCH_THAT;
+            currClauseType = QPSConstants::SUCH_THAT;
         } else if (std::regex_match(clause, QPSRegexes::PATTERN_CLAUSE)) {
-            clauseType = QPSConstants::PATTERN;
+            currClauseType = QPSConstants::PATTERN;
         } else if (std::regex_match(clause, QPSRegexes::AND_CLAUSE)){
-            clause.replace(0, 2, clauseType);
+            clause.replace(0, 2, currClauseType);
         } else {
             // ignore
         }
