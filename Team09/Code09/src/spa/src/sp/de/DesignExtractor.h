@@ -31,6 +31,7 @@ public:
     std::unordered_set<std::pair<StmtNum, StmtNum>> getFollows();
     std::unordered_set<std::pair<StmtNum, StmtNum>> getParent();
     std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureUses();
     std::unordered_set<std::pair<StmtNum, Variable>> getModifies();
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
     std::unordered_set<std::pair<StmtNum, StmtNum>> getNext();

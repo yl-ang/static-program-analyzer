@@ -13,6 +13,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setParentStore(getParent());
     writer->setStatementModifiesStore(getModifies());
     writer->setStatementUsesStore(getUses());
+    writer->setProcedureUsesStore(getProcedureUses());
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
     writer->setCallStore(getCalls());
@@ -80,6 +81,10 @@ std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getParent() {
 
 std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getUses() {
     return usesExtractor->getUses();
+}
+
+std::unordered_set<std::pair<Procedure, Variable>> DesignExtractor::getProcedureUses() {
+    return usesExtractor->getProcedureUses();
 }
 
 std::unordered_set<std::pair<StmtNum, Variable>> DesignExtractor::getModifies() {
