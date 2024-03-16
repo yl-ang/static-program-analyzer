@@ -15,4 +15,5 @@ public:
     Affects(ClauseArgument& affector, ClauseArgument& affected) : affector(affector), affected(affected) {}
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

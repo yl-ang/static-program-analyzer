@@ -12,10 +12,8 @@ bool isInteger(const std::string& str) {
     return std::regex_match(str, std::regex("^(?:0|[1-9][0-9]*)$"));
 }
 
-// Assumption that there does not exist a synonym with the name BOOLEAN
-// EDIT: There might be, so removed the second condition
 bool isSynonym(const std::string& str) {
-    return isIdent(str); // && !isBoolean(str);
+    return isIdent(str);
 }
 
 bool isWildcard(const std::string& str) {
@@ -193,13 +191,49 @@ bool isTuple(const std::string& str) {
 }
 
 bool isElem(const std::string& str) {
-    return isSynonym(str);
+    return isSynonym(str) || isAttrRef(str);
+}
+
+bool isAttrCond(const std::string& attrCond) {
+    return isAttrCompare(attrCond);
+}
+
+bool isAttrCompare(const std::string& attrComp) {
+    std::vector<std::string> expressions = splitByDelimiter(attrComp, "=");
+    if (expressions.size() != 2) {
+        return false;
+    }
+    return isRef(expressions[0]) && isRef(expressions[1]);
+}
+
+bool isRef(const std::string& ref) {
+    return isQuotedIdent(ref) || isInteger(ref) || isAttrRef(ref);
+}
+
+bool isAttrRef(const std::string& attrRef) {
+    std::vector<std::string> attrs = splitByDelimiter(attrRef, ".");
+    if (attrs.size() != 2) {
+        return false;
+    }
+    return isSynonym(attrs[0]) && isAttrName(attrs[1]);
+}
+
+bool isAttrName(const std::string& attrName) {
+    return std::regex_search(attrName, std::regex("^(" + QPSConstants::ATTR_NAME + ")"));
+}
+
+bool isNotRelation(const std::string& notRelation) {
+    return std::regex_search(notRelation, std::regex("^" + QPSConstants::NOT));
 }
 
 bool containsSuchThatClause(const std::string& selectStatement) {
     return std::regex_search(selectStatement, std::regex(QPSConstants::SUCH_THAT));
 }
 
-bool containsPatternClause(const std::string& selectStatement) {
-    return std::regex_search(selectStatement, std::regex(QPSConstants::PATTERN));
+bool containsPatternClause(const std::string& patternStatement) {
+    return std::regex_search(patternStatement, std::regex(QPSConstants::PATTERN));
+}
+
+bool containsWithClause(const std::string& withStatement) {
+    return std::regex_search(withStatement, std::regex(QPSConstants::WITH));
 }

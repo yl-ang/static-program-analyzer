@@ -30,10 +30,15 @@ private:
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
                                        PKBFacadeReader& pkb);
 
+    ArrangedClauses arrangeClauses() const;
+    bool evaluateBooleanClauses(PKBFacadeReader&) const;
     Table buildSelectTable(const PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
-    bool evaluateBooleanClauses(PKBFacadeReader&) const;
-    bool containsSelectSynonyms(QueryClausePtr) const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
-    ArrangedClauses arrangeClauses() const;
+
+    // Getters and checkers
+    bool hasNoClauses() const;
+    bool isSelectBoolean() const;
+    std::vector<std::string> getEmptyResult() const;
+    bool containsSelectSynonyms(QueryClausePtr) const;
 };

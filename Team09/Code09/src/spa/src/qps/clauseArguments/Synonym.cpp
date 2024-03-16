@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "qps/exceptions/Exception.h"
+#include "qps/exceptions/QPSSyntaxError.h"
 
 Synonym::Synonym(const DesignEntityType& t, const std::string& n) : type(t), name(n) {}
 
@@ -36,6 +36,11 @@ bool Synonym::isSynonym() const {
 
 std::string Synonym::getClauseType() const {
     return "Synonym";
+}
+
+bool Synonym::updateType(SynonymStore* store) {
+    type = store->getDesignEntityType(name);
+    return type != DesignEntityType::UNKNOWN;
 }
 
 std::string Synonym::entityTypeToString(DesignEntityType type) {
@@ -88,7 +93,7 @@ DesignEntityType Synonym::determineType(const std::string type) {
     } else if (type == "print") {
         entityType = DesignEntityType::PRINT;
     } else {
-        throw Exception("String is not found in valid EntityTypes: " + type);
+        throw QPSSyntaxError();
     }
     return entityType;
 }

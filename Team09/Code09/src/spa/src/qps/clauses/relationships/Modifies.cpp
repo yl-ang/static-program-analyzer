@@ -1,106 +1,128 @@
 #include "Modifies.h"
 
-Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : stmt(stmt), var(var) {}
+Modifies::Modifies(ClauseArgument& stmt, ClauseArgument& var) : modifier(stmt), var(var) {}
+
+bool Modifies::validateArguments() {
+    if (modifier.isWildcard()) {
+        return false;
+    }
+    if (modifier.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(modifier);
+        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT) {
+            return false;
+        }
+    }
+    if (var.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(var);
+        if (second.getType() != DesignEntityType::VARIABLE) {
+            return false;
+        }
+    }
+    return true;
+}
 
 ClauseResult Modifies::evaluate(PKBFacadeReader& reader) {
-    if (isSimpleResult()) {
-        return {reader.hasStatementVariableModifiesRelationship(stmt, var)};
+    if (modifier.isSynonym() && var.isSynonym()) {
+        return evaluateBothSynonyms(reader);
     }
 
-    // Synonym, Literal
-    if (stmt.isSynonym() && var.isLiteral()) {
-        return statementsModifyLiteral(reader);
+    if (modifier.isSynonym()) {
+        return evaluateModifierSynonym(reader);
     }
 
-    // Synonym, Wildcard
-    if (stmt.isSynonym() && var.isWildcard()) {
-        return allStmtsThatModifySomeVar(reader);
+    if (var.isSynonym()) {
+        // Integer, Synonym
+        if (modifier.isInteger()) {
+            return variablesModifedByStatement(reader);
+        }
+
+        // Literal, Synonym
+        if (modifier.isLiteral()) {
+            return variablesModifiedByProcedure(reader);
+        }
     }
 
-    // Integer, Synonym
-    if (stmt.isInteger() && var.isSynonym()) {
-        return variablesModifedByStatement(reader);
-    }
-
-    // Wildcard, Synonym
-    if (stmt.isWildcard() && var.isSynonym()) {
-        return allModifiedVariables(reader);
-    }
-
-    // Synonym, Synonym
-    return evaluateBothSynonyms(reader);
+    return {reader.hasStatementVariableModifiesRelationship(modifier, var) ||
+            reader.hasProcedureVariableModifiesRelationship(modifier, var)};
 }
 
 ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
+    Synonym modifierSyn = static_cast<Synonym&>(modifier);
     Synonym varSyn = static_cast<Synonym&>(var);
 
-    SynonymValues stmtValues{};
+    SynonymValues modifierValues{};
     SynonymValues varValues{};
 
     for (Variable var : reader.getVariables()) {
-        std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
-        for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), stmts)) {
-            stmtValues.push_back(std::to_string(currStmt));
-            varValues.push_back(var);
+        if (modifierSyn.getType() == DesignEntityType::PROCEDURE) {
+            std::unordered_set<Procedure> procs = reader.getModifiesProceduresByVariable(var);
+            for (Procedure proc : procs) {
+                modifierValues.push_back(proc);
+                varValues.push_back(var);
+            }
+        } else {
+            std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
+            for (StmtNum currStmt : filterStatementsByType(reader, modifierSyn.getType(), stmts)) {
+                modifierValues.push_back(std::to_string(currStmt));
+                varValues.push_back(var);
+            }
         }
     }
 
-    std::vector<Synonym> headers = {stmtSyn, varSyn};
-    std::vector<SynonymValues> values = {stmtValues, varValues};
+    std::vector<Synonym> headers = {modifierSyn, varSyn};
+    std::vector<SynonymValues> values = {modifierValues, varValues};
     return {headers, values};
 }
 
-ClauseResult Modifies::allModifiedVariables(PKBFacadeReader& reader) {
+ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
+    Synonym modifierSyn = static_cast<Synonym&>(modifier);
+
+    std::unordered_set<Variable> vars{};
+    if (var.isWildcard()) {
+        vars = reader.getVariables();
+    } else {
+        vars.insert(var.getValue());
+    }
+
+    SynonymValues values{};
+    if (modifierSyn.getType() == DesignEntityType::PROCEDURE) {
+        for (Variable var : vars) {
+            auto procs = reader.getModifiesProceduresByVariable(var);
+            for (Procedure proc : procs) {
+                values.push_back(proc);
+            }
+        }
+    } else {
+        std::unordered_set<StmtNum> allStmts{};
+        for (Variable var : vars) {
+            std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
+            allStmts.insert(stmts.begin(), stmts.end());
+        }
+
+        for (StmtNum currStmt : filterStatementsByType(reader, modifierSyn.getType(), allStmts)) {
+            values.push_back(std::to_string(currStmt));
+        }
+    }
+
+    return {modifierSyn, values};
+}
+
+ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getVariables()) {
-        if (!reader.getModifiesStatementsByVariable(currVar).empty()) {
-            values.push_back(currVar);
-        }
+    for (Variable currVar : reader.getModifiesVariablesByProcedure(modifier.getValue())) {
+        values.push_back(currVar);
     }
 
     return {varSyn, values};
 }
 
-ClauseResult Modifies::allStmtsThatModifySomeVar(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
-
-    std::unordered_set<Variable> vars = reader.getVariables();
-    std::unordered_set<StmtNum> allStmts{};
-    for (Variable var : vars) {
-        std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
-        allStmts.insert(stmts.begin(), stmts.end());
-    }
-
-    SynonymValues values{};
-    for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), allStmts)) {
-        values.push_back(std::to_string(currStmt));
-    }
-
-    return {stmtSyn, values};
-}
-
-ClauseResult Modifies::statementsModifyLiteral(PKBFacadeReader& reader) {
-    Synonym stmtSyn = static_cast<Synonym&>(stmt);
-    Literal varLit = static_cast<Literal&>(var);
-
-    SynonymValues values{};
-    std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(varLit.getValue());
-    for (StmtNum currStmt : filterStatementsByType(reader, stmtSyn.getType(), stmts)) {
-        values.push_back(std::to_string(currStmt));
-    }
-
-    return {stmtSyn, values};
-}
-
 ClauseResult Modifies::variablesModifedByStatement(PKBFacadeReader& reader) {
-    Integer stmtInt = static_cast<Integer&>(stmt);
     Synonym varSyn = static_cast<Synonym&>(var);
 
     SynonymValues values{};
-    for (Variable currVar : reader.getModifiesVariablesByStatement(std::stoi(stmtInt.getValue()))) {
+    for (Variable currVar : reader.getModifiesVariablesByStatement(std::stoi(modifier.getValue()))) {
         values.push_back(currVar);
     }
 
@@ -125,5 +147,5 @@ std::unordered_set<StmtNum> Modifies::filterStatementsByType(PKBFacadeReader& re
 }
 
 bool Modifies::isSimpleResult() const {
-    return !stmt.isSynonym() && !var.isSynonym();
+    return !modifier.isSynonym() && !var.isSynonym();
 }

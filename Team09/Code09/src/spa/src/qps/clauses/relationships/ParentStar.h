@@ -26,4 +26,5 @@ public:
     ParentStar(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

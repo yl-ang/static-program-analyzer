@@ -8,7 +8,7 @@
 
 class Uses : public Relationship {
 private:
-    ClauseArgument& stmt;
+    ClauseArgument& user;
     ClauseArgument& var;
 
     /**
@@ -18,9 +18,8 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult statementsUseLiteral(PKBFacadeReader&);
-    ClauseResult allVariablesBeingUsed(PKBFacadeReader&);
-    ClauseResult allStmtsThatUseSomeVar(PKBFacadeReader&);
+    ClauseResult evaluateUserSynonym(PKBFacadeReader&);
+    ClauseResult variablesUsedByProcedure(PKBFacadeReader&);
     ClauseResult variablesUsedByStatement(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
     std::unordered_set<StmtNum> filterStatementsByType(PKBFacadeReader&, DesignEntityType, std::unordered_set<StmtNum>);
@@ -29,4 +28,5 @@ public:
     Uses(ClauseArgument&, ClauseArgument&);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

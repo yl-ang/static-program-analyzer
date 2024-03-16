@@ -19,16 +19,24 @@ void PatternExtractor::visitCall(CallNode* node) {}
 void PatternExtractor::visitAssign(AssignmentNode* node) {
     int stmtNum = node->getStmtNumber();
     std::string lhs = node->getVar();
-    std::vector<std::string> rhsVars = node->getExpr()->getVars();
-    std::vector<std::string> rhsConsts = node->getExpr()->getConsts();
+    std::shared_ptr<ExpressionNode> expr = node->getExpr();
+    std::vector<std::string> rhsVars = expr->getVars();
+    std::vector<std::string> rhsConsts = expr->getConsts();
     for (int i = 0; i < rhsVars.size(); ++i) {
         this->pattern.insert({stmtNum, {lhs, rhsVars[i]}});
     }
     for (int i = 0; i < rhsConsts.size(); ++i) {
         this->pattern.insert({stmtNum, {lhs, rhsConsts[i]}});
     }
+
+    this->matchablePattern.insert({stmtNum, {lhs, expr}});
 }
 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getPattern() {
     return this->pattern;
+}
+
+std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>>
+PatternExtractor::getMatchablePattern() {
+    return this->matchablePattern;
 }

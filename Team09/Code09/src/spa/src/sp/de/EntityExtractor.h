@@ -6,7 +6,6 @@
 #include "../../PKB/PKBClient/PKBFacadeWriter.h"
 #include "../../PKB/utils/DataTypes.h"
 #include "AstVisitor.h"
-#include "sp/ast/grammar_nodes/statements/CallNode.h"
 
 enum class DesignEntityStatementType {
     READ,

@@ -29,4 +29,23 @@ TEST_CASE("Semantic Validation Tests") {
         auto program = std::make_shared<ProgramNode>(children);
         REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Procedure with name: a declared twice");
     }
+    SECTION("Calling procedure does not throw error") {
+        auto callStatement = std::make_shared<CallNode>("a", 0);
+        std::vector<std::shared_ptr<ASTNode>> procBChildren = {callStatement};
+        auto procedure1 = std::make_shared<ProcedureNode>("a", std::vector<std::shared_ptr<ASTNode>>());
+        auto procedure2 = std::make_shared<ProcedureNode>("b", procBChildren);
+        std::vector<std::shared_ptr<ASTNode>> children = {procedure1, procedure2};
+        auto program = std::make_shared<ProgramNode>(children);
+        REQUIRE_NOTHROW(validator.validateSemantics(program));
+    }
+
+    SECTION("Calling non procedure throws error") {
+        auto callStatement = std::make_shared<CallNode>("c", 0);
+        std::vector<std::shared_ptr<ASTNode>> procBChildren = {callStatement};
+        auto procedure1 = std::make_shared<ProcedureNode>("a", std::vector<std::shared_ptr<ASTNode>>());
+        auto procedure2 = std::make_shared<ProcedureNode>("b", procBChildren);
+        std::vector<std::shared_ptr<ASTNode>> children = {procedure1, procedure2};
+        auto program = std::make_shared<ProgramNode>(children);
+        REQUIRE_THROWS_WITH(validator.validateSemantics(program), "Attempted to call: c, which is not a procedure.");
+    }
 }

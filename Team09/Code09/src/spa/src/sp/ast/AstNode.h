@@ -19,8 +19,7 @@ class ASTNode : public AstNodeInterface {
 public:
     ASTNode(std::string value, std::string type, std::vector<std::shared_ptr<ASTNode>> children = {},
             int stmtNumber = -1)
-        : value(value), type(type), children((children)), stmtNumber(stmtNumber) {
-    }
+        : value(value), type(type), children((children)), stmtNumber(stmtNumber) {}
 
     std::string getType() const {
         return type;
@@ -63,9 +62,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& obj) {
         os << "{ \"value\": \"" << obj.value << "\", "
-            << "\"type\": \"" << obj.type << "\", "
-            << "\"line number\": \"" << obj.stmtNumber << "\","
-            << "\"children\": [";
+           << "\"type\": \"" << obj.type << "\", "
+           << "\"line number\": \"" << obj.stmtNumber << "\","
+           << "\"children\": [";
 
         for (size_t i = 0; i < obj.children.size(); ++i) {
             os << "[" << *(obj.children[i]) << "]";

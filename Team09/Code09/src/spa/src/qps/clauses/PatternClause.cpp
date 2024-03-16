@@ -119,3 +119,24 @@ ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
 
     return {aSyn, stmtNumbers};
 }
+
+bool PatternClause::validateArguments(SynonymStore* store) {
+    Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
+    if (!aSyn.updateType(store)) {
+        return false;
+    }
+    if (aSyn.getType() != DesignEntityType::ASSIGN) {
+        return false;
+    }
+
+    if (firstArg.isSynonym()) {
+        Synonym fSyn = dynamic_cast<Synonym&>(firstArg);
+        if (!fSyn.updateType(store)) {
+            return false;
+        }
+
+        if (fSyn.getType() != DesignEntityType::VARIABLE) {
+            return false;
+        }
+    }
+}

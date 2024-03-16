@@ -11,5 +11,5 @@ public:
     FollowsValidator(const std::vector<std::string>& args);
     FollowsValidator() = default;
     virtual void validateSyntax() override;
-    virtual void validateSemantic(SynonymStore* store) override;
+    virtual void validateSemantic(ValidatorSynonymStore* store) override;
 };
