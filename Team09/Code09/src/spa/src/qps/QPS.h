@@ -11,7 +11,6 @@
 class QPS {
 private:
     QpsTokenizer tokenizer;
-    Validator validator;
     PQLParser parser;
     PKBFacadeReader pkbReader;
 

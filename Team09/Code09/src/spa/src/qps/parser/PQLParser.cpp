@@ -37,7 +37,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
     
     // Semantic Checking
-    validateClauses(selectEntities, suchThatClauses, patternClauses, entities);
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
@@ -53,36 +53,6 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
         } else {
             throw QPSSyntaxError();
         }
-    }
-}
-
-void PQLParser::validateClauses(std::vector<Synonym>& selectEntities, std::vector<SuchThatClause>& suchThatClauses,
-                    std::vector<PatternClause>& patternClauses, SynonymStore& entities) {
-    bool hasSemanticError = false;
-
-    if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
-        if (!selectEntities[0].updateType(&entities)) {
-            selectEntities.erase(selectEntities.begin());
-        }
-        // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
-        // Evaluator will know if BOOLEAN if vector is empty
-        // Do not trigger a warning should it not be a Synonym type
-    } else {
-        for (Synonym& syn : selectEntities) {
-            hasSemanticError = hasSemanticError || !syn.updateType(&entities);
-        }
-    }
-
-    for (SuchThatClause& clause : suchThatClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-
-    for (PatternClause& clause : patternClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-
-    if (hasSemanticError) {
-        throw QPSSemanticError();
     }
 }
 
@@ -129,7 +99,6 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
             }
         }
 
-        // Semantic checks begins here
         for (std::string synonym : synonyms) {
             synonymStore.storeSynonym(entityType, synonym);
         }

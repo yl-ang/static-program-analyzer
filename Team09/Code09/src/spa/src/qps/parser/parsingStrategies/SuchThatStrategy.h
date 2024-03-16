@@ -2,6 +2,7 @@
 
 #include "../../clauses/SuchThatClause.h"
 #include "ParsingStrategy.h"
+#include "qps/validator/Validator.h"
 
 class SuchThatStrategy : public ParsingStrategy {
 private:
