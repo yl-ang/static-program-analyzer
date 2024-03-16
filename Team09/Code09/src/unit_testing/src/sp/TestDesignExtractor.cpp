@@ -17,6 +17,7 @@ TEST_CASE("Design Extractor Tests") {
     08      a = b;
         }
     09 a = 1;
+    10 call proc;
     */
 
     // x = y;
@@ -70,8 +71,6 @@ TEST_CASE("Design Extractor Tests") {
     std::shared_ptr<VariableNode> jNode1 = std::make_shared<VariableNode>(VariableNode("j", 7));
     std::shared_ptr<VariableNode> aNode1 = std::make_shared<VariableNode>(VariableNode("a", 8));
     std::shared_ptr<VariableNode> bNode1 = std::make_shared<VariableNode>(VariableNode("b", 8));
-    std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>(VariableNode("x", 9));
-    std::shared_ptr<ConstantNode> constNode = std::make_shared<ConstantNode>(ConstantNode("1", 9));
 
     std::vector<std::shared_ptr<StatementNode>> childrenI5 = {};
     std::vector<std::shared_ptr<StatementNode>> childrenI7 = {};
@@ -92,7 +91,15 @@ TEST_CASE("Design Extractor Tests") {
 
     auto ifNode = std::make_shared<IfNode>(IandandNode, IstmtList, IstmtList2, 6);
 
+    // x = 1;
+
+    std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>(VariableNode("x", 9));
+    std::shared_ptr<ConstantNode> constNode = std::make_shared<ConstantNode>(ConstantNode("1", 9));
+
     auto xAssign = std::make_shared<AssignmentNode>(xNode2, constNode, 9);
+
+    // call test;
+    auto callNode = std::make_shared<CallNode>("test", 10);
 
     std::vector<std::shared_ptr<StatementNode>> childrenProc = {};
     childrenProc.push_back(equalNode);
@@ -101,6 +108,7 @@ TEST_CASE("Design Extractor Tests") {
     childrenProc.push_back(whileNode);
     childrenProc.push_back(ifNode);
     childrenProc.push_back(xAssign);
+    childrenProc.push_back(callNode);
 
     auto stmtListProc = std::make_shared<StatementListNode>(childrenProc);
     auto ProcNode = std::make_shared<ProcedureNode>("main", stmtListProc);
@@ -111,11 +119,11 @@ TEST_CASE("Design Extractor Tests") {
 
     /*
    procedure test {
-   01 read a;
+   11 read a;
    }
     */
-    auto variableA = std::make_shared<VariableNode>("a", 1);
-    auto readA = std::make_shared<ReadNode>(variableA, 1);
+    auto variableA = std::make_shared<VariableNode>("a", 11);
+    auto readA = std::make_shared<ReadNode>(variableA, 11);
     std::vector<std::shared_ptr<StatementNode>> children2 = {};
     children2.push_back(readA);
     auto stmtListProc1 = std::make_shared<StatementListNode>(children2);
@@ -170,7 +178,7 @@ TEST_CASE("Design Extractor Tests") {
         REQUIRE(expectedConstants == designExtractor->getConstants());
     }
 
-    SECTION("Multiple procedures variables extracted correctly") {
+    SECTION("Multiple procedures constants extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
         std::unordered_set<std::string> expectedConstants = {"1"};
@@ -204,14 +212,14 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Single line procedure has statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode2);
-        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 1}};
+        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 11}};
         REQUIRE(expectedStatements == designExtractor->getStatements());
     }
 
     SECTION("Multiple procedure statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
-        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 1},   Stmt{StatementType::ASSIGN, 1},
+        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 11},  Stmt{StatementType::ASSIGN, 1},
                                                        Stmt{StatementType::READ, 2},   Stmt{StatementType::PRINT, 3},
                                                        Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5},
                                                        Stmt{StatementType::IF, 6},     Stmt{StatementType::ASSIGN, 7},
@@ -222,7 +230,8 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Follows extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4}, {4, 6}, {6, 9}};
+        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4},
+                                                                           {4, 6}, {6, 9}, {9, 10}};
         REQUIRE(expectedFollows == designExtractor->getFollows());
     }
 
@@ -236,7 +245,8 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Multiple procedures follows extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4}, {4, 6}, {6, 9}};
+        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4},
+                                                                           {4, 6}, {6, 9}, {9, 10}};
         REQUIRE(expectedFollows == designExtractor->getFollows());
     }
 
@@ -297,7 +307,7 @@ TEST_CASE("Design Extractor Tests") {
     SECTION("Single line procedure has modifies extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "a"}};
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{11, "a"}};
         REQUIRE(expectedModifies == designExtractor->getModifies());
     }
 
@@ -305,7 +315,7 @@ TEST_CASE("Design Extractor Tests") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode3);
         std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {
-            {1, "a"}, {1, "x"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}};
+            {11, "a"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}, {1, "x"}};
         REQUIRE(expectedModifies == designExtractor->getModifies());
     }
 
@@ -316,6 +326,7 @@ TEST_CASE("Design Extractor Tests") {
             {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
         REQUIRE(expectedPattern == designExtractor->getPattern());
     }
+
     SECTION("Single line procedure has pattern extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode2);
@@ -329,5 +340,12 @@ TEST_CASE("Design Extractor Tests") {
         std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {
             {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
         REQUIRE(expectedPattern == designExtractor->getPattern());
+    }
+
+    SECTION("Calls extracted correctly") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<Procedure, Procedure>> expectedCalls = {{"main", "test"}};
+        REQUIRE(expectedCalls == designExtractor->getCalls());
     }
 }

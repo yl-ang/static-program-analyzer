@@ -15,6 +15,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setStatementUsesStore(getUses());
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
+    writer->setCallStore(getCalls());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
@@ -25,9 +26,10 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->modifiesExtractor = new ModifiesExtractor();
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
+    this->callsExtractor = new CallsExtractor();
 
-    std::vector<AstVisitor*> visitors{entityExtractor, followsExtractor,  parentExtractor,
-                                      usesExtractor,   modifiesExtractor, patternExtractor};
+    std::vector<AstVisitor*> visitors{entityExtractor,   followsExtractor, parentExtractor, usesExtractor,
+                                      modifiesExtractor, patternExtractor, callsExtractor};
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
@@ -88,4 +90,8 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Desi
 
 std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
     return nextExtractor->getNextRelationships();
+}
+
+std::unordered_set<std::pair<Procedure, Procedure>> DesignExtractor::getCalls() {
+    return callsExtractor->getCalls();
 }
