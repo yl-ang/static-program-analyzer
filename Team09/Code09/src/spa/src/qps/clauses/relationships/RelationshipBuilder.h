@@ -22,6 +22,7 @@ static const std::unordered_map<std::string, RelationshipType> RELATIONSHIP_TYPE
     {QPSConstants::PARENT, RelationshipType::PARENT},   {QPSConstants::PARENT_STAR, RelationshipType::PARENT_STAR},
     {QPSConstants::USES, RelationshipType::USES},       {QPSConstants::MODIFIES, RelationshipType::MODIFIES},
     {QPSConstants::NEXT, RelationshipType::NEXT},       {QPSConstants::NEXT_STAR, RelationshipType::NEXT_STAR},
+    {QPSConstants::CALLS, RelationshipType::CALLS},       {QPSConstants::CALLS_STAR, RelationshipType::CALLS_STAR},
     {QPSConstants::AFFECTS, RelationshipType::AFFECTS}};  // update here
 
 class RelationshipBuilder {

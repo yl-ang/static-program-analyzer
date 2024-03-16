@@ -36,6 +36,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
         } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)){
             clauseList[i].replace(0, 2, currClauseType);
         } else {
+            // Will need to add WITH support in future
             // ignore
         }
     }
@@ -130,7 +131,7 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
 
         // if BOOLEAN, since we have no idea if it is a variable or not now, will
         // not perform any case on it. This will be done in semantic checking.
-        // * Capture it like a synonym, for now.
+        // Capture it like a synonym, for now.
 
         // if single return, will return a vector with a single ClauseArgument.
         if (isSynonym(selectEntity) && isBoolean(selectEntity)) {
