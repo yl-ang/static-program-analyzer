@@ -61,15 +61,12 @@ void SemanticValidator::checkCyclicCalls() {
 
 void SemanticValidator::checkCycle(std::shared_ptr<std::unordered_map<std::string, bool>> visited,
                                    std::string currentProcedure) {
-    if (visited->at(currentProcedure)) {
-        throw CyclicProcedureCallsError();
-    }
-
-    for (auto& [_, value] : *(procedureNames.get())) {
-        for (auto procedureName : value) {
-            visited->at(procedureName) = true;
-            checkCycle(visited, procedureName);
-            visited->at(procedureName) = false;
+    for (auto value : procedureNames->at(currentProcedure)) {
+        if (visited->at(value)) {
+            throw CyclicProcedureCallsError();
         }
+        visited->at(value) = true;
+        checkCycle(visited, value);
+        visited->at(value) = false;
     }
 }
