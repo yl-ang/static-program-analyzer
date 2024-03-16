@@ -33,7 +33,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             currClauseType = QPSConstants::SUCH_THAT;
         } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
             currClauseType = QPSConstants::PATTERN;
-        } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)){
+        } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)) {
             clauseList[i].replace(0, 2, currClauseType);
         } else {
             // Will need to add WITH support in future
@@ -50,7 +50,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
         if (!selectEntities[0].updateType(&entities)) {
             selectEntities.erase(selectEntities.begin());
-        } 
+        }
         // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
         // Evaluator will know if BOOLEAN if vector is empty
         // Do not trigger a warning should it not be a Synonym type
@@ -161,7 +161,8 @@ std::vector<SuchThatClause> PQLParser::findSuchThatClauses(std::vector<std::stri
         if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
             // replaced only the below line for strategy pattern refactor
             // SuchThatClause st = toSTClause(entities, clauseString);
-            // UnparsedClause(std::vector<Synonym> entities, std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
+            // UnparsedClause(std::vector<Synonym> entities,
+            // std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
             UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
             std::unique_ptr<QueryClause> qc = unparsedClause.execute();
             SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
