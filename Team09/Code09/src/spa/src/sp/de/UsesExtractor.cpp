@@ -7,10 +7,13 @@ void UsesExtractor::visitStmtLst(StatementListNode* node) {}
 void UsesExtractor::visitExpression(ExpressionNode* node) {}
 void UsesExtractor::visitFactor(FactorNode* node) {}
 void UsesExtractor::visitTerm(TermNode* node) {}
-void UsesExtractor::visitProcedure(ProcedureNode* node) {}
 void UsesExtractor::visitRead(ReadNode* node) {}
 void UsesExtractor::visitVariable(VariableNode* node) {}
 void UsesExtractor::visitConstant(ConstantNode* node) {}
+
+void UsesExtractor::visitProcedure(ProcedureNode* node) {
+    this->currentProc = node->name;
+}
 
 void UsesExtractor::visitCall(CallNode* node) {
     int userStmtNum = node->statementNumber;
@@ -36,6 +39,7 @@ void UsesExtractor::visitCall(CallNode* node) {
 
         // Create a new pair with the updated stmtNum value and insert it
         this->uses.insert({userStmtNum, oldPair.second});
+        this->procedureUses.insert({currentProc, oldPair.second});
     }
 }
 
@@ -44,6 +48,7 @@ void UsesExtractor::visitAssign(AssignmentNode* node) {
     std::vector<std::string> usedVariables = node->expression->getVars();
     for (int i = 0; i < usedVariables.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariables[i]});
+        this->procedureUses.insert({currentProc, usedVariables[i]});
     }
 }
 
@@ -51,6 +56,7 @@ void UsesExtractor::visitPrint(PrintNode* node) {
     int userStmtNum = node->statementNumber;
     std::string usedVariable = node->variable->value;
     this->uses.insert({userStmtNum, usedVariable});
+    this->procedureUses.insert({currentProc, usedVariable});
 }
 
 void UsesExtractor::visitWhile(WhileNode* node) {
@@ -58,6 +64,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
     std::vector<std::string> usedVariablesInCond = node->whileCondition->getVars();
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
+        this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
     }
 
     // Extract uses relationships from usesExtractorHelper and append to usesExtractor
@@ -76,6 +83,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
 
         // Create a new pair with the updated stmtNum value and insert it
         uses.insert({userStmtNum, oldPair.second});
+        this->procedureUses.insert({currentProc, oldPair.second});
     }
 }
 
@@ -84,6 +92,7 @@ void UsesExtractor::visitIf(IfNode* node) {
     std::vector<std::string> usedVariablesInCond = node->ifCondition->getVars();
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
+        this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
     }
     UsesExtractor* thenUsesExtractorHelper = new UsesExtractor(this->procs);
     UsesExtractor* elseUsesExtractorHelper = new UsesExtractor(this->procs);
@@ -100,6 +109,7 @@ void UsesExtractor::visitIf(IfNode* node) {
 
         // Create a new pair with the updated stmtNum value and insert it
         uses.insert({userStmtNum, oldPair.second});
+        this->procedureUses.insert({currentProc, oldPair.second});
     }
 
     for (auto it = extractedElseUses.begin(); it != extractedElseUses.end();) {
@@ -108,11 +118,16 @@ void UsesExtractor::visitIf(IfNode* node) {
 
         // Create a new pair with the updated stmtNum value and insert it
         uses.insert({userStmtNum, oldPair.second});
+        this->procedureUses.insert({currentProc, oldPair.second});
     }
 }
 
 std::unordered_set<std::pair<StmtNum, Variable>> UsesExtractor::getUses() {
     return this->uses;
+}
+
+std::unordered_set<std::pair<Procedure, Variable>> UsesExtractor::getProcedureUses() {
+    return this->procedureUses;
 }
 
 void UsesExtractor::dfsVisitHelper(std::shared_ptr<ASTNode> node, UsesExtractor* visitor) {
@@ -130,8 +145,3 @@ void UsesExtractor::dfsVisitHelper(ASTNode* node, UsesExtractor* visitor) {
         dfsVisitHelper(child.get(), visitor);
     }
 }
-
-// per procedure,
-// have a separate visitor that visits all the procedures, then stores the pointer to each procedure
-
-// then in visitcall, call uses extractor on the procedure node of the procedure being called recursively

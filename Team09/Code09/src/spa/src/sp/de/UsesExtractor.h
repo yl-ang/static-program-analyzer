@@ -13,6 +13,7 @@
 class UsesExtractor : public AbstractionExtractor {
 public:
     std::unordered_map<std::string, ProcedureNode*> procs;
+    std::string currentProc;
 
     explicit UsesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
 
@@ -32,6 +33,7 @@ public:
     void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<StmtNum, Variable>> getUses();
+    std::unordered_set<std::pair<Procedure, Variable>> getProcedureUses();
     void dfsVisitHelper(std::shared_ptr<ASTNode> node, UsesExtractor* visitor);
     void dfsVisitHelper(ASTNode* node, UsesExtractor* visitor);
 };
