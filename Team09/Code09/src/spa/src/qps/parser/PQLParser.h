@@ -19,14 +19,14 @@ typedef std::vector<std::string> UnparsedQueries;
 
 class PQLParser {
 private:
+    static void validateClauses(SynonymStore* store, std::vector<Synonym>& selectEntities,
+                                std::vector<SuchThatClause>& suchThatClauses,
+                                std::vector<PatternClause>& patternClauses);
     static std::string getQueryClauses(UnparsedQueries);
     static std::vector<std::string> searchClause(const std::regex&, const std::string&);
     
 public:
     static void modifyClauseList(std::vector<std::string>&);
-    static void validateClauses(std::vector<Synonym>&, std::vector<SuchThatClause>&,
-                                std::vector<PatternClause>&, SynonymStore&);
-
     static Query parse(UnparsedQueries);
     static SynonymStore parseQueryEntities(std::vector<std::string>);
     static std::vector<Synonym> findSelectClauses(std::string);

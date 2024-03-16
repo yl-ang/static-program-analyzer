@@ -21,23 +21,23 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             throw QPSSyntaxError();
         }
     }
-    // Select entities in select clause (without checking declaration)
-    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
-
+    
     // Returns such that, pattern, and
     std::vector<std::string> clauseList = getAllClauses(unparsedClauses);
     
+    // ALL entities declared
+    SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
+
     // Replace 'and' clause with 'such that', 'pattern', etc. before processing
     modifyClauseList(clauseList);
 
+    // Select entities in select clause (without checking declaration)
+    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
-
-    // ALL entities declared
-    SynonymStore entities = PQLParser::parseQueryEntities(unparsedEntities);
     
     // Semantic Checking
-    validateClauses(selectEntities, suchThatClauses, patternClauses, entities);
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities, suchThatClauses, patternClauses};
 }
 
@@ -53,36 +53,6 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
         } else {
             throw QPSSyntaxError();
         }
-    }
-}
-
-void PQLParser::validateClauses(std::vector<Synonym>& selectEntities, std::vector<SuchThatClause>& suchThatClauses,
-                    std::vector<PatternClause>& patternClauses, SynonymStore& entities) {
-    bool hasSemanticError = false;
-
-    if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
-        if (!selectEntities[0].updateType(&entities)) {
-            selectEntities.erase(selectEntities.begin());
-        }
-        // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
-        // Evaluator will know if BOOLEAN if vector is empty
-        // Do not trigger a warning should it not be a Synonym type
-    } else {
-        for (Synonym& syn : selectEntities) {
-            hasSemanticError = hasSemanticError || !syn.updateType(&entities);
-        }
-    }
-
-    for (SuchThatClause& clause : suchThatClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-
-    for (PatternClause& clause : patternClauses) {
-        hasSemanticError = hasSemanticError || clause.validateArguments(&entities);
-    }
-
-    if (hasSemanticError) {
-        throw QPSSemanticError();
     }
 }
 
@@ -129,7 +99,6 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
             }
         }
 
-        // Semantic checks begins here
         for (std::string synonym : synonyms) {
             synonymStore.storeSynonym(entityType, synonym);
         }
@@ -151,11 +120,10 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
         // if single return, will return a vector with a single ClauseArgument.
         if (isElem(selectEntity)) {
             return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
-        }
 
         // if multiple return, will return a vector with multiple ClauseArgument.
-        else if (isTuple(selectEntity)) {
-            
+        } else if (isTuple(selectEntity)) {
+                
             std::smatch matches;
             if (std::regex_match(selectEntity, matches, QPSRegexes::TUPLE)) {
                 std::string elems = matches[1];

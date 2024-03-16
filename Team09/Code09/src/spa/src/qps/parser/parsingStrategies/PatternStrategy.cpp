@@ -8,6 +8,7 @@ std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
 
         std::vector<std::string> parameterStringsToParse{assignSynonym};
         std::vector<std::string> cleanedParameters{cleanParameters(parameters)};
+        Validator::validatePatternSyntax(assignSynonym, parameters);
 
         parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
                                        cleanedParameters.end());
@@ -17,7 +18,7 @@ std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
 
         return patternClause;
     } else {
-        throw Exception("Cannot convert string to PatternClause: " + str);
+        throw QPSSyntaxError();
     }
 }
 
@@ -47,7 +48,7 @@ std::vector<ClauseArgument*> PatternStrategy::buildPatternParameters(const std::
     } else if (isSynonym(ptEntRef)) {
         results.push_back(new Synonym(DesignEntityType::UNKNOWN, ptEntRef));
     } else {
-        throw Exception("Issues determining if Pattern EntRef is literal, wildcard, or synonym: " + ptEntRef);
+        throw QPSSyntaxError();
     }
 
     // third argument is expression-spec OR wildcard
@@ -58,7 +59,7 @@ std::vector<ClauseArgument*> PatternStrategy::buildPatternParameters(const std::
             results.push_back(new ExpressionSpec(removeAllWhitespaces(ptExpressionSpec)));
         }
     } else {
-        throw Exception("Pattern Expression-spec is not expression-spec or wildcard: " + ptEntRef);
+        throw QPSSyntaxError();
     }
 
     return results;
