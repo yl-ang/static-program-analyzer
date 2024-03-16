@@ -3,12 +3,13 @@
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "Relationship.h"
 #include "qps/clauseArguments/ClauseArgument.h"
+#include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
 class Calls : public Relationship {
 private:
-    ClauseArgument& currentProcedure;
-    ClauseArgument& nextProcedure;
+    ClauseArgument& caller;
+    ClauseArgument& callee;
 
     /**
      * Check if the result is a simple boolean result.
@@ -17,11 +18,12 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult evaluate(PKBFacadeReader&);
+    ClauseResult evaluateCalleeSynonym(PKBFacadeReader& reader);
+    ClauseResult evaluateCallerSynonym(PKBFacadeReader&);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
     Calls(ClauseArgument&, ClauseArgument&);
-    
+
     ClauseResult evaluate(PKBFacadeReader&) override;
-    bool validateArguments() override;
 };
