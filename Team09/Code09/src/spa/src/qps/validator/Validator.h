@@ -10,13 +10,14 @@
 #include "qps/clauses/PatternClause.h"
 #include "qps/clauses/SuchThatClause.h"
 #include "qps/exceptions/QPSSyntaxError.h"
+#include "qps/parser/SelectEntContainer.h"
 #include "qps/parser/SynonymStore.h"
 
 class Validator {
 public:
     static void validatePatternSyntax(const std::string& synonym, const std::string& arguments);
     static void validateSuchThatSyntax(const std::string& relType, const std::string& arguments);
-    static void validateClauses(SynonymStore* store, std::vector<Synonym>& selectEntities,
+    static void validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
                                 std::vector<SuchThatClause>& suchThatClauses,
                                 std::vector<PatternClause>& patternClauses);
 

@@ -32,14 +32,12 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // Replace 'and' clause with 'such that', 'pattern', etc. before processing
     modifyClauseList(clauseList);
 
-    // Select entities in select clause (without checking declaration)
-    std::vector<Synonym> selectEntities = PQLParser::parseSelectClause(unparsedClauses);
+    std::shared_ptr<SelectEntContainer> selectEntities = PQLParser::parseSelectClause(unparsedClauses);
     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
 
-    // Semantic Checking
     Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
-    return Query{selectEntities, suchThatClauses, patternClauses};
+    return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
 }
 
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
@@ -113,7 +111,7 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
     return synonymStore;
 }
 
-std::vector<Synonym> PQLParser::parseSelectClause(std::string unparsedClauses) {
+std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string unparsedClauses) {
     std::smatch match;
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
         std::string selectEntity = match[1];
@@ -124,18 +122,24 @@ std::vector<Synonym> PQLParser::parseSelectClause(std::string unparsedClauses) {
 
         // if single return, will return a vector with a single ClauseArgument.
         if (isElem(selectEntity)) {
-            return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
+            std::shared_ptr<Elem> container = std::make_shared<Elem>();
+            container->add(selectEntity);
+            return container;
+            // return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
         }
         // if multiple return, will return a vector with multiple ClauseArgument.
         if (isTuple(selectEntity)) {
-            std::vector<Synonym> result = {};  // if there is none
+            // std::vector<Synonym> result = {};  // if there is none
+            std::shared_ptr<Tuple> container = std::make_shared<Tuple>();
             std::string elems = selectEntity.substr(1, selectEntity.size() - 2);
             std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
             // Push back the split results into a vector
             for (const auto& str : splitResult) {
-                result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
+                container->add(str);
+                // result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
             }
-            return result;
+            return container;
+            // return result;
         }
     }
     throw QPSSyntaxError();

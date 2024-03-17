@@ -9,6 +9,7 @@
 #include "qps/evaluator/Query.h"
 #include "qps/exceptions/QPSSemanticError.h"
 #include "qps/exceptions/QPSSyntaxError.h"
+#include "qps/parser/SelectEntContainer.h"
 #include "qps/parser/SynonymStore.h"
 #include "qps/parser/parsingStrategies/ParsingStrategy.h"
 #include "qps/parser/parsingStrategies/PatternStrategy.h"
@@ -25,7 +26,7 @@ public:
     static void modifyClauseList(std::vector<std::string>&);
     static Query parse(UnparsedQueries);
     static SynonymStore parseQueryEntities(std::vector<std::string>);
-    static std::vector<Synonym> parseSelectClause(std::string);
+    static std::shared_ptr<SelectEntContainer> parseSelectClause(std::string);
     static std::vector<SuchThatClause> parseSuchThatClauses(std::vector<std::string>);
     static std::vector<PatternClause> parsePatternClauses(std::vector<std::string>);
 };
