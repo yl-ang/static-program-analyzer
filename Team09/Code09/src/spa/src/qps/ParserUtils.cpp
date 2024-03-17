@@ -167,9 +167,6 @@ std::vector<size_t> getClauseIndices(const std::string& str, const std::string& 
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {
-    if (str.empty()) {
-        return {};
-    }
     std::vector<size_t> indices;
     auto words_begin = std::sregex_iterator(str.begin(), str.end(), regexPattern);
     auto words_end = std::sregex_iterator();
