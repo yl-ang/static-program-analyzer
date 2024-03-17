@@ -43,7 +43,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
     std::string currClauseType;
-    for (size_t i = 0; i < clauseList.size(); ++i) {
+    for (size_t i = 0; i < clauseList.size(); i++) {
         if (std::regex_match(clauseList[i], QPSRegexes::SELECT_CLAUSE)) {
             // Do nothing
         } else if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {

@@ -1,6 +1,7 @@
 #include <qps/parser/PQLParser.h>
-
+#include <qps/ParserUtils.h>
 #include <tuple>
+#include <vector>
 
 #include "catch.hpp"
 
@@ -490,4 +491,10 @@ TEST_CASE("And (2)") {
     PQLParser::modifyClauseList(clauseList_1);
     REQUIRE(clauseList_1[0] == "such that Modifies( and , _)");
     REQUIRE(clauseList_1[1] == "such that Parent(s, s1)");
+}
+
+TEST_CASE("And (3)") {
+    std::string inputString_And = "Select <and, s1> such that Follows( and , 2) and Parent(s1, s2) pattern a(a, \"expr+x)\") and Modifies(v, )";
+    std::vector<std::string> result = getAllClauses(inputString_And);
+    std::vector<std::string> result_2 = getAllClauses(inputString_And);
 }
