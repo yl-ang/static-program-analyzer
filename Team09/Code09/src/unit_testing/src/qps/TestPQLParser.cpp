@@ -6,43 +6,43 @@
 
 // parsing entities
 TEST_CASE("one_variable") {
-   std::vector<std::string> one_variable = {"variable v1;"};
-   std::vector<Synonym> expected_one_variable = {Synonym(DesignEntityType::VARIABLE, "v1")};
-   SynonymStore synonymStore = PQLParser::parseQueryEntities(one_variable);
-   REQUIRE(synonymStore.containsSynonym(expected_one_variable[0]));
+    std::vector<std::string> one_variable = {"variable v1;"};
+    std::vector<Synonym> expected_one_variable = {Synonym(DesignEntityType::VARIABLE, "v1")};
+    SynonymStore synonymStore = PQLParser::parseQueryEntities(one_variable);
+    REQUIRE(synonymStore.containsSynonym(expected_one_variable[0]));
 }
 TEST_CASE("two_variables") {
-   std::vector<std::string> two_variables = {"variable v1, v2;"};
-   std::vector<Synonym> expected_two_variables = {Synonym(DesignEntityType::VARIABLE, "v1"),
-                                                  Synonym(DesignEntityType::VARIABLE, "v2")};
-   SynonymStore synonymStore = PQLParser::parseQueryEntities(two_variables);
-   REQUIRE(synonymStore.containsSynonym(expected_two_variables[0]));
-   REQUIRE(synonymStore.containsSynonym(expected_two_variables[1]));
+    std::vector<std::string> two_variables = {"variable v1, v2;"};
+    std::vector<Synonym> expected_two_variables = {Synonym(DesignEntityType::VARIABLE, "v1"),
+                                                    Synonym(DesignEntityType::VARIABLE, "v2")};
+    SynonymStore synonymStore = PQLParser::parseQueryEntities(two_variables);
+    REQUIRE(synonymStore.containsSynonym(expected_two_variables[0]));
+    REQUIRE(synonymStore.containsSynonym(expected_two_variables[1]));
 }
 TEST_CASE("one_call_assign_stmt") {
-   std::vector<std::string> one_call_assign_stmt = {"call c1;", "assign a1;", "stmt s1;"};
-   std::vector<Synonym> expected_one_call_assign_stmt = {Synonym(DesignEntityType::CALL, "c1"),
-                                                         Synonym(DesignEntityType::ASSIGN, "a1"),
-                                                         Synonym(DesignEntityType::STMT, "s1")};
+    std::vector<std::string> one_call_assign_stmt = {"call c1;", "assign a1;", "stmt s1;"};
+    std::vector<Synonym> expected_one_call_assign_stmt = {Synonym(DesignEntityType::CALL, "c1"),
+                                                            Synonym(DesignEntityType::ASSIGN, "a1"),
+                                                            Synonym(DesignEntityType::STMT, "s1")};
 
-   SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
-   
-   REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[0]));
-   REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[1]));
-   REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[2]));
+    SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
+
+    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[0]));
+    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[1]));
+    REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[2]));
 }
 TEST_CASE("various_call_assign_stmt") {
-   std::vector<std::string> various_call_assign_stmt = {"call c1, c2;", "assign a1;", "stmt s1, s2;"};
-   std::vector<Synonym> expected_various_call_assign_stmt = {
-       Synonym(DesignEntityType::CALL, "c1"), Synonym(DesignEntityType::CALL, "c2"),
-       Synonym(DesignEntityType::ASSIGN, "a1"), Synonym(DesignEntityType::STMT, "s1"),
-       Synonym(DesignEntityType::STMT, "s2")};
-   SynonymStore synonymStore = PQLParser::parseQueryEntities(various_call_assign_stmt);
-   REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[0]));
-   REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[1]));
-   REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[2]));
-   REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[3]));
-   REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[4]));
+    std::vector<std::string> various_call_assign_stmt = {"call c1, c2;", "assign a1;", "stmt s1, s2;"};
+    std::vector<Synonym> expected_various_call_assign_stmt = {
+        Synonym(DesignEntityType::CALL, "c1"), Synonym(DesignEntityType::CALL, "c2"),
+        Synonym(DesignEntityType::ASSIGN, "a1"), Synonym(DesignEntityType::STMT, "s1"),
+        Synonym(DesignEntityType::STMT, "s2")};
+    SynonymStore synonymStore = PQLParser::parseQueryEntities(various_call_assign_stmt);
+    REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[0]));
+    REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[1]));
+    REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[2]));
+    REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[3]));
+    REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[4]));
 }
 
 // Testing Find Queries functions
@@ -387,7 +387,7 @@ TEST_CASE("PQLParser: Select ... pattern (1)") {
     std::vector<PatternClause> result_2 = PQLParser::parsePatternClauses(clauseList_2);
     std::vector<PatternClause> result_3 = PQLParser::parsePatternClauses(clauseList_3);
     std::vector<PatternClause> result_4 = PQLParser::parsePatternClauses(clauseList_4);
-    
+
     std::vector<SuchThatClause> suchThatClauses = {};
     std::vector<Synonym> selectClauses = {};
     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_1);
@@ -467,7 +467,8 @@ TEST_CASE("PQLParser: Select ... pattern (4)") {
 
     ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
 
-    SuchThatClause s = SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
+    SuchThatClause s = SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1),
+                                    static_cast<ClauseArgument*>(&v));
     PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
                                        static_cast<ClauseArgument*>(&temp));
     REQUIRE(suchThatClauses.size() == 1);
