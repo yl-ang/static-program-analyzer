@@ -5,7 +5,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <regex>
+#include <algorithm>
 
+#include "qps/exceptions/QPSSyntaxError.h"
 #include "QPSConstants.h"
 #include "QPSRegexes.h"
 

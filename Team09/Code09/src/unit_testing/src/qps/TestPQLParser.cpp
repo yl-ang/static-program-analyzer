@@ -448,7 +448,7 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
 }
 
 TEST_CASE("PQLParser: Select ... pattern (4)") {
-    std::string select_pt_1 = "Select a such that Uses (a1, v) such that Uses (a, a1) pattern a (v, _\"temp\"_)";
+    std::string select_pt_1 = "Select a such that Uses (a1, v) pattern a (v, _\"temp\"_)";
 
     // Testing Find Queries functions
     std::vector<std::string> various_assorted_1 = {"assign a, a1;", "variable v;"};
@@ -459,7 +459,7 @@ TEST_CASE("PQLParser: Select ... pattern (4)") {
     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList_1);
     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList_1);
 
-    Validator::validateClauses(&entities, selectClauses, suchThatClauses, patternClauses);
+    Validator::validateClauses(&entities_1, selectClauses, suchThatClauses, patternClauses);
 
     Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");

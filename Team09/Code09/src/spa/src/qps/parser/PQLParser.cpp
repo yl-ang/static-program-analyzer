@@ -1,5 +1,5 @@
 #include "PQLParser.h"
-
+#include <iostream>
 // Checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
@@ -44,7 +44,9 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
     std::string currClauseType;
     for (size_t i = 0; i < clauseList.size(); ++i) {
-        if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
+        if (std::regex_match(clauseList[i], QPSRegexes::SELECT_CLAUSE)) {
+            // Do nothing
+        } else if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
             currClauseType = QPSConstants::SUCH_THAT;
         } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
             currClauseType = QPSConstants::PATTERN;
