@@ -16,8 +16,8 @@ enum class RelationshipType {
     USES,
     NEXT,
     NEXT_STAR,
-    CALL,
-    CALL_STAR,
+    CALLS,
+    CALLS_STAR,
     AFFECTS
 };
 

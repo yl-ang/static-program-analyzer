@@ -5,12 +5,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <regex>
+#include <algorithm>
 
+#include "qps/exceptions/QPSSyntaxError.h"
 #include "QPSConstants.h"
-
-const std::string WHITESPACES = " \n\r\t\b\f";
-const std::string SPACE = " ";
-const std::string QUOTATIONS = "\"";
+#include "QPSRegexes.h"
 
 std::string replaceAllExtraWhitespaces(const std::string& str);
 std::string removeAllWhitespaces(const std::string& str);
@@ -24,4 +24,6 @@ std::string trim(const std::string& str);
 std::tuple<std::string, std::string> splitResultAndClause(const std::string& str);
 std::vector<std::string> extractReturnResults(const std::string& str);
 std::vector<std::string> getAllClauses(const std::string& str);
+void addClause(std::vector<std::string>* clauses, const std::string& clause);
 std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause);
+std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& pattern);

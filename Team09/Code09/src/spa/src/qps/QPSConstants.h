@@ -3,6 +3,9 @@
 #include <string>
 
 struct QPSConstants {
+    inline static const std::string WHITESPACES = " \n\r\t\b\f";
+    inline static const std::string SPACE = " ";
+    inline static const std::string QUOTATIONS = "\"";
     inline static const std::string TRUE_STRING = "TRUE";
     inline static const std::string FALSE_STRING = "FALSE";
   

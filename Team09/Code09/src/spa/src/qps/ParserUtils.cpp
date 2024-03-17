@@ -3,11 +3,11 @@
 std::string replaceAllExtraWhitespaces(const std::string& str) {
     std::string replacedString;
 
-    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
-    std::regex consecutiveSpacePattern = std::regex(SPACE + "+");
+    std::regex whitespacePattern = std::regex("[" + QPSConstants::WHITESPACES + "]");
+    std::regex consecutiveSpacePattern = std::regex(QPSConstants::SPACE + "+");
 
-    replacedString = std::regex_replace(str, whitespacePattern, SPACE);
-    replacedString = std::regex_replace(replacedString, consecutiveSpacePattern, SPACE);
+    replacedString = std::regex_replace(str, whitespacePattern, QPSConstants::SPACE);
+    replacedString = std::regex_replace(replacedString, consecutiveSpacePattern, QPSConstants::SPACE);
 
     return trim(replacedString);
 }
@@ -15,7 +15,7 @@ std::string replaceAllExtraWhitespaces(const std::string& str) {
 std::string removeAllWhitespaces(const std::string& str) {
     std::string replacedString;
 
-    std::regex whitespacePattern = std::regex("[" + WHITESPACES + "]");
+    std::regex whitespacePattern = std::regex("[" + QPSConstants::WHITESPACES + "]");
     replacedString = std::regex_replace(str, whitespacePattern, "");
 
     return replacedString;
@@ -24,7 +24,7 @@ std::string removeAllWhitespaces(const std::string& str) {
 std::string removeAllQuotations(const std::string& str) {
     std::string replacedString;
 
-    std::regex quotationsPattern = std::regex("[" + QUOTATIONS + "]");
+    std::regex quotationsPattern = std::regex("[" + QPSConstants::QUOTATIONS + "]");
     replacedString = std::regex_replace(str, quotationsPattern, "");
 
     return replacedString;
@@ -83,13 +83,13 @@ std::vector<std::string> stringToWordList(const std::string& string) {
 }
 
 std::string trim(const std::string& str) {
-    size_t start = str.find_first_not_of(WHITESPACES);
+    size_t start = str.find_first_not_of(QPSConstants::WHITESPACES);
     std::string trimmedString;
     if (start != std::string::npos) {
         trimmedString = str.substr(start);
     }
 
-    size_t end = trimmedString.find_last_not_of(WHITESPACES);
+    size_t end = trimmedString.find_last_not_of(QPSConstants::WHITESPACES);
     if (end != std::string::npos) {
         trimmedString = trimmedString.substr(0, end + 1);
     }
@@ -120,30 +120,44 @@ std::tuple<std::string, std::string> splitResultAndClause(const std::string& str
 // str = "such that Follows(1, 2) pattern a("_", "_")"
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
-    std::vector<std::string> clauseStarts = {QPSConstants::SUCH_THAT, QPSConstants::PATTERN};
+    std::vector<std::regex> clausePatterns = {QPSRegexes::SELECT_CLAUSE, QPSRegexes::SUCHTHAT_CLAUSE,
+                                              QPSRegexes::PATTERN_CLAUSE, QPSRegexes::AND_CLAUSE};
 
-    std::vector<size_t> allClausesIndices = {};
-    for (std::string clauseString : clauseStarts) {
-        std::vector<size_t> clauseIndices = getClauseIndices(str, clauseString);
+    std::vector<size_t> allClausesIndices = {0};
+    for (const auto& pattern : clausePatterns) {
+        std::vector<size_t> clauseIndices = getClauseIndices(str, pattern);
         allClausesIndices.insert(std::end(allClausesIndices), std::begin(clauseIndices), std::end(clauseIndices));
     }
 
-    if (allClausesIndices.size() == 0) {
-        return {};
-    }
+    // Remove duplicates
+    auto it = std::unique(allClausesIndices.begin(), allClausesIndices.end());
+    allClausesIndices.erase(it, allClausesIndices.end());
 
     std::sort(allClausesIndices.begin(), allClausesIndices.end());
 
     std::vector<std::string> clauses = {};
     std::string clause;
-    for (int i = 0; i < allClausesIndices.size() - 1; i++) {
-        clause = str.substr(allClausesIndices.at(i), allClausesIndices.at(i + 1));
-        clauses.push_back(trim(clause));
+    for (int i = 1; i < allClausesIndices.size(); i++) {
+        clause = str.substr(allClausesIndices.at(i - 1), allClausesIndices.at(i) - allClausesIndices.at(i - 1));
+        addClause(&clauses, clause);
     }
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
-    clauses.push_back(trim(clause));
-
+    addClause(&clauses, clause);
     return clauses;
+}
+
+void addClause(std::vector<std::string>* clauses, const std::string& clause) {
+    std::smatch match;
+    if (removeAllWhitespaces(clause) != "") {
+        if (!std::regex_match(clause, match, QPSRegexes::SELECT_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::SUCHTHAT_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::PATTERN_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::AND_CLAUSE) && removeAllWhitespaces(clause) != "") {
+            throw QPSSyntaxError();
+        } else {
+            clauses->push_back(trim(clause));
+        }
+    }
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
@@ -164,4 +178,17 @@ std::vector<size_t> getClauseIndices(const std::string& str, const std::string& 
     }
 
     return clausePositionList;
+}
+
+std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {
+    std::vector<size_t> indices;
+    auto words_begin = std::sregex_iterator(str.begin(), str.end(), regexPattern);
+    auto words_end = std::sregex_iterator();
+
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+        std::smatch match = *i;
+        indices.push_back(match.position(0));
+    }
+
+    return indices;
 }

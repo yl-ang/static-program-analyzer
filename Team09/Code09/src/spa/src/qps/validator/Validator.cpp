@@ -40,11 +40,21 @@ void Validator::validateClauses(SynonymStore* store, std::vector<Synonym>& selec
     if (!store->isValidStore()) {
         hasSemanticError = true;
     }
-    for (Synonym& syn : selectEntities) {
-        if (!syn.updateType(store)) {
-            hasSemanticError = true;
+    if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
+        if (!selectEntities[0].updateType(store)) {
+            selectEntities.erase(selectEntities.begin());
+        }
+        // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
+        // Evaluator will know if BOOLEAN if vector is empty
+        // Do not trigger a warning should it not be a Synonym type
+    } else {
+        for (Synonym& syn : selectEntities) {
+            if (!syn.updateType(store)) {
+                hasSemanticError = true;
+            }
         }
     }
+
     for (SuchThatClause& clause : suchThatClauses) {
         if (!clause.validateArguments(store)) {
             hasSemanticError = true;
