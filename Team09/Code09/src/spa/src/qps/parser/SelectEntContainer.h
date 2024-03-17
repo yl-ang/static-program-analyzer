@@ -17,14 +17,6 @@ public:
     virtual bool updateSynonyms(SynonymStore* store) = 0;
 
     virtual std::vector<Synonym> getSynonyms() = 0;
-
-    bool isTuple() {
-        return false;
-    }
-
-    bool isElem() {
-        return false;
-    }
 };
 
 class Tuple : public SelectEntContainer {
@@ -39,10 +31,6 @@ class Tuple : public SelectEntContainer {
 
     std::vector<Synonym> getSynonyms() {
         return container;
-    }
-
-    bool isTuple() {
-        return true;
     }
 };
 
@@ -60,9 +48,5 @@ class Elem : public SelectEntContainer {
             return {};
         }
         return container;
-    }
-
-    bool isElem() {
-        return true;
     }
 };
