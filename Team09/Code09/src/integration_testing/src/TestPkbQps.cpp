@@ -1089,14 +1089,17 @@ TEST_CASE("Multi") {
         SECTION("Tuple, Return two values(with different synonyms), such that and pattern") {
             QPSResult result = qps.processQueries(
                 "assign a; stmt s1,s2; variable v; Select <s1, v> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
-            QPSResult expected = {"1 num1", "1 num2"};
+            QPSResult expected = {"1 num1", "1 num2", "2 num1", "2 num2", "3 num1",
+                                  "3 num2", "7 num1", "7 num2", "8 num1", "8 num2"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
 
         SECTION("Tuple, Return two values(with shared synonyms), such that and pattern") {
             QPSResult result = qps.processQueries(
                 "assign a; stmt s1,s2; variable v; Select <a, s1> such that Follows(a,s2) pattern a(v,_\"1\"_)");
-            QPSResult expected = {"1 1"};
+            QPSResult expected = {"1 1", "1 10", "1 11", "1 12", "1 2", "1 3",  "1 4",  "1 5",
+                                  "1 6", "1 7",  "1 8",  "1 9",  "8 1", "8 10", "8 11", "8 12",
+                                  "8 2", "8 3",  "8 4",  "8 5",  "8 6", "8 7",  "8 8",  "8 9"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
     }

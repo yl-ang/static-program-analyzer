@@ -15,8 +15,9 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return getEmptyResult();
     }
 
-    const TableManager tableManager{buildSelectTable(pkb)};
-    if (tableManager.isEmpty()) {
+    const TableManager tableManager{};
+
+    if (buildAndJoinSelectTable(tableManager, pkb); tableManager.isEmpty()) {
         // There are no results to select at all. Return empty result.
         return getEmptyResult();
     }
@@ -130,9 +131,10 @@ bool Query::containsSelectSynonyms(QueryClausePtr clause) const {
     return false;
 }
 
-Table Query::buildSelectTable(const PKBFacadeReader& pkb) const {
-    std::vector<Synonym> header{selectEntities};
-    std::vector<ColumnData> columns{};
+void Query::buildAndJoinSelectTable(const TableManager& tm, const PKBFacadeReader& pkb) const {
+    if (selectEntities.empty()) {
+        return;
+    }
 
     for (Synonym entity : selectEntities) {
         ColumnData row{};
@@ -169,8 +171,6 @@ Table Query::buildSelectTable(const PKBFacadeReader& pkb) const {
             }
             break;
         }
-        columns.push_back(row);
+        tm.join(ClauseResult{entity, row});
     }
-
-    return Table{header, columns};
 }
