@@ -125,21 +125,17 @@ std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string unp
             std::shared_ptr<Elem> container = std::make_shared<Elem>();
             container->add(selectEntity);
             return container;
-            // return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
         }
         // if multiple return, will return a vector with multiple ClauseArgument.
         if (isTuple(selectEntity)) {
-            // std::vector<Synonym> result = {};  // if there is none
             std::shared_ptr<Tuple> container = std::make_shared<Tuple>();
             std::string elems = selectEntity.substr(1, selectEntity.size() - 2);
             std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
             // Push back the split results into a vector
             for (const auto& str : splitResult) {
                 container->add(str);
-                // result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
             }
             return container;
-            // return result;
         }
     }
     throw QPSSyntaxError();
