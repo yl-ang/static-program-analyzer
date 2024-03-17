@@ -13,6 +13,8 @@ using QPSResult = std::vector<std::string>;
 #define REQUIRE_THROW_SYNTAX_ERROR(expr) REQUIRE((expr)[0] == "SyntaxError")
 #define REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected) equalVectorContents(result, expected)
 #define REQUIRE_EMPTY(result) REQUIRE((result).empty())
+#define REQUIRE_FALSE_RESULT(expr) REQUIRE(expr[0] == "FALSE")
+#define REQUIRE_TRUE_RESULT(expr) REQUIRE(expr[0] == "TRUE")
 
 // HELPER FUNCTIONS
 void equalVectorContents(QPSResult result, QPSResult expected) {
@@ -1013,3 +1015,93 @@ TEST_CASE("Select with 1 such-that clause") {
         }
     }
 };
+
+TEST_CASE("Multi") {
+    PKB pkb{};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
+
+    const std::string FALSE_VALUE = "FALSE";
+    const std::string TRUE_VALUE = "TRUE";
+
+    SECTION("Tuple Return Values") {
+        SECTION("BOOLEAN, Return TRUE, such that") {
+            QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
+            REQUIRE_TRUE_RESULT(result);
+        }
+
+        SECTION("BOOLEAN, Return FALSE, such that") {
+            QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
+            REQUIRE_FALSE_RESULT(result);
+        }
+
+        SECTION("BOOLEAN, Return TRUE, pattern") {
+            QPSResult result = qps.processQueries("assign a; Select BOOLEAN pattern a(_,_\"1\"_)");
+            REQUIRE_TRUE_RESULT(result);
+        }
+
+        SECTION("BOOLEAN, Return FALSE, pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
+            REQUIRE_FALSE_RESULT(result);
+        }
+
+        SECTION("Tuple, Return two values, such that") {
+            QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
+            QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two same values, such that") {
+            QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s1> such that Follows(s1, s2)");
+            QPSResult expected = {"1 1", "2 2", "3 3", "7 7", "8 8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return three values, such that") {
+            QPSResult result =
+                qps.processQueries("stmt s1, s2; variable v; Select <s1,s2,v> such that Follows(s1, s2)");
+            QPSResult expected = {"1 2 num1", "2 3 num1", "3 6 num1", "7 12 num1", "8 9 num1",
+                                  "1 2 num2", "2 3 num2", "3 6 num2", "7 12 num2", "8 9 num2",
+                                  "1 2 num3", "2 3 num3", "3 6 num3", "7 12 num3", "8 9 num3"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values, pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select <a, v> pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "8 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(such that), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <s1, s2> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(pattern), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <a, v> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "8 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(with different synonyms), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <s1, v> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "1 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(with shared synonyms), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <a, s1> such that Follows(a,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 1"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
+
+    SECTION("Multiple Clauses") {}
+
+    SECTION("Clauses with 'and'") {}
+}
