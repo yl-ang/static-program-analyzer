@@ -123,15 +123,15 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     std::vector<std::regex> clausePatterns = {QPSRegexes::SELECT_CLAUSE, QPSRegexes::SUCHTHAT_CLAUSE,
                                               QPSRegexes::PATTERN_CLAUSE, QPSRegexes::AND_CLAUSE};
 
-    std::vector<size_t> allClausesIndices = {0};
+    std::vector<size_t> allClausesIndices = {};
     for (const auto& pattern : clausePatterns) {
         std::vector<size_t> clauseIndices = getClauseIndices(str, pattern);
         allClausesIndices.insert(std::end(allClausesIndices), std::begin(clauseIndices), std::end(clauseIndices));
     }
 
-    // Remove duplicates
-    auto it = std::unique(allClausesIndices.begin(), allClausesIndices.end());
-    allClausesIndices.erase(it, allClausesIndices.end());
+    if (allClausesIndices.size() == 0) {
+        return {};
+    }
 
     std::sort(allClausesIndices.begin(), allClausesIndices.end());
 
@@ -139,25 +139,11 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     std::string clause;
     for (int i = 1; i < allClausesIndices.size(); i++) {
         clause = str.substr(allClausesIndices.at(i - 1), allClausesIndices.at(i) - allClausesIndices.at(i - 1));
-        addClause(&clauses, clause);
+        clauses.push_back(trim(clause));
     }
-    clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
-    addClause(&clauses, clause);
+    clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1));
+    clauses.push_back(trim(clause));
     return clauses;
-}
-
-void addClause(std::vector<std::string>* clauses, const std::string& clause) {
-    std::smatch match;
-    if (removeAllWhitespaces(clause) != "") {
-        if (!std::regex_match(clause, match, QPSRegexes::SELECT_CLAUSE) &&
-            !std::regex_match(clause, match, QPSRegexes::SUCHTHAT_CLAUSE) &&
-            !std::regex_match(clause, match, QPSRegexes::PATTERN_CLAUSE) &&
-            !std::regex_match(clause, match, QPSRegexes::AND_CLAUSE) && removeAllWhitespaces(clause) != "") {
-            throw QPSSyntaxError();
-        } else {
-            clauses->push_back(trim(clause));
-        }
-    }
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
@@ -181,6 +167,9 @@ std::vector<size_t> getClauseIndices(const std::string& str, const std::string& 
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {
+    if (str.empty()) {
+        return {};
+    }
     std::vector<size_t> indices;
     auto words_begin = std::sregex_iterator(str.begin(), str.end(), regexPattern);
     auto words_end = std::sregex_iterator();

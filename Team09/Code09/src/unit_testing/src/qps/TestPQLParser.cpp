@@ -1,5 +1,6 @@
-#include <qps/parser/PQLParser.h>
 #include <qps/ParserUtils.h>
+#include <qps/parser/PQLParser.h>
+
 #include <tuple>
 #include <vector>
 
@@ -15,7 +16,7 @@ TEST_CASE("one_variable") {
 TEST_CASE("two_variables") {
     std::vector<std::string> two_variables = {"variable v1, v2;"};
     std::vector<Synonym> expected_two_variables = {Synonym(DesignEntityType::VARIABLE, "v1"),
-                                                    Synonym(DesignEntityType::VARIABLE, "v2")};
+                                                   Synonym(DesignEntityType::VARIABLE, "v2")};
     SynonymStore synonymStore = PQLParser::parseQueryEntities(two_variables);
     REQUIRE(synonymStore.containsSynonym(expected_two_variables[0]));
     REQUIRE(synonymStore.containsSynonym(expected_two_variables[1]));
@@ -23,8 +24,8 @@ TEST_CASE("two_variables") {
 TEST_CASE("one_call_assign_stmt") {
     std::vector<std::string> one_call_assign_stmt = {"call c1;", "assign a1;", "stmt s1;"};
     std::vector<Synonym> expected_one_call_assign_stmt = {Synonym(DesignEntityType::CALL, "c1"),
-                                                            Synonym(DesignEntityType::ASSIGN, "a1"),
-                                                            Synonym(DesignEntityType::STMT, "s1")};
+                                                          Synonym(DesignEntityType::ASSIGN, "a1"),
+                                                          Synonym(DesignEntityType::STMT, "s1")};
 
     SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
 
@@ -57,9 +58,9 @@ TEST_CASE("PQLParser: Select (1)") {
     std::string select_2 = "Select a1";
     std::string select_3 = "Select s1";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
-    std::vector<Synonym> result_3 = PQLParser::findSelectClauses(select_3);
+    std::vector<Synonym> result_1 = PQLParser::parseSelectClause(select_1);
+    std::vector<Synonym> result_2 = PQLParser::parseSelectClause(select_2);
+    std::vector<Synonym> result_3 = PQLParser::parseSelectClause(select_3);
     std::vector<SuchThatClause> suchThatClauses = {};
     std::vector<PatternClause> patternClauses = {};
     Validator::validateClauses(&entities, result_1, suchThatClauses, patternClauses);
@@ -78,8 +79,8 @@ TEST_CASE("PQLParser: Select (2))") {
     std::string select_1 = "Select <v1,v2>";
     std::string select_2 = "  Select    <v1,    v2>  ";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
+    std::vector<Synonym> result_1 = PQLParser::parseSelectClause(select_1);
+    std::vector<Synonym> result_2 = PQLParser::parseSelectClause(select_2);
     std::vector<SuchThatClause> suchThatClauses = {};
     std::vector<PatternClause> patternClauses = {};
     Validator::validateClauses(&entities, result_1, suchThatClauses, patternClauses);
@@ -97,8 +98,8 @@ TEST_CASE("PQLParser: Select (3))") {
     std::string select_1 = "Select BOOLEAN";
     std::string select_2 = "  Select    BOOLEAN  ";
 
-    std::vector<Synonym> result_1 = PQLParser::findSelectClauses(select_1);
-    std::vector<Synonym> result_2 = PQLParser::findSelectClauses(select_2);
+    std::vector<Synonym> result_1 = PQLParser::parseSelectClause(select_1);
+    std::vector<Synonym> result_2 = PQLParser::parseSelectClause(select_2);
     std::vector<SuchThatClause> suchThatClauses = {};
     std::vector<PatternClause> patternClauses = {};
     Validator::validateClauses(&entities, result_1, suchThatClauses, patternClauses);
@@ -120,9 +121,9 @@ TEST_CASE("PQLParser: Parent (1)") {
     std::vector<std::string> clauseList_2 = getAllClauses(select_st_2);
     std::vector<std::string> clauseList_3 = getAllClauses(select_st_3);
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(select_st_1);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(select_st_2);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(select_st_3);
+    std::vector<Synonym> result_01 = PQLParser::parseSelectClause(select_st_1);
+    std::vector<Synonym> result_02 = PQLParser::parseSelectClause(select_st_2);
+    std::vector<Synonym> result_03 = PQLParser::parseSelectClause(select_st_3);
 
     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_1);
     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_2);
@@ -176,9 +177,9 @@ TEST_CASE("PQLParser: Parent (2)") {
     std::vector<std::string> clauseList_5 = getAllClauses(select_st_5);
     std::vector<std::string> clauseList_6 = getAllClauses(select_st_6);
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(select_st_4);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(select_st_5);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(select_st_6);
+    std::vector<Synonym> result_01 = PQLParser::parseSelectClause(select_st_4);
+    std::vector<Synonym> result_02 = PQLParser::parseSelectClause(select_st_5);
+    std::vector<Synonym> result_03 = PQLParser::parseSelectClause(select_st_6);
 
     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_4);
     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_5);
@@ -234,10 +235,10 @@ TEST_CASE("PQLParser: Parent (3)") {
     std::vector<std::string> clauseList_9 = getAllClauses(select_st_9);
     std::vector<std::string> clauseList_10 = getAllClauses(select_st_10);
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(select_st_7);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(select_st_8);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(select_st_9);
-    std::vector<Synonym> result_04 = PQLParser::findSelectClauses(select_st_10);
+    std::vector<Synonym> result_01 = PQLParser::parseSelectClause(select_st_7);
+    std::vector<Synonym> result_02 = PQLParser::parseSelectClause(select_st_8);
+    std::vector<Synonym> result_03 = PQLParser::parseSelectClause(select_st_9);
+    std::vector<Synonym> result_04 = PQLParser::parseSelectClause(select_st_10);
 
     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_7);
     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_8);
@@ -304,10 +305,10 @@ TEST_CASE("PQLParser: Parent (4)") {
     std::vector<std::string> clauseList_13 = getAllClauses(select_st_13);
     std::vector<std::string> clauseList_14 = getAllClauses(select_st_14);
 
-    std::vector<Synonym> result_01 = PQLParser::findSelectClauses(select_st_11);
-    std::vector<Synonym> result_02 = PQLParser::findSelectClauses(select_st_12);
-    std::vector<Synonym> result_03 = PQLParser::findSelectClauses(select_st_13);
-    std::vector<Synonym> result_04 = PQLParser::findSelectClauses(select_st_14);
+    std::vector<Synonym> result_01 = PQLParser::parseSelectClause(select_st_11);
+    std::vector<Synonym> result_02 = PQLParser::parseSelectClause(select_st_12);
+    std::vector<Synonym> result_03 = PQLParser::parseSelectClause(select_st_13);
+    std::vector<Synonym> result_04 = PQLParser::parseSelectClause(select_st_14);
 
     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_11);
     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_12);
@@ -468,10 +469,10 @@ TEST_CASE("PQLParser: Select ... pattern (4)") {
 
     ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
 
-    SuchThatClause s = SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1),
-                                    static_cast<ClauseArgument*>(&v));
+    SuchThatClause s =
+        SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
     PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
-                                       static_cast<ClauseArgument*>(&temp));
+                                    static_cast<ClauseArgument*>(&temp));
     REQUIRE(suchThatClauses.size() == 1);
     REQUIRE(patternClauses.size() == 1);
     REQUIRE(s.equals(suchThatClauses[0]));
@@ -495,7 +496,7 @@ TEST_CASE("And (2)") {
 
 TEST_CASE("And (3)") {
     std::string inputString_And =
-    "Select <and, s1> such that Follows( and , 2) and Parent(s1, s2) pattern a(a, \"expr+x)\") and Modifies(v, )";
+        "Select <and, s1> such that Follows( and , 2) and Parent(s1, s2) pattern a(a, \"expr+x)\") and Modifies(v, )";
     std::vector<std::string> result = getAllClauses(inputString_And);
     std::vector<std::string> result_2 = getAllClauses(inputString_And);
 }

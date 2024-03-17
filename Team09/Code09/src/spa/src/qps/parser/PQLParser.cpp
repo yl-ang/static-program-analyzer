@@ -1,4 +1,5 @@
 #include "PQLParser.h"
+
 #include <iostream>
 // Checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
@@ -32,7 +33,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     modifyClauseList(clauseList);
 
     // Select entities in select clause (without checking declaration)
-    std::vector<Synonym> selectEntities = PQLParser::findSelectClauses(unparsedClauses);
+    std::vector<Synonym> selectEntities = PQLParser::parseSelectClause(unparsedClauses);
     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
 
@@ -108,12 +109,10 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
     return synonymStore;
 }
 
-std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
+std::vector<Synonym> PQLParser::parseSelectClause(std::string unparsedClauses) {
     std::smatch match;
-    std::string selectEntity;
-    std::vector<Synonym> result = {};  // if there is none
     if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
-        selectEntity = match[1];
+        std::string selectEntity = match[1];
 
         // if BOOLEAN, since we have no idea if it is a variable or not now, will
         // not perform any case on it. This will be done in semantic checking.
@@ -122,25 +121,20 @@ std::vector<Synonym> PQLParser::findSelectClauses(std::string unparsedClauses) {
         // if single return, will return a vector with a single ClauseArgument.
         if (isElem(selectEntity)) {
             return {Synonym(DesignEntityType::UNKNOWN, selectEntity)};
-
+        }
         // if multiple return, will return a vector with multiple ClauseArgument.
-        } else if (isTuple(selectEntity)) {
-            std::smatch matches;
-            if (std::regex_match(selectEntity, matches, QPSRegexes::TUPLE)) {
-                std::string elems = matches[1];
-                std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
-                // Push back the split results into a vector
-                for (const auto& str : splitResult) {
-                    result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
-                }
-            } else {
-                throw QPSSyntaxError();
+        if (isTuple(selectEntity)) {
+            std::vector<Synonym> result = {};  // if there is none
+            std::string elems = selectEntity.substr(1, selectEntity.size() - 2);
+            std::vector<std::string> splitResult = splitByDelimiter(elems, ",");
+            // Push back the split results into a vector
+            for (const auto& str : splitResult) {
+                result.push_back(Synonym(DesignEntityType::UNKNOWN, str));
             }
-        } else {
-            throw QPSSyntaxError();
+            return result;
         }
     }
-    return result;
+    throw QPSSyntaxError();
 }
 
 std::vector<SuchThatClause> PQLParser::parseSuchThatClauses(std::vector<std::string> clauseList) {
