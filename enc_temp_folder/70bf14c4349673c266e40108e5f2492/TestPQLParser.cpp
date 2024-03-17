@@ -494,8 +494,7 @@ TEST_CASE("And (2)") {
 }
 
 TEST_CASE("And (3)") {
-    std::string inputString_And =
-    "Select <and, s1> such that Follows( and , 2) and Parent(s1, s2) pattern a(a, \"expr+x)\") and Modifies(v, )";
+    std::string inputString_And = "Select <and, s1> such that Follows( and , 2) and Parent(s1, s2) pattern a(a, \"expr+x)\") and Modifies(v, )";
     std::vector<std::string> result = getAllClauses(inputString_And);
     std::vector<std::string> result_2 = getAllClauses(inputString_And);
 }
