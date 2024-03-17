@@ -139,14 +139,14 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     std::string clause;
     for (int i = 1; i < allClausesIndices.size(); i++) {
         clause = str.substr(allClausesIndices.at(i - 1), allClausesIndices.at(i) - allClausesIndices.at(i - 1));
-        addClause(clauses, clause);
+        addClause(&clauses, clause);
     }
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
-    addClause(clauses, clause);
+    addClause(&clauses, clause);
     return clauses;
 }
 
-void addClause(std::vector<std::string>& clauses, const std::string& clause) {
+void addClause(std::vector<std::string>* clauses, const std::string& clause) {
     std::smatch match;
     if (removeAllWhitespaces(clause) != "") {
         if (!std::regex_match(clause, match, QPSRegexes::SELECT_CLAUSE) &&
@@ -155,7 +155,7 @@ void addClause(std::vector<std::string>& clauses, const std::string& clause) {
             !std::regex_match(clause, match, QPSRegexes::AND_CLAUSE) && removeAllWhitespaces(clause) != "") {
             throw QPSSyntaxError();
         } else {
-            clauses.push_back(trim(clause));
+            clauses->push_back(trim(clause));
         }
     }
 }
