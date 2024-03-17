@@ -500,3 +500,111 @@ TEST_CASE("And (3)") {
     std::vector<std::string> result = getAllClauses(inputString_And);
     std::vector<std::string> result_2 = getAllClauses(inputString_And);
 }
+
+#define REQUIRE_THROW_SYNTAX_ERROR(expr) REQUIRE_THROWS_AS(expr, QPSSyntaxError)
+#define REQUIRE_THROW_SEMANTIC_ERROR(expr) REQUIRE_THROWS_AS(expr, QPSSemanticError)
+using vectorString = std::vector<std::string>;
+
+TEST_CASE("SyntaxError") {
+    SECTION("No Select") {
+        vectorString input = {"stmt s;", "variable v;", ""};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Missing synonym name") {
+        vectorString input = {"stmt ;", "variable v;", "Select s"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Declaration not synonym") {
+        vectorString input = {"stmt 1s;", "variable v;", "Select s such that Follows* (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Two Selects, one with semi-colon") {
+        vectorString input = {"stmt s;", "Select s;", "Select s such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Two Selects, combine in one statement") {
+        vectorString input = {"stmt s;", "Select s Select s such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Tuple return, missing open angular bracket") {
+        vectorString input = {"stmt s;", "Select s> such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Tuple return, missing close angular bracket") {
+        vectorString input = {"stmt s;", "Select <s such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Tuple return, extra comma") {
+        vectorString input = {"stmt s;", "Select <,s> such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("RelRef<space>*") {
+        vectorString input = {"stmt s;", "variable v;", "Select s such that Follows * (1, 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Next, with ident") {
+        vectorString input = {"stmt s;", "variable v;", "Select s such that Next(\"x\", 2)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Modifies, with two wildcards") {
+        vectorString input = {"stmt s;", "variable v;", "Select s such that Modifies(__, _)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Uses, missing value") {
+        vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s,)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Uses, one synonym") {
+        vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Pattern, Messy and wrong expression") {
+        vectorString input = {"assign a;", "Select a such that pattern a (_, \"(x + 1))/ 2)\")"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Pattern, Missing value") {
+        vectorString input = {"assign a;", "Select a such that pattern a (_,)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Pattern, Missing front underscore") {
+        vectorString input = {"assign a;", "Select a such that pattern a (_, _\"x\")"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Pattern, Missing back underscore") {
+        vectorString input = {"assign a;", "Select a such that pattern a (_, \"x\"_)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Pattern, Missing synonym") {
+        vectorString input = {"assign a;", "Select a such that pattern (_, \"x\"_)"};
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+    }
+}
+
+TEST_CASE("SemanticError") {
+    SECTION("No declarations") {
+        vectorString input = {"Select s such that Parent(1,2)"};
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+    }
+
+    SECTION("Missing declaration") {
+        vectorString input = {"stmt s1;", "Select s such that Parent(1,2)"};
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+    }
+}
