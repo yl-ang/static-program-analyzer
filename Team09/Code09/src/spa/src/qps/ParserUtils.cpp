@@ -139,32 +139,25 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     std::string clause;
     for (int i = 1; i < allClausesIndices.size(); i++) {
         clause = str.substr(allClausesIndices.at(i - 1), allClausesIndices.at(i) - allClausesIndices.at(i - 1));
-        std::smatch match;
-        if (removeAllWhitespaces(clause) != "") {
-            if (!std::regex_match(clause, match, QPSRegexes::SELECT_CLAUSE) &&
-                !std::regex_match(clause, match, QPSRegexes::SUCHTHAT_CLAUSE) &&
-                !std::regex_match(clause, match, QPSRegexes::PATTERN_CLAUSE) &&
-                !std::regex_match(clause, match, QPSRegexes::AND_CLAUSE) && removeAllWhitespaces(clause) != "") {
-                throw QPSSyntaxError();
-            } else {
-                clauses.push_back(trim(clause));
-            }
-        }
+        addClause(clauses, clause);
     }
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1), std::string::npos);
-    std::smatch match2;
+    addClause(clauses, clause);
+    return clauses;
+}
+
+void addClause(std::vector<std::string>& clauses, const std::string& clause) {
+    std::smatch match;
     if (removeAllWhitespaces(clause) != "") {
-        if ((!std::regex_match(clause, match2, QPSRegexes::SELECT_CLAUSE) &&
-             !std::regex_match(clause, match2, QPSRegexes::SUCHTHAT_CLAUSE) &&
-             !std::regex_match(clause, match2, QPSRegexes::PATTERN_CLAUSE) &&
-             !std::regex_match(clause, match2, QPSRegexes::AND_CLAUSE)) &&
-            removeAllWhitespaces(clause) != "") {
+        if (!std::regex_match(clause, match, QPSRegexes::SELECT_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::SUCHTHAT_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::PATTERN_CLAUSE) &&
+            !std::regex_match(clause, match, QPSRegexes::AND_CLAUSE) && removeAllWhitespaces(clause) != "") {
             throw QPSSyntaxError();
         } else {
             clauses.push_back(trim(clause));
         }
     }
-    return clauses;
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
