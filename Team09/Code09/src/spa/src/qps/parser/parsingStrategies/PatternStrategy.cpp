@@ -3,6 +3,9 @@
 std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, QPSRegexes::PATTERN_ARGS)) {
+        if (argMatch.suffix().matched) {
+            throw QPSSyntaxError();
+        }
         std::string assignSynonym = argMatch[1];
         std::string parameters = argMatch[2];
 
