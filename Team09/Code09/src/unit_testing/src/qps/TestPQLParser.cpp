@@ -477,3 +477,17 @@ TEST_CASE("PQLParser: Select ... pattern (4)") {
     REQUIRE(p.equals(patternClauses[0]));
 }
 
+TEST_CASE("And (1)") {
+    std::vector<std::string> clauseList_1 = {"Select v1", "such that Modifies(s1, s2)", "and Modifies(s2, s1)"};
+    PQLParser::modifyClauseList(clauseList_1);
+    REQUIRE(clauseList_1[0] == "Select v1");
+    REQUIRE(clauseList_1[1] == "such that Modifies(s1, s2)");
+    REQUIRE(clauseList_1[2] == "such that Modifies(s2, s1)");
+}
+
+TEST_CASE("And (2)") {
+    std::vector<std::string> clauseList_1 = {"such that Modifies( and , _)", "and Parent(s, s1)"};
+    PQLParser::modifyClauseList(clauseList_1);
+    REQUIRE(clauseList_1[0] == "such that Modifies( and , _)");
+    REQUIRE(clauseList_1[1] == "such that Parent(s, s1)");
+}
