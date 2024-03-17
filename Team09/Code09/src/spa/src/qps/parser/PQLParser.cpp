@@ -44,9 +44,10 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
     std::string currClauseType;
+    int selectCounter = 0;
     for (size_t i = 0; i < clauseList.size(); i++) {
         if (std::regex_match(clauseList[i], QPSRegexes::SELECT_CLAUSE)) {
-            // Do nothing
+            selectCounter++;
         } else if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
             currClauseType = QPSConstants::SUCH_THAT;
         } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
@@ -56,6 +57,9 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
         } else {
             throw QPSSyntaxError();
         }
+    }
+    if (selectCounter > 1) {
+        throw QPSSyntaxError();
     }
 }
 
