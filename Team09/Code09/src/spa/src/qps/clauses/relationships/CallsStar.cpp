@@ -1,6 +1,22 @@
 #include "CallsStar.h"
 
-CallsStar::CallsStar(ClauseArgument& caller, ClauseArgument& callee) : callee(caller), caller(callee) {}
+CallsStar::CallsStar(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
+
+bool CallsStar::validateArguments() {
+    if (caller.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(caller);
+        if (first.getType() != DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    if (callee.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(callee);
+        if (second.getType() != DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    return true;
+}
 
 ClauseResult CallsStar::evaluate(PKBFacadeReader& reader) {
     if (callee.isSynonym() && caller.isSynonym()) {
@@ -15,7 +31,7 @@ ClauseResult CallsStar::evaluate(PKBFacadeReader& reader) {
         return evaluateCallerSynonym(reader);
     }
 
-    return {reader.hasCallRelationship(callee, caller)};
+    return {reader.hasCallStarRelationship(caller, callee)};
 }
 
 ClauseResult CallsStar::evaluateCalleeSynonym(PKBFacadeReader& reader) {
