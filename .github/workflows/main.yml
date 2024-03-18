@@ -97,12 +97,10 @@ jobs:
         run: ./src/integration_testing/integration_testing
         
       - name: Autotester System Testing
-        shell: bash
-        run: |
-          cd Team09/Code09/build/src/autotester/Release
-          ./autotester.exe "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
-            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
-            "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+        working-directory: ${{runner.workspace}}/build
+        run: ./src/autotester/autotester "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
+                "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
+                "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
       
       - name: Output Autotester out.xml
         shell: bash
