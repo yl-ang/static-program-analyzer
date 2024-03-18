@@ -33,26 +33,16 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
     }
 }
 
-void Validator::validateClauses(SynonymStore* store, std::vector<Synonym>& selectEntities,
+void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
                                 std::vector<SuchThatClause>& suchThatClauses,
                                 std::vector<PatternClause>& patternClauses) {
     bool hasSemanticError = false;
     if (!store->isValidStore()) {
         hasSemanticError = true;
     }
-    if (selectEntities.size() == 1 && isBoolean(selectEntities[0].getValue())) {
-        if (!selectEntities[0].updateType(store)) {
-            selectEntities.erase(selectEntities.begin());
-        }
-        // Update 'BOOLEAN' if it is Synonym, remove if cannot be found
-        // Evaluator will know if BOOLEAN if vector is empty
-        // Do not trigger a warning should it not be a Synonym type
-    } else {
-        for (Synonym& syn : selectEntities) {
-            if (!syn.updateType(store)) {
-                hasSemanticError = true;
-            }
-        }
+
+    if (!selectEntities->updateSynonyms(store)) {
+        hasSemanticError = true;
     }
 
     for (SuchThatClause& clause : suchThatClauses) {

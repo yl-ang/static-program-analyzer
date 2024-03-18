@@ -3,11 +3,14 @@
 std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, QPSRegexes::SUCHTHAT_ARGS)) {
+        if (argMatch.suffix().matched) {
+            throw QPSSyntaxError();
+        }
         std::string type = argMatch[1];
         std::string parameters = argMatch[2];
 
         Validator::validateSuchThatSyntax(type, parameters);
-        std::vector<std::string> parameterStringsToParse{cleanParameters(parameters)};
+        std::vector<std::string> parameterStringsToParse = splitByDelimiter(parameters, ",");
         std::vector<ClauseArgument*> entityVector{buildSTParameters(parameterStringsToParse)};
         std::unique_ptr<SuchThatClause> suchThatClause{std::make_unique<SuchThatClause>(
             RelationshipBuilder::determineRelationshipType(type), entityVector[0], entityVector[1])};
