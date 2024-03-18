@@ -29,9 +29,9 @@ std::unique_ptr<Relationship> RelationshipBuilder::createRelationship(Relationsh
         return std::make_unique<NextStar>(firstArg, secondArg);
 
     case (RelationshipType::CALLS):
-        return std::make_unique<Next>(firstArg, secondArg);
+        return std::make_unique<Calls>(firstArg, secondArg);
     case (RelationshipType::CALLS_STAR):
-        return std::make_unique<NextStar>(firstArg, secondArg);
+        return std::make_unique<CallsStar>(firstArg, secondArg);
     case (RelationshipType::AFFECTS):
         return std::make_unique<Next>(firstArg, secondArg);
     }

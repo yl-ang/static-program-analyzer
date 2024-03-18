@@ -2,6 +2,22 @@
 
 Calls::Calls(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
 
+bool Calls::validateArguments() {
+    if (caller.isSynonym()) {
+        Synonym first = dynamic_cast<Synonym&>(caller);
+        if (first.getType() != DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    if (callee.isSynonym()) {
+        Synonym second = dynamic_cast<Synonym&>(callee);
+        if (second.getType() != DesignEntityType::PROCEDURE) {
+            return false;
+        }
+    }
+    return true;
+}
+
 ClauseResult Calls::evaluate(PKBFacadeReader& reader) {
     if (callee.isSynonym() && caller.isSynonym()) {
         return evaluateBothSynonyms(reader);

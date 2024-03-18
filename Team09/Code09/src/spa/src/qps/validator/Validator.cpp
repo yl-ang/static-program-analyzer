@@ -26,7 +26,7 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
         validateStmtStmt(argVector);
     } else if (relType == QPSConstants::MODIFIES || relType == QPSConstants::USES) {
         validateStmtOREntEnt(argVector);
-    } else if (relType == QPSConstants::CALL || relType == QPSConstants::CALLS_STAR) {
+    } else if (relType == QPSConstants::CALLS || relType == QPSConstants::CALLS_STAR) {
         validateEntEnt(argVector);
     } else {
         throw QPSSyntaxError();
