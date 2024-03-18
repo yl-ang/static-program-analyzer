@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "PKB/Stores/AssignPatternStore.h"
 #include "catch.hpp"
 #include "qps/clauseArguments/Synonym.h"

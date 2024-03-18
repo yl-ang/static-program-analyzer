@@ -1,5 +1,7 @@
 #include "AssignPatternStore.h"
 
+#include <functional>
+
 void AssignPatternStore::initialiseStore(
     std::function<bool(std::string, std::string)> fp,
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patterns) {
