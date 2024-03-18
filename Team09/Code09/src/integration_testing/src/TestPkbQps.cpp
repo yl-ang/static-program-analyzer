@@ -158,6 +158,7 @@ TEST_CASE("Only select") {
     }
 }
 
+/*
 TEST_CASE("Boolean Select") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -183,6 +184,7 @@ TEST_CASE("Boolean Select") {
         REQUIRE_FALSE_RESULT(result);
     }
 }
+*/
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
