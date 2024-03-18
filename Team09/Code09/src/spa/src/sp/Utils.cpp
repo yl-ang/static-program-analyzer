@@ -85,6 +85,8 @@ This function checks whether s1 ==s2 by first creating a PatternTreeNode for s2.
 Then, it deserialises s1 to get a PatternTreeNode for s2.
 Finally, it performs comparison and returns the result
 */
-bool isExactMatch(std::string s1, std::string s2) {
-    return PatternTreeNode::deserializeToNode(s1) == PatternTreeNode::buildTreeFromString(s2);
+bool isExactMatch(std::string spInput, std::string qpsInput) {
+    std::shared_ptr<PatternTreeNode> spTree = PatternTreeNode::deserializeToNode(spInput);
+    std::shared_ptr<PatternTreeNode> qpsTree = PatternTreeNode::buildTreeFromString(qpsInput);
+    return PatternTreeNode::isEqual(spTree, qpsTree);
 }

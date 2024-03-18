@@ -46,11 +46,11 @@ std::string PatternTreeNode::serialiseToString(std::shared_ptr<PatternTreeNode> 
 }
 void PatternTreeNode::serializeHelper(std::shared_ptr<PatternTreeNode> node, std::ostringstream& out) {
     if (node != nullptr) {
-        out << node->value;
+        out << node->value << " ";
         serializeHelper(node->left, out);
         serializeHelper(node->right, out);
     } else {
-        out << SERIALISING_DELIMITER;
+        out << SERIALISING_DELIMITER << " ";
     }
 }
 

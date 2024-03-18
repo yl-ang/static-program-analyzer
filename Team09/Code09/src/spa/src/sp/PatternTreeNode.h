@@ -36,7 +36,6 @@ public:
         return os;
     }
 
-    // adapte
     static bool isEqual(const std::shared_ptr<PatternTreeNode>& lhs, const std::shared_ptr<PatternTreeNode>& rhs) {
         if (lhs == nullptr && rhs == nullptr)
             return true;
