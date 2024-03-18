@@ -154,6 +154,32 @@ TEST_CASE("Only select") {
     }
 }
 
+TEST_CASE("Boolean Select") {
+    PKB pkb{};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
+
+    SECTION("BOOLEAN, Return TRUE, such that") {
+        QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
+        REQUIRE_TRUE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return FALSE, such that") {
+        QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
+        REQUIRE_FALSE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return TRUE, pattern") {
+        QPSResult result = qps.processQueries("assign a; Select BOOLEAN pattern a(_,_\"1\"_)");
+        REQUIRE_TRUE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return FALSE, pattern") {
+        QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
+        REQUIRE_FALSE_RESULT(result);
+    }
+}
+
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -508,9 +534,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
 
             SECTION("ParentStar(Integer, Synonym: other types)") {
-                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, s)");
-                QPSResult expected = {"4", "5"};
-                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+                QPSResult result = qps.processQueries("if ifs; Select ifs such that Parent*(3, ifs)");
+                REQUIRE_EMPTY(result);
             }
 
             SECTION("ParentStar(Synonym, Integer)") {
@@ -618,13 +643,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Modifies(Procedure, synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Modifies(Procedure, Variable)") {
                 QPSResult result = qps.processQueries("procedure p; Select p such that Modifies(p, \"num2\")");
@@ -673,7 +696,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Uses(_, \"num2\")"));
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
+            /* TODO(Ezekiel): Enable after fixing stoi error
             SECTION("Uses(Literal: [procedure name], VariableName)") {
                 QPSResult result = qps.processQueries("procedure p; Select p such that Uses(\"main\", \"num1\")");
                 QPSResult expected = {"main", "next"};
@@ -687,7 +710,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
+            /* TODO(Ezekiel): Enable after fixing stoi error
             SECTION("Uses(Literal: [procedure name], Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(\"main\", _)");
                 QPSResult expected = {allStmts};
@@ -710,13 +733,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Uses(ProcedureName, Synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Uses(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Uses(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Uses(3, v)");
@@ -1020,30 +1041,7 @@ TEST_CASE("Multi") {
     PKBFacadeReader pfr{buildPKBNew(pkb)};
     QPS qps{pfr};
 
-    const std::string FALSE_VALUE = "FALSE";
-    const std::string TRUE_VALUE = "TRUE";
-
     SECTION("Tuple Return Values") {
-        SECTION("BOOLEAN, Return TRUE, such that") {
-            QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
-            REQUIRE_TRUE_RESULT(result);
-        }
-
-        SECTION("BOOLEAN, Return FALSE, such that") {
-            QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
-            REQUIRE_FALSE_RESULT(result);
-        }
-
-        SECTION("BOOLEAN, Return TRUE, pattern") {
-            QPSResult result = qps.processQueries("assign a; Select BOOLEAN pattern a(_,_\"1\"_)");
-            REQUIRE_TRUE_RESULT(result);
-        }
-
-        SECTION("BOOLEAN, Return FALSE, pattern") {
-            QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
-            REQUIRE_FALSE_RESULT(result);
-        }
-
         SECTION("Tuple, Return two values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
@@ -1103,7 +1101,49 @@ TEST_CASE("Multi") {
         }
     }
 
-    SECTION("Multiple Clauses") {}
+    SECTION("Multiple Clauses") {
+        SECTION("Chained such that") {
+            QPSResult result = qps.processQueries(
+                "stmt s1, s2; Select s1 such that Follows(s1, s2) such that Parent(s1, _) such that Parent(_, s2)");
+            QPSResult expected = {"7"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-    SECTION("Clauses with 'and'") {}
+        SECTION("Chained pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern and such that") {
+            QPSResult result = qps.processQueries(
+                "assign a; variable v; stmt s; Select s such that Parent*(3, s) pattern a(_,_) such that Modifies(s, "
+                "\"num2\") pattern a(v,_\"1\"_)");
+            QPSResult expected = {"5"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
+
+    SECTION("Clauses with 'and'") {
+        SECTION("Chained such that") {
+            QPSResult result = qps.processQueries(
+                "stmt s1, s2; Select s1 such that Follows(s1, s2) and Parent(s1, _) and Parent(_, s2)");
+            QPSResult expected = {"7"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) and a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern and such that") {
+            QPSResult result = qps.processQueries(
+                "assign a; variable v; stmt s; Select s such that Parent*(3, s) and Modifies(s, \"num2\") pattern "
+                "a(_,_) and a(v,_\"1\"_)");
+            QPSResult expected = {"5"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
 }
