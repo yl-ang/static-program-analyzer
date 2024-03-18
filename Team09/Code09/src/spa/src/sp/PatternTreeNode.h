@@ -12,16 +12,16 @@ public:
     PatternTreeNode(std::string value) : value(value), left(NULL), right(NULL) {}
     PatternTreeNode();
     static PatternTreeNode buildTreeFromString(std::string value);
-    std::string serialiseToString(std::shared_ptr<PatternTreeNode> node);
+    static std::string serialiseToString(std::shared_ptr<PatternTreeNode> node);
     static std::shared_ptr<PatternTreeNode> deserializeToNode(std::string);
 
     friend bool operator==(const PatternTreeNode& lhs, const PatternTreeNode& rhs) {
         // TODO(ben): verify this equality works
         return lhs.value == rhs.value && lhs.left == rhs.left && lhs.left == rhs.left;
     }
+    static PatternTreeNode buildTreeFromAST(std::shared_ptr<ExpressionNode> expressoinNode);
 
 private:
-    static PatternTreeNode buildTreeFromAST(std::shared_ptr<ExpressionNode> expressoinNode);
-    void serializeHelper(std::shared_ptr<PatternTreeNode> node, std::ostringstream& out);
+    static void serializeHelper(std::shared_ptr<PatternTreeNode> node, std::ostringstream& out);
     static std::shared_ptr<PatternTreeNode> deserializeHelper(std::istringstream& in);
 };
