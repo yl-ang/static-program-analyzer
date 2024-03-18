@@ -86,6 +86,5 @@ Then, it deserialises s1 to get a PatternTreeNode for s2.
 Finally, it performs comparison and returns the result
 */
 bool isExactMatch(std::string s1, std::string s2) {
-    return PatternTreeNode::deserializeToNode(s1) ==
-           std::make_shared<PatternTreeNode>(PatternTreeNode::buildTreeFromString(s2));
+    return PatternTreeNode::deserializeToNode(s1) == PatternTreeNode::buildTreeFromString(s2);
 }

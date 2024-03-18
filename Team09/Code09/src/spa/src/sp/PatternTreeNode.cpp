@@ -11,7 +11,7 @@
 
 const char SERIALISING_DELIMITER[] = "#";
 
-PatternTreeNode PatternTreeNode::buildTreeFromString(std::string value) {
+std::shared_ptr<PatternTreeNode> PatternTreeNode::buildTreeFromString(std::string value) {
     SourceLoader sourceLoader;
     std::stringstream ss{value};
     std::vector<std::string> inputStrings = sourceLoader.loadSimple(ss);
@@ -27,14 +27,14 @@ PatternTreeNode PatternTreeNode::buildTreeFromString(std::string value) {
     return buildTreeFromAST(expressionNodeAST);
 }
 
-PatternTreeNode PatternTreeNode::buildTreeFromAST(std::shared_ptr<ExpressionNode> node) {
-    PatternTreeNode root = PatternTreeNode(node->value);
+std::shared_ptr<PatternTreeNode> PatternTreeNode::buildTreeFromAST(std::shared_ptr<ExpressionNode> node) {
+    auto root = std::make_shared<PatternTreeNode>(node->value);
     if (node->left != nullptr) {
-        root.left = std::make_shared<PatternTreeNode>(buildTreeFromAST(node->left));
+        root->left = buildTreeFromAST(node->left);
     }
 
     if (node->right != nullptr) {
-        root.right = std::make_shared<PatternTreeNode>(buildTreeFromAST(node->right));
+        root->right = buildTreeFromAST(node->right);
     }
     return root;
 }

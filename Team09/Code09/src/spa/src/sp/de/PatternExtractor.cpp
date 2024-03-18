@@ -37,10 +37,8 @@ void PatternExtractor::visitAssign(AssignmentNode* node) {
 
     // add to assignment traversal set
     // <LHS, RHS>, StmtNumber>
-    std::string treeLHS = PatternTreeNode::serialiseToString(
-        std::make_shared<PatternTreeNode>(PatternTreeNode::buildTreeFromString(lhs)));
-    std::string treeRHS =
-        PatternTreeNode::serialiseToString(std::make_shared<PatternTreeNode>(PatternTreeNode::buildTreeFromAST(expr)));
+    std::string treeLHS = PatternTreeNode::serialiseToString(PatternTreeNode::buildTreeFromString(lhs));
+    std::string treeRHS = PatternTreeNode::serialiseToString(PatternTreeNode::buildTreeFromAST(expr));
     this->assignmentTraversals.insert({stmtNum, {treeLHS, treeRHS}});
 }
 
