@@ -1132,23 +1132,21 @@ TEST_CASE("Multi") {
     SECTION("Clauses with 'and'") {
         SECTION("Chained such that") {
             QPSResult result = qps.processQueries(
-                "stmt s1, s2; Select s1 such that Follows(s1, s2) and such that Parent(s1, _) and such that Parent(_, "
-                "s2)");
+                "stmt s1, s2; Select s1 such that Follows(s1, s2) and Parent(s1, _) and Parent(_, s2)");
             QPSResult expected = {"7"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
 
         SECTION("Chained pattern") {
-            QPSResult result =
-                qps.processQueries("assign a; variable v; Select a pattern a(_,_) and pattern a(v,_\"1\"_)");
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) and a(v,_\"1\"_)");
             QPSResult expected = {"1", "8"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
 
         SECTION("Chained pattern and such that") {
             QPSResult result = qps.processQueries(
-                "assign a; variable v; stmt s; Select s such that Parent*(3, s) pattern a(_,_) and such that "
-                "Modifies(s, \"num2\") pattern a(v,_\"1\"_)");
+                "assign a; variable v; stmt s; Select s such that Parent*(3, s) and Modifies(s, \"num2\") pattern "
+                "a(_,_) and a(v,_\"1\"_)");
             QPSResult expected = {"5"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
