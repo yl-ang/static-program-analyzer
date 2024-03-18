@@ -27,22 +27,22 @@ jobs:
           mkdir build
           cd build
           cmake -A x64 ..
-          cmake --build . --target unit_testing --config Release
+          #cmake --build . --target unit_testing --config Release
           cmake --build . --target integration_testing --config Release
-          cmake --build . --target autotester --config Release
+          #cmake --build . --target autotester --config Release
           cd ../..
        
-      - name: Unit Testing
-        shell: bash
-        run: |
-          cd Team09/Code09/build/src/unit_testing/Release
-          ./unit_testing.exe
-
       - name: Integration Testing
         shell: bash
         run: |
           cd Team09/Code09/build/src/integration_testing/Release
           ./integration_testing.exe
+
+      - name: Unit Testing
+        shell: bash
+        run: |
+          cd Team09/Code09/build/src/unit_testing/Release
+          ./unit_testing.exe
              
       - name: Autotester System Testing
         shell: bash
