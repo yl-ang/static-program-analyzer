@@ -3,444 +3,1371 @@
 #include "catch.hpp"
 #include "sp/de/DesignExtractor.h"
 
-TEST_CASE("Design Extractor Tests") {
+TEST_CASE("Entity Extractor Tests") {
     /*
-    01  x = y;
-    02  read a;
-    03  print z;
-    04  while ((c < d) && (e > f)) {
-    05      g = h;
+        procedure proc1 {
+            01 x = y + 2;
+            02 read a;
+            03 while ((c < d) && (e > f)) {
+            04     g = h;
+            }
         }
-    06  if (( i < j ) && ( k > l )) then {
-    07      i = j;
-        } else {
-    08      a = b;
+        procedure proc2 {
+            05 print z;
+            06 if (!(i < j)) then {
+            07     i = j;
+            08     x = y + 2;
+            } else {
+            09     a = b;
+            10     call proc1;
+            }
         }
-    09 a = 1;
+        procedure proc3 {
+            11 call proc2;
+            12 call proc1;
+            13 x = x - 1;
+        }
     */
+    // 01 x = y + 2;
+    std::shared_ptr<VariableNode> ANode_x = std::make_shared<VariableNode>(VariableNode("x", 1));
+    std::shared_ptr<VariableNode> ANode_y = std::make_shared<VariableNode>(VariableNode("y", 1));
+    std::shared_ptr<ConstantNode> ANode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 1));
+    std::shared_ptr<ExpressionNode> ANode_ADD =
+        std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, ANode_y, ANode_2, 1));
+    auto assignNode = std::make_shared<AssignmentNode>(ANode_x, ANode_ADD, 1);
 
-    // x = y;
-    std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>(VariableNode("x", 1));
-    std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>(VariableNode("y", 1));
-    auto equalNode = std::make_shared<AssignmentNode>(xNode, yNode, 1);
+    // 02 read a;
+    std::shared_ptr<VariableNode> RNode_a = std::make_shared<VariableNode>(VariableNode("a", 2));
+    auto readNode = std::make_shared<ReadNode>(RNode_a, 2);
 
-    // read a;
-    std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>(VariableNode("a", 2));
-    auto readNode = std::make_shared<ReadNode>(aNode, 2);
+    // 03 while ((c < d) && (e > f)) {
+    // 04     g = h;
+    //    }
+    std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 3));
+    std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 3));
+    std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 3));
+    std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 3));
+    std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 4));
+    std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 4));
 
-    // print z;
-    std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>(VariableNode("z", 3));
-    auto printNode = std::make_shared<PrintNode>(zNode, 3);
+    std::vector<std::shared_ptr<StatementNode>> WChildren = {};
 
-    // while ((c < d) && (e > f)) {
-    //     g = h;
-    // }
-    std::shared_ptr<VariableNode> cNode = std::make_shared<VariableNode>(VariableNode("c", 4));
-    std::shared_ptr<VariableNode> dNode = std::make_shared<VariableNode>(VariableNode("d", 4));
-    std::shared_ptr<VariableNode> eNode = std::make_shared<VariableNode>(VariableNode("e", 4));
-    std::shared_ptr<VariableNode> fNode = std::make_shared<VariableNode>(VariableNode("f", 4));
-    std::shared_ptr<VariableNode> gNode = std::make_shared<VariableNode>(VariableNode("g", 5));
-    std::shared_ptr<VariableNode> hNode = std::make_shared<VariableNode>(VariableNode("h", 5));
+    auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 3);
+    auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 3);
+    auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 3);
 
-    std::vector<std::shared_ptr<StatementNode>> childrenW6 = {};
+    auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 4);
+    WChildren.push_back(Wassign);
 
-    auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, cNode, dNode, 4);
+    auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+    auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 3);
 
-    auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, eNode, fNode, 4);
+    std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+    childrenProc1.push_back(assignNode);
+    childrenProc1.push_back(readNode);
+    childrenProc1.push_back(whileNode);
 
-    auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 4);
+    auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+    auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
 
-    auto assign = std::make_shared<AssignmentNode>(gNode, hNode, 5);
-    childrenW6.push_back(assign);
-    auto WstmtList = std::make_shared<StatementListNode>(childrenW6);
+    // 05 print z;
+    std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 5));
+    auto printNode = std::make_shared<PrintNode>(PNode_z, 5);
 
-    auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 4);
+    // 06 if (!(i < j)) then {
+    // 07     i = j;
+    // 08     x = y + 2;
+    //    } else {
+    // 09     a = b;
+    // 10     call proc1;
+    //    }
+    std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 6));
+    std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 6));
+    std::shared_ptr<VariableNode> INode_i1 = std::make_shared<VariableNode>(VariableNode("i", 7));
+    std::shared_ptr<VariableNode> INode_j1 = std::make_shared<VariableNode>(VariableNode("j", 7));
+    std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 8));
+    std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 8));
+    std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 8));
+    std::shared_ptr<ExpressionNode> INode_ADD =
+        std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 8));
+    std::shared_ptr<VariableNode> ENode_a = std::make_shared<VariableNode>(VariableNode("a", 9));
+    std::shared_ptr<VariableNode> ENode_b = std::make_shared<VariableNode>(VariableNode("b", 9));
 
-    // if (( i < j ) && ( k > l )) then {
-    //       i = j;
-    // } else {
-    //       a = b;
-    // }
+    auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 6);
+    auto InotNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::NOT, IlessThan, 6);
 
-    std::shared_ptr<VariableNode> iNode = std::make_shared<VariableNode>(VariableNode("i", 6));
-    std::shared_ptr<VariableNode> jNode = std::make_shared<VariableNode>(VariableNode("j", 6));
-    std::shared_ptr<VariableNode> kNode = std::make_shared<VariableNode>(VariableNode("k", 6));
-    std::shared_ptr<VariableNode> lNode = std::make_shared<VariableNode>(VariableNode("l", 6));
-    std::shared_ptr<VariableNode> iNode1 = std::make_shared<VariableNode>(VariableNode("i", 7));
-    std::shared_ptr<VariableNode> jNode1 = std::make_shared<VariableNode>(VariableNode("j", 7));
-    std::shared_ptr<VariableNode> aNode1 = std::make_shared<VariableNode>(VariableNode("a", 8));
-    std::shared_ptr<VariableNode> bNode1 = std::make_shared<VariableNode>(VariableNode("b", 8));
+    std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+    std::vector<std::shared_ptr<StatementNode>> EChildren = {};
 
-    std::vector<std::shared_ptr<StatementNode>> childrenI5 = {};
-    std::vector<std::shared_ptr<StatementNode>> childrenI7 = {};
+    auto Iassign = std::make_shared<AssignmentNode>(INode_i1, INode_j1, 7);
+    auto Iassign2 = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 8);
+    IChildren.push_back(Iassign);
+    IChildren.push_back(Iassign2);
 
-    auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, iNode, jNode, 6);
+    auto Eassign = std::make_shared<AssignmentNode>(ENode_a, ENode_b, 9);
+    auto Ecall = std::make_shared<CallNode>("proc1", 10);
+    EChildren.push_back(Eassign);
+    EChildren.push_back(Ecall);
 
-    auto ImoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, kNode, lNode, 6);
+    auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+    auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+    auto ifNode = std::make_shared<IfNode>(InotNode, IstmtList, EstmtList, 6);
 
-    auto IandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, IlessThan, ImoreThan, 6);
+    std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+    childrenProc2.push_back(printNode);
+    childrenProc2.push_back(ifNode);
 
-    auto Iassign = std::make_shared<AssignmentNode>(iNode1, jNode1, 7);
-    childrenI5.push_back(Iassign);
-    auto IstmtList = std::make_shared<StatementListNode>(childrenI5);
+    auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+    auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
 
-    auto Iassign1 = std::make_shared<AssignmentNode>(aNode1, bNode1, 8);
-    childrenI7.push_back(Iassign1);
-    auto IstmtList2 = std::make_shared<StatementListNode>(childrenI7);
+    // 11 call proc2;
+    auto callNode = std::make_shared<CallNode>("proc2", 11);
 
-    auto ifNode = std::make_shared<IfNode>(IandandNode, IstmtList, IstmtList2, 6);
+    // 12 call proc1;
+    auto callNode1 = std::make_shared<CallNode>("proc1", 12);
 
-    // x = 1;
+    // 13 x = x - 1;
+    std::shared_ptr<VariableNode> A1Node_x = std::make_shared<VariableNode>(VariableNode("x", 13));
+    std::shared_ptr<VariableNode> A1Node_x1 = std::make_shared<VariableNode>(VariableNode("x", 13));
+    std::shared_ptr<ConstantNode> A1Node_1 = std::make_shared<ConstantNode>(ConstantNode("1", 13));
+    std::shared_ptr<ExpressionNode> A1Node_SUB =
+        std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::SUB, A1Node_x1, A1Node_1, 13));
 
-    std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>(VariableNode("x", 9));
-    std::shared_ptr<ConstantNode> constNode = std::make_shared<ConstantNode>(ConstantNode("1", 9));
+    auto assignNode1 = std::make_shared<AssignmentNode>(A1Node_x, A1Node_SUB, 13);
 
-    auto xAssign = std::make_shared<AssignmentNode>(xNode2, constNode, 9);
+    std::vector<std::shared_ptr<StatementNode>> childrenProc3 = {};
+    childrenProc3.push_back(callNode);
+    childrenProc3.push_back(callNode1);
+    childrenProc3.push_back(assignNode1);
 
-    std::vector<std::shared_ptr<StatementNode>> childrenProc = {};
-    childrenProc.push_back(equalNode);
-    childrenProc.push_back(readNode);
-    childrenProc.push_back(printNode);
-    childrenProc.push_back(whileNode);
-    childrenProc.push_back(ifNode);
-    childrenProc.push_back(xAssign);
+    auto stmtListProc3 = std::make_shared<StatementListNode>(childrenProc3);
+    auto Proc3Node = std::make_shared<ProcedureNode>("proc3", stmtListProc3);
 
-    auto stmtListProc = std::make_shared<StatementListNode>(childrenProc);
-    auto ProcNode = std::make_shared<ProcedureNode>("main", stmtListProc);
+    // Create program
     std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
-    childrenProg.push_back(ProcNode);
+    childrenProg.push_back(Proc1Node);
+    childrenProg.push_back(Proc2Node);
+    childrenProg.push_back(Proc3Node);
 
     auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
 
-    /*
-   procedure test {
-   11 read a;
-   }
-    */
-    auto variableA = std::make_shared<VariableNode>("a", 11);
-    auto readA = std::make_shared<ReadNode>(variableA, 11);
-    std::vector<std::shared_ptr<StatementNode>> children2 = {};
-    children2.push_back(readA);
-    auto stmtListProc1 = std::make_shared<StatementListNode>(children2);
-
-    auto ProcNode2 = std::make_shared<ProcedureNode>("test", stmtListProc1);
-    std::vector<std::shared_ptr<ProcedureNode>> childrenProg2 = {};
-
-    childrenProg2.push_back(ProcNode2);
-    auto ProgNode2 = std::make_shared<ProgramNode>(childrenProg2);
-
-    std::vector<std::shared_ptr<ProcedureNode>> childrenProg3 = {};
-
-    childrenProg3.push_back(ProcNode);
-    childrenProg3.push_back(ProcNode2);
-
-    auto ProgNode3 = std::make_shared<ProgramNode>(childrenProg3);
-
-    SECTION("Variables extracted correctly") {
+    SECTION("VARIABLEs extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<std::string> expectedVariables = {"x", "y", "a", "z", "c", "d", "e", "f",
-                                                             "g", "h", "i", "j", "k", "l", "b"};
+        std::unordered_set<std::string> expectedVariables = {"x", "y", "a", "c", "d", "e", "f",
+                                                             "g", "h", "z", "i", "j", "b"};
         REQUIRE(expectedVariables == designExtractor->getVariables());
     }
 
-    SECTION("Single line procedure has variables extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::string> expectedVariables = {"a"};
-        REQUIRE(expectedVariables == designExtractor->getVariables());
-    }
-
-    SECTION("Multiple procedures variables extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::string> expectedVariables = {"x", "y", "a", "z", "c", "d", "e", "f",
-                                                             "g", "h", "i", "j", "k", "l", "b"};
-        REQUIRE(expectedVariables == designExtractor->getVariables());
-    }
-
-    SECTION("Constants extracted correctly") {
+    SECTION("CONSTANTs extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<std::string> expectedConstants = {"1"};
+        std::unordered_set<std::string> expectedConstants = {"2", "1"};
         REQUIRE(expectedConstants == designExtractor->getConstants());
     }
 
-    SECTION("Single line procedure has constants extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::string> expectedConstants = {};
-        REQUIRE(expectedConstants == designExtractor->getConstants());
-    }
-
-    SECTION("Multiple procedures constants extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::string> expectedConstants = {"1"};
-        REQUIRE(expectedConstants == designExtractor->getConstants());
-    }
-
-    SECTION("Procedure extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::string> expectedProcedures = {"main"};
-        REQUIRE(expectedProcedures == designExtractor->getProcedures());
-    }
-
-    SECTION("Multiple procedure extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::string> expectedProcedures = {"main", "test"};
-        REQUIRE(expectedProcedures == designExtractor->getProcedures());
-    }
-
-    SECTION("Statements extracted correctly") {
+    SECTION("STATEMENTs extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
         std::unordered_set<Stmt> expectedStatements = {
-            Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::READ, 2},   Stmt{StatementType::PRINT, 3},
-            Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5}, Stmt{StatementType::IF, 6},
-            Stmt{StatementType::ASSIGN, 7}, Stmt{StatementType::ASSIGN, 8}, Stmt{StatementType::ASSIGN, 9}};
+            Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::READ, 2},   Stmt{StatementType::WHILE, 3},
+            Stmt{StatementType::ASSIGN, 4}, Stmt{StatementType::PRINT, 5},  Stmt{StatementType::IF, 6},
+            Stmt{StatementType::ASSIGN, 7}, Stmt{StatementType::ASSIGN, 8}, Stmt{StatementType::ASSIGN, 9},
+            Stmt{StatementType::CALL, 10},  Stmt{StatementType::CALL, 11},  Stmt{StatementType::CALL, 12},
+            Stmt{StatementType::ASSIGN, 13}};
         REQUIRE(expectedStatements == designExtractor->getStatements());
     }
 
-    SECTION("Single line procedure has statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 11}};
-        REQUIRE(expectedStatements == designExtractor->getStatements());
-    }
-
-    SECTION("Multiple procedure statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<Stmt> expectedStatements = {Stmt{StatementType::READ, 11},  Stmt{StatementType::ASSIGN, 1},
-                                                       Stmt{StatementType::READ, 2},   Stmt{StatementType::PRINT, 3},
-                                                       Stmt{StatementType::WHILE, 4},  Stmt{StatementType::ASSIGN, 5},
-                                                       Stmt{StatementType::IF, 6},     Stmt{StatementType::ASSIGN, 7},
-                                                       Stmt{StatementType::ASSIGN, 8}, Stmt{StatementType::ASSIGN, 9}};
-        REQUIRE(expectedStatements == designExtractor->getStatements());
-    }
-
-    SECTION("Follows extracted correctly") {
+    SECTION("PROCEDUREs extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4}, {4, 6}, {6, 9}};
+        std::unordered_set<std::string> expectedProcedures = {"proc1", "proc2", "proc3"};
+        REQUIRE(expectedProcedures == designExtractor->getProcedures());
+    }
+}
+
+TEST_CASE("Follows Extractor Tests") {
+    /*
+        procedure proc1 {
+            01 read a;
+            02 while ((c < d) && (e > f)) {
+            03     g = h;
+               }
+        }
+        procedure proc2 {
+            04 print z;
+            05 if (!(i < j)) then {
+            06     x = y + 2;
+               } else {
+            07     a = b;
+            08     call proc1;
+               }
+        }
+    */
+
+    // 01 read a;
+    std::shared_ptr<VariableNode> RNode_a = std::make_shared<VariableNode>(VariableNode("a", 1));
+    auto readNode = std::make_shared<ReadNode>(RNode_a, 1);
+
+    // 02 while ((c < d) && (e > f)) {
+    // 03     g = h;
+    //    }
+    std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 2));
+    std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 2));
+    std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 2));
+    std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 2));
+    std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 3));
+    std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 3));
+
+    std::vector<std::shared_ptr<StatementNode>> WChildren = {};
+
+    auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 2);
+    auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 2);
+    auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 2);
+
+    auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 3);
+    WChildren.push_back(Wassign);
+
+    auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+    auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 2);
+
+    std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+    childrenProc1.push_back(readNode);
+    childrenProc1.push_back(whileNode);
+
+    auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+    auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+    // 04 print z;
+    std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 4));
+    auto printNode = std::make_shared<PrintNode>(PNode_z, 4);
+
+    // 05 if (!(i < j)) then {
+    // 06     x = y + 2;
+    //    } else {
+    // 07     a = b;
+    // 08     call proc1;
+    //    }
+    std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 5));
+    std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 5));
+    std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 6));
+    std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 6));
+    std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 6));
+    std::shared_ptr<ExpressionNode> INode_ADD =
+        std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 6));
+    std::shared_ptr<VariableNode> ENode_a = std::make_shared<VariableNode>(VariableNode("a", 7));
+    std::shared_ptr<VariableNode> ENode_b = std::make_shared<VariableNode>(VariableNode("b", 7));
+
+    auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 5);
+    auto InotNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::NOT, IlessThan, 5);
+
+    std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+    std::vector<std::shared_ptr<StatementNode>> EChildren = {};
+
+    auto Iassign = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 6);
+    IChildren.push_back(Iassign);
+
+    auto Eassign = std::make_shared<AssignmentNode>(ENode_a, ENode_b, 7);
+    auto Ecall = std::make_shared<CallNode>("proc1", 8);
+    EChildren.push_back(Eassign);
+    EChildren.push_back(Ecall);
+
+    auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+    auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+    auto ifNode = std::make_shared<IfNode>(InotNode, IstmtList, EstmtList, 5);
+
+    std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+    childrenProc2.push_back(printNode);
+    childrenProc2.push_back(ifNode);
+
+    auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+    auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+    // Create program
+    std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+    childrenProg.push_back(Proc1Node);
+    childrenProg.push_back(Proc2Node);
+
+    auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+    SECTION("FOLLOWS extracted correctly") {
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {4, 5}, {7, 8}};
         REQUIRE(expectedFollows == designExtractor->getFollows());
     }
+}
 
-    SECTION("Single line procedure has follows extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {};
-        REQUIRE(expectedFollows == designExtractor->getFollows());
-    }
-
-    SECTION("Multiple procedures follows extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedFollows = {{1, 2}, {2, 3}, {3, 4}, {4, 6}, {6, 9}};
-        REQUIRE(expectedFollows == designExtractor->getFollows());
-    }
-
-    SECTION("Parent extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedParent = {{4, 5}, {6, 7}, {6, 8}};
-        REQUIRE(expectedParent == designExtractor->getParent());
-    }
-
-    SECTION("Single line procedure has parent extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedParent = {};
-        REQUIRE(expectedParent == designExtractor->getParent());
-    }
-
-    SECTION("Multiple procedures parent extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedParent = {{4, 5}, {6, 7}, {6, 8}};
-        REQUIRE(expectedParent == designExtractor->getParent());
-    }
-
-    SECTION("Uses statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {
-            {1, "y"}, {3, "z"}, {4, "c"}, {4, "d"}, {4, "e"}, {4, "f"}, {4, "h"}, {5, "h"},
-            {6, "i"}, {6, "j"}, {6, "k"}, {6, "l"}, {6, "j"}, {7, "j"}, {6, "b"}, {8, "b"}};
-        REQUIRE(expectedUses == designExtractor->getUses());
-    }
-
-    SECTION("Uses procedures extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureUses = {
-            {"main", "y"}, {"main", "z"}, {"main", "c"}, {"main", "d"}, {"main", "e"}, {"main", "f"},
-            {"main", "h"}, {"main", "h"}, {"main", "i"}, {"main", "j"}, {"main", "k"}, {"main", "l"},
-            {"main", "j"}, {"main", "j"}, {"main", "b"}, {"main", "b"}};
-        REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
-    }
-
-    SECTION("Single line procedure has uses extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {};
-        REQUIRE(expectedUses == designExtractor->getUses());
-    }
-
-    SECTION("Multiple procedures uses statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {
-            {1, "y"}, {3, "z"}, {4, "c"}, {4, "d"}, {4, "e"}, {4, "f"}, {4, "h"}, {5, "h"},
-            {6, "i"}, {6, "j"}, {6, "k"}, {6, "l"}, {6, "j"}, {7, "j"}, {6, "b"}, {8, "b"}};
-        REQUIRE(expectedUses == designExtractor->getUses());
-    }
-
-    SECTION("Multiple procedures uses procedures extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureUses = {
-            {"main", "y"}, {"main", "z"}, {"main", "c"}, {"main", "d"}, {"main", "e"}, {"main", "f"},
-            {"main", "h"}, {"main", "h"}, {"main", "i"}, {"main", "j"}, {"main", "k"}, {"main", "l"},
-            {"main", "j"}, {"main", "j"}, {"main", "b"}, {"main", "b"}};
-        REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
-    }
-
-    SECTION("Modifies statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {
-            {1, "x"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}};
-        REQUIRE(expectedModifies == designExtractor->getModifies());
-    }
-
-    SECTION("Modifies procedures extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
-            {"main", "x"}, {"main", "a"}, {"main", "g"}, {"main", "g"}, {"main", "i"},
-            {"main", "a"}, {"main", "i"}, {"main", "a"}, {"main", "x"}};
-        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
-    }
-
-    SECTION("Single line procedure has modifies extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{11, "a"}};
-        REQUIRE(expectedModifies == designExtractor->getModifies());
-    }
-
-    SECTION("Multiple procedures modifies statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {
-            {11, "a"}, {2, "a"}, {4, "g"}, {5, "g"}, {6, "i"}, {6, "a"}, {7, "i"}, {8, "a"}, {9, "x"}, {1, "x"}};
-        REQUIRE(expectedModifies == designExtractor->getModifies());
-    }
-
-    SECTION("Multiple procedures modifies procedures extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
-            {"test", "a"}, {"main", "a"}, {"main", "g"}, {"main", "g"}, {"main", "i"}, {"main", "a"},
-            {"main", "i"}, {"main", "a"}, {"main", "x"}, {"main", "x"}, {"main", "a"}};
-        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
-    }
-
-    SECTION("Pattern extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {
-            {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
-        REQUIRE(expectedPattern == designExtractor->getPattern());
-    }
-
-    SECTION("Single line procedure has pattern extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode2);
-        std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {};
-        REQUIRE(expectedPattern == designExtractor->getPattern());
-    }
-
-    SECTION("Multiple procedures pattern extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNode3);
-        std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {
-            {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
-        REQUIRE(expectedPattern == designExtractor->getPattern());
-    }
-
-    /* THIS TEST IS FOR CALLS ONLY
-       procedure sad {
-        1 call happy;
-       }
-       procedure happy {
-        2 print a;
-        3 read b;
-       }
+TEST_CASE("Parent Extractor Tests") {
+    SECTION("PARENTs extracted correctly") {
+        /*
+            procedure proc1 {
+                01 read a;
+                02 while ((c < d) && (e > f)) {
+                03     g = h;
+                }
+            }
+            procedure proc2 {
+                04 print z;
+                05 if (!(i < j)) then {
+                06     x = y + 2;
+                } else {
+                07     a = b;
+                08     call proc1;
+                }
+            }
         */
 
-    auto callNode = std::make_shared<CallNode>("happy", 1);
-    std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
-    childrenCall.push_back(callNode);
-    auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
-    auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
+        // 01 read a;
+        std::shared_ptr<VariableNode> RNode_a = std::make_shared<VariableNode>(VariableNode("a", 1));
+        auto readNode = std::make_shared<ReadNode>(RNode_a, 1);
 
-    auto variableCall = std::make_shared<VariableNode>("a", 2);
-    auto printCall = std::make_shared<PrintNode>(variableCall, 2);
+        // 02 while ((c < d) && (e > f)) {
+        // 03     g = h;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 2));
+        std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 2));
+        std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 2));
+        std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 2));
+        std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 3));
+        std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 3));
 
-    auto variableCall2 = std::make_shared<VariableNode>("b", 3);
-    auto readCall = std::make_shared<ReadNode>(variableCall2, 3);
+        std::vector<std::shared_ptr<StatementNode>> WChildren = {};
 
-    std::vector<std::shared_ptr<StatementNode>> childrenCall2 = {};
-    childrenCall2.push_back(printCall);
-    childrenCall2.push_back(readCall);
-    auto stmtListProcCall2 = std::make_shared<StatementListNode>(childrenCall2);
-    auto ProcNodeCall2 = std::make_shared<ProcedureNode>("happy", stmtListProcCall2);
+        auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 2);
+        auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 2);
+        auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 2);
 
-    std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
+        auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 3);
+        WChildren.push_back(Wassign);
 
-    childrenProgCall.push_back(ProcNodeCall);
-    childrenProgCall.push_back(ProcNodeCall2);
-    auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
+        auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+        auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 2);
 
-    SECTION("Calls extracted correctly") {
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(readNode);
+        childrenProc1.push_back(whileNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 04 print z;
+        std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 4));
+        auto printNode = std::make_shared<PrintNode>(PNode_z, 4);
+
+        // 05 if (!(i < j)) then {
+        // 06     x = y + 2;
+        //    } else {
+        // 07     a = b;
+        // 08     call proc1;
+        //    }
+        std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 5));
+        std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 5));
+        std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 6));
+        std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 6));
+        std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 6));
+        std::shared_ptr<ExpressionNode> INode_ADD =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 6));
+        std::shared_ptr<VariableNode> ENode_a = std::make_shared<VariableNode>(VariableNode("a", 7));
+        std::shared_ptr<VariableNode> ENode_b = std::make_shared<VariableNode>(VariableNode("b", 7));
+
+        auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 5);
+        auto InotNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::NOT, IlessThan, 5);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren = {};
+
+        auto Iassign = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 6);
+        IChildren.push_back(Iassign);
+
+        auto Eassign = std::make_shared<AssignmentNode>(ENode_a, ENode_b, 7);
+        auto Ecall = std::make_shared<CallNode>("proc1", 8);
+        EChildren.push_back(Eassign);
+        EChildren.push_back(Ecall);
+
+        auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+        auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+        auto ifNode = std::make_shared<IfNode>(InotNode, IstmtList, EstmtList, 5);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(printNode);
+        childrenProc2.push_back(ifNode);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedParent = {{2, 3}, {5, 6}, {5, 7}, {5, 8}};
+        REQUIRE(expectedParent == designExtractor->getParent());
+    }
+
+    SECTION("PARENTs extracted correctly - Nested IF and WHILE statements") {
+        /*
+            procedure proc1 {
+                01 read a;
+                02 while ((c < d) && (e > f)) {
+                03     g = h;
+                04     if (!(i < j)) then {
+                05         x = y + 2;
+                       } else {
+                06         a = b;
+                07         call proc2;
+                       }
+                    }
+            }
+            procedure proc2 {
+                08 print z;
+            }
+        */
+
+        // 01 read a;
+        std::shared_ptr<VariableNode> RNode_a = std::make_shared<VariableNode>(VariableNode("a", 1));
+        auto readNode = std::make_shared<ReadNode>(RNode_a, 1);
+
+        // 02 while ((c < d) && (e > f)) {
+        // 03     g = h;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 2));
+        std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 2));
+        std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 2));
+        std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 2));
+        std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 3));
+        std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 3));
+
+        std::vector<std::shared_ptr<StatementNode>> WChildren = {};
+
+        auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 2);
+        auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 2);
+        auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 2);
+
+        auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 3);
+
+        // 04 if (!(i < j)) then {
+        // 05     x = y + 2;
+        //    } else {
+        // 06     a = b;
+        // 07     call proc2;
+        //    }
+        std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 4));
+        std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 4));
+        std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 5));
+        std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 5));
+        std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 5));
+        std::shared_ptr<ExpressionNode> INode_ADD =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 5));
+        std::shared_ptr<VariableNode> ENode_a = std::make_shared<VariableNode>(VariableNode("a", 6));
+        std::shared_ptr<VariableNode> ENode_b = std::make_shared<VariableNode>(VariableNode("b", 6));
+
+        auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 4);
+        auto InotNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::NOT, IlessThan, 4);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren = {};
+
+        auto Iassign = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 5);
+        IChildren.push_back(Iassign);
+
+        auto Eassign = std::make_shared<AssignmentNode>(ENode_a, ENode_b, 6);
+        auto Ecall = std::make_shared<CallNode>("proc2", 7);
+        EChildren.push_back(Eassign);
+        EChildren.push_back(Ecall);
+
+        auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+        auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+        auto ifNode = std::make_shared<IfNode>(InotNode, IstmtList, EstmtList, 4);
+
+        WChildren.push_back(Wassign);
+        WChildren.push_back(ifNode);
+
+        auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+        auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 2);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(readNode);
+        childrenProc1.push_back(whileNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 08 print z;
+        std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 8));
+        auto printNode = std::make_shared<PrintNode>(PNode_z, 8);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(printNode);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, StmtNum>> expectedParent = {{2, 3}, {2, 4}, {4, 5}, {4, 6}, {4, 7}};
+        REQUIRE(expectedParent == designExtractor->getParent());
+    }
+}
+
+TEST_CASE("Modifies Extractor Tests") {
+    SECTION("MODIFIES extracted correctly - READ statements") {
+        /*
+            procedure proc1 {
+                01 read z;
+            }
+            procedure proc2 {
+                02 read y;
+            }
+        */
+        // 01 read z;
+        std::shared_ptr<VariableNode> RNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto readNode = std::make_shared<ReadNode>(RNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(readNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 read y;
+        std::shared_ptr<VariableNode> RNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto readNode1 = std::make_shared<ReadNode>(RNode_y, 2);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(readNode1);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "z"}, {2, "y"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("MODIFIES extracted correctly - ASSIGN statements") {
+        /*
+            procedure proc1 {
+                01 x = 2 * (5 - y);
+            }
+            procedure proc2 {
+                02 x = 4;
+                03 z = v;
+            }
+        */
+        // 01 x = 2 * (5 - y);
+        std::shared_ptr<VariableNode> ANode_x = std::make_shared<VariableNode>(VariableNode("x", 1));
+        std::shared_ptr<VariableNode> ANode_y = std::make_shared<VariableNode>(VariableNode("y", 1));
+        std::shared_ptr<ConstantNode> ANode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 1));
+        std::shared_ptr<ConstantNode> ANode_5 = std::make_shared<ConstantNode>(ConstantNode("5", 1));
+        std::shared_ptr<ExpressionNode> ANode_SUB =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::SUB, ANode_5, ANode_y, 1));
+        std::shared_ptr<ExpressionNode> ANode_MUL =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::MUL, ANode_2, ANode_SUB, 1));
+        auto assignNode = std::make_shared<AssignmentNode>(ANode_x, ANode_MUL, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(assignNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 x = 4;
+        std::shared_ptr<VariableNode> ANode_x1 = std::make_shared<VariableNode>(VariableNode("x", 2));
+        std::shared_ptr<ConstantNode> ANode_4 = std::make_shared<ConstantNode>(ConstantNode("4", 2));
+        auto assignNode2 = std::make_shared<AssignmentNode>(ANode_x1, ANode_4, 2);
+
+        // 03 z = v;
+        std::shared_ptr<VariableNode> ANode_z = std::make_shared<VariableNode>(VariableNode("z", 3));
+        std::shared_ptr<VariableNode> ANode_v = std::make_shared<VariableNode>(VariableNode("v", 3));
+        auto assignNode3 = std::make_shared<AssignmentNode>(ANode_z, ANode_v, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(assignNode2);
+        childrenProc2.push_back(assignNode3);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "x"}, {2, "x"}, {3, "z"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("MODIFIES extracted correctly - WHILE statements") {
+        /*
+            procedure proc1 {
+                01 while ((c < d) && (e > f)) {
+                02     g = h;
+                   }
+            }
+            procedure proc2 {
+                03 while ((c < d) && (e > f)) {
+                04     read a;
+                   }
+            }
+        */
+
+        // 01 while ((c < d) && (e > f)) {
+        // 02     g = h;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 1));
+        std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 1));
+        std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 1));
+        std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 1));
+        std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 2));
+        std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 2));
+
+        std::vector<std::shared_ptr<StatementNode>> WChildren = {};
+
+        auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 1);
+        auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 1);
+        auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 1);
+
+        auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 2);
+        WChildren.push_back(Wassign);
+
+        auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+        auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(whileNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 03 while ((c < d) && (e > f)) {
+        // 04     read a;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c2 = std::make_shared<VariableNode>(VariableNode("c", 3));
+        std::shared_ptr<VariableNode> WNode_d2 = std::make_shared<VariableNode>(VariableNode("d", 3));
+        std::shared_ptr<VariableNode> WNode_e2 = std::make_shared<VariableNode>(VariableNode("e", 3));
+        std::shared_ptr<VariableNode> WNode_f2 = std::make_shared<VariableNode>(VariableNode("f", 3));
+        std::shared_ptr<VariableNode> RNode_a = std::make_shared<VariableNode>(VariableNode("a", 4));
+
+        std::vector<std::shared_ptr<StatementNode>> WChildren2 = {};
+
+        auto WlessThan2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c2, WNode_d2, 3);
+        auto WmoreThan2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e2, WNode_f2, 3);
+        auto WandandNode2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan2, WmoreThan2, 3);
+
+        auto readNode = std::make_shared<ReadNode>(RNode_a, 4);
+        WChildren2.push_back(readNode);
+
+        auto WstmtList2 = std::make_shared<StatementListNode>(WChildren2);
+        auto whileNode2 = std::make_shared<WhileNode>(WandandNode2, WstmtList2, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(whileNode2);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{2, "g"}, {1, "g"}, {4, "a"}, {3, "a"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("MODIFIES extracted correctly - IF statements") {
+        /*
+            procedure proc1 {
+                01 if (i < j) then {
+                02     x = y + 2;
+                   } else {
+                03     print b;
+                   }
+            }
+            procedure proc2 {
+                04 if (i > j) then {
+                05     read a;
+                   } else {
+                06     y = v;
+                   }
+            }
+        */
+
+        // 01 if (i < j) then {
+        // 02     x = y + 2;
+        //    } else {
+        // 03     print b;
+        //    }
+        std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 1));
+        std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 1));
+        std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 2));
+        std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 2));
+        std::shared_ptr<ExpressionNode> INode_ADD =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 2));
+        std::shared_ptr<VariableNode> INode_b = std::make_shared<VariableNode>(VariableNode("b", 3));
+
+        auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren = {};
+
+        auto Iassign = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 2);
+        IChildren.push_back(Iassign);
+
+        auto printNode = std::make_shared<PrintNode>(INode_b, 3);
+        EChildren.push_back(printNode);
+
+        auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+        auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+        auto ifNode = std::make_shared<IfNode>(IlessThan, IstmtList, EstmtList, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(ifNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 04 if (i > j) then {
+        // 05     read a;
+        //    } else {
+        // 06     y = v;
+        //    }
+        std::shared_ptr<VariableNode> INode_i2 = std::make_shared<VariableNode>(VariableNode("i", 4));
+        std::shared_ptr<VariableNode> INode_j2 = std::make_shared<VariableNode>(VariableNode("j", 4));
+        std::shared_ptr<VariableNode> INode_a = std::make_shared<VariableNode>(VariableNode("a", 5));
+        std::shared_ptr<VariableNode> INode_y2 = std::make_shared<VariableNode>(VariableNode("y", 6));
+        std::shared_ptr<VariableNode> INode_v = std::make_shared<VariableNode>(VariableNode("v", 6));
+
+        auto IgreaterThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, INode_i2, INode_j2, 4);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren2 = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren2 = {};
+
+        auto readNode = std::make_shared<ReadNode>(INode_a, 5);
+        IChildren2.push_back(readNode);
+
+        auto assignNode = std::make_shared<AssignmentNode>(INode_y2, INode_v, 6);
+        EChildren2.push_back(assignNode);
+
+        auto IstmtList2 = std::make_shared<StatementListNode>(IChildren2);
+        auto EstmtList2 = std::make_shared<StatementListNode>(EChildren2);
+        auto ifNode2 = std::make_shared<IfNode>(IgreaterThan, IstmtList2, EstmtList2, 4);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(ifNode2);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        /*
+            procedure proc1 {
+                01 if (i < j) then {
+                02     x = y + 2;
+                   } else {
+                03     print b;
+                   }
+            }
+            procedure proc2 {
+                04 if (i > j) then {
+                05     read a;
+                   } else {
+                06     y = v;
+                   }
+            }
+        */
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{2, "x"}, {1, "x"}, {5, "a"},
+                                                                             {4, "a"}, {6, "y"}, {4, "y"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("MODIFIES extracted correctly - CALL statements") {
+        /*
+            procedure proc1 {
+                01 read z;
+            }
+            procedure proc2 {
+                02 read y;
+                03 call proc1;
+            }
+        */
+        // 01 read z;
+        std::shared_ptr<VariableNode> RNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto readNode = std::make_shared<ReadNode>(RNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(readNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 read y;
+        std::shared_ptr<VariableNode> RNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto readNode1 = std::make_shared<ReadNode>(RNode_y, 2);
+
+        // 03 call proc1
+        auto callNode = std::make_shared<CallNode>("proc1", 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(readNode1);
+        childrenProc2.push_back(callNode);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "z"}, {2, "y"}, {3, "z"}};
+        REQUIRE(expectedModifies == designExtractor->getModifies());
+    }
+
+    SECTION("MODIFIES extracted correctly - PROCEDURES") {
+        /*
+            procedure proc1 {
+                01 read z;
+            }
+            procedure proc2 {
+                02 read y;
+                03 call proc1;
+            }
+        */
+        // 01 read z;
+        std::shared_ptr<VariableNode> RNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto readNode = std::make_shared<ReadNode>(RNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(readNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 read y;
+        std::shared_ptr<VariableNode> RNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto readNode1 = std::make_shared<ReadNode>(RNode_y, 2);
+
+        // 03 call proc1
+        auto callNode = std::make_shared<CallNode>("proc1", 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(readNode1);
+        childrenProc2.push_back(callNode);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
+            {"proc1", "z"}, {"proc2", "y"}, {"proc2", "z"}};
+        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
+    }
+}
+
+TEST_CASE("Uses Extractor Tests") {
+    SECTION("USES extracted correctly - PRINT statements") {
+        /*
+            procedure proc1 {
+                01 print z;
+            }
+            procedure proc2 {
+                02 print y;
+            }
+        */
+        // 01 print z;
+        std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto printNode = std::make_shared<PrintNode>(PNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(printNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 print y;
+        std::shared_ptr<VariableNode> PNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto printNode1 = std::make_shared<PrintNode>(PNode_y, 2);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(printNode1);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "z"}, {2, "y"}};
+        REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("USES extracted correctly - ASSIGN statements") {
+        /*
+            procedure proc1 {
+                01 x = 2 * (5 - y);
+            }
+            procedure proc2 {
+                02 x = 4;
+                03 z = v;
+            }
+        */
+        // 01 x = 2 * (5 - y);
+        std::shared_ptr<VariableNode> ANode_x = std::make_shared<VariableNode>(VariableNode("x", 1));
+        std::shared_ptr<VariableNode> ANode_y = std::make_shared<VariableNode>(VariableNode("y", 1));
+        std::shared_ptr<ConstantNode> ANode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 1));
+        std::shared_ptr<ConstantNode> ANode_5 = std::make_shared<ConstantNode>(ConstantNode("5", 1));
+        std::shared_ptr<ExpressionNode> ANode_SUB =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::SUB, ANode_5, ANode_y, 1));
+        std::shared_ptr<ExpressionNode> ANode_MUL =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::MUL, ANode_2, ANode_SUB, 1));
+        auto assignNode = std::make_shared<AssignmentNode>(ANode_x, ANode_MUL, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(assignNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 x = 4;
+        std::shared_ptr<VariableNode> ANode_x1 = std::make_shared<VariableNode>(VariableNode("x", 2));
+        std::shared_ptr<ConstantNode> ANode_4 = std::make_shared<ConstantNode>(ConstantNode("4", 2));
+        auto assignNode2 = std::make_shared<AssignmentNode>(ANode_x1, ANode_4, 2);
+
+        // 03 z = v;
+        std::shared_ptr<VariableNode> ANode_z = std::make_shared<VariableNode>(VariableNode("z", 3));
+        std::shared_ptr<VariableNode> ANode_v = std::make_shared<VariableNode>(VariableNode("v", 3));
+        auto assignNode3 = std::make_shared<AssignmentNode>(ANode_z, ANode_v, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(assignNode2);
+        childrenProc2.push_back(assignNode3);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        /*
+            procedure proc1 {
+                01 x = 2 * (5 - y);
+            }
+            procedure proc2 {
+                02 x = 4;
+                03 z = v;
+            }
+        */
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "y"}, {3, "v"}};
+        REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("USES extracted correctly - WHILE statements") {
+        /*
+            procedure proc1 {
+                01 while ((c < d) && (e > f)) {
+                02     g = h;
+                   }
+            }
+            procedure proc2 {
+                03 while ((c < d) && (e > f)) {
+                04     print a;
+                   }
+            }
+        */
+
+        // 01 while ((c < d) && (e > f)) {
+        // 02     g = h;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c = std::make_shared<VariableNode>(VariableNode("c", 1));
+        std::shared_ptr<VariableNode> WNode_d = std::make_shared<VariableNode>(VariableNode("d", 1));
+        std::shared_ptr<VariableNode> WNode_e = std::make_shared<VariableNode>(VariableNode("e", 1));
+        std::shared_ptr<VariableNode> WNode_f = std::make_shared<VariableNode>(VariableNode("f", 1));
+        std::shared_ptr<VariableNode> WNode_g = std::make_shared<VariableNode>(VariableNode("g", 2));
+        std::shared_ptr<VariableNode> WNode_h = std::make_shared<VariableNode>(VariableNode("h", 2));
+
+        std::vector<std::shared_ptr<StatementNode>> WChildren = {};
+
+        auto WlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c, WNode_d, 1);
+        auto WmoreThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e, WNode_f, 1);
+        auto WandandNode = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan, WmoreThan, 1);
+
+        auto Wassign = std::make_shared<AssignmentNode>(WNode_g, WNode_h, 2);
+        WChildren.push_back(Wassign);
+
+        auto WstmtList = std::make_shared<StatementListNode>(WChildren);
+        auto whileNode = std::make_shared<WhileNode>(WandandNode, WstmtList, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(whileNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 03 while ((c < d) && (e > f)) {
+        // 04     print a;
+        //    }
+        std::shared_ptr<VariableNode> WNode_c2 = std::make_shared<VariableNode>(VariableNode("c", 3));
+        std::shared_ptr<VariableNode> WNode_d2 = std::make_shared<VariableNode>(VariableNode("d", 3));
+        std::shared_ptr<VariableNode> WNode_e2 = std::make_shared<VariableNode>(VariableNode("e", 3));
+        std::shared_ptr<VariableNode> WNode_f2 = std::make_shared<VariableNode>(VariableNode("f", 3));
+        std::shared_ptr<VariableNode> PNode_a = std::make_shared<VariableNode>(VariableNode("a", 4));
+
+        std::vector<std::shared_ptr<StatementNode>> WChildren2 = {};
+
+        auto WlessThan2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, WNode_c2, WNode_d2, 3);
+        auto WmoreThan2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, WNode_e2, WNode_f2, 3);
+        auto WandandNode2 = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::ANDAND, WlessThan2, WmoreThan2, 3);
+
+        auto printNode = std::make_shared<PrintNode>(PNode_a, 4);
+        WChildren2.push_back(printNode);
+
+        auto WstmtList2 = std::make_shared<StatementListNode>(WChildren2);
+        auto whileNode2 = std::make_shared<WhileNode>(WandandNode2, WstmtList2, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(whileNode2);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "c"}, {1, "d"}, {1, "e"}, {1, "f"},
+                                                                         {2, "h"}, {1, "h"}, {3, "c"}, {3, "d"},
+                                                                         {3, "e"}, {3, "f"}, {4, "a"}, {3, "a"}};
+        REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("USES extracted correctly - IF statements") {
+        /*
+            procedure proc1 {
+                01 if (i < j) then {
+                02     x = y + 2;
+                   } else {
+                03     print b;
+                   }
+            }
+            procedure proc2 {
+                04 if (i > j) then {
+                05     read a;
+                   } else {
+                06     y = v;
+                   }
+            }
+        */
+
+        // 01 if (i < j) then {
+        // 02     x = y + 2;
+        //    } else {
+        // 03     print b;
+        //    }
+        std::shared_ptr<VariableNode> INode_i = std::make_shared<VariableNode>(VariableNode("i", 1));
+        std::shared_ptr<VariableNode> INode_j = std::make_shared<VariableNode>(VariableNode("j", 1));
+        std::shared_ptr<VariableNode> INode_x = std::make_shared<VariableNode>(VariableNode("x", 2));
+        std::shared_ptr<VariableNode> INode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        std::shared_ptr<ConstantNode> INode_2 = std::make_shared<ConstantNode>(ConstantNode("2", 2));
+        std::shared_ptr<ExpressionNode> INode_ADD =
+            std::make_shared<ExpressionNode>(ExpressionNode(LEXICAL_TOKEN_TYPE::ADD, INode_y, INode_2, 2));
+        std::shared_ptr<VariableNode> INode_b = std::make_shared<VariableNode>(VariableNode("b", 3));
+
+        auto IlessThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, INode_i, INode_j, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren = {};
+
+        auto Iassign = std::make_shared<AssignmentNode>(INode_x, INode_ADD, 2);
+        IChildren.push_back(Iassign);
+
+        auto printNode = std::make_shared<PrintNode>(INode_b, 3);
+        EChildren.push_back(printNode);
+
+        auto IstmtList = std::make_shared<StatementListNode>(IChildren);
+        auto EstmtList = std::make_shared<StatementListNode>(EChildren);
+        auto ifNode = std::make_shared<IfNode>(IlessThan, IstmtList, EstmtList, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(ifNode);
+
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 04 if (i > j) then {
+        // 05     read a;
+        //    } else {
+        // 06     y = v;
+        //    }
+        std::shared_ptr<VariableNode> INode_i2 = std::make_shared<VariableNode>(VariableNode("i", 4));
+        std::shared_ptr<VariableNode> INode_j2 = std::make_shared<VariableNode>(VariableNode("j", 4));
+        std::shared_ptr<VariableNode> INode_a = std::make_shared<VariableNode>(VariableNode("a", 5));
+        std::shared_ptr<VariableNode> INode_y2 = std::make_shared<VariableNode>(VariableNode("y", 6));
+        std::shared_ptr<VariableNode> INode_v = std::make_shared<VariableNode>(VariableNode("v", 6));
+
+        auto IgreaterThan = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::GREATER_THAN, INode_i2, INode_j2, 4);
+
+        std::vector<std::shared_ptr<StatementNode>> IChildren2 = {};
+        std::vector<std::shared_ptr<StatementNode>> EChildren2 = {};
+
+        auto readNode = std::make_shared<ReadNode>(INode_a, 5);
+        IChildren2.push_back(readNode);
+
+        auto assignNode = std::make_shared<AssignmentNode>(INode_y2, INode_v, 6);
+        EChildren2.push_back(assignNode);
+
+        auto IstmtList2 = std::make_shared<StatementListNode>(IChildren2);
+        auto EstmtList2 = std::make_shared<StatementListNode>(EChildren2);
+        auto ifNode2 = std::make_shared<IfNode>(IgreaterThan, IstmtList2, EstmtList2, 4);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(ifNode2);
+
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {
+            {1, "i"}, {1, "j"}, {2, "y"}, {1, "y"}, {3, "b"}, {1, "b"}, {4, "i"}, {4, "j"}, {6, "v"}, {4, "v"}};
+        REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("USES extracted correctly - CALL statements") {
+        /*
+            procedure proc1 {
+                01 print z;
+            }
+            procedure proc2 {
+                02 print y;
+                03 call proc1;
+            }
+        */
+        // 01 print z;
+        std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto printNode = std::make_shared<PrintNode>(PNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(printNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 print y;
+        std::shared_ptr<VariableNode> PNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto printNode1 = std::make_shared<PrintNode>(PNode_y, 2);
+
+        // 03 call proc1
+        auto callNode = std::make_shared<CallNode>("proc1", 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(printNode1);
+        childrenProc2.push_back(callNode);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "z"}, {2, "y"}, {3, "z"}};
+        REQUIRE(expectedUses == designExtractor->getUses());
+    }
+
+    SECTION("USES extracted correctly - PROCEDURES") {
+        /*
+            procedure proc1 {
+                01 print z;
+            }
+            procedure proc2 {
+                02 print y;
+                03 call proc1;
+            }
+        */
+        // 01 print z;
+        std::shared_ptr<VariableNode> PNode_z = std::make_shared<VariableNode>(VariableNode("z", 1));
+        auto printNode = std::make_shared<PrintNode>(PNode_z, 1);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc1 = {};
+        childrenProc1.push_back(printNode);
+        auto stmtListProc1 = std::make_shared<StatementListNode>(childrenProc1);
+        auto Proc1Node = std::make_shared<ProcedureNode>("proc1", stmtListProc1);
+
+        // 02 print y;
+        std::shared_ptr<VariableNode> PNode_y = std::make_shared<VariableNode>(VariableNode("y", 2));
+        auto printNode1 = std::make_shared<PrintNode>(PNode_y, 2);
+
+        // 03 call proc1
+        auto callNode = std::make_shared<CallNode>("proc1", 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenProc2 = {};
+        childrenProc2.push_back(printNode1);
+        childrenProc2.push_back(callNode);
+        auto stmtListProc2 = std::make_shared<StatementListNode>(childrenProc2);
+        auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
+
+        // Create program
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
+        childrenProg.push_back(Proc1Node);
+        childrenProg.push_back(Proc2Node);
+        auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNode);
+        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureUses = {
+            {"proc1", "z"}, {"proc2", "y"}, {"proc2", "z"}};
+        REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
+    }
+}
+
+TEST_CASE("Calls Extractor Tests") {
+    SECTION("CALLS extracted correctly") {
+        /*
+            procedure sad {
+                01 call happy;
+            }
+            procedure happy {
+                02 print a;
+                03 read b;
+            }
+        */
+        auto callNode = std::make_shared<CallNode>("happy", 1);
+        std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
+        childrenCall.push_back(callNode);
+        auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
+        auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
+
+        auto variableCall = std::make_shared<VariableNode>("a", 2);
+        auto printCall = std::make_shared<PrintNode>(variableCall, 2);
+
+        auto variableCall2 = std::make_shared<VariableNode>("b", 3);
+        auto readCall = std::make_shared<ReadNode>(variableCall2, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenCall2 = {};
+        childrenCall2.push_back(printCall);
+        childrenCall2.push_back(readCall);
+        auto stmtListProcCall2 = std::make_shared<StatementListNode>(childrenCall2);
+        auto ProcNodeCall2 = std::make_shared<ProcedureNode>("happy", stmtListProcCall2);
+
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
+
+        childrenProgCall.push_back(ProcNodeCall);
+        childrenProgCall.push_back(ProcNodeCall2);
+        auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
+
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNodeCall);
         std::unordered_set<std::pair<Procedure, Procedure>> expectedCalls = {{"sad", "happy"}};
         REQUIRE(expectedCalls == designExtractor->getCalls());
     }
 
-    SECTION("Uses extracted correctly for call statements") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNodeCall);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedUses = {{1, "a"}, {2, "a"}};
-        REQUIRE(expectedUses == designExtractor->getUses());
-    }
+    SECTION("CALLS should not work - Single PROCEDURE") {
+        // might not need this i think is already tested in semantic vali
+        /*
+            procedure sad {
+                01 call happy;
+            }
+        */
+        auto callNode = std::make_shared<CallNode>("happy", 1);
+        std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
+        childrenCall.push_back(callNode);
+        auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
+        auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
 
-    SECTION("Modifies extracted correctly for call statements") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNodeCall);
-        std::unordered_set<std::pair<StmtNum, Variable>> expectedModifies = {{1, "b"}, {3, "b"}};
-        REQUIRE(expectedModifies == designExtractor->getModifies());
-    }
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
 
-    SECTION("Uses for procedures with call statements extracted correctly") {
-        DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNodeCall);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureUses = {
-            {"sad", "a"}, {"sad", "a"}, {"happy", "a"}};
-        REQUIRE(expectedProcedureUses == designExtractor->getProcedureUses());
-    }
+        childrenProgCall.push_back(ProcNodeCall);
+        auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
 
-    SECTION("Modifies for procedures with call statements extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
-        designExtractor->extract(ProgNodeCall);
-        std::unordered_set<std::pair<Procedure, Variable>> expectedProcedureModifies = {
-            {"sad", "b"}, {"happy", "b"}, {"sad", "b"}};
-        REQUIRE(expectedProcedureModifies == designExtractor->getProcedureModifies());
+        REQUIRE_THROWS(designExtractor->extract(ProgNodeCall));
     }
 }
+
+// Pattern Extractor Tests -- this will be refactored once pattern implementation is done
+TEST_CASE("Pattern Extractor Tests") {
+    // SECTION("Pattern extracted correctly") {
+    //     DesignExtractor *designExtractor = new DesignExtractor();
+    //     designExtractor->extract(ProgNode);
+    //     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {
+    //         {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
+    //     REQUIRE(expectedPattern == designExtractor->getPattern());
+    // }
+
+    // SECTION("Single line procedure has pattern extracted correctly") {
+    //     DesignExtractor *designExtractor = new DesignExtractor();
+    //     designExtractor->extract(ProgNode2);
+    //     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {};
+    //     REQUIRE(expectedPattern == designExtractor->getPattern());
+    // }
+
+    // SECTION("Multiple procedures pattern extracted correctly") {
+    //     DesignExtractor *designExtractor = new DesignExtractor();
+    //     designExtractor->extract(ProgNode3);
+    //     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> expectedPattern = {
+    //         {1, {"x", "y"}}, {5, {"g", "h"}}, {7, {"i", "j"}}, {8, {"a", "b"}}, {9, {"x", "1"}}};
+    //     REQUIRE(expectedPattern == designExtractor->getPattern());
+    // }
+}
+
+// Next Extractor Tests
+TEST_CASE("Next Extractor Tests") {}
