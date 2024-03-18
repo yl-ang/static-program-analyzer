@@ -4,6 +4,7 @@
 
 #include "NodeDeclarations.h"
 #include "sp/PatternTreeNode.h"
+#include "sp/Utils.h"
 
 void PatternExtractor::visitPrint(PrintNode* node) {}
 void PatternExtractor::visitWhile(WhileNode* node) {}
@@ -49,4 +50,8 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Patt
 std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>>
 PatternExtractor::getMatchablePattern() {
     return this->matchablePattern;
+}
+
+std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getAssignmentPattern() {
+    return this->assignmentTraversals;
 }

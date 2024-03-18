@@ -37,6 +37,7 @@ public:
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getPattern();
     std::unordered_set<std::pair<StmtNum, StmtNum>> getNext();
     std::unordered_set<std::pair<Procedure, Procedure>> getCalls();
+    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getAssignmentPattern();
 
 private:
     ProcedureTracker* procedureTracker;
