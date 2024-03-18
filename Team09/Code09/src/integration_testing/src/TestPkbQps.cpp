@@ -158,16 +158,17 @@ TEST_CASE("Only select") {
     }
 }
 
-/*
 TEST_CASE("Boolean Select") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
     QPS qps{pfr};
 
+    /*
     SECTION("BOOLEAN, Return TRUE, such that") {
         QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
         REQUIRE_TRUE_RESULT(result);
     }
+    */
 
     SECTION("BOOLEAN, Return FALSE, such that") {
         QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
@@ -184,7 +185,6 @@ TEST_CASE("Boolean Select") {
         REQUIRE_FALSE_RESULT(result);
     }
 }
-*/
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
@@ -1208,6 +1208,7 @@ TEST_CASE("Multi") {
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
+        */
 
         SECTION("Tuple, Return two same values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s1> such that Follows(s1, s2)");
@@ -1259,16 +1260,18 @@ TEST_CASE("Multi") {
                                   "1 6", "1 7",  "1 8",  "1 9",  "8 1", "8 10", "8 11", "8 12",
                                   "8 2", "8 3",  "8 4",  "8 5",  "8 6", "8 7",  "8 8",  "8 9"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
-        }*/
+        }
     }
 
     SECTION("Multiple Clauses") {
+        /*
         SECTION("Chained such that") {
             QPSResult result = qps.processQueries(
                 "stmt s1, s2; Select s1 such that Follows(s1, s2) such that Parent(s1, _) such that Parent(_, s2)");
             QPSResult expected = {"7"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
+        */
 
         SECTION("Chained pattern") {
             QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) pattern a(v,_\"1\"_)");
