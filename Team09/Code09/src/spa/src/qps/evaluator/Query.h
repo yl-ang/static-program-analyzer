@@ -32,7 +32,7 @@ private:
 
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
-    Table buildSelectTable(const PKBFacadeReader&) const;
+    void buildAndJoinSelectTable(const TableManager&, const PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
 

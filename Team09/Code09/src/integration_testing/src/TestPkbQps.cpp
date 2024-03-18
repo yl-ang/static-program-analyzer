@@ -13,6 +13,8 @@ using QPSResult = std::vector<std::string>;
 #define REQUIRE_THROW_SYNTAX_ERROR(expr) REQUIRE((expr)[0] == "SyntaxError")
 #define REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected) equalVectorContents(result, expected)
 #define REQUIRE_EMPTY(result) REQUIRE((result).empty())
+#define REQUIRE_FALSE_RESULT(expr) REQUIRE(expr[0] == "FALSE")
+#define REQUIRE_TRUE_RESULT(expr) REQUIRE(expr[0] == "TRUE")
 
 // HELPER FUNCTIONS
 void equalVectorContents(QPSResult result, QPSResult expected) {
@@ -153,6 +155,32 @@ TEST_CASE("Only select") {
         SECTION("Missing semicolon") {
             REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("stmt s Select s; stmt s2"));
         }
+    }
+}
+
+TEST_CASE("Boolean Select") {
+    PKB pkb{};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
+
+    SECTION("BOOLEAN, Return TRUE, such that") {
+        QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
+        REQUIRE_TRUE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return FALSE, such that") {
+        QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
+        REQUIRE_FALSE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return TRUE, pattern") {
+        QPSResult result = qps.processQueries("assign a; Select BOOLEAN pattern a(_,_\"1\"_)");
+        REQUIRE_TRUE_RESULT(result);
+    }
+
+    SECTION("BOOLEAN, Return FALSE, pattern") {
+        QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
+        REQUIRE_FALSE_RESULT(result);
     }
 }
 
@@ -510,9 +538,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
 
             SECTION("ParentStar(Integer, Synonym: other types)") {
-                QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, s)");
-                QPSResult expected = {"4", "5"};
-                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+                QPSResult result = qps.processQueries("if ifs; Select ifs such that Parent*(3, ifs)");
+                REQUIRE_EMPTY(result);
             }
 
             SECTION("ParentStar(Synonym, Integer)") {
@@ -739,8 +766,6 @@ TEST_CASE("Select with 1 such-that clause") {
     }
     // ai-gen end
 
-    // TODO(Ezekiel): Enable after implementing the Calls and CallsStar parser
-    /*
     SECTION("Calls") {
         SECTION("No synonyms") {
             SECTION("Calls(Procedure, Procedure)") {
@@ -799,11 +824,11 @@ TEST_CASE("Select with 1 such-that clause") {
             }
 
             SECTION("Calls(Procedure, Synonym: Stmt") {
-                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(\"main\", a)"));
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("assign a; Select a such that Calls(\"main\", a)"));
             }
 
             SECTION("Calls(Synonym: Stmt, Procedure") {
-                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(a, \"next\")"));
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("assign a; Select a such that Calls(a, \"next\")"));
             }
         }
 
@@ -819,66 +844,66 @@ TEST_CASE("Select with 1 such-that clause") {
     SECTION("CallsStar") {
         SECTION("No synonyms") {
             SECTION("CallsStar(Procedure, Procedure)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", \"next\")");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(\"main\", \"next\")");
                 QPSResult expected = {allProcs};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Procedure, Wildcard)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", _)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(\"main\", _)");
                 QPSResult expected = {allProcs};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Wildcard, Procedure)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, \"next\")");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(_, \"next\")");
                 QPSResult expected = {allProcs};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Wildcard, Wildcard)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, _)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(_, _)");
                 QPSResult expected = {allProcs};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Wildcard, Wildcard)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"next\", _)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(\"next\", _)");
                 REQUIRE_EMPTY(result);
             }
         }
 
         SECTION("1 Synonym") {
             SECTION("CallsStar(Procedure, Synonym)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(\"main\", p)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(\"main\", p)");
                 QPSResult expected = {"next"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Synonym, Procedure)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, \"next\")");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(p, \"next\")");
                 QPSResult expected = {"main"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Synonym, Wildcard)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(p, _)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(p, _)");
                 QPSResult expected = {"main"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Wildcard, Synonym)") {
-                QPSResult result = qps.processQueries("procedure p; Select p such that Calls(_, p)");
+                QPSResult result = qps.processQueries("procedure p; Select p such that Calls*(_, p)");
                 QPSResult expected = {"next"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
             SECTION("CallsStar(Procedure, Synonym: Stmt") {
-                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(\"main\", a)"));
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("assign a; Select a such that Calls*(\"main\", a)"));
             }
 
             SECTION("CallsStar(Synonym: Stmt, Procedure") {
-                REQUIRE_THROW_SYNTAX_ERROR(qps.processQueries("assign a; Select a such that Calls(a, \"next\")"));
+                REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("assign a; Select a such that Calls*(a, \"next\")"));
             }
         }
 
@@ -890,7 +915,6 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
     }
-    */
 
     SECTION("Next") {
         QPSResult allNext = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
@@ -1169,3 +1193,115 @@ TEST_CASE("Select with 1 such-that clause") {
         }
     }
 };
+
+TEST_CASE("Multi") {
+    PKB pkb{};
+    PKBFacadeReader pfr{buildPKBNew(pkb)};
+    QPS qps{pfr};
+
+    SECTION("Tuple Return Values") {
+        SECTION("Tuple, Return two values, such that") {
+            QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
+            QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two same values, such that") {
+            QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s1> such that Follows(s1, s2)");
+            QPSResult expected = {"1 1", "2 2", "3 3", "7 7", "8 8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return three values, such that") {
+            QPSResult result =
+                qps.processQueries("stmt s1, s2; variable v; Select <s1,s2,v> such that Follows(s1, s2)");
+            QPSResult expected = {"1 2 num1", "2 3 num1", "3 6 num1", "7 12 num1", "8 9 num1",
+                                  "1 2 num2", "2 3 num2", "3 6 num2", "7 12 num2", "8 9 num2",
+                                  "1 2 num3", "2 3 num3", "3 6 num3", "7 12 num3", "8 9 num3"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values, pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select <a, v> pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "8 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(such that), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <s1, s2> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(pattern), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <a, v> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "8 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(with different synonyms), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <s1, v> such that Follows(s1,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 num1", "1 num2", "2 num1", "2 num2", "3 num1",
+                                  "3 num2", "7 num1", "7 num2", "8 num1", "8 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Tuple, Return two values(with shared synonyms), such that and pattern") {
+            QPSResult result = qps.processQueries(
+                "assign a; stmt s1,s2; variable v; Select <a, s1> such that Follows(a,s2) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1 1", "1 10", "1 11", "1 12", "1 2", "1 3",  "1 4",  "1 5",
+                                  "1 6", "1 7",  "1 8",  "1 9",  "8 1", "8 10", "8 11", "8 12",
+                                  "8 2", "8 3",  "8 4",  "8 5",  "8 6", "8 7",  "8 8",  "8 9"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
+
+    SECTION("Multiple Clauses") {
+        SECTION("Chained such that") {
+            QPSResult result = qps.processQueries(
+                "stmt s1, s2; Select s1 such that Follows(s1, s2) such that Parent(s1, _) such that Parent(_, s2)");
+            QPSResult expected = {"7"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) pattern a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern and such that") {
+            QPSResult result = qps.processQueries(
+                "assign a; variable v; stmt s; Select s such that Parent*(3, s) pattern a(_,_) such that Modifies(s, "
+                "\"num2\") pattern a(v,_\"1\"_)");
+            QPSResult expected = {"5"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
+
+    SECTION("Clauses with 'and'") {
+        SECTION("Chained such that") {
+            QPSResult result = qps.processQueries(
+                "stmt s1, s2; Select s1 such that Follows(s1, s2) and Parent(s1, _) and Parent(_, s2)");
+            QPSResult expected = {"7"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) and a(v,_\"1\"_)");
+            QPSResult expected = {"1", "8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Chained pattern and such that") {
+            QPSResult result = qps.processQueries(
+                "assign a; variable v; stmt s; Select s such that Parent*(3, s) and Modifies(s, \"num2\") pattern "
+                "a(_,_) and a(v,_\"1\"_)");
+            QPSResult expected = {"5"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
+}

@@ -71,20 +71,26 @@ Row TableManager::combineRows(const Row& row, const Row& otherRow, const std::ve
 
 std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     std::vector<Synonym> commonHeaders{};
+    std::unordered_set<SynonymValue> seen{};
+
     for (Synonym header : this->result.getHeaders()) {
-        if (other.containsHeader(header)) {
+        if (seen.find(header.getValue()) == seen.end() && other.containsHeader(header)) {
             commonHeaders.push_back(header);
+            seen.insert(header.getValue());
         }
     }
     return commonHeaders;
 }
 
 std::vector<Synonym> TableManager::mergeHeaders(const Table& other) const {
-    std::vector<Synonym> newHeaders{this->result.getHeaders()};
+    std::vector<Synonym> newHeaders{};
     std::unordered_set<SynonymValue> seen{};
 
     for (Synonym header : this->result.getHeaders()) {
-        seen.insert(header.getValue());
+        if (seen.find(header.getValue()) == seen.end()) {
+            newHeaders.push_back(header);
+            seen.insert(header.getValue());
+        }
     }
 
     for (Synonym header : other.getHeaders()) {
