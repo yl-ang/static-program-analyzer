@@ -21,6 +21,9 @@ bool isWildcard(const std::string& str) {
 }
 
 bool isQuotedIdent(const std::string& str) {
+    if (str.empty()) {
+        return false;
+    }
     bool startsAndEndsWithQuotes = std::regex_match(str, std::regex("^\".*\"$"));
     std::string ident = trim(str.substr(1, str.size() - 2));
     return startsAndEndsWithQuotes && isIdent(ident);

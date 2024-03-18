@@ -22,7 +22,6 @@ private:
     ClauseResult variablesModifedByStatement(PKBFacadeReader&);
     ClauseResult variablesModifiedByProcedure(PKBFacadeReader& reader);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
-    std::unordered_set<StmtNum> filterStatementsByType(PKBFacadeReader&, DesignEntityType, std::unordered_set<StmtNum>);
 
 public:
     Modifies(ClauseArgument&, ClauseArgument&);

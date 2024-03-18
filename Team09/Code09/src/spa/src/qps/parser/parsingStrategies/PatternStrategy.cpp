@@ -3,11 +3,14 @@
 std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, QPSRegexes::PATTERN_ARGS)) {
+        if (argMatch.suffix().matched) {
+            throw QPSSyntaxError();
+        }
         std::string assignSynonym = argMatch[1];
         std::string parameters = argMatch[2];
 
         std::vector<std::string> parameterStringsToParse{assignSynonym};
-        std::vector<std::string> cleanedParameters{cleanParameters(parameters)};
+        std::vector<std::string> cleanedParameters = splitByDelimiter(parameters, ",");
         Validator::validatePatternSyntax(assignSynonym, parameters);
 
         parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
