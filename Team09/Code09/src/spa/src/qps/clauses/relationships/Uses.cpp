@@ -1,5 +1,7 @@
 #include "Uses.h"
 
+#include "../ClauseEvaluatorUtils.h"
+
 Uses::Uses(ClauseArgument& user, ClauseArgument& var) : user(user), var(var) {}
 
 bool Uses::validateArguments() {
@@ -42,8 +44,9 @@ ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
         }
     }
 
-    return {reader.hasStatementVariableUseRelationship(user, var) ||
-            reader.hasProcedureVariableModifiesRelationship(user, var)};
+    return {ClauseEvaluatorUtils::isIdentLiteral(user.getValue())
+                ? reader.hasProcedureVariableUseRelationship(user, var)
+                : reader.hasStatementVariableUseRelationship(user, var)};
 }
 
 ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
@@ -62,7 +65,7 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
             }
         } else {
             std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(var);
-            for (StmtNum currStmt : filterStatementsByType(reader, userSyn.getType(), stmts)) {
+            for (StmtNum currStmt : ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), stmts)) {
                 userValues.push_back(std::to_string(currStmt));
                 varValues.push_back(var);
             }
@@ -99,7 +102,7 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
             allStmts.insert(users.begin(), users.end());
         }
 
-        for (StmtNum stmt : filterStatementsByType(reader, userSyn.getType(), allStmts)) {
+        for (StmtNum stmt : ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), allStmts)) {
             values.push_back(std::to_string(stmt));
         }
     }
@@ -126,23 +129,6 @@ ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
     }
 
     return {varSyn, values};
-}
-
-std::unordered_set<StmtNum> Uses::filterStatementsByType(PKBFacadeReader& reader, DesignEntityType type,
-                                                         std::unordered_set<StmtNum> users) {
-    StatementType mappedStmtType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[type];
-
-    if (type == DesignEntityType::STMT) {
-        return users;
-    }
-
-    std::unordered_set<StmtNum> filteredSet{};
-    for (StmtNum curruser : users) {
-        if (reader.getStatementByStmtNum(curruser)->type == mappedStmtType) {
-            filteredSet.insert(curruser);
-        }
-    }
-    return filteredSet;
 }
 
 bool Uses::isSimpleResult() const {

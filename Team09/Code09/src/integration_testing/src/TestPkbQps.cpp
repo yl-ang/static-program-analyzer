@@ -584,13 +584,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Modifies(Literal: [procedure name], Variable)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Modifies(\"main\", \"num1\")");
                 QPSResult expected = {allStmts};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Modifies(Wildcard, Variable)") {
                 REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Modifies(_, \"num2\")"));
@@ -616,13 +614,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Modifies(Procedure, synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Modifies(Procedure, Variable)") {
                 QPSResult result = qps.processQueries("procedure p; Select p such that Modifies(p, \"num2\")");
@@ -671,13 +667,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_THROW_SEMANTIC_ERROR(qps.processQueries("stmt s; Select s such that Uses(_, \"num2\")"));
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Uses(Literal: [procedure name], VariableName)") {
                 QPSResult result = qps.processQueries("procedure p; Select p such that Uses(\"main\", \"num1\")");
                 QPSResult expected = {"main", "next"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Uses(Integer, Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, _)");
@@ -685,13 +679,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Uses(Literal: [procedure name], Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(\"main\", _)");
                 QPSResult expected = {allStmts};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
         }
 
         SECTION("1 synonym") {
@@ -708,13 +700,11 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            /* TODO(Hanqin): Enable after fixing validation error
             SECTION("Uses(ProcedureName, Synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Uses(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
-            */
 
             SECTION("Uses(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Uses(3, v)");
