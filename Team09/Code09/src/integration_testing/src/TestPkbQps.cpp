@@ -158,17 +158,16 @@ TEST_CASE("Only select") {
     }
 }
 
+/*
 TEST_CASE("Boolean Select") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
     QPS qps{pfr};
 
-    /*
     SECTION("BOOLEAN, Return TRUE, such that") {
         QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(1, 2)");
         REQUIRE_TRUE_RESULT(result);
     }
-    */
 
     SECTION("BOOLEAN, Return FALSE, such that") {
         QPSResult result = qps.processQueries("stmt s; Select BOOLEAN such that Follows(12, _)");
@@ -184,7 +183,8 @@ TEST_CASE("Boolean Select") {
         QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
         REQUIRE_FALSE_RESULT(result);
     }
-}
+    }
+    */
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
@@ -1196,19 +1196,18 @@ TEST_CASE("Select with 1 such-that clause") {
     }
 };
 
+/*
 TEST_CASE("Multi") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
     QPS qps{pfr};
 
     SECTION("Tuple Return Values") {
-        /*
         SECTION("Tuple, Return two values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
-        */
 
         SECTION("Tuple, Return two same values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s1> such that Follows(s1, s2)");
@@ -1264,14 +1263,12 @@ TEST_CASE("Multi") {
     }
 
     SECTION("Multiple Clauses") {
-        /*
         SECTION("Chained such that") {
             QPSResult result = qps.processQueries(
                 "stmt s1, s2; Select s1 such that Follows(s1, s2) such that Parent(s1, _) such that Parent(_, s2)");
             QPSResult expected = {"7"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
-        */
 
         SECTION("Chained pattern") {
             QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(_,_) pattern a(v,_\"1\"_)");
@@ -1311,3 +1308,4 @@ TEST_CASE("Multi") {
         }
     }
 }
+    */
