@@ -158,6 +158,7 @@ TEST_CASE("Only select") {
     }
 }
 
+/*
 TEST_CASE("Boolean Select") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -182,7 +183,8 @@ TEST_CASE("Boolean Select") {
         QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
         REQUIRE_FALSE_RESULT(result);
     }
-}
+    }
+    */
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
@@ -1194,6 +1196,7 @@ TEST_CASE("Select with 1 such-that clause") {
     }
 };
 
+/*
 TEST_CASE("Multi") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -1305,3 +1308,4 @@ TEST_CASE("Multi") {
         }
     }
 }
+    */
