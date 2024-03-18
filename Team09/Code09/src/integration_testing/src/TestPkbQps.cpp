@@ -1010,7 +1010,7 @@ TEST_CASE("Select with 1 such-that clause") {
         SECTION("1 synonym") {
             SECTION("Next(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(3, s)");
-                QPSResult expected = {"4", "5"};
+                QPSResult expected = {"4", "5", "6"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
@@ -1027,7 +1027,7 @@ TEST_CASE("Select with 1 such-that clause") {
 
             SECTION("Next(Synonym, Stmt)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(s, 4)");
-                QPSResult expected = {"3"};
+                QPSResult expected = {"1", "2", "3"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
@@ -1038,7 +1038,7 @@ TEST_CASE("Select with 1 such-that clause") {
             }
 
             SECTION("Next(Synonym: others, Stmt)") {
-                QPSResult result = qps.processQueries("assign a; Select a such that Next*(a, 4)");
+                QPSResult result = qps.processQueries("while w; Select w such that Next*(w, 4)");
                 REQUIRE_EMPTY(result);
             }
         }
