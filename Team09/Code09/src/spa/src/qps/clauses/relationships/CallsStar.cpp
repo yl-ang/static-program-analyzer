@@ -1,6 +1,6 @@
 #include "CallsStar.h"
 
-CallsStar::CallsStar(ClauseArgument& caller, ClauseArgument& callee) : callee(caller), caller(callee) {}
+CallsStar::CallsStar(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
 
 bool CallsStar::validateArguments() {
     if (caller.isSynonym()) {
@@ -31,7 +31,7 @@ ClauseResult CallsStar::evaluate(PKBFacadeReader& reader) {
         return evaluateCallerSynonym(reader);
     }
 
-    return {reader.hasCallStarRelationship(callee, caller)};
+    return {reader.hasCallStarRelationship(caller, callee)};
 }
 
 ClauseResult CallsStar::evaluateCalleeSynonym(PKBFacadeReader& reader) {

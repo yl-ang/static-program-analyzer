@@ -31,7 +31,7 @@ ClauseResult Calls::evaluate(PKBFacadeReader& reader) {
         return evaluateCallerSynonym(reader);
     }
 
-    return {reader.hasCallRelationship(callee, caller)};
+    return {reader.hasCallRelationship(caller, callee)};
 }
 
 ClauseResult Calls::evaluateCalleeSynonym(PKBFacadeReader& reader) {
