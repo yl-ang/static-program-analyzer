@@ -74,6 +74,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+  
+      - name: test
+        run: |
+          cat $GITHUB_WORKSPACE/Team09/Tests09/milestone2/milestone2_source_1.txt
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
@@ -98,9 +102,8 @@ jobs:
         
       - name: Autotester System Testing
         working-directory: ${{runner.workspace}}/build
-        run: ./src/autotester/autotester "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_source_1.txt" \
-                "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/milestone2_queries_1.txt" \
-                "${GITHUB_WORKSPACE}/Team09/Tests09/milestone2/out.xml"
+        run: |
+            ./src/autotester/autotester $GITHUB_WORKSPACE/Team09/Tests09/milestone2/milestone2_source_1.txt $GITHUB_WORKSPACE/Team09/Tests09/milestone2/milestone2_queries_1.txt $GITHUB_WORKSPACE/Team09/Tests09/milestone2/out.xml
       
       - name: Output Autotester out.xml
         shell: bash

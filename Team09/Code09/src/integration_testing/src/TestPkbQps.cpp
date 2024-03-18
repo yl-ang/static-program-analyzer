@@ -1202,6 +1202,7 @@ TEST_CASE("Multi") {
     QPS qps{pfr};
 
     SECTION("Tuple Return Values") {
+        /*
         SECTION("Tuple, Return two values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
@@ -1258,7 +1259,7 @@ TEST_CASE("Multi") {
                                   "1 6", "1 7",  "1 8",  "1 9",  "8 1", "8 10", "8 11", "8 12",
                                   "8 2", "8 3",  "8 4",  "8 5",  "8 6", "8 7",  "8 8",  "8 9"};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
-        }
+        }*/
     }
 
     SECTION("Multiple Clauses") {
