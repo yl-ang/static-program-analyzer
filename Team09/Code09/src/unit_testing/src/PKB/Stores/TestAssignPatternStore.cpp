@@ -6,11 +6,11 @@
 #include "qps/clauseArguments/Wildcard.h"
 
 bool alwaysTrueFunction(std::string s1, std::string s2) {
-    return s1 == s2;
+    return true;
 }
 
 bool alwaysFalseFunction(std::string s1, std::string s2) {
-    return s1 != s2;
+    return false;
 }
 
 TEST_CASE("store - All Tests") {
@@ -58,7 +58,7 @@ TEST_CASE("store - All Tests") {
         REQUIRE(store.hasExactPattern(3, arg1, arg2));
     }
 
-    SECTION("Test always returns true for hasPartialPattern - (stmtNum, wildcard, variable)") {
+    SECTION("Test always returns false for hasPartialPattern - (stmtNum, wildcard, variable)") {
         std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patterns = {
             {1, {"x", "y + 6"}}, {2, {"a", "b"}}, {3, {"p", "q"}}};
         std::function<bool(std::string, std::string)> funct_ptr1 = alwaysTrueFunction;
@@ -69,7 +69,7 @@ TEST_CASE("store - All Tests") {
         std::string arg1 = "_";
         std::string arg2 = "y";
 
-        REQUIRE(store.hasPartialPattern(1, arg1, arg2));
+        REQUIRE_FALSE(store.hasPartialPattern(1, arg1, arg2));
     }
 
     SECTION("Test always returns false for hasPartialPattern - (stmtNum, variable, wildcard)") {
