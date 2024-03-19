@@ -41,7 +41,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
 }
 
-std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>> 
+std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>>
         PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::shared_ptr<SelectEntContainer> selectEntities;
     std::vector<SuchThatClause> suchThatClauses;
@@ -164,7 +164,7 @@ std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string cla
 
 SuchThatClause PQLParser::parseSuchThatClauses(std::string clauseString) {
     std::vector<SuchThatClause> result = {};  // if there is none
-    
+
     // replaced only the below line for strategy pattern refactor
     // SuchThatClause st = toSTClause(entities, clauseString);
     // UnparsedClause(std::vector<Synonym> entities,
