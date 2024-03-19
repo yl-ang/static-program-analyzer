@@ -46,6 +46,15 @@ public:
         return false;
     }
 
+    static bool isPartiallyEqual(const std::shared_ptr<PatternTreeNode>& lhs,
+                                 const std::shared_ptr<PatternTreeNode>& rhs) {
+        if (lhs == nullptr)
+            return false;
+        if (isEqual(lhs, rhs))
+            return true;
+        return isPartiallyEqual(lhs->left, rhs) || isPartiallyEqual(lhs->right, rhs);
+    }
+
     static std::shared_ptr<PatternTreeNode> buildTreeFromAST(std::shared_ptr<ExpressionNode> expressoinNode);
 
 private:
