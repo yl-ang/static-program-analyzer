@@ -15,4 +15,5 @@ PKB::PKB() noexcept {
 
     nextStore = std::make_shared<NextStore>();
     callStore = std::make_shared<CallStore>();
+    assignPatternStore = std::make_shared<AssignPatternStore>();
 }

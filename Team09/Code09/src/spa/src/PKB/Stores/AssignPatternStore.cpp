@@ -28,7 +28,7 @@ bool AssignPatternStore::hasPattern(StmtNum stmtNum, std::string lhs, std::strin
         // Check if there is any pair in the set where the values match lhs and rhs
         for (const auto& pair : pairSet) {
             // Assuming StmtNum is an integer type
-            if (pair.first == lhs && pair.second == rhs) {
+            if (functionPointer(pair.first, lhs) && functionPointer(pair.second, rhs)) {
                 return true;
             }
         }
@@ -38,7 +38,7 @@ bool AssignPatternStore::hasPattern(StmtNum stmtNum, std::string lhs, std::strin
 }
 
 bool AssignPatternStore::hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2) {
-    if (arg1.isWildcard() & arg2.isWildcard()) {
+    if (arg1.isWildcard() && arg2.isWildcard()) {
         return !patternsMap[stmtNum].empty();
     }
 
