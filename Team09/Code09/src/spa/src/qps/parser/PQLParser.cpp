@@ -33,8 +33,19 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     modifyClauseList(clauseList);
 
     std::shared_ptr<SelectEntContainer> selectEntities = PQLParser::parseSelectClause(unparsedClauses);
-    std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList);
-    std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList);
+
+    std::vector<SuchThatClause> suchThatClauses;
+    std::vector<PatternClause> patternClauses;
+
+    for (std::string clauseString : clauseList) {
+        if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
+            suchThatClauses.push_back(PQLParser::parseSuchThatClauses(clauseString));
+        } else if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
+            patternClauses.push_back(PQLParser::parsePatternClauses(clauseString));
+        } else {
+            throw QPSSyntaxError();
+        }
+    }
 
     Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
@@ -141,45 +152,35 @@ std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string unp
     throw QPSSyntaxError();
 }
 
-std::vector<SuchThatClause> PQLParser::parseSuchThatClauses(std::vector<std::string> clauseList) {
+SuchThatClause PQLParser::parseSuchThatClauses(std::string clauseString) {
     std::vector<SuchThatClause> result = {};  // if there is none
-    for (std::string clauseString : clauseList) {
-        if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
-            // replaced only the below line for strategy pattern refactor
-            // SuchThatClause st = toSTClause(entities, clauseString);
-            // UnparsedClause(std::vector<Synonym> entities,
-            // std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
-            UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
-            std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-            SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
-            if (stPtr) {
-                SuchThatClause stClause = std::move(*stPtr);
-                result.push_back(stClause);
-            } else {
-                throw Exception("Issues with Strategy Pattern for SuchThatClauses");
-            }
-        }
+    
+    // replaced only the below line for strategy pattern refactor
+    // SuchThatClause st = toSTClause(entities, clauseString);
+    // UnparsedClause(std::vector<Synonym> entities,
+    // std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
+    UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
+    std::unique_ptr<QueryClause> qc = unparsedClause.execute();
+    SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
+    if (stPtr) {
+        SuchThatClause stClause = std::move(*stPtr);
+        return stClause;
+    } else {
+        throw Exception("Issues with Strategy Pattern for SuchThatClauses");
     }
-    return result;
 }
 
-std::vector<PatternClause> PQLParser::parsePatternClauses(std::vector<std::string> clauseList) {
+PatternClause PQLParser::parsePatternClauses(std::string clauseString) {
     std::vector<PatternClause> result = {};  // if there is none
-    for (std::string clauseString : clauseList) {
-        if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
-            // replaced only the below line for strategy pattern refactor
-            // PatternClause st = toPatternClause(entities, clauseString);
-            UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
-            std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-            PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
-            if (ptPtr) {
-                PatternClause ptClause = std::move(*ptPtr);
-                result.push_back(ptClause);
-            } else {
-                throw Exception("Issues with Strategy Pattern for PatternClauses");
-            }
-        }
+    // replaced only the below line for strategy pattern refactor
+    // PatternClause st = toPatternClause(entities, clauseString);
+    UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
+    std::unique_ptr<QueryClause> qc = unparsedClause.execute();
+    PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
+    if (ptPtr) {
+        PatternClause ptClause = std::move(*ptPtr);
+        return ptClause;
+    } else {
+        throw Exception("Issues with Strategy Pattern for PatternClauses");
     }
-
-    return result;
 }

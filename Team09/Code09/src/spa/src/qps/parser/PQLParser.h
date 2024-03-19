@@ -27,6 +27,6 @@ public:
     static Query parse(UnparsedQueries);
     static SynonymStore parseQueryEntities(std::vector<std::string>);
     static std::shared_ptr<SelectEntContainer> parseSelectClause(std::string);
-    static std::vector<SuchThatClause> parseSuchThatClauses(std::vector<std::string>);
-    static std::vector<PatternClause> parsePatternClauses(std::vector<std::string>);
+    static SuchThatClause parseSuchThatClauses(std::string);
+    static PatternClause parsePatternClauses(std::string);
 };
