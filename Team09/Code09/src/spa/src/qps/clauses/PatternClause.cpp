@@ -58,7 +58,7 @@ ClauseResult PatternClause::evaluateArgSyn(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
     Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable
 
-    std::unordered_set<Stmt> allStmts = reader.getStatementsByType(StatementType::ASSIGN);
+    std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::unordered_set<Variable> allVars = reader.getVariables();
 
     std::vector<std::string> stmtNumbers = {};
@@ -74,7 +74,7 @@ ClauseResult PatternClause::evaluateArgSyn(PKBFacadeReader& reader) {
         second = &secondArg;
     }
 
-    for (Stmt stmt : allStmts) {
+    for (Stmt stmt : assignStmts) {
         for (Variable var : allVars) {
             Literal tempLiteral(var);
             if (reader.hasPattern(stmt.stmtNum, tempLiteral, *second)) {
@@ -98,8 +98,15 @@ ClauseResult PatternClause::evaluateArgSyn(PKBFacadeReader& reader) {
 
 ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
     Synonym aSyn = dynamic_cast<Synonym&>(assignSynonym);
-    std::unordered_set<Stmt> allStmts = reader.getStmts();
+    std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::vector<std::string> stmtNumbers = {};
+
+    if (firstArg.isWildcard() && secondArg.isWildcard()) {
+        for (Stmt stmt : assignStmts) {
+            stmtNumbers.push_back(std::to_string(stmt.stmtNum));
+        }
+        return {aSyn, stmtNumbers};
+    }
 
     // Temporary solution to ExpressionSpec
     ClauseArgument* second;
@@ -111,7 +118,7 @@ ClauseResult PatternClause::evaluateArgNonSyns(PKBFacadeReader& reader) {
         second = &secondArg;
     }
 
-    for (Stmt stmt : allStmts) {
+    for (Stmt stmt : assignStmts) {
         if (reader.hasPattern(stmt.stmtNum, firstArg, *second)) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
