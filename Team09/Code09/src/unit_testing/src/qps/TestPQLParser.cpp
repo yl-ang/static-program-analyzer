@@ -487,8 +487,9 @@ TEST_CASE("And (1)") {
 TEST_CASE("And (2)") {
     std::vector<std::string> clauseList_1 = {"Select and", "such that Modifies( and , _)", "and Parent(s, s1)"};
     PQLParser::modifyClauseList(clauseList_1);
-    REQUIRE(clauseList_1[0] == "such that Modifies( and , _)");
-    REQUIRE(clauseList_1[1] == "such that Parent(s, s1)");
+    REQUIRE(clauseList_1[0] == "Select and");
+    REQUIRE(clauseList_1[1] == "such that Modifies( and , _)");
+    REQUIRE(clauseList_1[2] == "such that Parent(s, s1)");
 }
 
 TEST_CASE("And (3)") {
