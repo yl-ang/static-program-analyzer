@@ -17,8 +17,6 @@ public:
     // setPatterns will take in a set containing pairs of stmtNum and nested pair (left hand side variable,
     // and right hand side expression)
 
-    bool hasExactPatternHelper(StmtNum stmtNum, std::string lhs, std::string rhs);
-    bool hasPartialPatternHelper(StmtNum stmtNum, std::string lhs, std::string rhs);
     bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
     bool hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
 
@@ -26,7 +24,10 @@ private:
     std::unordered_map<StmtNum, std::unordered_set<std::pair<std::string, std::string>>> patternsMap;
     void setPatterns(const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>>& patterns);
     void setFunctionPointer(const std::function<bool(std::string, std::string)>);
-
+    bool applyPatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum, std::string arg1,
+                              std::string arg2);
+    bool applyPatternFunctionHelper(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
+                                    std::string arg1, std::string arg2);
     std::function<bool(std::string, std::string)> exactMatchFP;
     std::function<bool(std::string, std::string)> partialMatchFP;
 };
