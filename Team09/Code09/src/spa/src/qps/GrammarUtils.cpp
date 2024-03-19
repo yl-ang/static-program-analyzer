@@ -47,12 +47,15 @@ bool isExpressionSpec(const std::string& str) {
         return true;
     }
 
-    bool startsAndEndsWithUnderscores = std::regex_match(str, std::regex("^_.*_$"));
     std::string removedUnderscoreString = str;
-    if (startsAndEndsWithUnderscores) {
+    if (isPartialExpression(str)) {
         removedUnderscoreString = trim(str.substr(1, str.size() - 2));
     }
     return isQuotedExpr(removedUnderscoreString);
+}
+
+bool isPartialExpression(const std::string& str) {
+    return std::regex_match(str, std::regex("^_.*_$"));
 }
 
 bool isQuotedExpr(const std::string& str) {

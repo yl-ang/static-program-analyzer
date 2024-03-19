@@ -1,20 +1,21 @@
 #pragma once
 
 #include "QueryClause.h"
+#include "qps/ParserUtils.h"
 #include "qps/clauseArguments/ExpressionSpec.h"
 #include "qps/clauseArguments/Synonym.h"
+#include "qps/clauses/patterns/AssignPattern.h"
+#include "qps/clauses/patterns/IfPattern.h"
+#include "qps/clauses/patterns/Pattern.h"
+#include "qps/clauses/patterns/WhilePattern.h"
 
 class PatternClause : public QueryClause {
-private:
-    ClauseArgument& assignSynonym;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
-
-    ClauseResult evaluateArgSyn(PKBFacadeReader&);
-    ClauseResult evaluateArgNonSyns(PKBFacadeReader&);
+protected:
+    ClauseArgument& synonym;
+    std::vector<ClauseArgument*> args;
 
 public:
-    PatternClause(ClauseArgument* assign, ClauseArgument* f, ClauseArgument* s);
+    PatternClause(ClauseArgument*, std::vector<ClauseArgument*>);
     bool equals(const QueryClause&) const override;
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;

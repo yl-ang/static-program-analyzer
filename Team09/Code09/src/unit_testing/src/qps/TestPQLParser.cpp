@@ -397,8 +397,8 @@ TEST_CASE("PQLParser: Select ... pattern (1)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     ExpressionSpec l = ExpressionSpec("\"x+y\"");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&l));
+    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
+                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
     REQUIRE(result_1.size() == 1);
     REQUIRE(result_2.size() == 1);
     REQUIRE(result_3.size() == 1);
@@ -434,8 +434,8 @@ TEST_CASE("PQLParser: Select ... pattern (2)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&l));
+    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
+                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
     REQUIRE(result_1.size() == 1);
     REQUIRE(result_2.size() == 1);
     REQUIRE(result_3.size() == 1);
@@ -468,8 +468,8 @@ TEST_CASE("PQLParser: Select ... pattern (4)") {
 
     SuchThatClause s =
         SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
-    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
-                                    static_cast<ClauseArgument*>(&temp));
+    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a),
+                                    {static_cast<ClauseArgument*>(&v), static_cast<ClauseArgument*>(&temp)});
     REQUIRE(suchThatClauses.size() == 1);
     REQUIRE(patternClauses.size() == 1);
     REQUIRE(s.equals(suchThatClauses[0]));
@@ -508,12 +508,12 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Missing synonym name") {
+    SECTION("Missing assignSyn name") {
         vectorString input = {"stmt ;", "variable v;", "Select s"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Declaration not synonym") {
+    SECTION("Declaration not assignSyn") {
         vectorString input = {"stmt 1s;", "variable v;", "Select s such that Follows* (1, 2)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -568,7 +568,7 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Uses, one synonym") {
+    SECTION("Uses, one assignSyn") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -598,7 +598,7 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Pattern, Missing synonym") {
+    SECTION("Pattern, Missing assignSyn") {
         vectorString input = {"assign a;", "Select a such that pattern (_, \"x\"_)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -643,12 +643,12 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("and as a synonym, pattern") {
+    SECTION("and as a assignSyn, pattern") {
         vectorString input = {"assign and, a;", "stmt s1;", "Select s1 pattern and (_, _) and a (_, _)"};
         REQUIRE_NOTHROW(PQLParser::parse(input));
     }
 
-    SECTION("Syntax Error before undeclared relCond synonym after and, pattern") {
+    SECTION("Syntax Error before undeclared relCond assignSyn after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (, _) and Modifies (s1, _)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -720,12 +720,12 @@ TEST_CASE("SemanticError") {
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Undeclared relCond synonym after pattern") {
+    SECTION("Undeclared relCond assignSyn after pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern Modifies (s1, _)"};
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Undeclared relCond synonym after and, pattern") {
+    SECTION("Undeclared relCond assignSyn after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (_, _) and Modifies (s1, _)"};
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }

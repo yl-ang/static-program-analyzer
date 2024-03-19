@@ -222,8 +222,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
-            SECTION("Follows(Integer, synonym") {
+        SECTION("1 assignSyn") {
+            SECTION("Follows(Integer, assignSyn") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Follows(1, s)");
                 QPSResult expected = {"2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -322,8 +322,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
-            SECTION("FollowsStar(Integer, synonym") {
+        SECTION("1 assignSyn") {
+            SECTION("FollowsStar(Integer, assignSyn") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Follows*(1, s)");
                 QPSResult expected = {"2", "3", "6"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -424,8 +424,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
-            SECTION("Parent(Integer, synonym") {
+        SECTION("1 assignSyn") {
+            SECTION("Parent(Integer, assignSyn") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Parent(3, s)");
                 QPSResult expected = {"4", "5"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -526,8 +526,8 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
-            SECTION("ParentStar(Integer, synonym)") {
+        SECTION("1 assignSyn") {
+            SECTION("ParentStar(Integer, assignSyn)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Parent*(3, s)");
                 QPSResult expected = {"4", "5"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -629,8 +629,8 @@ TEST_CASE("Select with 1 such-that clause") {
         }
 
         QPSResult allModifyingStatements = {"1", "2", "3", "5", "6", "7", "8"};
-        SECTION("1 synonym") {
-            SECTION("Modifies(Integer, synonym)") {
+        SECTION("1 assignSyn") {
+            SECTION("Modifies(Integer, assignSyn)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(1, v)");
                 QPSResult expected = {"num1"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -647,7 +647,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allModifyingStatements);
             }
 
-            SECTION("Modifies(Procedure, synonym)") {
+            SECTION("Modifies(Procedure, assignSyn)") {
                 QPSResult result = qps.processQueries("variable v; Select v such that Modifies(\"main\", v)");
                 QPSResult expected = {"num1", "num2"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -719,7 +719,7 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
+        SECTION("1 assignSyn") {
             SECTION("Uses(Synonym, VariableName)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, \"num1\")");
                 QPSResult expected = {"3", "4", "5", "6", "7"};
@@ -942,7 +942,7 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
+        SECTION("1 assignSyn") {
             SECTION("Next(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next(3, s)");
                 QPSResult expected = {"4", "5"};
@@ -1023,7 +1023,7 @@ TEST_CASE("Select with 1 such-that clause") {
             }
         }
 
-        SECTION("1 synonym") {
+        SECTION("1 assignSyn") {
             SECTION("Next(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(3, s)");
                 QPSResult expected = {"4", "5", "6"};
