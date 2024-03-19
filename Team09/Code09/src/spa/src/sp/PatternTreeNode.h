@@ -11,6 +11,7 @@
 // Serialising and deserialising:
 // https://leetcode.com/problems/serialize-and-deserialize-binary-tree/solutions/74259/recursive-preorder-python-and-c-o-n/
 // Equality: https://leetcode.com/problems/same-tree/solutions/3746149/recursive-approach-with-easy-steps/
+// Partial Match: https://leetcode.com/problems/subtree-of-another-tree/description/
 class PatternTreeNode {
 public:
     std::string value;
