@@ -43,7 +43,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
 }
 
 ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb) {
-    return [&pkb](Synonym synonym, SynonymValue value) {
+    return [&pkb](Synonym synonym, SynonymValue value) -> SynonymValue {
         const auto& attr = synonym.getAttr();
 
         if (!attr.has_value()) {
@@ -74,7 +74,7 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
             return value;
         }
 
-        return "";
+        return value;
     };
 }
 
