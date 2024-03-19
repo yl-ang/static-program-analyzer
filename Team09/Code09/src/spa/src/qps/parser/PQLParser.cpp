@@ -32,13 +32,14 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // Replace 'and' clause with 'such that', 'pattern', etc. before processing
     modifyClauseList(clauseList);
 
-    std::shared_ptr<SelectEntContainer> selectEntities = PQLParser::parseSelectClause(unparsedClauses);
-
+    std::shared_ptr<SelectEntContainer> selectEntities;
     std::vector<SuchThatClause> suchThatClauses;
     std::vector<PatternClause> patternClauses;
 
     for (std::string clauseString : clauseList) {
-        if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
+        if (std::regex_match(clauseString, QPSRegexes::SELECT_CLAUSE)) {
+            selectEntities = parseSelectClause(clauseString);
+        } else if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
             suchThatClauses.push_back(PQLParser::parseSuchThatClauses(clauseString));
         } else if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
             patternClauses.push_back(PQLParser::parsePatternClauses(clauseString));
@@ -67,7 +68,7 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
             throw QPSSyntaxError();
         }
     }
-    if (selectCounter > 1) {
+    if (selectCounter != 1) {
         throw QPSSyntaxError();
     }
 }
@@ -122,9 +123,9 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
     return synonymStore;
 }
 
-std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string unparsedClauses) {
+std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string clauseString) {
     std::smatch match;
-    if (std::regex_search(unparsedClauses, match, QPSRegexes::SELECT_CLAUSE)) {
+    if (std::regex_search(clauseString, match, QPSRegexes::SELECT_CLAUSE)) {
         std::string selectEntity = match[1];
 
         // if BOOLEAN, since we have no idea if it is a variable or not now, will
