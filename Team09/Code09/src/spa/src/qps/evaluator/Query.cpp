@@ -36,7 +36,46 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
                                       : std::vector{QPSConstants::TRUE_STRING};
     }
 
+    const ValueTransformer transformer = projectSynonymAttributesTransformer(pkb);
+    tableManager.projectAttributes(transformer);
+
     return tableManager.extractResults(selectEntities);
+}
+
+ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb) {
+    return [&pkb](Synonym synonym, SynonymValue value) {
+        const auto& attr = synonym.getAttr();
+
+        if (!attr.has_value()) {
+            return value;
+        }
+
+        switch (attr.value()) {
+        case SynonymAttributeType::PROCNAME:
+            if (synonym.getType() == DesignEntityType::CALL) {
+                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
+                return value;
+            }
+            return value;
+
+        case SynonymAttributeType::VARNAME:
+            if (synonym.getType() == DesignEntityType::READ) {
+                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
+                return value;
+            }
+            if (synonym.getType() == DesignEntityType::PRINT) {
+                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
+                return value;
+            }
+            return value;
+
+        case SynonymAttributeType::VALUE:
+        case SynonymAttributeType::STMTNUM:
+            return value;
+        }
+
+        return "";
+    };
 }
 
 bool Query::hasNoClauses() const {
