@@ -32,13 +32,24 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     // Replace 'and' clause with 'such that', 'pattern', etc. before processing
     modifyClauseList(clauseList);
 
+    auto result = parseClauses(clauseList);
+    std::shared_ptr<SelectEntContainer> selectEntities = std::get<0>(result);
+    std::vector<SuchThatClause> suchThatClauses = std::get<1>(result);
+    std::vector<PatternClause> patternClauses = std::get<2>(result);
+
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
+    return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
+}
+
+std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>> 
+        PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::shared_ptr<SelectEntContainer> selectEntities;
     std::vector<SuchThatClause> suchThatClauses;
     std::vector<PatternClause> patternClauses;
 
     for (std::string clauseString : clauseList) {
         if (std::regex_match(clauseString, QPSRegexes::SELECT_CLAUSE)) {
-            selectEntities = parseSelectClause(clauseString);
+            selectEntities = PQLParser::parseSelectClause(clauseString);
         } else if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
             suchThatClauses.push_back(PQLParser::parseSuchThatClauses(clauseString));
         } else if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
@@ -47,9 +58,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
             throw QPSSyntaxError();
         }
     }
-
-    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
-    return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
+    return std::make_tuple(selectEntities, suchThatClauses, patternClauses);
 }
 
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {

@@ -1,5 +1,5 @@
 #include <qps/ParserUtils.h>
-#include <qps/parser/PQLParser.h>
+#include "PQLParserTester.h"
 
 #include <vector>
 
@@ -9,14 +9,14 @@
 TEST_CASE("one_variable") {
     std::vector<std::string> one_variable = {"variable v1;"};
     std::vector<Synonym> expected_one_variable = {Synonym(DesignEntityType::VARIABLE, "v1")};
-    SynonymStore synonymStore = PQLParser::parseQueryEntities(one_variable);
+    SynonymStore synonymStore = PQLParserTester::parseQueryEntities(one_variable);
     REQUIRE(synonymStore.containsSynonym(expected_one_variable[0]));
 }
 TEST_CASE("two_variables") {
     std::vector<std::string> two_variables = {"variable v1, v2;"};
     std::vector<Synonym> expected_two_variables = {Synonym(DesignEntityType::VARIABLE, "v1"),
                                                    Synonym(DesignEntityType::VARIABLE, "v2")};
-    SynonymStore synonymStore = PQLParser::parseQueryEntities(two_variables);
+    SynonymStore synonymStore = PQLParserTester::parseQueryEntities(two_variables);
     REQUIRE(synonymStore.containsSynonym(expected_two_variables[0]));
     REQUIRE(synonymStore.containsSynonym(expected_two_variables[1]));
 }
@@ -26,7 +26,7 @@ TEST_CASE("one_call_assign_stmt") {
                                                           Synonym(DesignEntityType::ASSIGN, "a1"),
                                                           Synonym(DesignEntityType::STMT, "s1")};
 
-    SynonymStore synonymStore = PQLParser::parseQueryEntities(one_call_assign_stmt);
+    SynonymStore synonymStore = PQLParserTester::parseQueryEntities(one_call_assign_stmt);
 
     REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[0]));
     REQUIRE(synonymStore.containsSynonym(expected_one_call_assign_stmt[1]));
@@ -38,7 +38,7 @@ TEST_CASE("various_call_assign_stmt") {
         Synonym(DesignEntityType::CALL, "c1"), Synonym(DesignEntityType::CALL, "c2"),
         Synonym(DesignEntityType::ASSIGN, "a1"), Synonym(DesignEntityType::STMT, "s1"),
         Synonym(DesignEntityType::STMT, "s2")};
-    SynonymStore synonymStore = PQLParser::parseQueryEntities(various_call_assign_stmt);
+    SynonymStore synonymStore = PQLParserTester::parseQueryEntities(various_call_assign_stmt);
     REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[0]));
     REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[1]));
     REQUIRE(synonymStore.containsSynonym(expected_various_call_assign_stmt[2]));
@@ -48,19 +48,19 @@ TEST_CASE("various_call_assign_stmt") {
 
 // Testing Find Queries functions
 std::vector<std::string> various_assorted = {"variable v1, v2;", "assign a1;", "stmt s1, s2;"};
-SynonymStore entities = PQLParser::parseQueryEntities(various_assorted);
+SynonymStore entities = PQLParserTester::parseQueryEntities(various_assorted);
 
 using containerPtr = std::shared_ptr<SelectEntContainer>;
 
 // Test cases
-TEST_CASE("PQLParser: Select (1)") {
+TEST_CASE("PQLParserTester: Select (1)") {
     std::string select_1 = "Select v1";
     std::string select_2 = "Select a1";
     std::string select_3 = "Select s1";
 
-    containerPtr result_1 = PQLParser::parseSelectClause(select_1);
-    containerPtr result_2 = PQLParser::parseSelectClause(select_2);
-    containerPtr result_3 = PQLParser::parseSelectClause(select_3);
+    containerPtr result_1 = PQLParserTester::parseSelectClause(select_1);
+    containerPtr result_2 = PQLParserTester::parseSelectClause(select_2);
+    containerPtr result_3 = PQLParserTester::parseSelectClause(select_3);
 
     result_1->updateSynonyms(&entities);
     result_2->updateSynonyms(&entities);
@@ -74,12 +74,12 @@ TEST_CASE("PQLParser: Select (1)") {
     REQUIRE(result_3->getSynonyms().size() == 1);
 }
 
-TEST_CASE("PQLParser: Select (2))") {
+TEST_CASE("PQLParserTester: Select (2))") {
     std::string select_1 = "Select <v1,v2>";
     std::string select_2 = "  Select    <v1,    v2>  ";
 
-    containerPtr result_1 = PQLParser::parseSelectClause(select_1);
-    containerPtr result_2 = PQLParser::parseSelectClause(select_2);
+    containerPtr result_1 = PQLParserTester::parseSelectClause(select_1);
+    containerPtr result_2 = PQLParserTester::parseSelectClause(select_2);
 
     result_1->updateSynonyms(&entities);
     result_2->updateSynonyms(&entities);
@@ -92,12 +92,12 @@ TEST_CASE("PQLParser: Select (2))") {
     REQUIRE(result_2->getSynonyms().size() == 2);
 }
 
-TEST_CASE("PQLParser: Select (3))") {
+TEST_CASE("PQLParserTester: Select (3))") {
     std::string select_1 = "Select BOOLEAN";
     std::string select_2 = "  Select    BOOLEAN  ";
 
-    containerPtr result_1 = PQLParser::parseSelectClause(select_1);
-    containerPtr result_2 = PQLParser::parseSelectClause(select_2);
+    containerPtr result_1 = PQLParserTester::parseSelectClause(select_1);
+    containerPtr result_2 = PQLParserTester::parseSelectClause(select_2);
 
     result_1->updateSynonyms(&entities);
     result_2->updateSynonyms(&entities);
@@ -110,7 +110,7 @@ TEST_CASE("PQLParser: Select (3))") {
 // Used for testing Parent/Follows/Parent*/Follows*
 // As syntax is the same for all these
 // To ensure that Follows/Parent*/Follows* work, will test one clause each minimally
-// TEST_CASE("PQLParser: Parent (1)") {
+// TEST_CASE("PQLParserTester: Parent (1)") {
 //     std::string select_st_1 = "Select s1 such that Parent(s1,s2)";
 //     std::string select_st_2 = "Select s1 such that Parent(s1,_)";
 //     std::string select_st_3 = "Select s1 such that Parent(s1,4)";
@@ -118,17 +118,17 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_2 = getAllClauses(select_st_2);
 //     std::vector<std::string> clauseList_3 = getAllClauses(select_st_3);
 
-//     containerPtr result_01 = PQLParser::parseSelectClause(select_st_1);
-//     containerPtr result_02 = PQLParser::parseSelectClause(select_st_2);
-//     containerPtr result_03 = PQLParser::parseSelectClause(select_st_3);
+//     containerPtr result_01 = PQLParserTester::parseSelectClause(select_st_1);
+//     containerPtr result_02 = PQLParserTester::parseSelectClause(select_st_2);
+//     containerPtr result_03 = PQLParserTester::parseSelectClause(select_st_3);
 
-//     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_1);
-//     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_2);
-//     std::vector<SuchThatClause> result_13 = PQLParser::parseSuchThatClauses(clauseList_3);
+//     std::vector<SuchThatClause> result_11 = PQLParserTester::parseSuchThatClauses(clauseList_1);
+//     std::vector<SuchThatClause> result_12 = PQLParserTester::parseSuchThatClauses(clauseList_2);
+//     std::vector<SuchThatClause> result_13 = PQLParserTester::parseSuchThatClauses(clauseList_3);
 
-//     std::vector<PatternClause> result_21 = PQLParser::parsePatternClauses(clauseList_1);
-//     std::vector<PatternClause> result_22 = PQLParser::parsePatternClauses(clauseList_2);
-//     std::vector<PatternClause> result_23 = PQLParser::parsePatternClauses(clauseList_3);
+//     std::vector<PatternClause> result_21 = PQLParserTester::parsePatternClauses(clauseList_1);
+//     std::vector<PatternClause> result_22 = PQLParserTester::parsePatternClauses(clauseList_2);
+//     std::vector<PatternClause> result_23 = PQLParserTester::parsePatternClauses(clauseList_3);
 
 //     Validator::validateClauses(&entities, result_01, result_11, result_21);
 //     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -166,7 +166,7 @@ TEST_CASE("PQLParser: Select (3))") {
 //     REQUIRE(result_23.size() == 0);
 // }
 
-// TEST_CASE("PQLParser: Parent (2)") {
+// TEST_CASE("PQLParserTester: Parent (2)") {
 //     std::string select_st_4 = "Select s1 such that Parent(s2,_)";
 //     std::string select_st_5 = "Select s1 such that Parent(s2,4)";
 //     std::string select_st_6 = "Select s1 such that Parent(s2,s1)";
@@ -174,17 +174,17 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_5 = getAllClauses(select_st_5);
 //     std::vector<std::string> clauseList_6 = getAllClauses(select_st_6);
 
-//     containerPtr result_01 = PQLParser::parseSelectClause(select_st_4);
-//     containerPtr result_02 = PQLParser::parseSelectClause(select_st_5);
-//     containerPtr result_03 = PQLParser::parseSelectClause(select_st_6);
+//     containerPtr result_01 = PQLParserTester::parseSelectClause(select_st_4);
+//     containerPtr result_02 = PQLParserTester::parseSelectClause(select_st_5);
+//     containerPtr result_03 = PQLParserTester::parseSelectClause(select_st_6);
 
-//     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_4);
-//     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_5);
-//     std::vector<SuchThatClause> result_13 = PQLParser::parseSuchThatClauses(clauseList_6);
+//     std::vector<SuchThatClause> result_11 = PQLParserTester::parseSuchThatClauses(clauseList_4);
+//     std::vector<SuchThatClause> result_12 = PQLParserTester::parseSuchThatClauses(clauseList_5);
+//     std::vector<SuchThatClause> result_13 = PQLParserTester::parseSuchThatClauses(clauseList_6);
 
-//     std::vector<PatternClause> result_21 = PQLParser::parsePatternClauses(clauseList_4);
-//     std::vector<PatternClause> result_22 = PQLParser::parsePatternClauses(clauseList_5);
-//     std::vector<PatternClause> result_23 = PQLParser::parsePatternClauses(clauseList_6);
+//     std::vector<PatternClause> result_21 = PQLParserTester::parsePatternClauses(clauseList_4);
+//     std::vector<PatternClause> result_22 = PQLParserTester::parsePatternClauses(clauseList_5);
+//     std::vector<PatternClause> result_23 = PQLParserTester::parsePatternClauses(clauseList_6);
 
 //     Validator::validateClauses(&entities, result_01, result_11, result_21);
 //     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -222,7 +222,7 @@ TEST_CASE("PQLParser: Select (3))") {
 //     REQUIRE(result_23.size() == 0);
 // }
 
-// TEST_CASE("PQLParser: Parent (3)") {
+// TEST_CASE("PQLParserTester: Parent (3)") {
 //     std::string select_st_7 = "Select s1 such that Parent(_,s1)";
 //     std::string select_st_8 = "Select s1 such that Parent(4,s1)";
 //     std::string select_st_9 = "Select s1 such that Parent(_,s2)";
@@ -232,20 +232,20 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_9 = getAllClauses(select_st_9);
 //     std::vector<std::string> clauseList_10 = getAllClauses(select_st_10);
 
-//     containerPtr result_01 = PQLParser::parseSelectClause(select_st_7);
-//     containerPtr result_02 = PQLParser::parseSelectClause(select_st_8);
-//     containerPtr result_03 = PQLParser::parseSelectClause(select_st_9);
-//     containerPtr result_04 = PQLParser::parseSelectClause(select_st_10);
+//     containerPtr result_01 = PQLParserTester::parseSelectClause(select_st_7);
+//     containerPtr result_02 = PQLParserTester::parseSelectClause(select_st_8);
+//     containerPtr result_03 = PQLParserTester::parseSelectClause(select_st_9);
+//     containerPtr result_04 = PQLParserTester::parseSelectClause(select_st_10);
 
-//     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_7);
-//     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_8);
-//     std::vector<SuchThatClause> result_13 = PQLParser::parseSuchThatClauses(clauseList_9);
-//     std::vector<SuchThatClause> result_14 = PQLParser::parseSuchThatClauses(clauseList_10);
+//     std::vector<SuchThatClause> result_11 = PQLParserTester::parseSuchThatClauses(clauseList_7);
+//     std::vector<SuchThatClause> result_12 = PQLParserTester::parseSuchThatClauses(clauseList_8);
+//     std::vector<SuchThatClause> result_13 = PQLParserTester::parseSuchThatClauses(clauseList_9);
+//     std::vector<SuchThatClause> result_14 = PQLParserTester::parseSuchThatClauses(clauseList_10);
 
-//     std::vector<PatternClause> result_21 = PQLParser::parsePatternClauses(clauseList_7);
-//     std::vector<PatternClause> result_22 = PQLParser::parsePatternClauses(clauseList_8);
-//     std::vector<PatternClause> result_23 = PQLParser::parsePatternClauses(clauseList_9);
-//     std::vector<PatternClause> result_24 = PQLParser::parsePatternClauses(clauseList_10);
+//     std::vector<PatternClause> result_21 = PQLParserTester::parsePatternClauses(clauseList_7);
+//     std::vector<PatternClause> result_22 = PQLParserTester::parsePatternClauses(clauseList_8);
+//     std::vector<PatternClause> result_23 = PQLParserTester::parsePatternClauses(clauseList_9);
+//     std::vector<PatternClause> result_24 = PQLParserTester::parsePatternClauses(clauseList_10);
 
 //     Validator::validateClauses(&entities, result_01, result_11, result_21);
 //     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -292,7 +292,7 @@ TEST_CASE("PQLParser: Select (3))") {
 // }
 
 // // Spacing and other relationships
-// TEST_CASE("PQLParser: Parent (4)") {
+// TEST_CASE("PQLParserTester: Parent (4)") {
 //     std::string select_st_11 = "   Select   s1   such  that  Parent (s1 ,  s2 ) ";
 //     std::string select_st_12 = "Select s1 such that Parent*(s1,s2)";
 //     std::string select_st_13 = "Select s1 such that Follows(s1,s2)";
@@ -302,20 +302,20 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_13 = getAllClauses(select_st_13);
 //     std::vector<std::string> clauseList_14 = getAllClauses(select_st_14);
 
-//     containerPtr result_01 = PQLParser::parseSelectClause(select_st_11);
-//     containerPtr result_02 = PQLParser::parseSelectClause(select_st_12);
-//     containerPtr result_03 = PQLParser::parseSelectClause(select_st_13);
-//     containerPtr result_04 = PQLParser::parseSelectClause(select_st_14);
+//     containerPtr result_01 = PQLParserTester::parseSelectClause(select_st_11);
+//     containerPtr result_02 = PQLParserTester::parseSelectClause(select_st_12);
+//     containerPtr result_03 = PQLParserTester::parseSelectClause(select_st_13);
+//     containerPtr result_04 = PQLParserTester::parseSelectClause(select_st_14);
 
-//     std::vector<SuchThatClause> result_11 = PQLParser::parseSuchThatClauses(clauseList_11);
-//     std::vector<SuchThatClause> result_12 = PQLParser::parseSuchThatClauses(clauseList_12);
-//     std::vector<SuchThatClause> result_13 = PQLParser::parseSuchThatClauses(clauseList_13);
-//     std::vector<SuchThatClause> result_14 = PQLParser::parseSuchThatClauses(clauseList_14);
+//     std::vector<SuchThatClause> result_11 = PQLParserTester::parseSuchThatClauses(clauseList_11);
+//     std::vector<SuchThatClause> result_12 = PQLParserTester::parseSuchThatClauses(clauseList_12);
+//     std::vector<SuchThatClause> result_13 = PQLParserTester::parseSuchThatClauses(clauseList_13);
+//     std::vector<SuchThatClause> result_14 = PQLParserTester::parseSuchThatClauses(clauseList_14);
 
-//     std::vector<PatternClause> result_21 = PQLParser::parsePatternClauses(clauseList_11);
-//     std::vector<PatternClause> result_22 = PQLParser::parsePatternClauses(clauseList_12);
-//     std::vector<PatternClause> result_23 = PQLParser::parsePatternClauses(clauseList_13);
-//     std::vector<PatternClause> result_24 = PQLParser::parsePatternClauses(clauseList_14);
+//     std::vector<PatternClause> result_21 = PQLParserTester::parsePatternClauses(clauseList_11);
+//     std::vector<PatternClause> result_22 = PQLParserTester::parsePatternClauses(clauseList_12);
+//     std::vector<PatternClause> result_23 = PQLParserTester::parsePatternClauses(clauseList_13);
+//     std::vector<PatternClause> result_24 = PQLParserTester::parsePatternClauses(clauseList_14);
 
 //     Validator::validateClauses(&entities, result_01, result_11, result_21);
 //     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -372,7 +372,7 @@ TEST_CASE("PQLParser: Select (3))") {
 // // pattern-cl : 'pattern' syn-assign '(' entRef ',' expression-spec ')'
 // // expression-spec :  '"' expr'"' | '_' '"' expr '"' '_' | '_'
 // // entRef : synonym | '_' | '"' IDENT '"'
-// TEST_CASE("PQLParser: Select ... pattern (1)") {
+// TEST_CASE("PQLParserTester: Select ... pattern (1)") {
 //     std::string select_pt_1 = "Select v1 pattern a1(v1,\"x+y\")";
 //     std::string select_pt_2 = "Select v1 pattern a1(v1,\"x + y\")";
 //     std::string select_pt_3 = "Select v1 pattern a1(v1,\"x +y\")";
@@ -382,13 +382,13 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_3 = getAllClauses(select_pt_3);
 //     std::vector<std::string> clauseList_4 = getAllClauses(select_pt_4);
 
-//     std::vector<PatternClause> result_1 = PQLParser::parsePatternClauses(clauseList_1);
-//     std::vector<PatternClause> result_2 = PQLParser::parsePatternClauses(clauseList_2);
-//     std::vector<PatternClause> result_3 = PQLParser::parsePatternClauses(clauseList_3);
-//     std::vector<PatternClause> result_4 = PQLParser::parsePatternClauses(clauseList_4);
+//     std::vector<PatternClause> result_1 = PQLParserTester::parsePatternClauses(clauseList_1);
+//     std::vector<PatternClause> result_2 = PQLParserTester::parsePatternClauses(clauseList_2);
+//     std::vector<PatternClause> result_3 = PQLParserTester::parsePatternClauses(clauseList_3);
+//     std::vector<PatternClause> result_4 = PQLParserTester::parsePatternClauses(clauseList_4);
 
 //     std::vector<SuchThatClause> suchThatClauses = {};
-//     containerPtr selectClauses = PQLParser::parseSelectClause("Select v1");
+//     containerPtr selectClauses = PQLParserTester::parseSelectClause("Select v1");
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_1);
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_2);
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_3);
@@ -409,7 +409,7 @@ TEST_CASE("PQLParser: Select (3))") {
 //     REQUIRE(ans1.equals(result_4[0]));
 // }
 
-// TEST_CASE("PQLParser: Select ... pattern (2)") {
+// TEST_CASE("PQLParserTester: Select ... pattern (2)") {
 //     std::string select_pt_1 = "Select v1 pattern a1(v1,_\"x+y\"_)";
 //     std::string select_pt_2 = "Select v1 pattern a1(v1,_\"x + y\"_)";
 //     std::string select_pt_3 = "Select v1 pattern a1(v1,_\"x +y\"_)";
@@ -419,13 +419,13 @@ TEST_CASE("PQLParser: Select (3))") {
 //     std::vector<std::string> clauseList_3 = getAllClauses(select_pt_3);
 //     std::vector<std::string> clauseList_4 = getAllClauses(select_pt_4);
 
-//     std::vector<PatternClause> result_1 = PQLParser::parsePatternClauses(clauseList_1);
-//     std::vector<PatternClause> result_2 = PQLParser::parsePatternClauses(clauseList_2);
-//     std::vector<PatternClause> result_3 = PQLParser::parsePatternClauses(clauseList_3);
-//     std::vector<PatternClause> result_4 = PQLParser::parsePatternClauses(clauseList_4);
+//     std::vector<PatternClause> result_1 = PQLParserTester::parsePatternClauses(clauseList_1);
+//     std::vector<PatternClause> result_2 = PQLParserTester::parsePatternClauses(clauseList_2);
+//     std::vector<PatternClause> result_3 = PQLParserTester::parsePatternClauses(clauseList_3);
+//     std::vector<PatternClause> result_4 = PQLParserTester::parsePatternClauses(clauseList_4);
 
 //     std::vector<SuchThatClause> suchThatClauses = {};
-//     containerPtr selectClauses = PQLParser::parseSelectClause("Select v1");
+//     containerPtr selectClauses = PQLParserTester::parseSelectClause("Select v1");
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_1);
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_2);
 //     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_3);
@@ -446,17 +446,17 @@ TEST_CASE("PQLParser: Select (3))") {
 //     REQUIRE(ans1.equals(result_4[0]));
 // }
 
-// TEST_CASE("PQLParser: Select ... pattern (4)") {
+// TEST_CASE("PQLParserTester: Select ... pattern (4)") {
 //     std::string select_pt_1 = "Select a such that Uses (a1, v) pattern a (v, _\"temp\"_)";
 
 //     // Testing Find Queries functions
 //     std::vector<std::string> various_assorted_1 = {"assign a, a1;", "variable v;"};
-//     SynonymStore entities_1 = PQLParser::parseQueryEntities(various_assorted_1);
+//     SynonymStore entities_1 = PQLParserTester::parseQueryEntities(various_assorted_1);
 
 //     std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
-//     containerPtr selectClauses = PQLParser::parseSelectClause("Select a");
-//     std::vector<SuchThatClause> suchThatClauses = PQLParser::parseSuchThatClauses(clauseList_1);
-//     std::vector<PatternClause> patternClauses = PQLParser::parsePatternClauses(clauseList_1);
+//     containerPtr selectClauses = PQLParserTester::parseSelectClause("Select a");
+//     std::vector<SuchThatClause> suchThatClauses = PQLParserTester::parseSuchThatClauses(clauseList_1);
+//     std::vector<PatternClause> patternClauses = PQLParserTester::parsePatternClauses(clauseList_1);
 
 //     Validator::validateClauses(&entities_1, selectClauses, suchThatClauses, patternClauses);
 
@@ -478,7 +478,7 @@ TEST_CASE("PQLParser: Select (3))") {
 
 TEST_CASE("And (1)") {
     std::vector<std::string> clauseList_1 = {"Select v1", "such that Modifies(s1, s2)", "and Modifies(s2, s1)"};
-    PQLParser::modifyClauseList(clauseList_1);
+    PQLParserTester::modifyClauseList(clauseList_1);
     REQUIRE(clauseList_1[0] == "Select v1");
     REQUIRE(clauseList_1[1] == "such that Modifies(s1, s2)");
     REQUIRE(clauseList_1[2] == "such that Modifies(s2, s1)");
@@ -486,7 +486,7 @@ TEST_CASE("And (1)") {
 
 TEST_CASE("And (2)") {
     std::vector<std::string> clauseList_1 = {"Select and", "such that Modifies( and , _)", "and Parent(s, s1)"};
-    PQLParser::modifyClauseList(clauseList_1);
+    PQLParserTester::modifyClauseList(clauseList_1);
     REQUIRE(clauseList_1[0] == "Select and");
     REQUIRE(clauseList_1[1] == "such that Modifies( and , _)");
     REQUIRE(clauseList_1[2] == "such that Parent(s, s1)");
@@ -506,228 +506,228 @@ using vectorString = std::vector<std::string>;
 TEST_CASE("SyntaxError") {
     SECTION("No Select") {
         vectorString input = {"stmt s;", "variable v;", ""};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing synonym name") {
         vectorString input = {"stmt ;", "variable v;", "Select s"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Declaration not synonym") {
         vectorString input = {"stmt 1s;", "variable v;", "Select s such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Two Selects, one with semi-colon") {
         vectorString input = {"stmt s;", "Select s;", "Select s such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Two Selects, combine in one statement") {
         vectorString input = {"stmt s;", "Select s Select s such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Tuple return, missing open angular bracket") {
         vectorString input = {"stmt s;", "Select s> such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Tuple return, missing close angular bracket") {
         vectorString input = {"stmt s;", "Select <s such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Tuple return, extra comma") {
         vectorString input = {"stmt s;", "Select <,s> such that Follows* (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Follow all lower case") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that follows(1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("RelRef<space>*") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Follows * (1, 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Next, with ident") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Next(\"x\", 2)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Modifies, with two wildcards") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Modifies(__, _)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Uses, missing value") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s,)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Uses, one synonym") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Capitalized pattern") {
         vectorString input = {"assign a;", "Select a such that Pattern a (_,_)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Messy and wrong expression") {
         vectorString input = {"assign a;", "Select a such that pattern a (_, \"(x + 1))/ 2)\")"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Missing value") {
         vectorString input = {"assign a;", "Select a such that pattern a (_,)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Missing front underscore") {
         vectorString input = {"assign a;", "Select a such that pattern a (_, _\"x\")"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Missing back underscore") {
         vectorString input = {"assign a;", "Select a such that pattern a (_, \"x\"_)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Pattern, Missing synonym") {
         vectorString input = {"assign a;", "Select a such that pattern (_, \"x\"_)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing relCond after such that") {
         vectorString input = {"assign a;", "stmt s1;", "Select s1 such that pattern a (s1, _)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing patternCond after pattern") {
         vectorString input = {"assign a;", "stmt s1;", "Select s1 pattern"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Misspelt and, such that") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 such that Modifies (s1, _) amd Uses (s1,_)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Misspelt and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (_, _) amd a1(_,_)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing relCond after and, such that") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 such that Modifies (s1, _) and "};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing relCond after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (_, _) and "};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("patternCond after such that") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 such that a (_, _)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("relCond after and, such that") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 such that Modifies (s1, _) and a (_, _)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("and as a synonym, pattern") {
         vectorString input = {"assign and, a;", "stmt s1;", "Select s1 pattern and (_, _) and a (_, _)"};
-        REQUIRE_NOTHROW(PQLParser::parse(input));
+        REQUIRE_NOTHROW(PQLParserTester::parse(input));
     }
 
     SECTION("Syntax Error before undeclared relCond synonym after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (, _) and Modifies (s1, _)"};
-        REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
     }
 }
 
 TEST_CASE("SemanticError") {
     SECTION("No declarations") {
         vectorString input = {"Select s such that Parent(1,2)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing declaration") {
         vectorString input = {"stmt s1;", "Select s such that Parent(1,2)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing BOOLEAN declaration") {
         vectorString input = {"stmt s1;", "Select <BOOLEAN> such that Parent(1,2)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Missing BOOLEAN declaration(2)") {
         vectorString input = {"stmt s1;", "Select <s1, BOOLEAN> such that Parent(1,2)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Follow, first arg not subtype of statement") {
         vectorString input = {"stmt s1;", "variable v;", "Select s1 such that Follows(v, 2)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Parent, second arg not subtype of statement") {
         vectorString input = {"variable s1;", "Select s1 such that Parent(1,s1)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Modifies, second arg not variable") {
         vectorString input = {"stmt s1;", "Select s1 such that Modifies(1,s1)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Modifies, first arg is wildcard") {
         vectorString input = {"variable s1;", "Select s1 such that Modifies(_,s1)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Uses, second arg not variable") {
         vectorString input = {"stmt s1;", "Select s1 such that Uses(1,s1)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Uses, first arg is wildcard") {
         vectorString input = {"variable s1;", "Select s1 such that Uses(_,s1)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     // SECTION("Calls, first arg not procedure") {
     //     vectorString input = {"variable s1;", "Select s1 such that Calls(s1,_)"};
-    //     REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+    //     REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     // }
 
     // SECTION("Calls, second arg not procedure") {
     //     vectorString input = {"variable s1;", "Select s1 such that Calls(_,s1)"};
-    //     REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+    //     REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     // }
 
     SECTION("Pattern, first arg not variable") {
         vectorString input = {"assign a;", "stmt s1;", "Select s1 pattern a (s1, _)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Undeclared relCond synonym after pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern Modifies (s1, _)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 
     SECTION("Undeclared relCond synonym after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (_, _) and Modifies (s1, _)"};
-        REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
+        REQUIRE_THROW_SEMANTIC_ERROR(PQLParserTester::parse(input));
     }
 }
