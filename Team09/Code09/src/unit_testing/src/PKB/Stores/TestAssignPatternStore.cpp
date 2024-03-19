@@ -23,13 +23,9 @@ TEST_CASE("store - All Tests") {
 
         store.initialiseStore(funct_ptr, funct_ptr1, patterns);
 
-        ClauseArgument* wildcardArg1 = new Wildcard();
-        ClauseArgument* synonymsArg2 = new Synonym(DesignEntityType::VARIABLE, "y");
+        std::string wildcardArg1 = "_";
+        std::string synonymsArg2 = "y";
 
-        REQUIRE(store.hasPattern(1, *wildcardArg1, *synonymsArg2));
-
-        // Cleanup
-        delete wildcardArg1;
-        delete synonymsArg2;
+        REQUIRE(store.hasExactPattern(1, wildcardArg1, synonymsArg2));
     }
 }
