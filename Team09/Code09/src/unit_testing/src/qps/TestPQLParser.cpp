@@ -394,12 +394,13 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     auto parsedClauses_3 = PQLParserTester::parseClauses(clauseList_3);
     auto parsedClauses_4 = PQLParserTester::parseClauses(clauseList_4);
 
-    // ignore below 2 blocks
+    // ignore
     containerPtr result_01 = std::get<0>(parsedClauses_1);
     containerPtr result_02 = std::get<0>(parsedClauses_2);
     containerPtr result_03 = std::get<0>(parsedClauses_3);
     containerPtr result_04 = std::get<0>(parsedClauses_4);
 
+    // ignore
     std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
     std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
     std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
@@ -430,72 +431,87 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     REQUIRE(ans1.equals(result_24[0]));
 }
 
-// TEST_CASE("PQLParserTester: Select ... pattern (2)") {
-//     std::string select_pt_1 = "Select v1 pattern a1(v1,_\"x+y\"_)";
-//     std::string select_pt_2 = "Select v1 pattern a1(v1,_\"x + y\"_)";
-//     std::string select_pt_3 = "Select v1 pattern a1(v1,_\"x +y\"_)";
-//     std::string select_pt_4 = "Select v1 pattern a1(v1,_\" x +y \"_)";
-//     std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
-//     std::vector<std::string> clauseList_2 = getAllClauses(select_pt_2);
-//     std::vector<std::string> clauseList_3 = getAllClauses(select_pt_3);
-//     std::vector<std::string> clauseList_4 = getAllClauses(select_pt_4);
+TEST_CASE("PQLParserTester: Select ... pattern (2)") {
+    std::string select_pt_1 = "Select v1 pattern a1(v1,_\"x+y\"_)";
+    std::string select_pt_2 = "Select v1 pattern a1(v1,_\"x + y\"_)";
+    std::string select_pt_3 = "Select v1 pattern a1(v1,_\"x +y\"_)";
+    std::string select_pt_4 = "Select v1 pattern a1(v1,_\" x +y \"_)";
+    std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
+    std::vector<std::string> clauseList_2 = getAllClauses(select_pt_2);
+    std::vector<std::string> clauseList_3 = getAllClauses(select_pt_3);
+    std::vector<std::string> clauseList_4 = getAllClauses(select_pt_4);
 
-//     std::vector<PatternClause> result_1 = PQLParserTester::parsePatternClauses(clauseList_1);
-//     std::vector<PatternClause> result_2 = PQLParserTester::parsePatternClauses(clauseList_2);
-//     std::vector<PatternClause> result_3 = PQLParserTester::parsePatternClauses(clauseList_3);
-//     std::vector<PatternClause> result_4 = PQLParserTester::parsePatternClauses(clauseList_4);
+    auto parsedClauses_1 = PQLParserTester::parseClauses(clauseList_1);
+    auto parsedClauses_2 = PQLParserTester::parseClauses(clauseList_2);
+    auto parsedClauses_3 = PQLParserTester::parseClauses(clauseList_3);
+    auto parsedClauses_4 = PQLParserTester::parseClauses(clauseList_4);
 
-//     std::vector<SuchThatClause> suchThatClauses = {};
-//     containerPtr selectClauses = PQLParserTester::parseSelectClause("Select v1");
-//     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_1);
-//     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_2);
-//     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_3);
-//     Validator::validateClauses(&entities, selectClauses, suchThatClauses, result_4);
+    // ignore
+    containerPtr result_01 = std::get<0>(parsedClauses_1);
+    containerPtr result_02 = std::get<0>(parsedClauses_2);
+    containerPtr result_03 = std::get<0>(parsedClauses_3);
+    containerPtr result_04 = std::get<0>(parsedClauses_4);
 
-//     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-//     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-//     ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-//     PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-//                                        static_cast<ClauseArgument*>(&l));
-//     REQUIRE(result_1.size() == 1);
-//     REQUIRE(result_2.size() == 1);
-//     REQUIRE(result_3.size() == 1);
-//     REQUIRE(result_4.size() == 1);
-//     REQUIRE(ans1.equals(result_1[0]));
-//     REQUIRE(ans1.equals(result_2[0]));
-//     REQUIRE(ans1.equals(result_3[0]));
-//     REQUIRE(ans1.equals(result_4[0]));
-// }
+    // ignore
+    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<SuchThatClause> result_14 = std::get<1>(parsedClauses_4);
 
-// TEST_CASE("PQLParserTester: Select ... pattern (4)") {
-//     std::string select_pt_1 = "Select a such that Uses (a1, v) pattern a (v, _\"temp\"_)";
+    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
 
-//     // Testing Find Queries functions
-//     std::vector<std::string> various_assorted_1 = {"assign a, a1;", "variable v;"};
-//     SynonymStore entities_1 = PQLParserTester::parseQueryEntities(various_assorted_1);
+    Validator::validateClauses(&entities, result_01, result_11, result_21);
+    Validator::validateClauses(&entities, result_02, result_12, result_22);
+    Validator::validateClauses(&entities, result_03, result_13, result_23);
+    Validator::validateClauses(&entities, result_04, result_14, result_24);
 
-//     std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
-//     containerPtr selectClauses = PQLParserTester::parseSelectClause("Select a");
-//     std::vector<SuchThatClause> suchThatClauses = PQLParserTester::parseSuchThatClauses(clauseList_1);
-//     std::vector<PatternClause> patternClauses = PQLParserTester::parsePatternClauses(clauseList_1);
+    Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
+    Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
+    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
+    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
+                                       static_cast<ClauseArgument*>(&l));
+    REQUIRE(result_21.size() == 1);
+    REQUIRE(result_22.size() == 1);
+    REQUIRE(result_23.size() == 1);
+    REQUIRE(result_24.size() == 1);
+    REQUIRE(ans1.equals(result_21[0]));
+    REQUIRE(ans1.equals(result_22[0]));
+    REQUIRE(ans1.equals(result_23[0]));
+    REQUIRE(ans1.equals(result_24[0]));
+}
 
-//     Validator::validateClauses(&entities_1, selectClauses, suchThatClauses, patternClauses);
+TEST_CASE("PQLParserTester: Select ... pattern (4)") {
+    std::string select_pt_1 = "Select a such that Uses (a1, v) pattern a (v, _\"temp\"_)";
 
-//     Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
-//     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-//     Synonym v = Synonym(DesignEntityType::VARIABLE, "v");
+    // Testing Find Queries functions
+    std::vector<std::string> various_assorted_1 = {"assign a, a1;", "variable v;"};
+    SynonymStore entities = PQLParserTester::parseQueryEntities(various_assorted_1);
+    std::vector<std::string> clauseList_1 = getAllClauses(select_pt_1);
+    auto parsedClauses_1 = PQLParserTester::parseClauses(clauseList_1);
 
-//     ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
+    // ignore one line below
+    containerPtr result_01 = std::get<0>(parsedClauses_1);
+    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
+    Validator::validateClauses(&entities, result_01, result_11, result_21);
 
-//     SuchThatClause s =
-//         SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
-//     PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
-//                                     static_cast<ClauseArgument*>(&temp));
-//     REQUIRE(suchThatClauses.size() == 1);
-//     REQUIRE(patternClauses.size() == 1);
-//     REQUIRE(s.equals(suchThatClauses[0]));
-//     REQUIRE(p.equals(patternClauses[0]));
-// }
+    Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
+    Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
+    Synonym v = Synonym(DesignEntityType::VARIABLE, "v");
+    ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
+
+    SuchThatClause s = SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1),
+        static_cast<ClauseArgument*>(&v));
+    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a),
+        static_cast<ClauseArgument*>(&v), static_cast<ClauseArgument*>(&temp));
+    REQUIRE(result_11.size() == 1);
+    REQUIRE(result_21.size() == 1);
+    REQUIRE(s.equals(result_11[0]));
+    REQUIRE(p.equals(result_21[0]));
+}
 
 TEST_CASE("And (1)") {
     std::vector<std::string> clauseList_1 = {"Select v1", "such that Modifies(s1, s2)", "and Modifies(s2, s1)"};
