@@ -11,7 +11,8 @@
 
 class AssignPatternStore {
 public:
-    void initialiseStore(std::function<bool(std::string, std::string)> fp,
+    void initialiseStore(std::function<bool(std::string, std::string)> exactMatchFP,
+                         std::function<bool(std::string, std::string)> partialMatchFP,
                          std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> input);
     // setPatterns will take in a set containing pairs of stmtNum and nested pair (left hand side variable,
     // and right hand side expression)
@@ -26,5 +27,6 @@ private:
     void setPatterns(const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>>& patterns);
     void setFunctionPointer(const std::function<bool(std::string, std::string)>);
 
-    std::function<bool(std::string, std::string)> functionPointer;
+    std::function<bool(std::string, std::string)> exactMatchFP;
+    std::function<bool(std::string, std::string)> partialMatchFP;
 };

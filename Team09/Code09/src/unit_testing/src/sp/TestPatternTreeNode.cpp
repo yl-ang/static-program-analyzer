@@ -4,7 +4,6 @@
 
 #include "catch.hpp"
 #include "sp/PatternTreeNode.h"
-using namespace std;  // NOLINT
 
 TEST_CASE("PatternTreeNode tests") {
     SECTION("Test build tree from string") {

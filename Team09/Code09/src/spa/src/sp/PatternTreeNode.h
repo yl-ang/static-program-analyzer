@@ -37,23 +37,23 @@ public:
         return os;
     }
 
-    static bool isEqual(const std::shared_ptr<PatternTreeNode>& lhs, const std::shared_ptr<PatternTreeNode>& rhs) {
-        if (lhs == nullptr && rhs == nullptr)
+    static bool isEqual(const std::shared_ptr<PatternTreeNode>& tree1, const std::shared_ptr<PatternTreeNode>& tree2) {
+        if (tree1 == nullptr && tree2 == nullptr)
             return true;
-        if (lhs == nullptr || rhs == nullptr)
+        if (tree1 == nullptr || tree2 == nullptr)
             return false;
-        if (lhs->value == rhs->value)
-            return isEqual(lhs->left, rhs->left) && isEqual(lhs->right, rhs->right);
+        if (tree1->value == tree2->value)
+            return isEqual(tree1->left, tree2->left) && isEqual(tree1->right, tree2->right);
         return false;
     }
 
-    static bool isPartiallyEqual(const std::shared_ptr<PatternTreeNode>& lhs,
-                                 const std::shared_ptr<PatternTreeNode>& rhs) {
-        if (lhs == nullptr)
+    static bool isPartiallyEqual(const std::shared_ptr<PatternTreeNode>& tree1,
+                                 const std::shared_ptr<PatternTreeNode>& tree2) {
+        if (tree1 == nullptr)
             return false;
-        if (isEqual(lhs, rhs))
+        if (isEqual(tree1, tree2))
             return true;
-        return isPartiallyEqual(lhs->left, rhs) || isPartiallyEqual(lhs->right, rhs);
+        return isPartiallyEqual(tree1->left, tree2) || isPartiallyEqual(tree1->right, tree2);
     }
 
     static std::shared_ptr<PatternTreeNode> buildTreeFromAST(std::shared_ptr<ExpressionNode> expressoinNode);

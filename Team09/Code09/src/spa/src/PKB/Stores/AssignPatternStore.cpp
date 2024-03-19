@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <functional>
 void AssignPatternStore::initialiseStore(
-    std::function<bool(std::string, std::string)> fp,
+    std::function<bool(std::string, std::string)> exactMatchFP,
+    std::function<bool(std::string, std::string)> partialMatchFP,
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patterns) {
-    functionPointer = fp;
+    exactMatchFP = exactMatchFP;
+    partialMatchFP = partialMatchFP;
     setPatterns(patterns);
 }
 
@@ -28,7 +30,7 @@ bool AssignPatternStore::hasPattern(StmtNum stmtNum, std::string lhs, std::strin
         // Check if there is any pair in the set where the values match lhs and rhs
         for (const auto& pair : pairSet) {
             // Assuming StmtNum is an integer type
-            if (functionPointer(pair.first, lhs) && functionPointer(pair.second, rhs)) {
+            if (exactMatchFP(pair.first, lhs) && exactMatchFP(pair.second, rhs)) {
                 return true;
             }
         }
@@ -48,7 +50,7 @@ bool AssignPatternStore::hasPattern(StmtNum stmtNum, ClauseArgument& arg1, Claus
 
         // Check if any RHS in the set matches arg2.getValue()
         return std::any_of(rhsSet.begin(), rhsSet.end(),
-                           [&](const auto& pair) { return functionPointer(pair.second, arg2.getValue()); });
+                           [&](const auto& pair) { return exactMatchFP(pair.second, arg2.getValue()); });
     }
 
     // if arg2 is wildcard, check if variable arg1 contains an expression in patternsMap
@@ -57,7 +59,7 @@ bool AssignPatternStore::hasPattern(StmtNum stmtNum, ClauseArgument& arg1, Claus
 
         if (stmtNumIter != patternsMap.end()) {
             return std::any_of(stmtNumIter->second.begin(), stmtNumIter->second.end(),
-                               [&](const auto& pair) { return functionPointer(pair.first, arg1.getValue()); });
+                               [&](const auto& pair) { return exactMatchFP(pair.first, arg1.getValue()); });
         } else {
             return false;
         }

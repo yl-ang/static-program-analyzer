@@ -18,7 +18,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
     writer->setCallStore(getCalls());
-    writer->setAssignPatternStore(isExactMatch, getAssignmentPattern());
+    writer->setAssignPatternStore(isExactMatch, isPartialMatch, getAssignmentPattern());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
