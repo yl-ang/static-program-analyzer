@@ -90,3 +90,9 @@ bool isExactMatch(std::string spInput, std::string qpsInput) {
     std::shared_ptr<PatternTreeNode> qpsTree = PatternTreeNode::buildTreeFromString(qpsInput);
     return PatternTreeNode::isEqual(spTree, qpsTree);
 }
+
+bool isPartialMatch(std::string spInput, std::string qpsInput) {
+    std::shared_ptr<PatternTreeNode> spTree = PatternTreeNode::deserializeToNode(spInput);
+    std::shared_ptr<PatternTreeNode> qpsTree = PatternTreeNode::buildTreeFromString(qpsInput);
+    return PatternTreeNode::isPartiallyEqual(spTree, qpsTree);
+}

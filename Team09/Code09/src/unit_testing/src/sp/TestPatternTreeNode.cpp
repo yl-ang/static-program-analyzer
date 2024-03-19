@@ -80,4 +80,18 @@ TEST_CASE("PatternTreeNode tests") {
         auto spInput = "add x # # 1 # # ";
         REQUIRE(!funct_ptr(spInput, qpsInput));
     }
+
+    SECTION("Test partial equality using function pter") {
+        std::function<bool(std::string, std::string)> funct_ptr = isPartialMatch;
+        auto qpsInput = "x";
+        auto spInput = "add x # # 1 # # ";  // x + 1
+        REQUIRE(funct_ptr(spInput, qpsInput));
+    }
+
+    SECTION("Test partial equality with different AST") {
+        std::function<bool(std::string, std::string)> funct_ptr = isPartialMatch;
+        auto qpsInput = "y + z";
+        auto spInput = "add add x # # y # # z # # ";  // x + y + z
+        REQUIRE(funct_ptr(spInput, qpsInput) == false);
+    }
 }
