@@ -18,6 +18,7 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
     writer->setCallStore(getCalls());
+    writer->setAssignPatternStore(isExactMatch, isPartialMatch, getAssignmentPattern());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
@@ -106,4 +107,8 @@ std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
 
 std::unordered_set<std::pair<Procedure, Procedure>> DesignExtractor::getCalls() {
     return callsExtractor->getCalls();
+}
+
+std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getAssignmentPattern() {
+    return patternExtractor->getAssignmentPattern();
 }

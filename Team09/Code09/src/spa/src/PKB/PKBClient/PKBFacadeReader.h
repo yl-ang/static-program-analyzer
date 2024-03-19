@@ -63,6 +63,7 @@ public:
     [[nodiscard]] std::unordered_set<Procedure> getUsesProceduresByVariable(const Variable& variable) const;
     [[nodiscard]] bool hasProcedureVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
+    // TODO(yl-ang): REMOVE AFTER ASSIGN PATTERN STORE IS DONE
     // Getters for PatternStore
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
     [[nodiscard]] bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
@@ -84,6 +85,10 @@ public:
     [[nodiscard]] std::unordered_set<Procedure> getCalleeStar(Procedure caller);
     [[nodiscard]] bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     [[nodiscard]] bool hasCallStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
+    // Getters for AssignPatternStore
+    [[nodiscard]] bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
+    [[nodiscard]] bool hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
 
 private:
     PKB* pkbReference = nullptr;

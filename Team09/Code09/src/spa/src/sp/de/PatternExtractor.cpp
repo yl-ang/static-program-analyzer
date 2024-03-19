@@ -1,6 +1,10 @@
 #include "PatternExtractor.h"
 
+#include <memory>
+
 #include "NodeDeclarations.h"
+#include "sp/PatternTreeNode.h"
+#include "sp/Utils.h"
 
 void PatternExtractor::visitPrint(PrintNode* node) {}
 void PatternExtractor::visitWhile(WhileNode* node) {}
@@ -31,6 +35,12 @@ void PatternExtractor::visitAssign(AssignmentNode* node) {
     }
 
     this->matchablePattern.insert({stmtNum, {lhs, expr}});
+
+    // add to assignment traversal set
+    // <LHS, RHS>, StmtNumber>
+    std::string treeLHS = PatternTreeNode::serialiseToString(PatternTreeNode::buildTreeFromString(lhs));
+    std::string treeRHS = PatternTreeNode::serialiseToString(PatternTreeNode::buildTreeFromAST(expr));
+    this->assignmentTraversals.insert({stmtNum, {treeLHS, treeRHS}});
 }
 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getPattern() {
@@ -40,4 +50,8 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Patt
 std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>>
 PatternExtractor::getMatchablePattern() {
     return this->matchablePattern;
+}
+
+std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getAssignmentPattern() {
+    return this->assignmentTraversals;
 }

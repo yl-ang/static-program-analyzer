@@ -43,6 +43,12 @@ public:
     // Setter for CallStore
     void setCallStore(const std::unordered_set<std::pair<Procedure, Procedure>> &callPairs) const;
 
+    // Setter for AssignPattern Store
+    void setAssignPatternStore(
+        const std::function<bool(std::string, std::string)> exactMatchFP,
+        const std::function<bool(std::string, std::string)> partialMatchFP,
+        const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;
+
 private:
     PKB *pkbReference = nullptr;
 };

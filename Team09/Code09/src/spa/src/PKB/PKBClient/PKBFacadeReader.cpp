@@ -217,3 +217,11 @@ std::unordered_set<Procedure> PKBFacadeReader::getCalleeStar(Procedure caller) {
 bool PKBFacadeReader::hasCallStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->callStore->hasCallStarRelationship(arg1, arg2);
 }
+
+bool PKBFacadeReader::hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2) {
+    return pkbReference->assignPatternStore->hasExactPattern(stmtNum, arg1, arg2);
+}
+
+bool PKBFacadeReader::hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2) {
+    return pkbReference->assignPatternStore->hasPartialPattern(stmtNum, arg1, arg2);
+}
