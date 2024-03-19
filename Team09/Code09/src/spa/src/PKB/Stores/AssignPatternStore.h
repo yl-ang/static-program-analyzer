@@ -17,10 +17,10 @@ public:
     // setPatterns will take in a set containing pairs of stmtNum and nested pair (left hand side variable,
     // and right hand side expression)
 
-    bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
-
-    // hasPattern checks if the given stmtNum and arg1 (lhs) and arg2 (rhs) exists in patternsMap
-    bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
+    bool hasExactPatternHelper(StmtNum stmtNum, std::string lhs, std::string rhs);
+    bool hasPartialPatternHelper(StmtNum stmtNum, std::string lhs, std::string rhs);
+    bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
+    bool hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
 
 private:
     std::unordered_map<StmtNum, std::unordered_set<std::pair<std::string, std::string>>> patternsMap;
