@@ -7,8 +7,7 @@
 
 enum BASIC_TOKEN_TYPE { _NAME, _INTEGER, SYMBOL, KEYWORD };
 
-const std::unordered_set<std::string> KEYWORDS = {
-    "procedure", "while", "if", "then", "else", "read", "print"};
+const std::unordered_set<std::string> KEYWORDS = {"procedure", "while", "if", "then", "else", "read", "print", "call"};
 
 /**
  * @brief Provides a intermediate representation of each string to disambiguate
