@@ -8,12 +8,18 @@
 
 class SynonymStore;
 
-enum SynonymAttributeType {
+enum class SynonymAttributeType {
     PROCNAME,
     VARNAME,
     VALUE,
     STMTNUM,
 };
+
+static inline const std::unordered_map<std::string, SynonymAttributeType> STRING_TO_ATTRIBUTE_MAP = {
+    {"procName", SynonymAttributeType::PROCNAME},
+    {"varName", SynonymAttributeType::VARNAME},
+    {"value", SynonymAttributeType::VALUE},
+    {"stmt#", SynonymAttributeType::STMTNUM}};
 
 enum class DesignEntityType {
     STMT,

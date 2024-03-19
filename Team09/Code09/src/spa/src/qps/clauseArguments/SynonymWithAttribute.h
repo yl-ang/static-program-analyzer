@@ -5,10 +5,7 @@ private:
     const SynonymAttributeType& attrType;
 
 public:
-    SynonymWithAttribute(const DesignEntityType& t, const std::string& n, const SynonymAttributeType& attrType)
-        : Synonym(t, n), attrType(attrType);
+    SynonymWithAttribute(const DesignEntityType& t, const std::string& n, const SynonymAttributeType& attrType);
 
-    std::optional<SynonymAttributeType> getAttr() override const {
-        return this->attrType;
-    };
+    std::optional<SynonymAttributeType> getAttr() const override;
 };
