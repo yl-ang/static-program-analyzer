@@ -14,6 +14,8 @@
 class CallStore {
 public:
     void setCallStore(const std::unordered_set<std::pair<Procedure, Procedure>>& callPairs);
+
+    // SP: This setter htere will take in sets of statement numbers that calls the Procedure (i.e 3. call hello;)
     void setCallStmtStore(const std::unordered_set<std::pair<Procedure, StmtNum>>& callStmtPairs);
 
     std::unordered_set<Procedure> getCaller(Procedure callee);
