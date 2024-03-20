@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/PatternClause.h"
+#include "sp/Utils.h"
 
 TEST_CASE("PatternClause evaluate") {
     PKB pkb{};
@@ -31,9 +32,9 @@ TEST_CASE("PatternClause evaluate") {
     std::unordered_set<Constant> constantStoreEntries = {"1", "2"};
     writer.setConstants(constantStoreEntries);
 
-    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
-        {2, {"x", "x"}}, {2, {"x", "y"}}, {3, {"x", "2"}}, {3, {"x", "x"}}, {4, {"x", "2"}}};
-    writer.setPatternStore(patternStoreEntries);
+    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> assignPatternStoreEntries = {
+        {2, {"x # # ", "add x # # y # # "}}, {3, {"x # # ", "mul 2 # # x # # "}}, {4, {"x # # ", "2 # # "}}};
+    writer.setAssignPatternStore(isExactMatch, isPartialMatch, assignPatternStoreEntries);
 
     Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
 

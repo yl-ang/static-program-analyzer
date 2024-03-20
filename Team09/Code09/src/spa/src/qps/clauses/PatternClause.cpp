@@ -31,7 +31,7 @@ bool PatternClause::equals(const QueryClause& other) const {
             return false;
         }
         for (int i = 0; i < args.size(); i++) {
-            if (!(args[i] == ptr->args[i])) {
+            if (!(*args[i] == *(ptr->args[i]))) {
                 return false;
             }
         }

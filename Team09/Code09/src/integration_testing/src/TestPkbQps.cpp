@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "pkb/PKB.h"
 #include "qps/QPS.h"
+#include "sp/Utils.h"
 
 namespace {
 // TYPE DEFS
@@ -69,8 +70,10 @@ const std::unordered_set<std::pair<StmtNum, Variable>> stmtUsesStoreEntries = {
 const std::unordered_set<std::pair<Procedure, Variable>> procUsesStoreEntries = {
     {"main", "num1"}, {"main", "num2"}, {"next", "num1"}, {"next", "num2"}};
 
-const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
-    {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
+// const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
+//     {1, {"num1", "1"}}, {5, {"num2", "num1"}}, {5, {"num2", "4"}}, {8, {"num2", "num2"}}, {8, {"num2", "1"}}};
+const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> assignPatternStoreEntries = {
+    {1, {"num1 # # ", "1 # # "}}, {5, {"num2 # # ", "add num1 # # 4 # # "}}, {8, {"num2 # # ", "sub num2 # # 1 # # "}}};
 
 const std::unordered_set<std::pair<Procedure, Procedure>> callsStoreEntries = {{"main", "next"}};
 
@@ -100,7 +103,8 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setProcedureModifiesStore(procModifiesStoreEntries);
     pfw.setStatementUsesStore(stmtUsesStoreEntries);
     pfw.setProcedureUsesStore(procUsesStoreEntries);
-    pfw.setPatternStore(patternStoreEntries);
+    // pfw.setPatternStore(patternStoreEntries);
+    pfw.setAssignPatternStore(isExactMatch, isPartialMatch, assignPatternStoreEntries);
     pfw.setCallStore(callsStoreEntries);
     pfw.setNextStore(nextStoreEntries);
 
