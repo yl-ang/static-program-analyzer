@@ -8,6 +8,5 @@
 
 class PatternBuilder {
 public:
-    static std::unique_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType, ClauseArgument*,
-                                                                 std::vector<ClauseArgument*>);
+    static std::unique_ptr<Pattern> buildPattern(DesignEntityType, ClauseArgument*, std::vector<ClauseArgument*>);
 };
