@@ -4,10 +4,8 @@
 #include "qps/ParserUtils.h"
 #include "qps/clauseArguments/ExpressionSpec.h"
 #include "qps/clauseArguments/Synonym.h"
-#include "qps/clauses/patterns/AssignPattern.h"
-#include "qps/clauses/patterns/IfPattern.h"
 #include "qps/clauses/patterns/Pattern.h"
-#include "qps/clauses/patterns/WhilePattern.h"
+#include "qps/clauses/patterns/PatternBuilder.h"
 
 class PatternClause : public QueryClause {
 protected:

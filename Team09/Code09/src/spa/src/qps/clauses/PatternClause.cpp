@@ -5,21 +5,8 @@ PatternClause::PatternClause(ClauseArgument* syn, std::vector<ClauseArgument*> a
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     Synonym& syn = dynamic_cast<Synonym&>(synonym);
     DesignEntityType synType = syn.getType();
-    std::unique_ptr<Pattern> pattern;
-    switch (synType) {
-    case DesignEntityType::ASSIGN:
-        pattern = std::make_unique<AssignPattern>(&syn, args);
-        break;
-    case DesignEntityType::WHILE:
-        pattern = std::make_unique<WhilePattern>(&syn, args);
-        break;
-    case DesignEntityType::IF:
-        pattern = std::make_unique<IfPattern>(&syn, args);
-        break;
-    default:
-        throw QPSSemanticError();
-    }
-    return pattern->evaluate(reader);
+    std::unique_ptr<Pattern> evaluator = PatternBuilder::buildPattern(synType, &syn, args);
+    return evaluator->evaluate(reader);
 }
 
 bool PatternClause::equals(const QueryClause& other) const {
