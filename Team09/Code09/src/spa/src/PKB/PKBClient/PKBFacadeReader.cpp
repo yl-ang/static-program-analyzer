@@ -222,7 +222,7 @@ std::unordered_set<StmtNum> PKBFacadeReader::getStmtNumFromCall(Procedure call) 
     return pkbReference->callStore->getStmtNumFromCall(call);
 }
 
-Procedure PKBFacadeReader::getCallFromStmtNum(StmtNum stmtNum) {
+std::optional<Procedure> PKBFacadeReader::getCallFromStmtNum(StmtNum stmtNum) {
     return pkbReference->callStore->getCallFromStmtNum(stmtNum);
 }
 

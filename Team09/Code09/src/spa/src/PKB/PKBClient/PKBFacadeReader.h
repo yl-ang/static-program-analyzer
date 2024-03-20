@@ -88,7 +88,7 @@ public:
 
     // Getters for CallStore (Call and StmtNumber)
     [[nodiscard]] std::unordered_set<StmtNum> getStmtNumFromCall(Procedure call);
-    [[nodiscard]] Procedure getCallFromStmtNum(StmtNum stmtNum);
+    [[nodiscard]] std::optional<Procedure> getCallFromStmtNum(StmtNum stmtNum);
 
     // Getters for AssignPatternStore
     [[nodiscard]] bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
