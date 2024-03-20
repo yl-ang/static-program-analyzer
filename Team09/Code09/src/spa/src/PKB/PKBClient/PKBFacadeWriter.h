@@ -42,6 +42,7 @@ public:
 
     // Setter for CallStore
     void setCallStore(const std::unordered_set<std::pair<Procedure, Procedure>> &callPairs) const;
+    void setCallStmtStore(const std::unordered_set<std::pair<Procedure, StmtNum>> &callStmtPairs) const;
 
     // Setter for AssignPattern Store
     void setAssignPatternStore(
