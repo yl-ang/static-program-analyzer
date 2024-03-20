@@ -1168,30 +1168,51 @@ TEST_CASE("Select with 1 such-that clause") {
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
 
-        // Exact Matching not implemented in Milestone 1
-        // SECTION("Assign(_, Exact Matching) Select a") {
-        //    QPSResult result = qps.processQueries("assign a; Select a pattern a(_, \"1\")");
-        //    QPSResult expected = {"1"};
-        //    REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
-        //}
+        SECTION("Assign(_, Exact Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; Select a pattern a(_, \"1\")");
+            QPSResult expected = {"1"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-        // SECTION("Assign(_, Exact Matching) Select v") {
-        //     QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_, \"1\")");
-        //     QPSResult expected = {allVars};
-        //     REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
-        // }
+        SECTION("Assign(_, Exact Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(_, \"1\")");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-        // SECTION("Assign(Variable, Exact Matching) Select a") {
-        // }
+        SECTION("Assign(Variable, Exact Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(v, \"num1+ 4 \")");
+            QPSResult expected = {"5"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-        // SECTION("Assign(Variable, Exact Matching) Select v") {
-        // }
+        SECTION("Assign(Variable, Exact Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(v, \"num1+ 4 \")");
+            QPSResult expected = {"num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-        // SECTION("Assign(VarName, Exact Matching) Select a") {
-        // }
+        SECTION("Assign(VarName, Exact Matching) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(\"num2\", \"num2-1\")");
+            QPSResult expected = {"8"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
 
-        // SECTION("Assign(VarName, Exact Matching) Select v") {
-        // }
+        SECTION("Assign(VarName, Exact Matching) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\", \"num2-1\")");
+            QPSResult expected = {allVars};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
+        SECTION("Assign(Variable, Exact Matching not in store) Select a") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select a pattern a(\"num2\", \"num2+1\")");
+            REQUIRE_EMPTY(result);
+        }
+
+        SECTION("Assign(Variable, Exact Matching not in store) Select v") {
+            QPSResult result = qps.processQueries("assign a; variable v; Select v pattern a(\"num2\", \"num2+1\")");
+            REQUIRE_EMPTY(result);
+        }
 
         SECTION("Assign(Variable, Partial Matching) Missing variable, Semantic Error") {
             QPSResult result = qps.processQueries("assign a; Select a pattern a(v,_\"1\"_)");
