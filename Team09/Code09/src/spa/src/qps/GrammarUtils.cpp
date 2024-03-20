@@ -37,6 +37,11 @@ bool isEntRef(const std::string& str) {
     return isSynonym(str) || isWildcard(str) || isQuotedIdent(str);
 }
 
+bool isIdentWithAttr(const std::string& str) {
+    std::string pattern = "^([a-zA-Z][a-zA-Z0-9]*)\\.(" + QPSConstants::ATTR_NAME + ")$";
+    return std::regex_search(str, std::regex(pattern));
+}
+
 bool isRelRef(const std::string& str) {
     std::string pattern = "^(" + QPSConstants::REL_REF_REGEX + ")$";
     return std::regex_search(str, std::regex(pattern));

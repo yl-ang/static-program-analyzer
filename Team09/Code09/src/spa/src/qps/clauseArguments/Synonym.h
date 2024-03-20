@@ -13,13 +13,8 @@ enum class SynonymAttributeType {
     VARNAME,
     VALUE,
     STMTNUM,
+    NONE,
 };
-
-static inline const std::unordered_map<std::string, SynonymAttributeType> STRING_TO_ATTRIBUTE_MAP = {
-    {"procName", SynonymAttributeType::PROCNAME},
-    {"varName", SynonymAttributeType::VARNAME},
-    {"value", SynonymAttributeType::VALUE},
-    {"stmt#", SynonymAttributeType::STMTNUM}};
 
 enum class DesignEntityType {
     STMT,
@@ -39,22 +34,23 @@ class Synonym : public ClauseArgument {
 private:
     DesignEntityType type;
     std::string name;
+    SynonymAttributeType attrType{SynonymAttributeType::NONE};
 
 public:
     Synonym(const DesignEntityType& t, const std::string& n);
+    Synonym(const DesignEntityType& t, const std::string& n, const SynonymAttributeType& a);
 
     static DesignEntityType determineType(const std::string);
+    static SynonymAttributeType stringToAttributeEnum(const std::string& str);
 
     bool isSynonym() const override;
     std::string getClauseType() const override;
     DesignEntityType getType() const;
     std::string getValue() const override;
+    std::optional<SynonymAttributeType> getAttr() const;
     static std::string entityTypeToString(DesignEntityType);
     bool updateType(SynonymStore* synonyms);
     void print();
     bool operator==(const ClauseArgument& other) const override;
-
-    virtual std::optional<SynonymAttributeType> getAttr() const {
-        return std::nullopt;
-    }
+    bool validateAttribute() const;
 };
