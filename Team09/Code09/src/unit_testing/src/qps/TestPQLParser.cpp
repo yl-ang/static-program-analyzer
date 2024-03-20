@@ -508,12 +508,12 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Missing assignSyn name") {
+    SECTION("Missing synonym name") {
         vectorString input = {"stmt ;", "variable v;", "Select s"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Declaration not assignSyn") {
+    SECTION("Declaration not synonym") {
         vectorString input = {"stmt 1s;", "variable v;", "Select s such that Follows* (1, 2)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -568,7 +568,7 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Uses, one assignSyn") {
+    SECTION("Uses, one synonym") {
         vectorString input = {"stmt s;", "variable v;", "Select s such that Uses(s)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -598,7 +598,7 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Pattern, Missing assignSyn") {
+    SECTION("Pattern, Missing synonym") {
         vectorString input = {"assign a;", "Select a such that pattern (_, \"x\"_)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -643,12 +643,12 @@ TEST_CASE("SyntaxError") {
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("and as a assignSyn, pattern") {
+    SECTION("and as a synonym, pattern") {
         vectorString input = {"assign and, a;", "stmt s1;", "Select s1 pattern and (_, _) and a (_, _)"};
         REQUIRE_NOTHROW(PQLParser::parse(input));
     }
 
-    SECTION("Syntax Error before undeclared relCond assignSyn after and, pattern") {
+    SECTION("Syntax Error before undeclared relCond synonym after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (, _) and Modifies (s1, _)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParser::parse(input));
     }
@@ -720,12 +720,12 @@ TEST_CASE("SemanticError") {
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Undeclared relCond assignSyn after pattern") {
+    SECTION("Undeclared relCond synonym after pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern Modifies (s1, _)"};
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }
 
-    SECTION("Undeclared relCond assignSyn after and, pattern") {
+    SECTION("Undeclared relCond synonym after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (_, _) and Modifies (s1, _)"};
         REQUIRE_THROW_SEMANTIC_ERROR(PQLParser::parse(input));
     }
