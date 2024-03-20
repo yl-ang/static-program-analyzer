@@ -11,6 +11,8 @@ ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
 
 bool PatternClause::equals(const QueryClause& other) const {
     if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
+        // !( == ) is used as oppose to !=
+        // This is because operator for != is not implemented
         if (!(synonym == ptr->synonym)) {
             return false;
         }
