@@ -2,6 +2,7 @@
 
 #include <qps/clauseArguments/ClauseArgument.h>
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -20,7 +21,7 @@ public:
     std::unordered_set<Procedure> getCallerStar(Procedure callee);
     std::unordered_set<Procedure> getCalleeStar(Procedure caller);
     std::unordered_set<StmtNum> getStmtNumFromCall(Procedure call);
-    Procedure getCallFromStmtNum(StmtNum stmtNum);
+    std::optional<Procedure> getCallFromStmtNum(StmtNum stmtNum);
     bool hasCallRelationship(Procedure caller, Procedure callee);
     bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasCallStarRelationship(Procedure caller, Procedure callee);
@@ -32,7 +33,10 @@ private:
     std::unordered_map<Procedure, std::unordered_set<Procedure>> callerToCalleeStarMap;
     std::unordered_map<Procedure, std::unordered_set<Procedure>> calleeToCallerStarMap;
 
+    // Each Procedure can be called by more than 0 statements
     std::unordered_map<Procedure, std::unordered_set<StmtNum>> callToStmtNumberMap;
+
+    // Each Statement can only call a Procedure
     std::unordered_map<StmtNum, Procedure> StmtNumberToCallMap;
 
     void computeTransitiveClosure();

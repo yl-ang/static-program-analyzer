@@ -79,11 +79,11 @@ std::unordered_set<StmtNum> CallStore::getStmtNumFromCall(Procedure call) {
     return {};
 }
 
-Procedure CallStore::getCallFromStmtNum(StmtNum stmtNum) {
+std::optional<Procedure> CallStore::getCallFromStmtNum(StmtNum stmtNum) {
     if (StmtNumberToCallMap.count(stmtNum)) {
         return StmtNumberToCallMap[stmtNum];
     }
-    return {};
+    return std::nullopt;
 }
 
 bool CallStore::hasCallRelationship(Procedure caller, Procedure callee) {
