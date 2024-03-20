@@ -5,11 +5,14 @@
 #include "Spa.h"
 #include "catch.hpp"
 
+const char CODE_DIRECTORY_NAME[] = "Code09";
+
 TEST_CASE("SP-PKB: Design Entities stored correctly") {
     SPA spa;
     auto filePath = std::filesystem::current_path();
-    for (int i = 0; i < 3; i++) {
+    while (filePath.filename() != CODE_DIRECTORY_NAME) {
         filePath = filePath.parent_path();
+        std::cout << filePath;
     }
 
     filePath /= "src/integration_testing/test_files/basic_source.txt";
@@ -50,8 +53,9 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
 TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     SPA spa;
     auto filePath = std::filesystem::current_path();
-    for (int i = 0; i < 3; i++) {
+    while (filePath.filename() != CODE_DIRECTORY_NAME) {
         filePath = filePath.parent_path();
+        std::cout << filePath;
     }
 
     filePath /= "src/integration_testing/test_files/basic_source.txt";
