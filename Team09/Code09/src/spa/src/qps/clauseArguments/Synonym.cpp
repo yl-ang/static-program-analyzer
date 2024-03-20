@@ -17,7 +17,7 @@ std::unordered_map<DesignEntityType, std::unordered_set<SynonymAttributeType>> D
     {DesignEntityType::ASSIGN, {SynonymAttributeType::STMTNUM}},
 
     {DesignEntityType::READ, {SynonymAttributeType::STMTNUM, SynonymAttributeType::VARNAME}},
-    {DesignEntityType::PRINT, {{SynonymAttributeType::STMTNUM}, SynonymAttributeType::VARNAME}},
+    {DesignEntityType::PRINT, {SynonymAttributeType::STMTNUM, SynonymAttributeType::VARNAME}},
 
     {DesignEntityType::PROCEDURE, {SynonymAttributeType::PROCNAME}},
     {DesignEntityType::CALL, {SynonymAttributeType::STMTNUM, SynonymAttributeType::PROCNAME}},

@@ -53,7 +53,7 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
         switch (attr.value()) {
         case SynonymAttributeType::PROCNAME:
             if (synonym.getType() == DesignEntityType::CALL) {
-                std::optional procedureName = pkb.getCallFromStmtNum(std::stoi(synonym.getValue()));
+                std::optional procedureName = pkb.getCallFromStmtNum(std::stoi(value));
                 if (procedureName.has_value()) {
                     return procedureName.value();
                 }
@@ -63,7 +63,7 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
 
         case SynonymAttributeType::VARNAME:
             if (synonym.getType() == DesignEntityType::READ) {
-                const auto& variables = pkb.getModifiesVariablesByStatement(std::stoi(synonym.getValue()));
+                const auto& variables = pkb.getModifiesVariablesByStatement(std::stoi(value));
                 if (variables.size() != 1) {
                     throw Exception("None or more than 1 variable found when reading Read Statement");
                 }
@@ -71,7 +71,7 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
                 return variable;
             }
             if (synonym.getType() == DesignEntityType::PRINT) {
-                const auto& variables = pkb.getUsesVariablesByStatement(std::stoi(synonym.getValue()));
+                const auto& variables = pkb.getUsesVariablesByStatement(std::stoi(value));
                 if (variables.size() != 1) {
                     throw Exception("None or more than 1 variable found when reading Print Statement");
                 }
