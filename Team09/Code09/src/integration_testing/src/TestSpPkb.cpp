@@ -7,8 +7,14 @@
 
 TEST_CASE("SP-PKB: Design Entities stored correctly") {
     SPA spa;
-    // This path is for VS, as the integration binary is running from the out folder... (Mac user take note)
-    spa.parse("../../../../../src/integration_testing/test_files/basic_source.txt");
+    auto filePath = std::filesystem::current_path();
+    for (int i = 0; i < 3; i++) {
+        filePath = filePath.parent_path();
+    }
+
+    filePath /= "src/integration_testing/test_files/basic_source.txt";
+
+    spa.parse(filePath);
     PKB& pkb = spa.getInternalPKB();
     PKBFacadeReader pkbFacadeReader(pkb);
 
@@ -39,8 +45,14 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
 
 TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     SPA spa;
-    // This path is for VS, as the integration binary is running from the out folder... (Mac user take note)
-    spa.parse("../../../../../src/integration_testing/test_files/basic_source.txt");
+    auto filePath = std::filesystem::current_path();
+    for (int i = 0; i < 3; i++) {
+        filePath = filePath.parent_path();
+    }
+
+    filePath /= "src/integration_testing/test_files/basic_source.txt";
+
+    spa.parse(filePath);
     PKB& pkb = spa.getInternalPKB();
     PKBFacadeReader pkbFacadeReader(pkb);
 
