@@ -19,14 +19,15 @@
 typedef std::vector<std::string> UnparsedQueries;
 
 class PQLParser {
-private:
-    static std::string getQueryClauses(UnparsedQueries);
-
-public:
-    static void modifyClauseList(std::vector<std::string>&);
-    static Query parse(UnparsedQueries);
-    static SynonymStore parseQueryEntities(std::vector<std::string>);
+protected:
     static std::shared_ptr<SelectEntContainer> parseSelectClause(std::string);
-    static std::vector<SuchThatClause> parseSuchThatClauses(std::vector<std::string>);
-    static std::vector<PatternClause> parsePatternClauses(std::vector<std::string>);
+    static SuchThatClause parseSuchThatClauses(std::string);
+    static PatternClause parsePatternClauses(std::string);
+    static std::string getQueryClauses(UnparsedQueries);
+    static SynonymStore parseQueryEntities(std::vector<std::string>);
+    static void modifyClauseList(std::vector<std::string>&);
+    static std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>,
+        std::vector<PatternClause>> parseClauses(const std::vector<std::string>&);
+public:
+    static Query parse(UnparsedQueries);
 };
