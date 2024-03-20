@@ -51,9 +51,24 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
-// ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    
-// }
+ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
+    bool affectorIsSynonym = affector.isSynonym();
+    Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
+
+    std::unordered_set<Stmt> allStmts{};
+    allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[DesignEntityType::ASSIGN]);
+
+    std::unordered_set<StmtNum> uniqueValues{};
+
+    for (Stmt stmt : allStmts) {
+        StmtNum stmtNum = stmt.stmtNum;
+        if (affectorIsSynonym) {
+            
+        } else {
+            
+        }
+    }
+}
 
 // ClauseResult Affects::evaluateUserSynonym(PKBFacadeReader& reader) {
     
