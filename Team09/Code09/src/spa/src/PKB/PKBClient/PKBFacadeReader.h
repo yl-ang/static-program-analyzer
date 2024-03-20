@@ -78,13 +78,17 @@ public:
     [[nodiscard]] bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
-    // Getters for CallStore
+    // Getters for CallStore (Call and Call relationships)
     [[nodiscard]] std::unordered_set<Procedure> getCaller(Procedure callee);
     [[nodiscard]] std::unordered_set<Procedure> getCallee(Procedure caller);
     [[nodiscard]] std::unordered_set<Procedure> getCallerStar(Procedure callee);
     [[nodiscard]] std::unordered_set<Procedure> getCalleeStar(Procedure caller);
     [[nodiscard]] bool hasCallRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     [[nodiscard]] bool hasCallStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+
+    // Getters for CallStore (Call and StmtNumber)
+    [[nodiscard]] std::unordered_set<StmtNum> getStmtNumFromCall(Procedure call);
+    [[nodiscard]] std::optional<Procedure> getCallFromStmtNum(StmtNum stmtNum);
 
     // Getters for AssignPatternStore
     [[nodiscard]] bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);

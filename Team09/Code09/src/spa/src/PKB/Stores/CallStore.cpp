@@ -4,14 +4,20 @@ void CallStore::setCallStore(const std::unordered_set<std::pair<Procedure, Proce
     for (const auto& pair : callPairs) {
         Procedure caller = pair.first;
         Procedure callee = pair.second;
-
-        const auto map = callerToCalleeMap.find(caller);
-
         callerToCalleeMap[caller].insert(callee);
         calleeToCallerMap[callee].insert(caller);
     }
 
     computeTransitiveClosure();
+}
+
+void CallStore::setCallStmtStore(const std::unordered_set<std::pair<Procedure, StmtNum>>& callStmtPairs) {
+    for (const auto& pair : callStmtPairs) {
+        Procedure call = pair.first;
+        StmtNum stmtNum = pair.second;
+        callToStmtNumberMap[call].insert(stmtNum);
+        StmtNumberToCallMap[stmtNum] = call;
+    }
 }
 
 void CallStore::computeTransitiveClosure() {
@@ -64,6 +70,20 @@ std::unordered_set<Procedure> CallStore::getCallerStar(Procedure callee) {
 
 std::unordered_set<Procedure> CallStore::getCalleeStar(Procedure caller) {
     return callerToCalleeStarMap.count(caller) ? callerToCalleeStarMap[caller] : std::unordered_set<Procedure>();
+}
+
+std::unordered_set<StmtNum> CallStore::getStmtNumFromCall(Procedure call) {
+    if (callToStmtNumberMap.count(call)) {
+        return callToStmtNumberMap[call];
+    }
+    return {};
+}
+
+std::optional<Procedure> CallStore::getCallFromStmtNum(StmtNum stmtNum) {
+    if (StmtNumberToCallMap.count(stmtNum)) {
+        return StmtNumberToCallMap[stmtNum];
+    }
+    return std::nullopt;
 }
 
 bool CallStore::hasCallRelationship(Procedure caller, Procedure callee) {
