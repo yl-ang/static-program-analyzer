@@ -489,7 +489,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Parent(synonym, StmtSyn)") {
+            SECTION("Parent(AssignSyn, StmtSyn)") {
                 QPSResult result = qps.processQueries("assign a; stmt s; Select a such that Parent(a, s)");
                 REQUIRE_EMPTY(result);
             }
@@ -680,7 +680,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allProcs);
             }
 
-            SECTION("Modifies(synonym, VariableSyn)") {
+            SECTION("Modifies(AssignSyn, VariableSyn)") {
                 QPSResult result = qps.processQueries("assign a; variable v; Select a such that Modifies(a, v)");
                 QPSResult expected = {"1", "5", "8"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -995,7 +995,7 @@ TEST_CASE("Select with 1 such-that clause") {
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(StmtSyn, synonym)") {
+            SECTION("Next(StmtSyn, AssignSyn)") {
                 QPSResult result = qps.processQueries("assign a; stmt s; Select a such that Next(s, a)");
                 QPSResult expected = {"5", "8"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
@@ -1006,77 +1006,77 @@ TEST_CASE("Select with 1 such-that clause") {
     SECTION("NextStar") {
         QPSResult allNext = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
         SECTION("No synonyms") {
-            SECTION("Next(Stmt, stmt)") {
+            SECTION("NextStar(Stmt, stmt)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(1, 2)");
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allNext);
             }
 
-            SECTION("Next(Stmt, Wildcard)") {
+            SECTION("NextStar(Stmt, Wildcard)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(1, _)");
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allNext);
             }
 
-            SECTION("Next(Wildcard, Statement)") {
+            SECTION("NextStar(Wildcard, Statement)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(_, 2)");
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allNext);
             }
 
-            SECTION("Next(Wildcard, Wildcard") {
+            SECTION("NextStar(Wildcard, Wildcard") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(_, _)");
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, allNext);
             }
         }
 
         SECTION("1 synonym") {
-            SECTION("Next(Stmt, Synonym)") {
+            SECTION("NextStar(Stmt, Synonym)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(3, s)");
                 QPSResult expected = {"4", "5", "6"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(Stmt, Synonym: assign)") {
+            SECTION("NextStar(Stmt, Synonym: assign)") {
                 QPSResult result = qps.processQueries("assign a; Select a such that Next*(3, a)");
                 QPSResult expected = {"5"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(Stmt, Synonym: others)") {
+            SECTION("NextStar(Stmt, Synonym: others)") {
                 QPSResult result = qps.processQueries("if ifs; Select ifs such that Next*(3, ifs)");
                 REQUIRE_EMPTY(result);
             }
 
-            SECTION("Next(Synonym, Stmt)") {
+            SECTION("NextStar(Synonym, Stmt)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Next*(s, 4)");
                 QPSResult expected = {"1", "2", "3"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(Synonym: if, Stmt)") {
+            SECTION("NextStar(Synonym: if, Stmt)") {
                 QPSResult result = qps.processQueries("if ifs; Select ifs such that Next*(ifs, 4)");
                 QPSResult expected = {"3"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(Synonym: others, Stmt)") {
+            SECTION("NextStar(Synonym: others, Stmt)") {
                 QPSResult result = qps.processQueries("while w; Select w such that Next*(w, 4)");
                 REQUIRE_EMPTY(result);
             }
         }
 
         SECTION("2 synonyms") {
-            SECTION("Next(StmtSyn, StmtSyn)") {
+            SECTION("NextStar(StmtSyn, StmtSyn)") {
                 QPSResult result = qps.processQueries("stmt s1, s2; Select s1 such that Next*(s1, s2)");
                 QPSResult expected = {"1", "2", "3", "4", "5", "7", "8", "9", "10", "11"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(IfSyn, StmtSyn)") {
+            SECTION("NextStar(IfSyn, StmtSyn)") {
                 QPSResult result = qps.processQueries("if ifs; stmt s; Select ifs such that Next*(ifs, s)");
                 QPSResult expected = {"3", "9"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
-            SECTION("Next(StmtSyn, synonym)") {
+            SECTION("NextStar(StmtSyn, AssignSyn)") {
                 QPSResult result = qps.processQueries("assign a; stmt s; Select a such that Next*(s, a)");
                 QPSResult expected = {"5", "8"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
