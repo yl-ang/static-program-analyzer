@@ -53,19 +53,30 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
         switch (attr.value()) {
         case SynonymAttributeType::PROCNAME:
             if (synonym.getType() == DesignEntityType::CALL) {
-                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
-                return value;
+                std::optional procedureName = pkb.getCallFromStmtNum(std::stoi(synonym.getValue()));
+                if (procedureName.has_value()) {
+                    return procedureName.value();
+                }
+                throw Exception("No procedure name found for Call Statement");
             }
             return value;
 
         case SynonymAttributeType::VARNAME:
             if (synonym.getType() == DesignEntityType::READ) {
-                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
-                return value;
+                const auto& variables = pkb.getModifiesVariablesByStatement(std::stoi(synonym.getValue()));
+                if (variables.size() != 1) {
+                    throw Exception("None or more than 1 variable found when reading Read Statement");
+                }
+                const auto& variable = *variables.begin();
+                return variable;
             }
             if (synonym.getType() == DesignEntityType::PRINT) {
-                // TODO(Ezekiel): This is returning the wrong value, replace once PKB API is ready.
-                return value;
+                const auto& variables = pkb.getUsesVariablesByStatement(std::stoi(synonym.getValue()));
+                if (variables.size() != 1) {
+                    throw Exception("None or more than 1 variable found when reading Print Statement");
+                }
+                const auto& variable = *variables.begin();
+                return variable;
             }
             return value;
 
