@@ -161,7 +161,6 @@ TEST_CASE("Only select") {
     }
 }
 
-/*
 TEST_CASE("Boolean Select") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -186,8 +185,7 @@ TEST_CASE("Boolean Select") {
         QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
         REQUIRE_FALSE_RESULT(result);
     }
-    }
-    */
+}
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
@@ -1425,13 +1423,21 @@ TEST_CASE("Select with 1 such-that clause") {
         }
     }
 };
-/*
+
 TEST_CASE("Multi") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
     QPS qps{pfr};
 
     SECTION("Tuple Return Values") {
+        SECTION("Tuple, Return attrRef and Synonym") {
+            QPSResult result = qps.processQueries(
+                "assign a; call c; print pr; read re; Select <a.stmt#, c.procName, pr.varName, re.varName>");
+            QPSResult expected = {"1 next num1 num2", "1 next num2 num2", "5 next num1 num2",
+                                  "5 next num2 num2", "8 next num1 num2", "8 next num2 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
         SECTION("Tuple, Return two values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
@@ -1537,4 +1543,3 @@ TEST_CASE("Multi") {
         }
     }
 }
-    */
