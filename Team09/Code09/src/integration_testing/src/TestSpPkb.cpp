@@ -14,7 +14,7 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
 
     filePath /= "src/integration_testing/test_files/basic_source.txt";
 
-    spa.parse(filePath);
+    spa.parse(filePath.string());
     PKB& pkb = spa.getInternalPKB();
     PKBFacadeReader pkbFacadeReader(pkb);
 
@@ -56,7 +56,7 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
 
     filePath /= "src/integration_testing/test_files/basic_source.txt";
 
-    spa.parse(filePath);
+    spa.parse(filePath.string());
     PKB& pkb = spa.getInternalPKB();
     PKBFacadeReader pkbFacadeReader(pkb);
 
