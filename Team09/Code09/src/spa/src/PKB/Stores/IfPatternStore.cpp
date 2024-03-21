@@ -5,9 +5,9 @@
 
 #include "PKB/Utils/DataTypes.h"
 
-void IfPatternStore::initialiseIfPatternStore(std::function<bool(std::string, std::string)> exactMatchFP,
-                                              std::function<bool(std::string, std::string)> partialMatchFP,
-                                              std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) {
+void IfPatternStore::initialiseStore(std::function<bool(std::string, std::string)> exactMatchFP,
+                                     std::function<bool(std::string, std::string)> partialMatchFP,
+                                     std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) {
     this->exactMatchFP = exactMatchFP;
     this->partialMatchFP = partialMatchFP;
     setIfPatterns(ifPatternPairs);
