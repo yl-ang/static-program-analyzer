@@ -1,7 +1,5 @@
 #pragma once
 
-#include <qps/clauseArguments/ClauseArgument.h>
-
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
