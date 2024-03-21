@@ -45,7 +45,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
-ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     bool affectorIsSynonym = affector.isSynonym();
     Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
 
@@ -64,17 +64,9 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     }
 }
 
-// ClauseResult Affects::evaluateUserSynonym(PKBFacadeReader& reader) {
-    
-// }
+ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {}
 
-// ClauseResult Affects::variablesUsedByProcedure(PKBFacadeReader& reader) {
-    
-// }
-
-// ClauseResult Affects::variablesUsedByStatement(PKBFacadeReader& reader) {
-    
-// }
+ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {}
 
 bool Affects::isSimpleResult() const {
     // Takes care of Integer/Wildcard, Wildcard/Wildcard
