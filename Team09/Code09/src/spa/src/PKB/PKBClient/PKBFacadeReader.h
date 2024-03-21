@@ -94,6 +94,10 @@ public:
     [[nodiscard]] bool hasExactPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
     [[nodiscard]] bool hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2);
 
+    // Getters for IfPatternStore
+    [[nodiscard]] bool hasExactPattern(StmtNum stmtNum, std::string expr);
+    [[nodiscard]] bool hasPartialPattern(StmtNum stmtNum, std::string expr);
+
 private:
     PKB* pkbReference = nullptr;
 };

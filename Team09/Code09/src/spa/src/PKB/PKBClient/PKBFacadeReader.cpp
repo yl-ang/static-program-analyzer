@@ -233,3 +233,11 @@ bool PKBFacadeReader::hasExactPattern(StmtNum stmtNum, std::string arg1, std::st
 bool PKBFacadeReader::hasPartialPattern(StmtNum stmtNum, std::string arg1, std::string arg2) {
     return pkbReference->assignPatternStore->hasPartialPattern(stmtNum, arg1, arg2);
 }
+
+bool PKBFacadeReader::hasExactPattern(StmtNum stmtNum, std::string expr) {
+    return pkbReference->ifPatternStore->hasExactPattern(stmtNum, expr);
+}
+
+bool PKBFacadeReader::hasPartialPattern(StmtNum stmtNum, std::string expr) {
+    return pkbReference->ifPatternStore->hasPartialPattern(stmtNum, expr);
+}
