@@ -16,7 +16,7 @@ void IfPatternStore::initialiseStore(std::function<bool(std::string, std::string
 void IfPatternStore::setIfPatterns(const std::unordered_set<std::pair<StmtNum, std::string>>& ifPatternPairs) {
     for (const auto& pattern : ifPatternPairs) {
         const auto& arg = pattern.second;
-        ifPatternsMap[pattern.first] = arg;
+        ifPatternsMap[pattern.first].insert(arg);
     }
 }
 
@@ -29,14 +29,16 @@ bool IfPatternStore::hasPartialPattern(StmtNum stmtNum, std::string arg) {
 }
 
 bool IfPatternStore::applyIfPatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
-                                            std::string queryArg) {
+                                            std::string arg) {
     auto it = ifPatternsMap.find(stmtNum);
 
     // Check if stmtNum is found
     if (it != ifPatternsMap.end()) {
-        // Retrieve the args associated with stmtNum
-        const auto& arg = it->second;
-        return function(arg, queryArg);
+        // Retrieve all the control variables with stmtNum
+        const auto& vars = it->second;
+        for (const auto& var : vars) {
+            return function(var, arg);
+        }
     }
     return false;
 }

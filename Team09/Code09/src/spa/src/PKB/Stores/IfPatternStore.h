@@ -17,7 +17,7 @@ public:
     bool hasPartialPattern(StmtNum stmtNum, std::string arg);
 
 private:
-    std::unordered_map<StmtNum, std::string> ifPatternsMap;
+    std::unordered_map<StmtNum, std::unordered_set<std::string>> ifPatternsMap;
     void setIfPatterns(const std::unordered_set<std::pair<StmtNum, std::string>>& ifPatternPairs);
     bool applyIfPatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
                                 std::string arg);
