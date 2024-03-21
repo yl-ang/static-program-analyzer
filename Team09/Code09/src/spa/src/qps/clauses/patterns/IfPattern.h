@@ -12,6 +12,10 @@ private:
     ClauseArgument& secondArg;
     ClauseArgument& thirdArg;
 
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
+
 public:
     IfPattern(ClauseArgument* ifSyn, std::vector<ClauseArgument*> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
