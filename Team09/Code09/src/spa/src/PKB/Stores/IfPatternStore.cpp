@@ -15,28 +15,28 @@ void IfPatternStore::initialiseStore(std::function<bool(std::string, std::string
 
 void IfPatternStore::setIfPatterns(const std::unordered_set<std::pair<StmtNum, std::string>>& ifPatternPairs) {
     for (const auto& pattern : ifPatternPairs) {
-        const auto& condExpr = pattern.second;
-        ifPatternsMap[pattern.first] = condExpr;
+        const auto& arg = pattern.second;
+        ifPatternsMap[pattern.first] = arg;
     }
 }
 
-bool IfPatternStore::hasExactPattern(StmtNum stmtNum, std::string expr) {
-    return applyIfPatternFunction(exactMatchFP, stmtNum, expr);
+bool IfPatternStore::hasExactPattern(StmtNum stmtNum, std::string arg) {
+    return applyIfPatternFunction(exactMatchFP, stmtNum, arg);
 }
 
-bool IfPatternStore::hasPartialPattern(StmtNum stmtNum, std::string expr) {
-    return applyIfPatternFunction(partialMatchFP, stmtNum, expr);
+bool IfPatternStore::hasPartialPattern(StmtNum stmtNum, std::string arg) {
+    return applyIfPatternFunction(partialMatchFP, stmtNum, arg);
 }
 
 bool IfPatternStore::applyIfPatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
-                                            std::string expr) {
+                                            std::string queryArg) {
     auto it = ifPatternsMap.find(stmtNum);
 
     // Check if stmtNum is found
     if (it != ifPatternsMap.end()) {
-        // Retrieve the expr associated with stmtNum
-        const auto& IfPatternExpr = it->second;
-        return function(IfPatternExpr, expr);
+        // Retrieve the args associated with stmtNum
+        const auto& arg = it->second;
+        return function(arg, queryArg);
     }
     return false;
 }
