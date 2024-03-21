@@ -6,12 +6,14 @@
 #include "PKB/Stores/CallStore.h"
 #include "PKB/Stores/EntityStore.h"
 #include "PKB/Stores/FollowsStore.h"
+#include "PKB/Stores/IfPatternStore.h"
 #include "PKB/Stores/ModifiesStore.h"
 #include "PKB/Stores/NextStore.h"
 #include "PKB/Stores/ParentStore.h"
 #include "PKB/Stores/PatternStore.h"
 #include "PKB/Stores/StatementStore.h"
 #include "PKB/Stores/UsesStore.h"
+#include "PKB/Stores/WhilePatternStore.h"
 
 class PKB {
 public:
@@ -33,4 +35,6 @@ public:
     std::shared_ptr<NextStore> nextStore;
     std::shared_ptr<CallStore> callStore;
     std::shared_ptr<AssignPatternStore> assignPatternStore;
+    std::shared_ptr<IfPatternStore> ifPatternStore;
+    std::shared_ptr<WhilePatternStore> whilePatternStore;
 };
