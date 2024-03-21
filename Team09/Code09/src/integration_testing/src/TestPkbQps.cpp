@@ -42,7 +42,7 @@ void equalVectorContents(QPSResult result, QPSResult expected) {
 //  9     if (num2 == 2) then {
 // 10       print num2;
 //        } else {
-// 11       print "0";
+// 11       print num1;
 //        }
 //      }
 // 12   print num2;
@@ -65,8 +65,8 @@ const std::unordered_set<std::pair<Procedure, Variable>> procModifiesStoreEntrie
     {"main", "num1"}, {"main", "num2"}, {"next", "num2"}};
 
 const std::unordered_set<std::pair<StmtNum, Variable>> stmtUsesStoreEntries = {
-    {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"}, {6, "num1"},  {6, "num2"},
-    {7, "num1"}, {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {12, "num2"}};
+    {3, "num1"}, {3, "num2"}, {4, "num1"}, {5, "num1"},  {6, "num1"},  {6, "num2"}, {7, "num1"},
+    {7, "num2"}, {8, "num2"}, {9, "num2"}, {10, "num2"}, {11, "num1"}, {12, "num2"}};
 const std::unordered_set<std::pair<Procedure, Variable>> procUsesStoreEntries = {
     {"main", "num1"}, {"main", "num2"}, {"next", "num1"}, {"next", "num2"}};
 
@@ -77,6 +77,8 @@ const std::unordered_set<std::pair<Procedure, Procedure>> callsStoreEntries = {{
 
 const std::unordered_set<std::pair<StmtNum, StmtNum>> nextStoreEntries = {
     {1, 2}, {2, 3}, {3, 4}, {3, 5}, {4, 6}, {5, 6}, {7, 8}, {8, 9}, {9, 10}, {9, 11}, {10, 12}, {11, 12}};
+
+const std::unordered_set<std::pair<Procedure, StmtNum>> callStmtStoreEntries = {{"next", 6}};
 
 // Common results
 const QPSResult allStmts = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
@@ -104,6 +106,7 @@ PKBFacadeReader buildPKBNew(PKB pkb) {
     pfw.setAssignPatternStore(isExactMatch, isPartialMatch, assignPatternStoreEntries);
     pfw.setCallStore(callsStoreEntries);
     pfw.setNextStore(nextStoreEntries);
+    pfw.setCallStmtStore(callStmtStoreEntries);
 
     return PKBFacadeReader{pkb};
 }
@@ -184,8 +187,8 @@ TEST_CASE("Boolean Select") {
         QPSResult result = qps.processQueries("assign a; variable v; Select BOOLEAN pattern a(v,_\"num3\"_)");
         REQUIRE_FALSE_RESULT(result);
     }
-    }
-    */
+}
+*/
 
 TEST_CASE("Select with 1 such-that clause") {
     PKB pkb{};
@@ -689,7 +692,7 @@ TEST_CASE("Select with 1 such-that clause") {
     // ai-gen start(gpt-4, 2, e)
     // prompt: https://platform.openai.com/playground/p/WnxaYJxypfRzOt9jqsY1qk0d?mode=chat
     SECTION("Uses") {
-        QPSResult allUsingStatements = {"3", "4", "5", "6", "7", "8", "9", "10", "12"};
+        QPSResult allUsingStatements = {"3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
         SECTION("No synonyms") {
             SECTION("Uses(Integer, VariableName)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(3, \"num1\")");
@@ -723,7 +726,7 @@ TEST_CASE("Select with 1 such-that clause") {
         SECTION("1 synonym") {
             SECTION("Uses(Synonym, VariableName)") {
                 QPSResult result = qps.processQueries("stmt s; Select s such that Uses(s, \"num1\")");
-                QPSResult expected = {"3", "4", "5", "6", "7"};
+                QPSResult expected = {"3", "4", "5", "6", "7", "11"};
                 REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
             }
 
@@ -1216,6 +1219,233 @@ TEST_CASE("Select with 1 such-that clause") {
             REQUIRE_THROW_SEMANTIC_ERROR(result);
         }
     }
+
+    SECTION("Test attrRef") {
+        SECTION("Select stmt#") {
+            SECTION("Stmts") {
+                QPSResult result = qps.processQueries("stmt s; Select s.stmt#");
+                QPSResult expected = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Assign statements") {
+                QPSResult result = qps.processQueries("assign a; Select a.stmt#");
+                QPSResult expected = {"1", "5", "8"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("If statements") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs.stmt#");
+                QPSResult expected = {"3", "9"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("While statements") {
+                QPSResult result = qps.processQueries("while w; Select w.stmt#");
+                QPSResult expected = {"7"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Call statements") {
+                QPSResult result = qps.processQueries("call c; Select c.stmt#");
+                QPSResult expected = {"6"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Read statements") {
+                QPSResult result = qps.processQueries("read r; Select r.stmt#");
+                QPSResult expected = {"2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Print statements") {
+                QPSResult result = qps.processQueries("print pr; Select pr.stmt#");
+                QPSResult expected = {"10", "11", "12", "4"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Procedure names") {
+                QPSResult result = qps.processQueries("procedure p; Select p.stmt#");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Variables") {
+                QPSResult result = qps.processQueries("variable v; Select v.stmt#");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Constants") {
+                QPSResult result = qps.processQueries("constant c; Select c.stmt#");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+        }
+
+        SECTION("Select procName") {
+            SECTION("Call statements") {
+                QPSResult result = qps.processQueries("call c; Select c.procName");
+                QPSResult expected = {"next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Procedure names") {
+                QPSResult result = qps.processQueries("procedure p; Select p.procName");
+                QPSResult expected = {"main", "next"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Stmts") {
+                QPSResult result = qps.processQueries("stmt s; Select s.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Assign statements") {
+                QPSResult result = qps.processQueries("assign a; Select a.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("If statements") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("While statements") {
+                QPSResult result = qps.processQueries("while w; Select w.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Read statements") {
+                QPSResult result = qps.processQueries("read r; Select r.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Print statements") {
+                QPSResult result = qps.processQueries("print p; Select p.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Variables") {
+                QPSResult result = qps.processQueries("variable v; Select v.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Constants") {
+                QPSResult result = qps.processQueries("constant c; Select c.procName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+        }
+
+        SECTION("Select varName") {
+            SECTION("Variables") {
+                QPSResult result = qps.processQueries("variable v; Select v.varName");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allVars);
+            }
+
+            SECTION("Read statements") {
+                QPSResult result = qps.processQueries("read r; Select r.varName");
+                QPSResult expected = {"num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Print statements") {
+                QPSResult result = qps.processQueries("print p; Select p.varName");
+                QPSResult expected = {"num1", "num2"};
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+            }
+
+            SECTION("Call statements") {
+                QPSResult result = qps.processQueries("call c; Select c.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Procedure names") {
+                QPSResult result = qps.processQueries("procedure p; Select p.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Stmts") {
+                QPSResult result = qps.processQueries("stmt s; Select s.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Assign statements") {
+                QPSResult result = qps.processQueries("assign a; Select a.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("If statements") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("While statements") {
+                QPSResult result = qps.processQueries("while w; Select w.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Constants") {
+                QPSResult result = qps.processQueries("constant c; Select c.varName");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+        }
+
+        SECTION("Select value") {
+            SECTION("Constants") {
+                QPSResult result = qps.processQueries("constant c; Select c.value");
+                REQUIRE_EQUAL_VECTOR_CONTENTS(result, allConsts);
+            }
+
+            SECTION("Variables") {
+                QPSResult result = qps.processQueries("variable v; Select v.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Read statements") {
+                QPSResult result = qps.processQueries("read r; Select r.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Print statements") {
+                QPSResult result = qps.processQueries("print p; Select p.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Call statements") {
+                QPSResult result = qps.processQueries("call c; Select c.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Procedure names") {
+                QPSResult result = qps.processQueries("procedure p; Select p.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Stmts") {
+                QPSResult result = qps.processQueries("stmt s; Select s.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("Assign statements") {
+                QPSResult result = qps.processQueries("assign a; Select a.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("If statements") {
+                QPSResult result = qps.processQueries("if ifs; Select ifs.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+
+            SECTION("While statements") {
+                QPSResult result = qps.processQueries("while w; Select w.value");
+                REQUIRE_THROW_SEMANTIC_ERROR(result);
+            }
+        }
+
+        SECTION("Follows(Synonym, Wildcard)") {
+            QPSResult result = qps.processQueries("stmt s; Select s.stmt# such that Follows(s, _)");
+            QPSResult expected = {allFollowees};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+    }
 };
 
 /*
@@ -1225,6 +1455,14 @@ TEST_CASE("Multi") {
     QPS qps{pfr};
 
     SECTION("Tuple Return Values") {
+        SECTION("Tuple, Return attrRef and Synonym") {
+            QPSResult result = qps.processQueries(
+                "assign a; call c; print pr; read re; Select <a.stmt#, c.procName, pr.varName, re.varName>");
+            QPSResult expected = {"1 next num1 num2", "1 next num2 num2", "5 next num1 num2",
+                                  "5 next num2 num2", "8 next num1 num2", "8 next num2 num2"};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
+
         SECTION("Tuple, Return two values, such that") {
             QPSResult result = qps.processQueries("stmt s1, s2; Select <s1,s2> such that Follows(s1, s2)");
             QPSResult expected = {"1 2", "2 3", "3 6", "7 12", "8 9"};
@@ -1330,4 +1568,4 @@ TEST_CASE("Multi") {
         }
     }
 }
-    */
+*/

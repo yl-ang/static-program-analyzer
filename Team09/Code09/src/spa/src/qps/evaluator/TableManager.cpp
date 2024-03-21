@@ -69,6 +69,7 @@ Row TableManager::combineRows(const Row& row, const Row& otherRow, const std::ve
     return newRow;
 }
 
+// TODO(Ezekiel): Refactor this
 std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     std::vector<Synonym> commonHeaders{};
     std::unordered_set<SynonymValue> seen{};
@@ -82,6 +83,7 @@ std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     return commonHeaders;
 }
 
+// TODO(Ezekiel): Refactor this
 std::vector<Synonym> TableManager::mergeHeaders(const Table& other) const {
     std::vector<Synonym> newHeaders{};
     std::unordered_set<SynonymValue> seen{};
@@ -122,17 +124,25 @@ std::vector<std::string> TableManager::extractResults(const std::vector<Synonym>
         return {};
     }
 
-    std::vector<std::string> results{};
-    std::unordered_set<std::string> seen{};
-
+    std::unordered_set<std::string> uniqueTuples{};
     for (const Row& row : this->result.getRows()) {
-        if (auto resultTuple{buildTuple(synonyms, row)}; seen.find(resultTuple) == seen.end()) {
-            seen.insert(resultTuple);
-            results.push_back(resultTuple);
+        uniqueTuples.insert(buildTuple(synonyms, row));
+    }
+
+    std::vector<std::string> results{uniqueTuples.begin(), uniqueTuples.end()};
+    return results;
+}
+
+void TableManager::projectAttributes(const ValueTransformer& attributeProjector) const {
+    std::vector<Synonym> synonymsWithAttributes{};
+
+    for (Synonym syn : this->result.getHeaders()) {
+        if (syn.getAttr().has_value()) {
+            synonymsWithAttributes.push_back(syn);
         }
     }
 
-    return results;
+    this->result.transformColumn(synonymsWithAttributes, attributeProjector);
 }
 
 std::string TableManager::buildTuple(const std::vector<Synonym>& synonyms, const Row& row) {

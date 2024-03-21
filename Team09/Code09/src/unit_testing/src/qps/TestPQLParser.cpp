@@ -47,7 +47,8 @@ TEST_CASE("various_call_assign_stmt") {
 }
 
 // Testing Find Queries functions
-std::vector<std::string> various_assorted = {"variable v1, v2;", "assign a1;", "stmt s1, s2;"};
+std::vector<std::string> various_assorted = {"variable v1, v2;", "assign a1;", "stmt s1, s2;", "procedure p1;",
+                                             "constant c1;"};
 SynonymStore entities = PQLParserTester::parseQueryEntities(various_assorted);
 
 using containerPtr = std::shared_ptr<SelectEntContainer>;
@@ -104,6 +105,50 @@ TEST_CASE("PQLParserTester: Select (3))") {
 
     REQUIRE(result_1->getSynonyms().size() == 0);
     REQUIRE(result_2->getSynonyms().size() == 0);
+}
+
+TEST_CASE("PQLParserTest: Select (4)") {
+    std::string select_1 = "Select <v1.varName, a1.stmt#>";
+    std::string select_2 = "Select <p1.procName, c1.value>";
+
+    containerPtr result_1 = PQLParserTester::parseSelectClause(select_1);
+    containerPtr result_2 = PQLParserTester::parseSelectClause(select_2);
+
+    result_1->updateSynonyms(&entities);
+    result_2->updateSynonyms(&entities);
+
+    REQUIRE(result_1->getSynonyms().size() == 2);
+    REQUIRE(result_1->getSynonyms()[0].getAttr().has_value());
+    REQUIRE(result_1->getSynonyms()[1].getAttr().has_value());
+    REQUIRE(Synonym(DesignEntityType::VARIABLE, "v1", SynonymAttributeType::VARNAME) == result_1->getSynonyms()[0]);
+    REQUIRE(Synonym(DesignEntityType::ASSIGN, "a1", SynonymAttributeType::STMTNUM) == result_1->getSynonyms()[1]);
+
+    REQUIRE(result_2->getSynonyms().size() == 2);
+    REQUIRE(result_2->getSynonyms()[0].getAttr().has_value());
+    REQUIRE(result_2->getSynonyms()[1].getAttr().has_value());
+    REQUIRE(Synonym(DesignEntityType::PROCEDURE, "p1", SynonymAttributeType::PROCNAME) == result_2->getSynonyms()[0]);
+    REQUIRE(Synonym(DesignEntityType::CONSTANT, "c1", SynonymAttributeType::VALUE) == result_2->getSynonyms()[1]);
+}
+
+TEST_CASE("PQLParserTest: Select updateSyonym returns correct boolean") {
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select v1.value")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select v1.procName")->updateSynonyms(&entities));
+
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select s1.varName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select s1.procName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select s1.value")->updateSynonyms(&entities));
+
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select a1.varName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select a1.procName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select a1.value")->updateSynonyms(&entities));
+
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select c1.procName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select c1.varName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select c1.stmt#")->updateSynonyms(&entities));
+
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select p1.varName")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select p1.stmt#")->updateSynonyms(&entities));
+    REQUIRE_FALSE(PQLParserTester::parseSelectClause("Select p1.value")->updateSynonyms(&entities));
 }
 
 // Select such that Parent()

@@ -29,6 +29,7 @@ private:
     static bool evaluateAndJoinClauses(const TableManager& tm,
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
                                        PKBFacadeReader& pkb);
+    static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
 
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
