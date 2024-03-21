@@ -8,10 +8,8 @@
 
 bool equalVector(std::vector<std::string> vec1, std::vector<std::string> vec2) {
     std::sort(vec1.begin(), vec1.end());
-    vec1.erase(std::unique(vec1.begin(), vec1.end()), vec1.end());
 
     std::sort(vec2.begin(), vec2.end());
-    vec2.erase(std::unique(vec2.begin(), vec2.end()), vec2.end());
 
     return vec1 == vec2;
 }
@@ -196,8 +194,8 @@ TEST_CASE("While Pattern evaluate") {
         {3, "x"}, {3, "y"}, {3, "abc"}, {6, "z"}, {6, "y"}};
     writer.setWhilePatternStore(whilePatternEntries);
 
-    std::vector<std::string> allWhileStmtsWithVariables{"3", "6"};
-    std::vector<std::string> allVarsInWhile{"x", "y", "abc", "z"};
+    std::vector<std::string> allWhileStmtsWithVariables{"3", "3", "3", "6", "6"};
+    std::vector<std::string> allVarsInWhile{"x", "y", "abc", "z", "y"};
 
     Synonym whileSyn{DesignEntityType::WHILE, "w"};
     Synonym varSyn{DesignEntityType::VARIABLE, "v"};
@@ -294,8 +292,8 @@ TEST_CASE("If Pattern evaluate") {
                                                                          {6, "w"}, {6, "y"}, {9, "z"}};
     writer.setIfPatternStore(ifPatternEntries);
 
-    std::vector<std::string> allIfStmtsWithVariables{"5", "6", "9"};
-    std::vector<std::string> allVarsInIf{"x", "y", "w", "z"};
+    std::vector<std::string> allIfStmtsWithVariables{"5", "5", "6", "6", "6", "9"};
+    std::vector<std::string> allVarsInIf{"x", "y", "z", "w", "y", "z"};
 
     Synonym ifSyn{DesignEntityType::IF, "ii"};
     Synonym varSyn{DesignEntityType::VARIABLE, "v"};
