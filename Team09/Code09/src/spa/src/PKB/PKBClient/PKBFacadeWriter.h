@@ -55,6 +55,11 @@ public:
                            const std::function<bool(std::string, std::string)> partialMatchFP,
                            const std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) const;
 
+    // Setter for WhilePattern
+    void setWhilePatternStore(std::function<bool(std::string, std::string)> exactMatchFP,
+                              std::function<bool(std::string, std::string)> partialMatchFP,
+                              std::unordered_set<std::pair<StmtNum, std::string>> whilePatternPairs) const;
+
 private:
     PKB *pkbReference = nullptr;
 };
