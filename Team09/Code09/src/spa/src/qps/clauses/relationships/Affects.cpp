@@ -22,16 +22,28 @@ bool Affects::validateArguments() {
 }
 
 ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
-    // if (isSimpleResult()) {
-    //     return {reader.hasParentRelationship(parent, child)};
-    // }
     /**
-     * synonym synonym
-     * synonym integer / integer synonym 
-     * wildcard synonym / synonym wilcard
+     * integer integer
+     * wildcard integer / integer wildcard
+     * wildcard wildcard
+     */ 
+    if (isSimpleResult()) {
+        return {reader.hasParentRelationship(affector, affected)};
+    }
+
+    /**
+     * Return types:
      * 
-     * integer integer TRUE/FALSE
-     * wildcard integer / integer wildcard 
+     * synonym synonym s1, s2
+     * 
+     * integer synonym s2
+     * wildcard synonym s2
+     * synonym integer s1
+     * synonym wilcard s1
+     * 
+     * TRUE/FALSE
+     * integer integer
+     * wildcard integer / integer wildcard
      * wildcard wildcard
     */
 
@@ -92,14 +104,6 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     SynonymValues affectorValues{};
     SynonymValues affectedValues{};
-
-    /**
-     * Original plan:
-     * 1. Get the variable modified by the statement
-     * 2. See if this variable is modified by any statement below, following control flow
-     * 3. Stop immediately after you hit one that modifies the variable 
-     * (as other following statements would break no modifies inbetween rule)
-    */
 
     /**
      * 1. Get assign statements that modify their variables
