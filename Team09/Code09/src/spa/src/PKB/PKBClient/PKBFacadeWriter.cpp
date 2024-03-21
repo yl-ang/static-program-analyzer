@@ -74,16 +74,11 @@ void PKBFacadeWriter::setAssignPatternStore(
     this->pkbReference->assignPatternStore->initialiseStore(exactMatchFP, partialMatchFP, patterns);
 }
 
-void PKBFacadeWriter::setIfPatternStore(
-    const std::function<bool(std::string, std::string)> exactMatchFP,
-    const std::function<bool(std::string, std::string)> partialMatchFP,
-    const std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) const {
-    this->pkbReference->ifPatternStore->initialiseStore(exactMatchFP, partialMatchFP, ifPatternPairs);
+void PKBFacadeWriter::setIfPatternStore(std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) const {
+    this->pkbReference->ifPatternStore->setIfPatternStore(ifPatternPairs);
 }
 
 void PKBFacadeWriter::setWhilePatternStore(
-    const std::function<bool(std::string, std::string)> exactMatchFP,
-    const std::function<bool(std::string, std::string)> partialMatchFP,
     const std::unordered_set<std::pair<StmtNum, std::string>> whilePatternPairs) const {
-    pkbReference->whilePatternStore->initialiseStore(exactMatchFP, partialMatchFP, whilePatternPairs);
+    pkbReference->whilePatternStore->setWhilePatternStore(whilePatternPairs);
 }
