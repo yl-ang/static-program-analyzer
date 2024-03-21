@@ -47,25 +47,38 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    bool affectorIsSynonym = affector.isSynonym();
-    Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
+    // bool affectorIsSynonym = affector.isSynonym();
+    // Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
 
-    std::unordered_set<Stmt> allStmts{};
-    allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[DesignEntityType::ASSIGN]);
+    // std::unordered_set<Stmt> allStmts{};
+    // allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[DesignEntityType::ASSIGN]);
 
-    std::unordered_set<StmtNum> uniqueValues{};
+    // std::unordered_set<StmtNum> uniqueValues{};
 
-    for (Stmt stmt : allStmts) {
-        StmtNum stmtNum = stmt.stmtNum;
-        if (affectorIsSynonym) {
+    // for (Stmt stmt : allStmts) {
+    //     StmtNum stmtNum = stmt.stmtNum;
+    //     if (affectorIsSynonym) {
             
-        } else {
+    //     } else {
             
-        }
-    }
+    //     }
+    // }
 }
 
-ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {}
+ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
+    bool affectorIsSynonym = affector.isSynonym();
+    Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
+    Integer stmtNum = affectorIsSynonym ? dynamic_cast<Integer&>(affected) : dynamic_cast<Integer&>(affector);
+
+    // Synonym Integer
+    /**
+     * Need to figure out the affector statements
+    */
+    // Integer Synonym
+    /**
+     * Need to figure out the affected statements
+    */
+}
 
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym affectorSyn = dynamic_cast<Synonym&>(affector);
@@ -95,58 +108,60 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * Then filter down to assign statements
      * Make tuple of modified variable and assign statement
     */
-    std::unordered_set<Variable> vars = reader.getVariables();
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAssignStmtList{};
-    for (Variable var : vars) {
-        std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
+    std::unordered_set<Variable> allVar = reader.getVariables();
+    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList{};
+    for (Variable var : allVar) {
+        std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
         std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
-                                                reader, affectorSyn.getType(), stmts);
-        for (StmtNum stmt : assignStmts) {
-            varAndAssignStmtList.insert(std::make_tuple(var, stmt));
+                                                reader, affectorSyn.getType(), allStmts);
+        for (StmtNum assignStmt : assignStmts) {
+            varAndAffectorStmtList.insert(std::make_tuple(var, assignStmt));
         }
     }
 
     /**
      * 2. For each tuple of modified variable and assign statement
      * - Get the control flow statements that follow it (like NextStar)
-     * - Filter out the assign statements
+     * - Get the CF with all the statements
+     * - Get separate list with assign statements
     */
-    for (const std::tuple<Variable, StmtNum>& varAndAssignStmt : varAndAssignStmtList) {
+    std::unordered_set<StmtNum> nextStmtNums{};
+    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         // Get NextStar Control Flow - all StmtNums that follow that assign statement
-        Variable variable = std::get<Variable>(varAndAssignStmt);
-        StmtNum stmtNum = std::get<StmtNum>(varAndAssignStmt);
-        std::unordered_set<StmtNum> nextStmtNums = reader.getNexteeStar(stmtNum);
-        std::unordered_set<StmtNum> nextAssignStmtNums{};
-        // Filtering out Assign Statements
+        StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
+        std::unordered_set<StmtNum> CFAffector = reader.getNexteeStar(affectorStmtNum);
+        nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
+    }
+
+    /**
+     * For each tuple of modified variable and assign statement:
+     * For each CF next assign statement:
+     * - iterate through variables used by the CF next assign statement,
+     * 
+     * - if not ASSIGN statement, CHECK that does not modify the variable
+     * if modified, exit loop for that affecter statement
+     * 
+     * - else if ASSIGN statement, CHECK that currVariable equals modified variable
+     * if yes, push back values
+    */
+    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+        StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
+        Variable variable = std::get<Variable>(varAndAffectorStmt);
+
         for (StmtNum nextStmtNum : nextStmtNums) {
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-            if (stmt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[DesignEntityType::ASSIGN]) {
-                nextAssignStmtNums.insert(nextStmtNum);
-            }
-        }
-
-        /**
-         * For each tuple of modified variable and assign statement:
-         * [Still in above loop]
-         * 
-         * For each CF next assign statement:
-         * - iterate through variables used by the CF next assign statement,
-         *   until you hit the first that satisifies below condition:
-         * - if currVariable equals modified variable, push back values and exit loops
-         * - Then exit the loop for THIS assign statement
-        */
-        bool found = false;
-        for (StmtNum nextAssignStmtNum : nextAssignStmtNums) {
-            for (Variable currVar : reader.getUsesVariablesByStatement(nextAssignStmtNum)) {
+            // Checking if modifies the affector variable
+            for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
                 if (currVar == variable) {
-                    affectorValues.push_back(std::to_string(stmtNum));
-                    affectedValues.push_back(std::to_string(nextAssignStmtNum));
-                    found = true;
-                    break;  // Break out of inner loop
+                    break;  // Break out of inner loop for current affector statement
                 }
             }
-            if (found) {
-                break;  // Break out of outer loop
+            // Checking if uses the affector variable
+            for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
+                if (currVar == variable) {  
+                    affectorValues.push_back(std::to_string(stmtNum));
+                    affectedValues.push_back(std::to_string(nextStmtNum));
+                }
             }
         }
     }
