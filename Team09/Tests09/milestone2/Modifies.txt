@@ -1,0 +1,155 @@
+70001 - Modifies / no synonyms / literal, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Modifies("a5", "a")
+none
+5000
+70002 - Modifies / no synonyms / literal, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Modifies("a5", _)
+none
+5000
+70003 - Modifies / no synonyms / wildcard, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Modifies(_, "a")
+SemanticError
+5000
+70004 - Modifies / no synonyms / wildcard, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Modifies(_,_)
+SemanticError
+5000
+70005 - Modifies / no synonyms / wildcard, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Modifies(_, 4)
+SyntaxError
+5000
+70006 - Modifies / no synonyms / integer, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Modifies(5, _)
+if,main,while
+5000
+70007 - Modifies / no synonyms / integer, varname
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Modifies(13, "c")
+none
+5000
+70008 - Modifies / no synonyms / varname, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Modifies("a", 13)
+SyntaxError
+5000
+70009 - Modifies / 1 synonyms / integer, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(4, v1)
+a3
+5000
+70010 - Modifies / 1 synonyms / wildcard, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(wildcard, v1)
+SemanticError
+5000
+70011 - Modifies / 1 synonyms / literal, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies("a5", v1)
+none
+5000
+70012 - Modifies / 1 synonyms / Synonym variable, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, "c")
+SemanticError
+5000
+70013 - Modifies / 1 synonyms / Synonym variable, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, _)
+SemanticError
+5000
+70014 - Modifies / 1 synonyms / Synonym variable, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, 10)
+SyntaxError
+5000
+70015 - Modifies / 2 synonyms / Synonym variable, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, v2)
+SemanticError
+5000
+70016 - Modifies / 2 synonyms / Synonym stmt, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(s1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70017 - Modifies / 2 synonyms / Synonym assign, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(a1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70018 - Modifies / 2 synonyms / Synonym read, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(r1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70019 - Modifies / 2 synonyms / Synonym print, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(pn1, v2)
+none
+5000
+70020 - Modifies / 2 synonyms / Synonym call, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(c1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70021 - Modifies / 2 synonyms / Synonym while, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(w1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70022 - Modifies / 2 synonyms / Synonym if, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(i1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70023 - Modifies / 2 synonyms / Synonym procedure, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(p1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+70024 - Modifies / 2 synonyms / Synonym Variable, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, s1)
+SemanticError
+5000
+70025 - Modifies / 2 synonyms / Synonym Variable, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, a1)
+SemanticError
+5000
+70026 - Modifies / 2 synonyms / Synonym Variable, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, r1)
+SemanticError
+5000
+70027 - Modifies / 2 synonyms / Synonym Variable, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, pn1)
+SemanticError
+5000
+70028 - Modifies / 2 synonyms / Synonym Variable, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, c1)
+SemanticError
+5000
+70029 - Modifies / 2 synonyms / Synonym Variable, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, w1)
+SemanticError
+5000
+70030 - Modifies / 2 synonyms / Synonym Variable, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, i1)
+SemanticError
+5000
+70031 - Modifies / 2 synonyms / Synonym Variable, Synonym Procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Modifies(v1, p1)
+SemanticError
+5000
