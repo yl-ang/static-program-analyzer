@@ -89,3 +89,13 @@ struct hash<std::pair<int, std::pair<std::basic_string<char>, std::basic_string<
     }
 };
 }  // namespace std
+
+// Hash method for call statement number pairs: i.e <Procedure, StmtNum>
+namespace std {
+template <>
+struct hash<std::pair<Procedure, StmtNum>> {
+    size_t operator()(const std::pair<Procedure, StmtNum>& p) const {
+        return hash<Procedure>()(p.first) ^ (hash<StmtNum>()(p.second) << 1);
+    }
+};
+}  // namespace std

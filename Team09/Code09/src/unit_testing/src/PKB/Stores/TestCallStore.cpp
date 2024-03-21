@@ -215,3 +215,18 @@ TEST_CASE("CallStore - CallStar Tests") {
         delete SynonymArg2;
     }
 }
+
+TEST_CASE("CallStore - Call Statement Test") {
+    CallStore callStore;
+    callStore.setCallStmtStore({{"Three", 1}, {"Three", 2}, {"Three", 3}, {"Three", 4}, {"Second", 5}, {"Second", 6}});
+
+    SECTION("Test getStmtNumFromCall") {
+        REQUIRE(callStore.getStmtNumFromCall("Three") == std::unordered_set<StmtNum>{1, 2, 3, 4});
+        REQUIRE(callStore.getStmtNumFromCall("Second") == std::unordered_set<StmtNum>{5, 6});
+    }
+
+    SECTION("Test getCallFromStmtNum") {
+        REQUIRE(callStore.getCallFromStmtNum(1) == "Three");
+        REQUIRE(callStore.getCallFromStmtNum(6) == "Second");
+    }
+}

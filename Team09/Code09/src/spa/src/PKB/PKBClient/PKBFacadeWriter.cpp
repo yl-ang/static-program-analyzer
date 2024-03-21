@@ -63,6 +63,10 @@ void PKBFacadeWriter::setCallStore(const std::unordered_set<std::pair<Procedure,
     this->pkbReference->callStore->setCallStore(callPairs);
 }
 
+void PKBFacadeWriter::setCallStmtStore(const std::unordered_set<std::pair<Procedure, StmtNum>> &callStmtPairs) const {
+    this->pkbReference->callStore->setCallStmtStore(callStmtPairs);
+}
+
 void PKBFacadeWriter::setAssignPatternStore(
     const std::function<bool(std::string, std::string)> exactMatchFP,
     const std::function<bool(std::string, std::string)> partialMatchFP,
