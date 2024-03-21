@@ -464,8 +464,9 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     ExpressionSpec l = ExpressionSpec("\"x+y\"");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&l));
+    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
+                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
+
     REQUIRE(result_21.size() == 1);
     REQUIRE(result_22.size() == 1);
     REQUIRE(result_23.size() == 1);
@@ -497,7 +498,6 @@ TEST_CASE("PQLParserTester: Select ... pattern (2)") {
     containerPtr result_03 = std::get<0>(parsedClauses_3);
     containerPtr result_04 = std::get<0>(parsedClauses_4);
 
-    // ignore
     std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
     std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
     std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
@@ -516,16 +516,13 @@ TEST_CASE("PQLParserTester: Select ... pattern (2)") {
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
     ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v1),
-                                       static_cast<ClauseArgument*>(&l));
-    REQUIRE(result_21.size() == 1);
-    REQUIRE(result_22.size() == 1);
-    REQUIRE(result_23.size() == 1);
-    REQUIRE(result_24.size() == 1);
-    REQUIRE(ans1.equals(result_21[0]));
-    REQUIRE(ans1.equals(result_22[0]));
-    REQUIRE(ans1.equals(result_23[0]));
-    REQUIRE(ans1.equals(result_24[0]));
+    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
+                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
+
+    REQUIRE(result_21[0].equals(ans1));
+    REQUIRE(result_22[0].equals(ans1));
+    REQUIRE(result_23[0].equals(ans1));
+    REQUIRE(result_24[0].equals(ans1));
 }
 
 TEST_CASE("PQLParserTester: Select ... pattern (4)") {
@@ -550,8 +547,8 @@ TEST_CASE("PQLParserTester: Select ... pattern (4)") {
 
     SuchThatClause s =
         SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
-    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a), static_cast<ClauseArgument*>(&v),
-                                    static_cast<ClauseArgument*>(&temp));
+    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a),
+                                    {static_cast<ClauseArgument*>(&v), static_cast<ClauseArgument*>(&temp)});
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_21.size() == 1);
     REQUIRE(s.equals(result_11[0]));
