@@ -13,6 +13,7 @@
 #include "PKB/Stores/PatternStore.h"
 #include "PKB/Stores/StatementStore.h"
 #include "PKB/Stores/UsesStore.h"
+#include "PKB/Stores/WhilePatternStore.h"
 
 class PKB {
 public:
@@ -35,4 +36,5 @@ public:
     std::shared_ptr<CallStore> callStore;
     std::shared_ptr<AssignPatternStore> assignPatternStore;
     std::shared_ptr<IfPatternStore> ifPatternStore;
+    std::shared_ptr<WhilePatternStore> whilePatternStore;
 };
