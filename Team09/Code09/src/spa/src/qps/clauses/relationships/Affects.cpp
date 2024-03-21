@@ -6,17 +6,11 @@ Affects::Affects(ClauseArgument& affector, ClauseArgument& affected)
     : affector(affector), affected(affected) {}
 
 bool Affects::validateArguments() {
-    if (!(affector.isSynonym() && affector.isInteger() && affector.isWildcard())) {
-        return false;
-    }
     if (affector.isSynonym()) {
         Synonym first = dynamic_cast<Synonym&>(affector);
         if (first.getType() != DesignEntityType::ASSIGN) {
             return false;
         }
-    }
-    if (!(affected.isSynonym() && affected.isInteger() && affected.isWildcard())) {
-        return false;
     }
     if (affected.isSynonym()) {
         Synonym second = dynamic_cast<Synonym&>(affected);
@@ -83,5 +77,6 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 // }
 
 bool Affects::isSimpleResult() const {
+    // Takes care of Integer/Wildcard, Wildcard/Wildcard
     return !affector.isSynonym() && !affected.isSynonym();
 }
