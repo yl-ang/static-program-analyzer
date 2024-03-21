@@ -11,8 +11,7 @@
 #include "qps/exceptions/QPSSyntaxError.h"
 
 std::string replaceAllExtraWhitespaces(const std::string& str);
-std::string removeAllWhitespaces(const std::string& str);
-std::string removeAllQuotations(const std::string& str);
+std::string removeCharsFrom(const std::string&, const std::string&);
 std::string cleanQuotedIdent(const std::string& str);
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter);
 std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter);

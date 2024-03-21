@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/PatternClause.h"
+#include "sp/Utils.h"
 
 TEST_CASE("PatternClause evaluate") {
     PKB pkb{};
@@ -31,9 +32,9 @@ TEST_CASE("PatternClause evaluate") {
     std::unordered_set<Constant> constantStoreEntries = {"1", "2"};
     writer.setConstants(constantStoreEntries);
 
-    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> patternStoreEntries = {
-        {2, {"x", "x"}}, {2, {"x", "y"}}, {3, {"x", "2"}}, {3, {"x", "x"}}, {4, {"x", "2"}}};
-    writer.setPatternStore(patternStoreEntries);
+    std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> assignPatternStoreEntries = {
+        {2, {"x # # ", "add x # # y # # "}}, {3, {"x # # ", "mul 2 # # x # # "}}, {4, {"x # # ", "2 # # "}}};
+    writer.setAssignPatternStore(isExactMatch, isPartialMatch, assignPatternStoreEntries);
 
     Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
 
@@ -41,7 +42,7 @@ TEST_CASE("PatternClause evaluate") {
     SECTION("Test Wildcard and Wildcard") {
         Wildcard wildcard = Wildcard();
 
-        PatternClause pc = PatternClause(&assignSyn, &wildcard, &wildcard);
+        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &wildcard});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
@@ -55,21 +56,21 @@ TEST_CASE("PatternClause evaluate") {
         ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
         ExpressionSpec literalExp_False = ExpressionSpec("_\"1\"_");
 
-        PatternClause pc = PatternClause(&assignSyn, &wildcard, &varExp);
+        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &varExp});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}});
 
-        PatternClause pc2 = PatternClause(&assignSyn, &wildcard, &literalExp);
+        PatternClause pc2 = PatternClause(&assignSyn, {&wildcard, &literalExp});
         result = pc2.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
         synValues = result.getAllSynonymValues();
         // REQUIRE(synValues == std::vector<SynonymValues>{{"3", "4"}});
 
-        PatternClause pc3 = PatternClause(&assignSyn, &wildcard, &literalExp_False);
+        PatternClause pc3 = PatternClause(&assignSyn, {&wildcard, &literalExp_False});
         result = pc3.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
@@ -81,7 +82,7 @@ TEST_CASE("PatternClause evaluate") {
         Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
         Wildcard wildcard = Wildcard();
 
-        PatternClause pc = PatternClause(&assignSyn, &variableSyn, &wildcard);
+        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &wildcard});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
@@ -95,21 +96,21 @@ TEST_CASE("PatternClause evaluate") {
         ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
         ExpressionSpec literalExp_False = ExpressionSpec("_\"1\"_");
 
-        PatternClause pc = PatternClause(&assignSyn, &variableSyn, &varExp);
+        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &varExp});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}, {"x"}});
 
-        PatternClause pc2 = PatternClause(&assignSyn, &variableSyn, &literalExp);
+        PatternClause pc2 = PatternClause(&assignSyn, {&variableSyn, &literalExp});
         result = pc2.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
         synValues = result.getAllSynonymValues();
         // REQUIRE(synValues == std::vector<SynonymValues>{{"3", "4"}, {"x", "x"}});
 
-        PatternClause pc3 = PatternClause(&assignSyn, &variableSyn, &literalExp_False);
+        PatternClause pc3 = PatternClause(&assignSyn, {&variableSyn, &literalExp_False});
         result = pc3.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
@@ -128,18 +129,18 @@ TEST_CASE("Test pattern getSynonyms") {
     ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
 
     SECTION("Test Wildcard and Wildcard") {
-        PatternClause pc = PatternClause(&assignSyn, &wildcard, &wildcard);
+        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &wildcard});
         std::vector<Synonym> synonyms = pc.getSynonyms();
         REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
     }
 
     SECTION("Test variable") {
-        PatternClause pc = PatternClause(&assignSyn, &variableSyn, &varExp);
+        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &varExp});
         std::vector<Synonym> synonyms = pc.getSynonyms();
         REQUIRE(synonyms == std::vector<Synonym>{assignSyn, variableSyn});
     }
     SECTION("Test wildcard and literal") {
-        PatternClause pc3 = PatternClause(&assignSyn, &wildcard, &literalExp);
+        PatternClause pc3 = PatternClause(&assignSyn, {&wildcard, &literalExp});
         std::vector<Synonym> synonyms = pc3.getSynonyms();
         REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
     }
