@@ -17,7 +17,7 @@ public:
     bool hasPartialPattern(StmtNum stmtNum, std::string arg);
 
 private:
-    std::unordered_map<StmtNum, std::string> whilePatternsMap;
+    std::unordered_map<StmtNum, std::unordered_set<std::string>> whilePatternsMap;
     void setWhilePatterns(const std::unordered_set<std::pair<StmtNum, std::string>>& whilePatternPairs);
     bool applyWhilePatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
                                    std::string arg);

@@ -11,7 +11,7 @@ void WhilePatternStore::initialiseStore(std::function<bool(std::string, std::str
 void WhilePatternStore::setWhilePatterns(const std::unordered_set<std::pair<StmtNum, std::string>>& whilePatternPairs) {
     for (const auto& pattern : whilePatternPairs) {
         const auto& variable = pattern.second;
-        whilePatternsMap[pattern.first] = variable;
+        whilePatternsMap[pattern.first].insert(variable);
     }
 }
 
@@ -29,8 +29,11 @@ bool WhilePatternStore::applyWhilePatternFunction(std::function<bool(std::string
 
     // Check if stmtNum is found
     if (it != whilePatternsMap.end()) {
-        const auto& whilePatternExpr = it->second;
-        return function(whilePatternExpr, arg);
+        // Retrieve all the control variables with stmtNum
+        const auto& vars = it->second;
+        for (const auto& var : vars) {
+            return function(var, arg);
+        }
     }
     return false;
 }
