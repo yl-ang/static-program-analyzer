@@ -172,11 +172,36 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(whileProc, a1));
     }
 
-    SECTION("Calls relationship stored correctly") {}
+    SECTION("Calls relationship stored correctly") {
+        auto ifProc = Literal("if");
+        auto main = Literal("main");
+        auto whileProc = Literal("while");
+        REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, main));
+        REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, whileProc));
+    }
 
-    SECTION("Follows relationship stored correctly") {}
+    SECTION("Follows relationship stored correctly") {
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(18, 19));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(19, 22));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(26, 30));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(41, 45));
+    }
 
-    SECTION("Next relationship stored correctly") {}
+    SECTION("Next relationship stored correctly") {
+        REQUIRE_FALSE(pkbFacadeReader.hasNextRelationship(18, 19));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(19, 20));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(19, 21));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(20, 22));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(21, 22));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(22, 34));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(27, 28));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(28, 30));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(29, 30));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(34, 36));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(34, 35));
+        REQUIRE(pkbFacadeReader.hasNextRelationship(35, 37));
+    }
 
     SECTION("Pattern stored correctly") {}
 }
