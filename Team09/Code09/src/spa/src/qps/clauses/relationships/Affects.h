@@ -19,7 +19,8 @@ private:
     bool isSimpleResult() const;
 
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateIntegerInteger(PKBFacadeReader&);
+    ClauseResult evaluateBothIntegers(PKBFacadeReader&);
+    ClauseResult evaluateBothWildcards(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 protected:

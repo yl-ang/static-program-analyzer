@@ -28,7 +28,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
      * wildcard wildcard
      */ 
     if (affector.isInteger() && affected.isInteger()) {
-        return evaluateIntegerInteger(reader);
+        return evaluateBothIntegers(reader);
     }
 
     if ((affector.isWildcard() && affected.isInteger()) || (affector.isInteger() && affected.isWildcard())) {
@@ -36,7 +36,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     }
 
     if (affector.isWildcard() && affected.isWildcard()) {
-        // return evaluateWildcardWildcard(reader);
+        return evaluateBothWildcards(reader);
     }
 
     /**
@@ -87,8 +87,7 @@ std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeR
  * Helper function
 */
 std::unordered_set<StmtNum> getNextStmtNums(
-        const std::unordered_set<std::tuple<Variable, StmtNum>>& varAndAffectorStmtList,
-        PKBFacadeReader& reader) {
+    const std::unordered_set<std::tuple<Variable, StmtNum>>& varAndAffectorStmtList, PKBFacadeReader& reader) {
     std::unordered_set<StmtNum> nextStmtNums{};
     for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         // Get NextStar Control Flow - all StmtNums that follow that assign statement
@@ -99,7 +98,7 @@ std::unordered_set<StmtNum> getNextStmtNums(
     return nextStmtNums;
 }
 
-ClauseResult Affects::evaluateIntegerInteger(PKBFacadeReader& reader) {
+ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
     Integer affectorInt = dynamic_cast<Integer&>(affector);
     Integer affectedInt = dynamic_cast<Integer&>(affected);
 
@@ -306,4 +305,61 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     std::vector<Synonym> headers = {affectorSyn, affectedSyn};
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
     return {headers, values};
+}
+
+ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
+    /**
+     * 1. Get assign statements that modify their variables
+     * Get statements that modify variables (LHS)
+     * Then filter down to assign statements
+     * Make tuple of modified variable and assign statement
+    */
+    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
+
+    /**
+     * 2. For each tuple of modified variable and assign statement
+     * - Get the control flow statements that follow it (like NextStar)
+     * - Get the CF with all the statements
+     * - Get separate list with assign statements
+    */
+    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
+
+    /**
+     * For each tuple of modified variable and assign statement:
+     * For each CF next assign statement:
+     * - iterate through variables used by the CF next assign statement,
+     * 
+     * - if not ASSIGN statement, CHECK that does not modify the variable
+     * -- if modified, exit loop for that affecter statement
+     * - else if ASSIGN statement, CHECK that currVariable equals modified variable
+     * -- if yes, push back values
+    */
+    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+        StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
+        Variable variable = std::get<Variable>(varAndAffectorStmt);
+
+        bool modified = false;
+        for (StmtNum nextStmtNum : nextStmtNums) {
+            std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+            if (modified) {
+                break;
+            } else {
+                // Checking if uses the affector variable
+                for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
+                    if (stmt.value().type == StatementType::ASSIGN && currVar == variable) {  
+                        return true;
+                    }
+                }
+                // Checking if modifies the affector variable AND not nextStmtNum
+                for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
+                    if (currVar == variable) {
+                        modified = true;
+                        break;  // Break out of inner loop for current affector statement
+                    }
+                }
+            }
+        }
+    }
+    
+    return false;
 }
