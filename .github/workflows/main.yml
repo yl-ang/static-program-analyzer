@@ -95,7 +95,7 @@ jobs:
 
       - name: Integration Testing
         working-directory: ${{runner.workspace}}/build
-        run: ./src/integration_testing/integration_testing
+        run: src/integration_testing/integration_testing
 
       - name: Autotester System Testing
         working-directory: ${{runner.workspace}}/build
