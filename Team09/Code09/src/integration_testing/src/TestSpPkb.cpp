@@ -126,9 +126,6 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         auto nestedWhile = Integer("41");
         auto variableZ = Literal("z");
         REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(nestedWhile, variableZ));
-        // auto call = Integer("36");
-        // auto procName = Literal("main");
-        // REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(call, procName));
     }
 
     SECTION("Uses relationship stored correctly - procedures") {
@@ -203,5 +200,12 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasNextRelationship(35, 37));
     }
 
-    SECTION("Pattern stored correctly") {}
+    SECTION("Assign Pattern stored correctly") {
+        REQUIRE(pkbFacadeReader.hasExactPattern(2, "a1", "_"));
+        REQUIRE(pkbFacadeReader.hasExactPattern(2, "_", "abc + xyz"));
+        REQUIRE(pkbFacadeReader.hasExactPattern(2, "a1", "_"));
+        REQUIRE(pkbFacadeReader.hasPartialPattern(2, "a1", "abc"));
+        REQUIRE(pkbFacadeReader.hasPartialPattern(5, "a4", "q + w"));
+        REQUIRE_FALSE(pkbFacadeReader.hasPartialPattern(5, "a4", "w+a"));
+    }
 }
