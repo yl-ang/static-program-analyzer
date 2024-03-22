@@ -5,6 +5,8 @@
 #include "PKB/Utils/DataTypes.h"
 #include "Spa.h"
 #include "catch.hpp"
+#include "qps/clauseArguments/Integer.h"
+#include "qps/clauseArguments/Literal.h"
 
 const char CODE_DIRECTORY_NAME[] = "Code09";
 
@@ -111,9 +113,39 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasParentRelationship(40, 45));
     }
 
-    SECTION("Uses relationship stored correctly - statements") {}
+    SECTION("Uses relationship stored correctly - statements") {
+        auto assignStmtNum = Integer("2");
+        auto variable = Literal("xyz");
+        REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(assignStmtNum, variable));
+        auto pn = Integer("6");
+        auto variablePrint = Literal("a");
+        REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(pn, variablePrint));
+        auto nestedIf = Integer("23");
+        auto variableIf = Literal("if");
+        REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(nestedIf, variableIf));
+        auto nestedWhile = Integer("41");
+        auto variableZ = Literal("z");
+        REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(nestedWhile, variableZ));
+        // auto call = Integer("36");
+        // auto procName = Literal("main");
+        // REQUIRE(pkbFacadeReader.hasStatementVariableUseRelationship(call, procName));
+    }
 
-    SECTION("Uses relationship stored correctly - procedures") {}
+    SECTION("Uses relationship stored correctly - procedures") {
+        auto main = Literal("main");
+        auto yLiteral = Literal("y");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(main, yLiteral));
+        auto ifProc = Literal("if");
+        auto print = Literal("print");
+        auto then = Literal("then");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(ifProc, print));
+        REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(ifProc, then));
+        auto whileProc = Literal("while");
+        auto a0 = Literal("a0");
+        auto c = Literal("c");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(whileProc, a0));
+        REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(whileProc, c));
+    }
 
     SECTION("Modifies relationship stored correctly - statements") {}
 
