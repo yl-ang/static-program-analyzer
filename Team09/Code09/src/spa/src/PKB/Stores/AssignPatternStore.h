@@ -23,7 +23,6 @@ public:
 private:
     std::unordered_map<StmtNum, std::unordered_set<std::pair<std::string, std::string>>> patternsMap;
     void setPatterns(const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>>& patterns);
-    void setFunctionPointer(const std::function<bool(std::string, std::string)>);
     bool applyPatternFunction(std::function<bool(std::string, std::string)> function, StmtNum stmtNum, std::string arg1,
                               std::string arg2);
     bool applyPatternFunctionHelper(std::function<bool(std::string, std::string)> function, StmtNum stmtNum,
