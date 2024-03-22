@@ -45,7 +45,7 @@ Select a1 pattern a1("a14", "    a  +2+c+4      ")
 5000
 10010 - Pattern / 1 synonym / Variable, Sub Expression
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
-Select a1 pattern a1("a9", _"xy      z-c"_)
+Select a1 pattern a1("a9", _"xyz   -c"_)
 none
 5000
 10011 - Pattern / 1 synonym / Variable, Sub Expression (2)
@@ -76,7 +76,7 @@ SemanticError
 10016 - Pattern / 2 synonyms / synonym, Sub Expression (4)
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
 Select a1 pattern a1(r1, "a1     5")
-SemanticError
+SyntaxError
 5000
 10017 - Pattern / 2 synonyms / variable, synonym (1)
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;

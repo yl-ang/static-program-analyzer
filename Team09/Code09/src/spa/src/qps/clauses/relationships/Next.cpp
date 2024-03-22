@@ -111,9 +111,7 @@ ClauseResult Next::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym nextSyn = dynamic_cast<Synonym&>(nextStmt);
 
     std::vector<Synonym> synonyms{currentSyn, nextSyn};
-    if (currentSyn == nextSyn) {
-        return {synonyms, {}};
-    }
+    bool areSameSynonyms = currentSyn == nextSyn;
 
     SynonymValues currentSynValues{}, nextSynValues{};
 
@@ -125,6 +123,15 @@ ClauseResult Next::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
         std::unordered_set<StmtNum> nexters = reader.getNexter(currStmt.stmtNum);
         if (nexters.empty()) {
+            continue;
+        }
+
+        if (areSameSynonyms) {
+            if (nexters.find(currStmt.stmtNum) != nexters.end()) {
+                currentSynValues.push_back(std::to_string(currStmt.stmtNum));
+                nextSynValues.push_back(std::to_string(currStmt.stmtNum));
+            }
+
             continue;
         }
 

@@ -1,5 +1,7 @@
 #include "NextStar.h"
 
+#include <iostream>
+
 NextStar::NextStar(ClauseArgument& currentStmt, ClauseArgument& nextStmt)
     : currentStmt(currentStmt), nextStmt(nextStmt) {}
 
@@ -112,9 +114,7 @@ ClauseResult NextStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym nextSyn = dynamic_cast<Synonym&>(nextStmt);
 
     std::vector<Synonym> synonyms{currentSyn, nextSyn};
-    if (currentSyn == nextSyn) {
-        return {synonyms, {}};
-    }
+    bool areSameSynonyms = currentSyn == nextSyn;
 
     SynonymValues currentSynValues{}, nextSynValues{};
 
@@ -126,6 +126,15 @@ ClauseResult NextStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
         std::unordered_set<StmtNum> nexters = reader.getNexterStar(currStmt.stmtNum);
         if (nexters.empty()) {
+            continue;
+        }
+
+        if (areSameSynonyms) {
+            if (nexters.find(currStmt.stmtNum) != nexters.end()) {
+                currentSynValues.push_back(std::to_string(currStmt.stmtNum));
+                nextSynValues.push_back(std::to_string(currStmt.stmtNum));
+            }
+
             continue;
         }
 
