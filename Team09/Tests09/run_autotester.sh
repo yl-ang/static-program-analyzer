@@ -7,6 +7,7 @@ case "$OSTYPE" in
   darwin*)  AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/build/src/autotester/autotester" ;;
   msys*)    AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe" ;;
   cygwin*)  AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe" ;;
+  linux-gnu*) AUTOTESTER_BINARY="$CURRENT_DIR/../Code09/out/build/x64-Debug/src/autotester/autotester.exe" ;;
   *)        echo "unknown: $OSTYPE" ;;
 esac
 

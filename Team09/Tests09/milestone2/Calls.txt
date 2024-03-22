@@ -1,0 +1,460 @@
+30001 - Calls / no synonyms / literal, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls("if", "main")
+if,main,while
+5000
+30002 - Calls / no synonyms / literal, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls("if", _)
+if,main,while
+5000
+30003 - Calls / no synonyms / wildcard, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(_, "main")
+if,main,while
+5000
+30004 - Calls / no synonyms / wildcard, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(_,_)
+if,main,while
+5000
+30005 - Calls / no synonyms / wildcard, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(_, 4)
+SyntaxError
+5000
+30006 - Calls / no synonyms / integer, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(5, _)
+SyntaxError
+5000
+30007 - Calls / no synonyms / wildcard, varname
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(_, "a1")
+none
+5000
+30008 - Calls / no synonyms / varname, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls("a3", _)
+none
+5000
+30009 - Calls / 1 synonym / Synonym procedure, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, "main")
+if
+5000
+30010 - Calls / 1 synonym / Synonym stmt, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, "if")
+SemanticError
+5000
+30011 - Calls / 1 synonym / Synonym assign, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, "if")
+SemanticError
+5000
+30012 - Calls / 1 synonym / Synonym read, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, "if")
+SemanticError
+5000
+30013 - Calls / 1 synonym / Synonym print, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, "if")
+SemanticError
+5000
+30014 - Calls / 1 synonym / Synonym call, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, "if")
+SemanticError
+5000
+30015 - Calls / 1 synonym / Synonym while, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, "if")
+SemanticError
+5000
+30016 - Calls / 1 synonym / Synonym if, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, "if")
+SemanticError
+5000
+30017- Calls / 1 synonym / literal, Synonym procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls("if", p1)
+main,while
+5000
+30018- Calls / 1 synonym / literal, Synonym stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls("main", s1)
+SemanticError
+5000
+30019- Calls / 1 synonym / literal, Synonym assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls("main", a1)
+SemanticError
+5000
+30020- Calls / 1 synonym / literal, Synonym read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls("main", r1)
+SemanticError
+5000
+30021- Calls / 1 synonym / literal, Synonym print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls("main", pn1)
+SemanticError
+5000
+30022- Calls / 1 synonym / literal, Synonym call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls("main", c1)
+SemanticError
+5000
+30023- Calls / 1 synonym / literal, Synonym while
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls("main", w1)
+SemanticError
+5000
+30024- Calls / 1 synonym / literal, Synonym if
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls("main", i1)
+SemanticError
+5000
+30025 - Calls / 2 synonyms / Synonym Procedure, Synonym Procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, p2)
+if
+5000
+30026 - Calls / 2 synonyms / Synonym Procedure, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, s1)
+SemanticError
+5000
+30027 - Calls / 2 synonyms / Synonym Procedure, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, a1)
+SemanticError
+5000
+30028 - Calls / 2 synonyms / Synonym Procedure, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, r1)
+SemanticError
+5000
+30029 - Calls / 2 synonyms / Synonym Procedure, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, pn1)
+SemanticError
+5000
+30030 - Calls / 2 synonyms / Synonym Procedure, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, c1)
+SemanticError
+5000
+30031 - Calls / 2 synonyms / Synonym Procedure, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, w1)
+SemanticError
+5000
+30032 - Calls / 2 synonyms / Synonym Procedure, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(p1, i1)
+SemanticError
+5000
+30033 - Calls / 2 synonyms / Synonym Stmt, Synonym Procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(s1, p1)
+SemanticError
+5000
+30034 - Calls / 2 synonyms / Synonym Assign, Synonym Procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Calls(a1, p1)
+SemanticError
+5000
+30035 - Calls / 2 synonyms / Synonym Read, Synonym Procedure  
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;  
+Select p1 such that Calls(r1, p1)  
+SemanticError
+5000
+30036 - Calls / 2 synonyms / Synonym Print, Synonym Procedure  
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;  
+Select p1 such that Calls(pn1, p1)  
+SemanticError
+5000
+30037 - Calls / 2 synonyms / Synonym Call, Synonym Procedure  
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;  
+Select p1 such that Calls(c1, p1)  
+SemanticError
+5000
+30038 - Calls / 2 synonyms / Synonym While, Synonym Procedure  
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;  
+Select p1 such that Calls(w1, p1)  
+SemanticError
+5000
+30039 - Calls / 2 synonyms / Synonym If, Synonym Procedure  
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;  
+Select p1 such that Calls(i1, p1)  
+SemanticError
+5000
+30037 - Calls / 2 synonyms / Synonym Stmt, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, s2)
+SemanticError
+5000
+30038 - Calls / 2 synonyms / Synonym Assign, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, s2)
+SemanticError
+5000
+30039 - Calls / 2 synonyms / Synonym Read, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, s2)
+SemanticError
+5000
+30040 - Calls / 2 synonyms / Synonym Print, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, s2)
+SemanticError
+5000
+30041 - Calls / 2 synonyms / Synonym Call, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, s2)
+SemanticError
+5000
+30042 - Calls / 2 synonyms / Synonym While, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, s2)
+SemanticError
+5000
+30043 - Calls / 2 synonyms / Synonym If, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, s2)
+SemanticError
+5000
+30044 - Calls / 2 synonyms / Synonym Stmt, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, a2)
+SemanticError
+5000
+30045 - Calls / 2 synonyms / Synonym Assign, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, a2)
+SemanticError
+5000
+30046 - Calls / 2 synonyms / Synonym Read, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, a2)
+SemanticError
+5000
+30047 - Calls / 2 synonyms / Synonym Print, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, a2)
+SemanticError
+5000
+30048 - Calls / 2 synonyms / Synonym Call, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, a2)
+SemanticError
+5000
+30049 - Calls / 2 synonyms / Synonym While, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, a2)
+SemanticError
+5000
+30050 - Calls / 2 synonyms / Synonym If, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, a2)
+SemanticError
+5000
+30051 - Calls / 2 synonyms / Synonym Stmt, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, r2)
+SemanticError
+5000
+30052 - Calls / 2 synonyms / Synonym Assign, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, r2)
+SemanticError
+5000
+30053 - Calls / 2 synonyms / Synonym Read, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, r2)
+SemanticError
+5000
+30054 - Calls / 2 synonyms / Synonym Print, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, r2)
+SemanticError
+5000
+30055 - Calls / 2 synonyms / Synonym Call, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, r2)
+SemanticError
+5000
+30056 - Calls / 2 synonyms / Synonym While, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, r2)
+SemanticError
+5000
+30057 - Calls / 2 synonyms / Synonym If, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, r2)
+SemanticError
+5000
+30058- Calls / 2 synonyms / Synonym Stmt, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, pn1)
+SemanticError
+5000
+30059 - Calls / 2 synonyms / Synonym Assign, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, pn2)
+SemanticError
+5000
+30060 - Calls / 2 synonyms / Synonym Read, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, pn2)
+SemanticError
+5000
+30061 - Calls / 2 synonyms / Synonym Print, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, pn2)
+SemanticError
+5000
+30062 - Calls / 2 synonyms / Synonym Call, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, pn2)
+SemanticError
+5000
+30063 - Calls / 2 synonyms / Synonym While, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, pn2)
+SemanticError
+5000
+30064 - Calls / 2 synonyms / Synonym If, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, pn2)
+SemanticError
+5000
+30065 - Calls / 2 synonyms / Synonym Stmt, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, c1)
+SemanticError
+5000
+30066 - Calls / 2 synonyms / Synonym Assign, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, c1)
+SemanticError
+5000
+30067 - Calls / 2 synonyms / Synonym Read, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, c1)
+SemanticError
+5000
+30068 - Calls / 2 synonyms / Synonym Print, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, c1)
+SemanticError
+5000
+30069 - Calls / 2 synonyms / Synonym Call, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, c2)
+SemanticError
+5000
+30070 - Calls / 2 synonyms / Synonym While, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, c1)
+SemanticError
+5000
+30071 - Calls / 2 synonyms / Synonym If, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, c1)
+SemanticError
+5000
+30072 - Calls / 2 synonyms / Synonym Stmt, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, w1)
+SemanticError
+5000
+30073 - Calls / 2 synonyms / Synonym Assign, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, w1)
+SemanticError
+5000
+30074 - Calls / 2 synonyms / Synonym Read, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, w1)
+SemanticError
+5000
+30075 - Calls / 2 synonyms / Synonym Print, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, w1)
+SemanticError
+5000
+30076 - Calls / 2 synonyms / Synonym Call, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, w1)
+SemanticError
+5000
+30077 - Calls / 2 synonyms / Synonym While, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, w1)
+SemanticError
+5000
+30078 - Calls / 2 synonyms / Synonym If, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, w1)
+SemanticError
+5000
+30079 - Calls / 2 synonyms / Synonym Stmt, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, i1)
+SemanticError
+5000
+30080 - Calls / 2 synonyms / Synonym Assign, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 such that Calls(a1, i1)
+SemanticError
+5000
+30081 - Calls / 2 synonyms / Synonym Read, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r1 such that Calls(r1, i1)
+SemanticError
+5000
+30082 - Calls / 2 synonyms / Synonym Print, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select pn1 such that Calls(pn1, i1)
+SemanticError
+5000
+30083 - Calls / 2 synonyms / Synonym Call, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select c1 such that Calls(c1, i1)
+SemanticError
+5000
+30084 - Calls / 2 synonyms / Synonym While, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select w1 such that Calls(w1, i1)
+SemanticError
+5000
+30085 - Calls / 2 synonyms / Synonym If, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select i1 such that Calls(i1, i2)
+SemanticError
+5000
+30086 - Calls / 2 synonyms / Synonym Stmt, Synonym Stmt, Same Synonym
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, s1)
+SemanticError
+5000
+30087 - Calls / 2 synonyms / Invalid Synonym (1)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select r2 such that Calls(x100, r2)
+SemanticError
+5000
+30088 - Calls / 2 synonyms / Invalid Synonym (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Calls(s1, a2030)
+SemanticError
+5000
+30089 - Calls / 2 synonyms / Invalid Synonym (3)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a100 such that Calls(s1, s2)
+SemanticError
+5000

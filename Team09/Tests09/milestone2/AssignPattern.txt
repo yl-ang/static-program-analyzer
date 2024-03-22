@@ -1,0 +1,105 @@
+10001 - Pattern / 1 synonym / Wildcard, Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, "y")
+12
+5000
+10002 - Pattern / 1 synonym / Wildcard, Partial Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, _"y"_)
+12,17
+5000
+10003 - Pattern / 1 synonym / Wildcard, Expression
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, "a+2+c+4")
+16
+5000
+10004 - Pattern / 1 synonym / Wildcard, Sub Expression
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, _"xyz-c"_)
+none
+5000
+10005 - Pattern / 1 synonym / Wildcard, Sub Expression (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, _"q+w"_)
+17,5,8,9
+5000
+10006 - Pattern / 1 synonym / Wildcard, Sub Expression (3)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1(_, _"d/z"_)
+none
+5000
+10007 - Pattern / 1 synonym / Variable, Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a7", "y")
+12
+5000
+10008 - Pattern / 1 synonym / Variable, Partial Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a7", _"y          "_)
+12
+5000
+10009 - Pattern / 1 synonym / Variable, Expression
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a14", "    a  +2+c+4      ")
+16
+5000
+10010 - Pattern / 1 synonym / Variable, Sub Expression
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a9", _"xyz   -c"_)
+none
+5000
+10011 - Pattern / 1 synonym / Variable, Sub Expression (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a15", _"       q+w "_)
+17
+5000
+10012 - Pattern / 1 synonym / Variable, Sub Expression (3)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select a1 pattern a1("a10", _"     d/z"_)
+none
+5000
+10013 - Pattern / 2 synonyms / synonym, Sub Expression (1)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(v1, _"a     "_)
+1,15,16,4,42,5,8,9
+5000
+10014 - Pattern / 2 synonyms / synonym, Sub Expression (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(s1, _"a"_)
+SemanticError
+5000
+10015 - Pattern / 2 synonyms / synonym, Sub Expression (3)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(pn1, _"a"_)
+SemanticError
+5000
+10016 - Pattern / 2 synonyms / synonym, Sub Expression (4)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(r1, "a1     5")
+SyntaxError
+5000
+10017 - Pattern / 2 synonyms / variable, synonym (1)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1("a    8", v1)
+SyntaxError
+5000
+10018 - Pattern / 2 synonyms / variable, synonym (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1("a8    ", s1)
+SyntaxError
+5000
+10019 - Pattern / 3 synonyms / Synonym, synonym
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(v1, v2)
+SyntaxError
+5000
+10020 - Pattern / 3 synonyms / Synonym, synonym (2)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(s1, v2)
+SyntaxError
+5000
+10021 - Pattern / 3 synonyms / Synonym, synonym (3)
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1,v2;
+Select a1 pattern a1(v1, s2)
+SyntaxError
+5000
