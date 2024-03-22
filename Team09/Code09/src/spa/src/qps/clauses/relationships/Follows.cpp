@@ -81,21 +81,36 @@ ClauseResult Follows::evaluateSynonymInteger(PKBFacadeReader& reader) {
         stmtNumOpt = reader.getFollower(stmtNum);
     }
 
-    if (!stmtNumOpt.has_value()) {
+    std::unordered_set<StmtNum> stmtNums{};
+    if (stmtNumOpt.has_value()) {
+        stmtNums.insert(stmtNumOpt.value());
+    }
+
+    if (stmtNums.empty()) {
         return {syn, {}};
     }
 
     if (syn.getType() == DesignEntityType::STMT) {
-        return {syn, {std::to_string(stmtNumOpt.value())}};
+        SynonymValues values{};
+        for (StmtNum stmtNum : stmtNums) {
+            values.push_back(std::to_string(stmtNum));
+        }
+        return {syn, values};
     }
 
-    std::optional<Stmt> stmtOpt = reader.getStatementByStmtNum(stmtNumOpt.value());
-    const auto synType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-    if (stmtOpt.has_value() && stmtOpt.value().type == synType) {
-        return {syn, {std::to_string(stmtNumOpt.value())}};
+    SynonymValues values{};
+    for (StmtNum stmtNum : stmtNums) {
+        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+        if (!stmt.has_value()) {
+            continue;
+        }
+        StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
+        if (stmt.value().type == synonymType) {
+            values.push_back(std::to_string(stmtNum));
+        }
     }
 
-    return {syn, {}};
+    return {syn, values};
 }
 
 ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
