@@ -21,6 +21,7 @@ private:
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateBothIntegers(PKBFacadeReader&);
     ClauseResult evaluateBothWildcards(PKBFacadeReader&);
+    ClauseResult evaluateWildcardInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 protected:

@@ -30,7 +30,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
         return evaluateBothWildcards(reader);
     }
     if ((affector.isWildcard() && affected.isInteger()) || (affector.isInteger() && affected.isWildcard())) {
-        // return evaluateWildcardInteger(reader);
+        return evaluateWildcardInteger(reader);
     }
     
 
@@ -90,6 +90,75 @@ std::unordered_set<StmtNum> getNextStmtNums(const std::unordered_set<std::tuple<
         nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
     }
     return nextStmtNums;
+}
+
+ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
+    bool affectorIsInteger = affector.isInteger();
+    Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
+
+    StmtNum stmtNum = std::stoi(integer.getValue());
+
+    /**
+     * Get control flow from established statement number
+    */
+    std::unordered_set<StmtNum> nextStmtNums{};
+    if (affectorIsInteger) {
+        nextStmtNums = reader.getNexteeStar(stmtNum);
+    } else {
+        nextStmtNums = reader.getNexterStar(stmtNum);
+    }
+
+    /**
+     * If !affectorIsSynonym:
+     * - start from affector statement and work downwards
+     * Else:
+     * - start from affected statement and work upwards
+    */
+   /**
+     * If !affectorIsSynonym:
+     * - start from affector statement and work downwards
+     * Else:
+     * - start from affected statement and work upwards
+    */
+    if (affectorIsInteger) {      
+        std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        for (Variable modifiedVariable : modifiedVariables) {
+            for (StmtNum nextStmtNum : nextStmtNums) {
+                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
+                // Checking if uses the affector variable
+                for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
+                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {  
+                        return true;
+                    }
+                }
+                // Checking if modifies the affector variable AND not nextStmtNum
+                for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
+                    if (currVar == modifiedVariable) {
+                        return false;
+                    }
+                }
+            }   
+        }
+
+    } else {
+        std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
+        for (Variable usesVariable : usesVariables) {
+            bool modified = false;
+            for (StmtNum nextStmtNum : nextStmtNums) {
+                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
+                // Checking if modified affected variable
+                for (Variable modifiedVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
+                    if (modifiedVar == usesVariable) {
+                        // If statement assign then mark as value element
+                        if (nextStmt.value().type == StatementType::ASSIGN) {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }   
+        }
+    }
 }
 
 ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
@@ -283,7 +352,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
             }   
         }
     }
-    
+
     return {syn, values};
 }
 
