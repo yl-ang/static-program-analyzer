@@ -28,7 +28,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
      * wildcard wildcard
      */ 
     if (isSimpleResult()) {
-        return {reader.hasParentRelationship(affector, affected)};
+        
     }
 
     /**
