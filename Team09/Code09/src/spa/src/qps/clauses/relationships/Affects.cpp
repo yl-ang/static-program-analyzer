@@ -215,17 +215,76 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     bool affectorIsSynonym = affector.isSynonym();
     Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
     Integer integer = affectorIsSynonym ? dynamic_cast<Integer&>(affected) : dynamic_cast<Integer&>(affector);
-
     StmtNum stmtNum = std::stoi(integer.getValue());
 
-    // Synonym Integer
+    SynonymValues values{};
+
     /**
-     * Need to figure out the affector statements
+     * Get control flow from established statement number
     */
-    // Integer Synonym
+    std::unordered_set<StmtNum> nextStmtNums{};
+    if (!affectorIsSynonym) {
+        nextStmtNums = reader.getNexteeStar(stmtNum);
+    } else {
+        nextStmtNums = reader.getNexterStar(stmtNum);
+    }
+
     /**
-     * Need to figure out the affected statements
+     * If !affectorIsSynonym:
+     * - start from affector statement and work downwards
+     * Else:
+     * - start from affected statement and work upwards
     */
+    if (!affectorIsSynonym) {      
+        std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        for (Variable modifiedVariable : modifiedVariables) {
+            bool modified = false;
+            for (StmtNum nextStmtNum : nextStmtNums) {
+                if (modified) {
+                    break;
+                }
+                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
+                // Checking if uses the affector variable
+                for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
+                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {  
+                        values.push_back(std::to_string(nextStmtNum));
+                    }
+                }
+                // Checking if modifies the affector variable AND not nextStmtNum
+                for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
+                    if (currVar == modifiedVariable) {
+                        modified = true;
+                        break;  // Break out of inner loop for current affector statement
+                    }
+                }
+            }   
+        }
+
+    } else {
+        std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
+        for (Variable usesVariable : usesVariables) {
+            bool modified = false;
+            for (StmtNum nextStmtNum : nextStmtNums) {
+                if (modified) {
+                    break;
+                }
+                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
+                // Checking if modified affected variable
+                for (Variable modifiedVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
+                    if (modifiedVar == usesVariable) {
+                        // If statement assign then mark as value element
+                        if (nextStmt.value().type == StatementType::ASSIGN) {
+                            values.push_back(std::to_string(nextStmtNum));
+                        }
+                        modified = true;
+                        break;
+                    }
+                }
+            }   
+        }
+    }
+    
+    return {syn, values};
 }
 
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
@@ -273,13 +332,13 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
         bool modified = false;
         for (StmtNum nextStmtNum : nextStmtNums) {
-            std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+            std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
             if (modified) {
                 break;
             }
             // Checking if uses the affector variable
             for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                if (stmt.value().type == StatementType::ASSIGN && currVar == variable) {  
+                if (nextStmt.value().type == StatementType::ASSIGN && currVar == variable) {  
                     affectorValues.push_back(std::to_string(stmtNum));
                     affectedValues.push_back(std::to_string(nextStmtNum));
                 }
