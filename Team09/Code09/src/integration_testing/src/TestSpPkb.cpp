@@ -147,9 +147,30 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasProcedureVariableUseRelationship(whileProc, c));
     }
 
-    SECTION("Modifies relationship stored correctly - statements") {}
+    SECTION("Modifies relationship stored correctly - statements") {
+        auto print = Literal("print");
+        auto printLnNumber = Integer("31");
+        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(printLnNumber, print));
+        auto read = Literal("read");
+        auto readLineNumber = Integer("25");
+        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(readLineNumber, read));
+    }
 
-    SECTION("Modifies relationship stored correctly - procedures") {}
+    SECTION("Modifies relationship stored correctly - procedures") {
+        auto mainProc = Literal("main");
+        auto variableA10 = Literal("a10");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(mainProc, variableA10));
+        auto ifProc = Literal("if");
+        auto print = Literal("print");
+        auto read = Literal("read");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(ifProc, print));
+        REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(ifProc, read));
+        auto whileProc = Literal("while");
+        auto a21 = Literal("a21");
+        auto a1 = Literal("a1");
+        REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(whileProc, a21));
+        REQUIRE(pkbFacadeReader.hasProcedureVariableModifiesRelationship(whileProc, a1));
+    }
 
     SECTION("Calls relationship stored correctly") {}
 
