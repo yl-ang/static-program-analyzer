@@ -9,9 +9,18 @@
 
 class Next : public BaseNext {
 public:
-    Next(ClauseArgument&, ClauseArgument&);
+    Next(ClauseArgument& currentStmt, ClauseArgument& nextStmt) : BaseNext(currentStmt, nextStmt) {}
 
-    bool hasNextRelationship(PKBFacadeReader&) override;
-    StmtSet getNexters(PKBFacadeReader&, const StmtNum&) override;
-    StmtSet getNextees(PKBFacadeReader&, const StmtNum&) override;
+private:
+    bool hasNextRelationship(PKBFacadeReader& reader) override {
+        return reader.hasNextRelationship(currentStmt, nextStmt);
+    }
+
+    StmtSet getNexters(PKBFacadeReader& reader, const StmtNum& nextee) override {
+        return reader.getNexter(nextee);
+    }
+
+    StmtSet getNextees(PKBFacadeReader& reader, const StmtNum& nexter) override {
+        return reader.getNextee(nexter);
+    }
 };

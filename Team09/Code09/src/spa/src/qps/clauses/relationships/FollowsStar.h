@@ -8,11 +8,19 @@
 #include "qps/clauses/ClauseResult.h"
 
 class FollowsStar : public BaseFollows {
-private:
-    bool hasFollowRelationship(PKBFacadeReader&) override;
-    StmtSet getFollowers(PKBFacadeReader&, const StmtNum&) override;
-    StmtSet getFollowees(PKBFacadeReader&, const StmtNum&) override;
-
 public:
-    FollowsStar(ClauseArgument&, ClauseArgument&);
+    FollowsStar(ClauseArgument& followee, ClauseArgument& follower) : BaseFollows(followee, follower) {}
+
+private:
+    bool hasFollowRelationship(PKBFacadeReader& reader) override {
+        return reader.hasFollowStarRelationship(followee, follower);
+    }
+
+    StmtSet getFollowers(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        return reader.getFollowersStar(stmtNum);
+    }
+
+    StmtSet getFollowees(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        return reader.getFolloweesStar(stmtNum);
+    }
 };

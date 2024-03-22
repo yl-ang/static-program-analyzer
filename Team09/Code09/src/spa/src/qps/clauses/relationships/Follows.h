@@ -8,11 +8,21 @@
 #include "qps/clauses/ClauseResult.h"
 
 class Follows : public BaseFollows {
-private:
-    bool hasFollowRelationship(PKBFacadeReader&) override;
-    StmtSet getFollowers(PKBFacadeReader&, const StmtNum&) override;
-    StmtSet getFollowees(PKBFacadeReader&, const StmtNum&) override;
-
 public:
-    Follows(ClauseArgument&, ClauseArgument&);
+    Follows(ClauseArgument& followee, ClauseArgument& follower) : BaseFollows(followee, follower) {}
+
+private:
+    bool hasFollowRelationship(PKBFacadeReader& reader) override {
+        return reader.hasFollowRelationship(followee, follower);
+    }
+
+    StmtSet getFollowers(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        std::optional stmtOpt = reader.getFollower(stmtNum);
+        return stmtOpt.has_value() ? StmtSet{stmtOpt.value()} : StmtSet{};
+    }
+
+    StmtSet getFollowees(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        std::optional stmtOpt = reader.getFollowee(stmtNum);
+        return stmtOpt.has_value() ? StmtSet{stmtOpt.value()} : StmtSet{};
+    }
 };
