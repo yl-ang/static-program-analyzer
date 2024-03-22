@@ -53,7 +53,7 @@ class Elem : public SelectEntContainer {
     }
 
     std::vector<Synonym> getSynonyms() override {
-        if (isBoolean(container[0].getValue())) {
+        if (isBoolean(container[0].getValue()) && container[0].getType() == DesignEntityType::UNKNOWN) {
             return {};
         }
         return container;
