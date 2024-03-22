@@ -11,6 +11,10 @@ private:
     ClauseArgument& firstArg;
     ClauseArgument& secondArg;
 
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
+
 public:
     WhilePattern(ClauseArgument* whileSyn, std::vector<ClauseArgument*> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
