@@ -145,12 +145,12 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     }
 
     SECTION("Modifies relationship stored correctly - statements") {
-        auto print = Literal("print");
+        auto printVariable = Literal("print");
         auto printLnNumber = Integer("31");
-        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(printLnNumber, print));
-        auto read = Literal("read");
+        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(printLnNumber, printVariable));
+        auto readVariable = Literal("read");
         auto readLineNumber = Integer("25");
-        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(readLineNumber, read));
+        REQUIRE(pkbFacadeReader.hasStatementVariableModifiesRelationship(readLineNumber, readVariable));
     }
 
     SECTION("Modifies relationship stored correctly - procedures") {
