@@ -7,13 +7,16 @@
 #include "sp/Utils.h"
 
 void PatternExtractor::visitPrint(PrintNode* node) {}
-void PatternExtractor::visitWhile(WhileNode* node) {}
+void PatternExtractor::visitWhile(WhileNode* node) {
+    this->isInWhileCondition = true;
+}
 void PatternExtractor::visitIf(IfNode* node) {
     this->isInIfCondition = true;
 }
 void PatternExtractor::visitProgram(ProgramNode* node) {}
 void PatternExtractor::visitStmtLst(StatementListNode* node) {
     this->isInIfCondition = false;
+    this->isInWhileCondition = false;
 }
 void PatternExtractor::visitExpression(ExpressionNode* node) {}
 void PatternExtractor::visitFactor(FactorNode* node) {}
@@ -21,7 +24,7 @@ void PatternExtractor::visitTerm(TermNode* node) {}
 void PatternExtractor::visitProcedure(ProcedureNode* node) {}
 void PatternExtractor::visitRead(ReadNode* node) {}
 void PatternExtractor::visitVariable(VariableNode* node) {
-    if (this->isInIfCondition) {
+    if (this->isInIfCondition || this->isInWhileCondition) {
         this->variablesInIfConditionExpr.insert({node->getStmtNumber(), node->value});
     }
 }
@@ -66,4 +69,8 @@ std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> Patt
 
 std::unordered_set<std::pair<StmtNum, std::string>> PatternExtractor::getIfPattern() {
     return this->variablesInIfConditionExpr;
+}
+
+std::unordered_set<std::pair<StmtNum, std::string>> PatternExtractor::getWhilePattern() {
+    return this->variablesInWhileConditionExpr;
 }
