@@ -29,4 +29,6 @@ public:
     void visitCall(CallNode* node) override;
 
     std::unordered_set<std::pair<Procedure, Procedure>> getCalls();
+
+    std::unordered_set<std::pair<Procedure, StmtNum>> getCallStmts();
 };

@@ -1320,6 +1320,46 @@ TEST_CASE("Calls Extractor Tests") {
         REQUIRE(expectedCalls == designExtractor->getCalls());
     }
 
+    SECTION("CALL statements extracted correctly") {
+        /*
+            procedure sad {
+                01 call happy;
+            }
+            procedure happy {
+                02 print a;
+                03 read b;
+            }
+        */
+        auto callNode = std::make_shared<CallNode>("happy", 1);
+        std::vector<std::shared_ptr<StatementNode>> childrenCall = {};
+        childrenCall.push_back(callNode);
+        auto stmtListProcCall = std::make_shared<StatementListNode>(childrenCall);
+        auto ProcNodeCall = std::make_shared<ProcedureNode>("sad", stmtListProcCall);
+
+        auto variableCall = std::make_shared<VariableNode>("a", 2);
+        auto printCall = std::make_shared<PrintNode>(variableCall, 2);
+
+        auto variableCall2 = std::make_shared<VariableNode>("b", 3);
+        auto readCall = std::make_shared<ReadNode>(variableCall2, 3);
+
+        std::vector<std::shared_ptr<StatementNode>> childrenCall2 = {};
+        childrenCall2.push_back(printCall);
+        childrenCall2.push_back(readCall);
+        auto stmtListProcCall2 = std::make_shared<StatementListNode>(childrenCall2);
+        auto ProcNodeCall2 = std::make_shared<ProcedureNode>("happy", stmtListProcCall2);
+
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProgCall = {};
+
+        childrenProgCall.push_back(ProcNodeCall);
+        childrenProgCall.push_back(ProcNodeCall2);
+        auto ProgNodeCall = std::make_shared<ProgramNode>(childrenProgCall);
+
+        DesignExtractor *designExtractor = new DesignExtractor();
+        designExtractor->extract(ProgNodeCall);
+        std::unordered_set<std::pair<Procedure, StmtNum>> expectedCallStmts = {{"happy", 1}};
+        REQUIRE(expectedCallStmts == designExtractor->getCallStmts());
+    }
+
     SECTION("CALLS should not work - Single PROCEDURE") {
         // might not need this i think is already tested in semantic vali
         /*
