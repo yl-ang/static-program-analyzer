@@ -24,11 +24,16 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->procedureTracker = new ProcedureTracker();
     dfsVisit(root, procedureTracker);
+#ifdef DEBUG_BUILD
+    std::cout << "done adding procs" << std::endl;
+#endif
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
-    this->usesExtractor = new UsesExtractor(procedureTracker->getProcedures());
-    this->modifiesExtractor = new ModifiesExtractor(procedureTracker->getProcedures());
+    this->usesExtractor =
+        new UsesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedUsesProcs);
+    this->modifiesExtractor =
+        new ModifiesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedModifiesProcs);
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
     this->callsExtractor = new CallsExtractor();
@@ -38,7 +43,14 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
+#ifdef DEBUG_BUILD
+        std::cout << "visited" << std::endl;
+#endif
     }
+
+#ifdef DEBUG_BUILD
+    std::cout << "Completed Visiting" << std::endl;
+#endif
 
     for (auto procedure : root->children) {
         this->nextExtractor->buildCFG(procedure);
