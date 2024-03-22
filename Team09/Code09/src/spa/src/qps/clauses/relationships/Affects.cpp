@@ -74,8 +74,8 @@ std::unordered_set<std::pair<Variable, StmtNum>> Affects::getAssignStatements(PK
 /**
  * Helper function
 */
-std::unordered_set<StmtNum> Affects::getNextStmtNums(const std::unordered_set<std::pair<Variable, StmtNum>>& varAndAffectorStmtList,
-                                                     PKBFacadeReader& reader) {
+std::unordered_set<StmtNum> Affects::getNextStmtNums(
+    const std::unordered_set<std::pair<Variable, StmtNum>>& varAndAffectorStmtList, PKBFacadeReader& reader) {
     std::unordered_set<StmtNum> nextStmtNums{};
     for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         // Get NextStar Control Flow - all StmtNums that follow that assign statement
@@ -101,14 +101,14 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
      * If affectorIsInteger: start from affector statement and work downwards
      * Else: start from affected statement and work upwards
     */
-    if (affectorIsInteger) {      
+    if (affectorIsInteger) {
         std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
         for (Variable modifiedVariable : modifiedVariables) {
             for (StmtNum nextStmtNum : nextStmtNums) {
                 std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
                 // Checking if uses the affector variable
                 for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {  
+                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {
                         return true;
                     }
                 }
@@ -118,7 +118,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
                         return false;
                     }
                 }
-            }   
+            }
         }
         return false;
     } else {
@@ -136,7 +136,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
                         return false;
                     }
                 }
-            }   
+            }
         }
         return false;
     }
@@ -271,7 +271,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
      * Else:
      * - start from affected statement and work upwards
     */
-    if (affectorIsInteger) {      
+    if (affectorIsInteger) {
         std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
         for (Variable modifiedVariable : modifiedVariables) {
             bool modified = false;
@@ -282,7 +282,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
                 std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
                 // Checking if uses the affector variable
                 for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {  
+                    if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {
                         values.push_back(std::to_string(nextStmtNum));
                     }
                 }
@@ -293,7 +293,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
                         break;  // Break out of inner loop for current affector statement
                     }
                 }
-            }   
+            }
         }
     } else {
         std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
@@ -315,7 +315,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
                         break;
                     }
                 }
-            }   
+            }
         }
     }
     return {syn, values};
@@ -369,7 +369,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
             }
             // Checking if uses the affector variable
             for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                if (nextStmt.value().type == StatementType::ASSIGN && currVar == variable) {  
+                if (nextStmt.value().type == StatementType::ASSIGN && currVar == variable) {
                     affectorValues.push_back(std::to_string(stmtNum));
                     affectedValues.push_back(std::to_string(nextStmtNum));
                 }
@@ -403,7 +403,7 @@ ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
             }
             // Checking if uses the affector variable
             for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                if (stmt.value().type == StatementType::ASSIGN && currVar == variable) {  
+                if (stmt.value().type == StatementType::ASSIGN && currVar == variable) {
                     return true;
                 }
             }
