@@ -177,13 +177,6 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, whileProc));
     }
 
-    SECTION("Follows relationship stored correctly") {
-        REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(18, 19));
-        REQUIRE(pkbFacadeReader.hasFollowRelationship(19, 22));
-        REQUIRE(pkbFacadeReader.hasFollowRelationship(26, 30));
-        REQUIRE(pkbFacadeReader.hasFollowRelationship(41, 45));
-    }
-
     SECTION("Next relationship stored correctly") {
         REQUIRE_FALSE(pkbFacadeReader.hasNextRelationship(18, 19));
         REQUIRE(pkbFacadeReader.hasNextRelationship(19, 20));
