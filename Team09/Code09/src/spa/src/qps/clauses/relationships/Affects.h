@@ -21,7 +21,10 @@ private:
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
-
+protected:
+    std::unordered_set<StmtNum> getNextStmtNums(
+        const std::unordered_set<std::tuple<Variable, StmtNum>>&, PKBFacadeReader&);
+    std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeReader&);
 public:
     Affects(ClauseArgument& affector, ClauseArgument& affected);
 

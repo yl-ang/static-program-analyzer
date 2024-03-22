@@ -66,6 +66,33 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
+std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeReader& reader) {
+    std::unordered_set<Variable> allVar = reader.getVariables();
+    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList{};
+    for (Variable var : allVar) {
+        std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
+        std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
+                                                    reader, DesignEntityType::ASSIGN, allStmts);
+        for (StmtNum assignStmt : assignStmts) {
+            varAndAffectorStmtList.insert(std::make_tuple(var, assignStmt));
+        }
+    }
+    return varAndAffectorStmtList;
+}
+
+std::unordered_set<StmtNum> getNextStmtNums(
+        const std::unordered_set<std::tuple<Variable, StmtNum>>& varAndAffectorStmtList,
+        PKBFacadeReader& reader) {
+    std::unordered_set<StmtNum> nextStmtNums{};
+    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+        // Get NextStar Control Flow - all StmtNums that follow that assign statement
+        StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
+        std::unordered_set<StmtNum> CFAffector = reader.getNexteeStar(affectorStmtNum);
+        nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
+    }
+    return nextStmtNums;
+}
+
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     bool affectorIsSynonym = affector.isSynonym();
     Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
@@ -79,16 +106,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
      * Then filter down to assign statements
      * Make tuple of modified variable and assign statement
     */
-    std::unordered_set<Variable> allVar = reader.getVariables();
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList{};
-    for (Variable var : allVar) {
-        std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
-        std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
-                                                reader, DesignEntityType::ASSIGN, allStmts);
-        for (StmtNum assignStmt : assignStmts) {
-            varAndAffectorStmtList.insert(std::make_tuple(var, assignStmt));
-        }
-    }
+    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
 
     /**
      * 2. For each tuple of modified variable and assign statement
@@ -96,13 +114,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
      * - Get the CF with all the statements
      * - Get separate list with assign statements
     */
-    std::unordered_set<StmtNum> nextStmtNums{};
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
-        // Get NextStar Control Flow - all StmtNums that follow that assign statement
-        StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
-        std::unordered_set<StmtNum> CFAffector = reader.getNexteeStar(affectorStmtNum);
-        nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
-    }
+    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
     /**
      * For each tuple of modified variable and assign statement:
@@ -180,16 +192,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * Then filter down to assign statements
      * Make tuple of modified variable and assign statement
     */
-    std::unordered_set<Variable> allVar = reader.getVariables();
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList{};
-    for (Variable var : allVar) {
-        std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
-        std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
-                                                reader, affectorSyn.getType(), allStmts);
-        for (StmtNum assignStmt : assignStmts) {
-            varAndAffectorStmtList.insert(std::make_tuple(var, assignStmt));
-        }
-    }
+    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
 
     /**
      * 2. For each tuple of modified variable and assign statement
@@ -197,13 +200,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * - Get the CF with all the statements
      * - Get separate list with assign statements
     */
-    std::unordered_set<StmtNum> nextStmtNums{};
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
-        // Get NextStar Control Flow - all StmtNums that follow that assign statement
-        StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
-        std::unordered_set<StmtNum> CFAffector = reader.getNexteeStar(affectorStmtNum);
-        nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
-    }
+    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
     /**
      * For each tuple of modified variable and assign statement:
