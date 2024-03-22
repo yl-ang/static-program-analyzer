@@ -1,5 +1,4 @@
 #include <filesystem>
-#include <set>
 #include <unordered_set>
 
 #include "PKB/PKB.h"
@@ -29,8 +28,7 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
             "r",   "t",   "a0",  "a1",  "a2",  "a3",  "a4",   "a5",    "a6",   "a7",  "a8",    "a9", "a10", "a14",
             "a15", "a16", "a17", "a20", "a21", "a22", "a23",  "a25",   "a33",  "a34", "while", "if", "gg",  "hh",
             "ii",  "o",   "m",   "x",   "b",   "b1",  "then", "print", "else", "a34", "read"};
-        REQUIRE(std::set<Variable>(variableSet.begin(), variableSet.end()) ==
-                std::set<Variable>(expectedVariableSet.begin(), expectedVariableSet.end()));
+        REQUIRE(variableSet == expectedVariableSet);
     }
 
     SECTION("Constants stored correctly") {
@@ -38,8 +36,7 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
         std::unordered_set<Constant> expectedConstantsSet = {"2",  "4",   "999", "1111", "9999", "50", "110", "40",
                                                              "10", "170", "29",  "1",    "11",   "90", "22",  "55",
                                                              "18", "3",   "34",  "27",   "15",   "6",  "68",  "0"};
-        REQUIRE(std::set<Variable>(constantsSet.begin(), constantsSet.end()) ==
-                std::set<Variable>(expectedConstantsSet.begin(), expectedConstantsSet.end()));
+        REQUIRE(constantsSet == expectedConstantsSet);
     }
 
     SECTION("Statements stored correctly") {
@@ -66,8 +63,7 @@ TEST_CASE("SP-PKB: Design Entities stored correctly") {
                 expectedStmtSet.insert({StatementType::WHILE, i});
             }
         }
-        REQUIRE(std::set<Stmt>(stmtSet.begin(), stmtSet.end()) ==
-                std::set<Stmt>(expectedStmtSet.begin(), expectedStmtSet.end()));
+        REQUIRE(stmtSet == expectedStmtSet);
     }
 
     SECTION("Procedures stored correctly") {
@@ -90,15 +86,30 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     PKB& pkb = spa.getInternalPKB();
     PKBFacadeReader pkbFacadeReader(pkb);
 
-    // SECTION("Follows relationship stored correctly") {
-    //     REQUIRE(pkbFacadeReader.hasFollowRelationship(1, 2));
-    //     REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(6, 7));
-    // }
+    SECTION("Follows relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(5, 6));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(6, 7));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(7, 8));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(18, 19));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(20, 21));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(19, 22));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(25, 26));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(26, 30));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(38, 40));
+        REQUIRE(pkbFacadeReader.hasFollowRelationship(41, 45));
+    }
 
-    // SECTION("Parent relationship stored correctly") {
-    //     REQUIRE(pkbFacadeReader.hasParentRelationship(1, 2));
-    //     REQUIRE_FALSE(pkbFacadeReader.hasParentRelationship(6, 7));
-    // }
+    SECTION("Parent relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasParentRelationship(19, 20));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(23, 26));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(23, 30));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(38, 39));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(40, 41));
+        REQUIRE(pkbFacadeReader.hasParentRelationship(40, 45));
+    }
 
     SECTION("Uses relationship stored correctly - statements") {}
 
