@@ -2,7 +2,7 @@
 
 #include "qps/clauses/relationships/Relationship.h"
 
-using ProcedureSet = const std::unordered_set<Procedure>&;
+using ProcedureSet = std::unordered_set<Procedure>;
 
 class BaseCalls : public Relationship {
 protected:
