@@ -57,15 +57,15 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 /**
  * Helper function
 */
-std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeReader& reader) {
+std::unordered_set<std::pair<Variable, StmtNum>> Affects::getAssignStatements(PKBFacadeReader& reader) {
     std::unordered_set<Variable> allVar = reader.getVariables();
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList{};
+    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList{};
     for (Variable var : allVar) {
         std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
         std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
                                                     reader, DesignEntityType::ASSIGN, allStmts);
         for (StmtNum assignStmt : assignStmts) {
-            varAndAffectorStmtList.insert(std::make_tuple(var, assignStmt));
+            varAndAffectorStmtList.insert(std::make_pair(var, assignStmt));
         }
     }
     return varAndAffectorStmtList;
@@ -74,9 +74,10 @@ std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeR
 /**
  * Helper function
 */
-std::unordered_set<StmtNum> getNextStmtNums(const std::unordered_set<std::tuple<Variable, StmtNum>>& varAndAffectorStmtList, PKBFacadeReader& reader) {
+std::unordered_set<StmtNum> Affects::getNextStmtNums(const std::unordered_set<std::pair<Variable, StmtNum>>& varAndAffectorStmtList,
+                                                     PKBFacadeReader& reader) {
     std::unordered_set<StmtNum> nextStmtNums{};
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         // Get NextStar Control Flow - all StmtNums that follow that assign statement
         StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
         std::unordered_set<StmtNum> CFAffector = reader.getNexteeStar(affectorStmtNum);
@@ -119,6 +120,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
                 }
             }   
         }
+        return false;
     } else {
         std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
         for (Variable usesVariable : usesVariables) {
@@ -136,6 +138,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
                 }
             }   
         }
+        return false;
     }
 }
 
@@ -204,7 +207,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 
     SynonymValues values{};
 
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
+    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
     std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
     /**
@@ -336,7 +339,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * Then filter down to assign statements
      * Make tuple of modified variable and assign statement
     */
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
+    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
     /**
      * 2. For each tuple of modified variable and assign statement
      * - Get the control flow statements that follow it (like NextStar)
@@ -386,7 +389,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
-    std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
+    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
     std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
     for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {

@@ -11,13 +11,6 @@ private:
     ClauseArgument& affector;
     ClauseArgument& affected;
 
-    /**
-     * Check if the result is a simple boolean result.
-     * It is a simple boolean result if both arguments are not synonyms.
-     * @return true if the result is a simple boolean result, false otherwise.
-     */
-    bool isSimpleResult() const;
-
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateBothIntegers(PKBFacadeReader&);
     ClauseResult evaluateBothWildcards(PKBFacadeReader&);
@@ -26,8 +19,8 @@ private:
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 protected:
     std::unordered_set<StmtNum> getNextStmtNums(
-        const std::unordered_set<std::tuple<Variable, StmtNum>>&, PKBFacadeReader&);
-    std::unordered_set<std::tuple<Variable, StmtNum>> getAssignStatements(PKBFacadeReader&);
+        const std::unordered_set<std::pair<Variable, StmtNum>>&, PKBFacadeReader&);
+    std::unordered_set<std::pair<Variable, StmtNum>> getAssignStatements(PKBFacadeReader&);
 public:
     Affects(ClauseArgument& affector, ClauseArgument& affected);
 
