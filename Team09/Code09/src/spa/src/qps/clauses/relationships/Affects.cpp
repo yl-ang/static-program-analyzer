@@ -27,8 +27,16 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
      * wildcard integer / integer wildcard
      * wildcard wildcard
      */ 
-    if (isSimpleResult()) {
-        
+    if (affector.isInteger() && affected.isInteger()) {
+        // return evaluateIntegerInteger(reader);
+    }
+
+    if ((affector.isWildcard() && affected.isInteger()) || (affector.isInteger() && affected.isWildcard())) {
+        // return evaluateWildcardInteger(reader);
+    }
+
+    if (affector.isWildcard() && affected.isWildcard()) {
+        // return evaluateWildcardWildcard(reader);
     }
 
     /**
