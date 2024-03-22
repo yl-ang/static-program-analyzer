@@ -21,8 +21,17 @@ bool Affects::validateArguments() {
     return true;
 }
 
+/**
+ * Similar logic:
+ * Bothsynonyms/BothWildcards
+ * SynonymInteger/WildcardInteger
+ * BothIntegers
+ * SynonymWildcard
+*/
 ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
- 
+    /**
+     * Returns TRUE/FALSE
+    */
     if (affector.isInteger() && affected.isInteger()) {
         return evaluateBothIntegers(reader);
     }
@@ -32,32 +41,16 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     if ((affector.isWildcard() && affected.isInteger()) || (affector.isInteger() && affected.isWildcard())) {
         return evaluateWildcardInteger(reader);
     }
-    
 
     /**
-     * Return types:
-     * 
-     * synonym synonym s1, s2
-     * synonym wilcard s1
-     * wildcard synonym s2
-     * 
-     * integer synonym s2
-     * synonym integer s1
-     * 
-     * TRUE/FALSE
-     * integer integer
-     * wildcard integer / integer wildcard
-     * wildcard wildcard
+     * Returns either s1, s2, or both
     */
-
     if ((affector.isInteger() && affected.isSynonym()) || (affector.isSynonym() && affected.isInteger())) {
         return evaluateSynonymInteger(reader);
     }
-
     if ((affector.isWildcard() && affected.isSynonym()) || (affector.isSynonym() && affected.isWildcard())) {
         return evaluateSynonymWildcard(reader);
     }
-
     return evaluateBothSynonyms(reader);
 }
 
@@ -95,30 +88,17 @@ std::unordered_set<StmtNum> getNextStmtNums(const std::unordered_set<std::tuple<
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector.isInteger();
     Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
-
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     /**
      * Get control flow from established statement number
     */
-    std::unordered_set<StmtNum> nextStmtNums{};
-    if (affectorIsInteger) {
-        nextStmtNums = reader.getNexteeStar(stmtNum);
-    } else {
-        nextStmtNums = reader.getNexterStar(stmtNum);
-    }
+    std::unordered_set<StmtNum> nextStmtNums =
+        affectorIsInteger ? reader.getNexteeStar(stmtNum) : reader.getNexterStar(stmtNum);
 
     /**
-     * If !affectorIsSynonym:
-     * - start from affector statement and work downwards
-     * Else:
-     * - start from affected statement and work upwards
-    */
-   /**
-     * If !affectorIsSynonym:
-     * - start from affector statement and work downwards
-     * Else:
-     * - start from affected statement and work upwards
+     * If affectorIsInteger: start from affector statement and work downwards
+     * Else: start from affected statement and work upwards
     */
     if (affectorIsInteger) {      
         std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
@@ -139,11 +119,9 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
                 }
             }   
         }
-
     } else {
         std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
         for (Variable usesVariable : usesVariables) {
-            bool modified = false;
             for (StmtNum nextStmtNum : nextStmtNums) {
                 std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
                 // Checking if modified affected variable
@@ -196,7 +174,7 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
      * For each Nextee:
      * - for all statements, CHECK that does not modify the variable
      * -- if modified, mark notModifiedBetween as false, and exit loop
-     * - else if goal statement, exit loop
+     * -- else if goal statement, exit loop
     */
     bool modifiedBetween = false;
     for (StmtNum nextStmtNum : nextStmtNums) {
@@ -217,7 +195,6 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
             }
         }
     }
-
     return usesModifiedVariable && !(modifiedBetween);
 }
 
@@ -227,14 +204,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 
     SynonymValues values{};
 
-    /**
-     * 1. Get assign statements that modify their variables
-    */
     std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-
-    /**
-     * 2. For each tuple of modified variable and assign statement
-    */
     std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
     /**
@@ -250,7 +220,6 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
-
         bool modified = false;
         for (StmtNum nextStmtNum : nextStmtNums) {
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
@@ -276,14 +245,13 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
             }
         }
     }
-
     return {syn, values};
 }
 
 ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    bool affectorIsSynonym = affector.isSynonym();
-    Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
-    Integer integer = affectorIsSynonym ? dynamic_cast<Integer&>(affected) : dynamic_cast<Integer&>(affector);
+    bool affectorIsInteger = affector.isInteger();
+    Synonym syn = affectorIsInteger ? dynamic_cast<Synonym&>(affected) : dynamic_cast<Synonym&>(affector);
+    Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     SynonymValues values{};
@@ -291,12 +259,8 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     /**
      * Get control flow from established statement number
     */
-    std::unordered_set<StmtNum> nextStmtNums{};
-    if (!affectorIsSynonym) {
-        nextStmtNums = reader.getNexteeStar(stmtNum);
-    } else {
-        nextStmtNums = reader.getNexterStar(stmtNum);
-    }
+    std::unordered_set<StmtNum> nextStmtNums =
+        affectorIsInteger ? reader.getNexteeStar(stmtNum) : reader.getNexterStar(stmtNum);
 
     /**
      * If !affectorIsSynonym:
@@ -304,7 +268,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
      * Else:
      * - start from affected statement and work upwards
     */
-    if (!affectorIsSynonym) {      
+    if (affectorIsInteger) {      
         std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
         for (Variable modifiedVariable : modifiedVariables) {
             bool modified = false;
@@ -328,7 +292,6 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
                 }
             }   
         }
-
     } else {
         std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
         for (Variable usesVariable : usesVariables) {
@@ -352,14 +315,12 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
             }   
         }
     }
-
     return {syn, values};
 }
 
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym affectorSyn = dynamic_cast<Synonym&>(affector);
     Synonym affectedSyn = dynamic_cast<Synonym&>(affected);
-
     std::vector<Synonym> synonyms{affectorSyn, affectedSyn};
 
     if (affectorSyn == affectedSyn) {
@@ -376,7 +337,6 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * Make tuple of modified variable and assign statement
     */
     std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-
     /**
      * 2. For each tuple of modified variable and assign statement
      * - Get the control flow statements that follow it (like NextStar)
@@ -398,7 +358,6 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
-
         bool modified = false;
         for (StmtNum nextStmtNum : nextStmtNums) {
             std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
@@ -421,43 +380,18 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
             }
         }
     }
-
     std::vector<Synonym> headers = {affectorSyn, affectedSyn};
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
     return {headers, values};
 }
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
-    /**
-     * 1. Get assign statements that modify their variables
-     * Get statements that modify variables (LHS)
-     * Then filter down to assign statements
-     * Make tuple of modified variable and assign statement
-    */
     std::unordered_set<std::tuple<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-
-    /**
-     * 2. For each tuple of modified variable and assign statement
-     * - Get the control flow statements that follow it (like NextStar)
-     * - Get the CF with all the statements
-     * - Get separate list with assign statements
-    */
     std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
 
-    /**
-     * For each tuple of modified variable and assign statement:
-     * For each CF next assign statement:
-     * - iterate through variables used by the CF next assign statement,
-     * 
-     * - if not ASSIGN statement, CHECK that does not modify the variable
-     * -- if modified, exit loop for that affecter statement
-     * - else if ASSIGN statement, CHECK that currVariable equals modified variable
-     * -- if yes, push back values
-    */
     for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
-
         bool modified = false;
         for (StmtNum nextStmtNum : nextStmtNums) {
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
@@ -479,6 +413,5 @@ ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
             }
         }
     }
-
     return false;
 }
