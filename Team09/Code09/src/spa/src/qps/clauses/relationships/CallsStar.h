@@ -2,29 +2,17 @@
 
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "Relationship.h"
+#include "baseClasses/BaseCalls.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
-class CallsStar : public Relationship {
+class CallsStar : public BaseCalls {
 private:
-    ClauseArgument& caller;
-    ClauseArgument& callee;
-
-    /**
-     * Check if the result is a simple boolean result.
-     * It is a simple boolean result if both arguments are not synonyms.
-     * @return true if the result is a simple boolean result, false otherwise.
-     */
-    bool isSimpleResult() const;
-
-    ClauseResult evaluateCalleeSynonym(PKBFacadeReader& reader);
-    ClauseResult evaluateCallerSynonym(PKBFacadeReader&);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
+    bool hasCallRelationship(PKBFacadeReader&) override;
+    ProcedureSet getCallee(PKBFacadeReader&, const Procedure&) override;
+    ProcedureSet getCaller(PKBFacadeReader&, const Procedure&) override;
 
 public:
     CallsStar(ClauseArgument&, ClauseArgument&);
-
-    ClauseResult evaluate(PKBFacadeReader&) override;
-    bool validateArguments() override;
 };
