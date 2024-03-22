@@ -125,14 +125,13 @@ ClauseResult FollowsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
             DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followeeSyn.getType()] != followee.type) {
             continue;
         }
-        std::string followeeStmtNumStr = std::to_string(followee.stmtNum);
-
-        for (StmtNum followerStmtNum : reader.getFollowersStar(followee.stmtNum)) {
+        std::unordered_set followers{reader.getFollowersStar(followee.stmtNum)};
+        for (StmtNum followerStmtNum : followers) {
             std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNum);
             if (followerSyn.getType() == DesignEntityType::STMT ||
                 (followerStmtOpt.has_value() &&
                  followerStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followerSyn.getType()])) {
-                followeeValues.push_back(followeeStmtNumStr);
+                followeeValues.push_back(std::to_string(followee.stmtNum));
                 followerValues.push_back(std::to_string(followerStmtNum));
             }
         }

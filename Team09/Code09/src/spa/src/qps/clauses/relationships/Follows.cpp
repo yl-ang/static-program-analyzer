@@ -130,19 +130,22 @@ ClauseResult Follows::evaluateBothSynonyms(PKBFacadeReader& reader) {
             DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followeeSyn.getType()] != followee.type) {
             continue;
         }
-        StmtNum followeeStmtNum = followee.stmtNum;
-        std::optional<StmtNum> followerStmtNumOpt = reader.getFollower(followeeStmtNum);
-        if (!followerStmtNumOpt.has_value()) {
-            continue;
+
+        std::optional<StmtNum> followerStmtNumOpt = reader.getFollower(followee.stmtNum);
+
+        std::unordered_set<StmtNum> followers{};
+        if (followerStmtNumOpt.has_value()) {
+            followers.insert(followerStmtNumOpt.value());
         }
 
-        std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNumOpt.value());
-
-        if (followerSyn.getType() == DesignEntityType::STMT ||
-            (followerStmtOpt.has_value() &&
-             followerStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followerSyn.getType()])) {
-            followeeValues.push_back(std::to_string(followeeStmtNum));
-            followerValues.push_back(std::to_string(followerStmtNumOpt.value()));
+        for (StmtNum followerStmtNum : followers) {
+            std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNum);
+            if (followerSyn.getType() == DesignEntityType::STMT ||
+                (followerStmtOpt.has_value() &&
+                 followerStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followerSyn.getType()])) {
+                followeeValues.push_back(std::to_string(followee.stmtNum));
+                followerValues.push_back(std::to_string(followerStmtNum));
+            }
         }
     }
 
