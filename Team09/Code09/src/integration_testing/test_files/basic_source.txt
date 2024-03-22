@@ -1,0 +1,48 @@
+procedure main {a0 = (a + (2 + (c + (4 + (d + (e + (f + (g + (h + i)))))))));
+    a1 = abc + xyz;
+    a2 = abc + xyz + c;
+    a3 = a + (a1 + a3) + d;
+    a4 = q + w + a;
+    print a;
+    print b;
+    a5 = (a + (q + w));
+    a6 = a + ((q + w));
+    print a0;
+    print a1;
+    a7 = (((y)));
+    a8 = abc + xyz - c * d / z % q;
+    a9 = (abc + xyz) - c * d / z % q;
+    a10 = a + (a1 + a3) * d / z % q;
+    a14 = a + 2 + c + 4;
+    a15 = q + w + e + r + t + y;
+    read a15;}
+procedure if {  if (!((a33 < abc + xyz + c)||(a9 < abc + xyz + c ))) then {
+            print a34;
+        } else {call main;}
+    if (a25 + 999 > while) then {
+        if(1111 > 9999 + if + (50/110)) then {
+            print else;
+        } else { read read;
+            if (!(read - (40 + 10) > 170)) then {
+                print = then;
+                then = print;
+            } else {call while;}
+            if (!(read + 29 - (40 - 1) > 0)) then {
+                print = then;
+                then = print;
+            } else { call while;}}
+    } else {if (!((a33 < abc + xyz + c)||(read - (11 - 90) > 22))) then {
+            print a34;
+        } else {   call main;}
+        a2 = abc + xyz;}}
+procedure while {while ( a16 == b1 ) {
+        a17 = 2;    }
+    while( 18 > 3 ) {
+        while((34 / t % h * 27 % t * m / r / x > z) || ((z * t / a > c) && ((c <= 55) || (y / y % b == b)))) {
+            a20 = b + (c + a);
+            print a0;
+            read a21;}
+        while(a22 != a * (15 * gg) % ((hh + 6) / ii)) {
+            while(!((a23 < abc + xyz + c)||(a15 - o / f > 68))) {
+                print a15;
+                read a1;   }}}}
