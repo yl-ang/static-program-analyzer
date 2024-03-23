@@ -296,13 +296,77 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
         AffectsTester{pfr, new Integer("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
-    // SECTION("Affects(synonym, wildcard)") {
+    SECTION("Affects(synonym, wildcard)") {
+        std::unordered_set<Variable> variables = {"x", "y"};
+        
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
-    // }
+        /**
+         * x = 1 -- assign/modifies x
+         * print x -- print/uses x
+         * x = x + 1 -- assign/modifies x/ uses x
+         * y = x + 1 -- assign/uses x
+        */
 
-    // SECTION("Affects(wildcard, synonym)") {
+        std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2},
+                                                                std::pair<int, int>{2, 3},
+                                                                std::pair<int, int>{3, 4}};
 
-    // }
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{2, "x"},
+                                                                        std::pair<int, std::string>{3, "x"},
+                                                                        std::pair<int, std::string>{4, "x"}};
+
+        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
+                                                                            std::pair<int, std::string>{3, "x"},
+                                                                            std::pair<int, std::string>{4, "y"}};
+
+        pfw.setVariables(variables);
+        pfw.setStmts(stmts);
+        pfw.setNextStore(nextStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
+
+        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+
+        AffectsTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "3"}});
+    }
+
+    SECTION("Affects(wildcard, synonym) / empty store") {
+        std::unordered_set<Variable> variables = {"x", "y"};
+        
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+
+        /**
+         * x = 1 -- assign/modifies x
+         * print x -- print/uses x
+         * x = x + 1 -- assign/modifies x/ uses x
+         * y = x + 1 -- assign/uses x
+        */
+
+        std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2},
+                                                                std::pair<int, int>{2, 3},
+                                                                std::pair<int, int>{3, 4}};
+
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{2, "x"},
+                                                                        std::pair<int, std::string>{3, "x"},
+                                                                        std::pair<int, std::string>{4, "x"}};
+
+        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
+                                                                            std::pair<int, std::string>{3, "x"},
+                                                                            std::pair<int, std::string>{4, "y"}};
+
+        pfw.setVariables(variables);
+        pfw.setStmts(stmts);
+        pfw.setNextStore(nextStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
+
+        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+
+        AffectsTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3", "4"}});
+    }
 }
 
 // TEST_CASE("SuchThatClause evaluate for affects relationship, both synonym") {

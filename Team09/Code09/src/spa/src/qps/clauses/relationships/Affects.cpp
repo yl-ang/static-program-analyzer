@@ -75,14 +75,12 @@ std::unordered_set<std::pair<Variable, StmtNum>> Affects::getAssignStatements(PK
  * Helper function
 */
 std::unordered_set<StmtNum> Affects::getNextStmtNums(
-    const std::unordered_set<std::pair<Variable, StmtNum>>& varAndAffectorStmtList, PKBFacadeReader& reader) {
+        const std::pair<Variable, StmtNum>& varAndAffectorStmt, PKBFacadeReader& reader) {
     std::unordered_set<StmtNum> nextStmtNums{};
-    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
-        // Get NextStar Control Flow - all StmtNums that follow that assign statement
-        StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
-        std::unordered_set<StmtNum> CFAffector = reader.getNexterStar(affectorStmtNum);
-        nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
-    }
+    // Get NextStar Control Flow - all StmtNums that follow that assign statement
+    StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
+    std::unordered_set<StmtNum> CFAffector = reader.getNexterStar(affectorStmtNum);
+    nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
     return nextStmtNums;
 }
 
@@ -229,10 +227,10 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     SynonymValues values{};
 
     std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
+    
 
     /**
-     * For each tuple of modified variable and assign statement:
+     * For each pair of modified variable and assign statement:
      * For each CF next assign statement:
      * - iterate through variables used by the CF next assign statement,
      * 
@@ -241,18 +239,24 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
      * - else if ASSIGN statement, CHECK that currVariable equals modified variable
      * -- if yes, push back values
     */
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+
+        std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmt, reader);
+        
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
         bool modified = false;
         for (StmtNum nextStmtNum : nextStmtNums) {
-            std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+            std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
             if (modified) {
                 break;
             }
             // Checking if uses the affector variable
-            for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                if (stmt.has_value() && stmt.value().type == StatementType::ASSIGN && currVar == variable) {
+            std::unordered_set<Variable> currVarList = reader.getUsesVariablesByStatement(nextStmtNum);
+            for (Variable currVar : currVarList) {
+                if (nextStmt.has_value() &&
+                        nextStmt.value().type == StatementType::ASSIGN &&
+                        currVar == variable) {
                     if (affectorIsSynonym) {
                         values.push_back(std::to_string(stmtNum));
                     } else {
@@ -363,19 +367,19 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * 1. Get assign statements that modify their variables
      * Get statements that modify variables (LHS)
      * Then filter down to assign statements
-     * Make tuple of modified variable and assign statement
+     * Make pair of modified variable and assign statement
     */
     std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
     /**
-     * 2. For each tuple of modified variable and assign statement
+     * 2. For each pair of modified variable and assign statement
      * - Get the control flow statements that follow it (like NextStar)
      * - Get the CF with all the statements
      * - Get separate list with assign statements
     */
-    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
+    
 
     /**
-     * For each tuple of modified variable and assign statement:
+     * For each pair of modified variable and assign statement:
      * For each CF next assign statement:
      * - iterate through variables used by the CF next assign statement,
      * 
@@ -384,7 +388,8 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
      * - else if ASSIGN statement, CHECK that currVariable equals modified variable
      * -- if yes, push back values
     */
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+        std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmt, reader);
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
         bool modified = false;
@@ -416,9 +421,10 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
     std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-    std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmtList, reader);
+    
 
-    for (const std::tuple<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
+        std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmt, reader);
         StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
         Variable variable = std::get<Variable>(varAndAffectorStmt);
         bool modified = false;
