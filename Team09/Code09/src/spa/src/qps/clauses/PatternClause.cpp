@@ -65,6 +65,17 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         return false;
     }
 
+    if ((*args[0]).isSynonym()) {
+        Synonym* fSyn = dynamic_cast<Synonym*>((args[0]));
+        if (!fSyn->updateType(store)) {
+            return false;
+        }
+
+        if (fSyn->getType() != DesignEntityType::VARIABLE) {
+            return false;
+        }
+    }
+
     DesignEntityType synType = syn.getType();
     switch (synType) {
     case DesignEntityType::WHILE:
@@ -73,16 +84,13 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         }
         [[fallthrough]];
     case DesignEntityType::ASSIGN:
+        if (args.size() != 2) {
+            throw QPSSyntaxError();
+        }
+        break;
     case DesignEntityType::IF:
-        if ((*args[0]).isSynonym()) {
-            Synonym* fSyn = dynamic_cast<Synonym*>((args[0]));
-            if (!fSyn->updateType(store)) {
-                return false;
-            }
-
-            if (fSyn->getType() != DesignEntityType::VARIABLE) {
-                return false;
-            }
+        if (args.size() != 3) {
+            throw QPSSyntaxError();
         }
         break;
     default:
