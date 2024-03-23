@@ -2,7 +2,9 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
+#include "AbstractionExtractor.h"
 #include "AstVisitor.h"
 
 class ProcedureTracker : public AstVisitor {
@@ -26,4 +28,8 @@ public:
 
     std::unordered_map<std::string, ProcedureNode*> procedures;
     std::unordered_map<std::string, ProcedureNode*> getProcedures();
+
+    // Used to cache results for speed up
+    std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>> extractedUsesProcs = {};
+    std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>> extractedModifiesProcs = {};
 };
