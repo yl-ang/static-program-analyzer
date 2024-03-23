@@ -9,6 +9,7 @@
 #include "Modifies.h"
 #include "Next.h"
 #include "NextStar.h"
+#include "Affects.h"
 #include "PKB/Utils/DataTypes.h"
 #include "Parent.h"
 #include "ParentStar.h"
