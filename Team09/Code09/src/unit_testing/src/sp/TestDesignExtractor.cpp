@@ -2,8 +2,10 @@
 #include <tuple>
 
 #include "catch.hpp"
+#include "sp/ast/grammar_nodes/ConstantNode.h"
 #include "sp/ast/grammar_nodes/statements/AssignmentNode.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
+#include "sp/ast/grammar_nodes/statements/WhileNode.h"
 #include "sp/de/AstVisitor.h"
 #include "sp/de/DesignExtractor.h"
 
@@ -1408,6 +1410,16 @@ TEST_CASE("Pattern Extractor Tests") {
             09     k = l;
                }
         }
+
+        procedure proc3 {
+            10 while ( i <  0) {
+                11 if (i < j) then {
+                12 a = c;
+                } else {
+                13 b = d;
+                }
+            }
+        }
     */
 
     // 01 read a;
@@ -1491,18 +1503,49 @@ TEST_CASE("Pattern Extractor Tests") {
         std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({printNode, outerIf}));
     auto Proc2Node = std::make_shared<ProcedureNode>("proc2", stmtListProc2);
 
+    // 10 while ( i <  0) {
+    //     11 if (i < j) then {
+    //     12 a = c;
+    //     } else {
+    //     13 b = d;
+    //     }
+    // }
+    auto wNode_i = std::make_shared<VariableNode>(VariableNode("i", 10));
+    auto wNodeI_i = std::make_shared<VariableNode>(VariableNode("i", 11));
+    auto wNodeI_j = std::make_shared<VariableNode>(VariableNode("j", 11));
+    auto wNodeI_a = std::make_shared<VariableNode>(VariableNode("a", 12));
+    auto wNodeI_c = std::make_shared<VariableNode>(VariableNode("c", 12));
+    auto wNodeI_b = std::make_shared<VariableNode>(VariableNode("b", 13));
+    auto wNodeI_d = std::make_shared<VariableNode>(VariableNode("d", 13));
+    auto wNode_0 = std::make_shared<ConstantNode>(ConstantNode("0", 10));
+
+    auto line10Condition = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, wNode_i, wNode_0, 10);
+    auto line11Condition = std::make_shared<ExpressionNode>(LEXICAL_TOKEN_TYPE::LESS_THAN, wNodeI_i, wNodeI_j, 11);
+    auto line12Assn = std::make_shared<AssignmentNode>(wNodeI_a, wNodeI_c, 12);
+    auto line13Assn = std::make_shared<AssignmentNode>(wNodeI_b, wNodeI_d, 13);
+
+    auto thenLst = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({line12Assn}));
+    auto elseLst = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({line13Assn}));
+    auto ifBlock = std::make_shared<IfNode>(line11Condition, thenLst, elseLst, 11);
+    auto whileLst = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({ifBlock}));
+    auto whileBlock = std::make_shared<WhileNode>(line10Condition, whileLst, 10);
+
+    auto stmtListProc3 = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({whileBlock}));
+    auto Proc3Node = std::make_shared<ProcedureNode>("proc3", stmtListProc3);
+
     // Create program
     std::vector<std::shared_ptr<ProcedureNode>> childrenProg = {};
     childrenProg.push_back(Proc1Node);
     childrenProg.push_back(Proc2Node);
+    childrenProg.push_back(Proc3Node);
 
     auto ProgNode = std::make_shared<ProgramNode>(childrenProg);
 
     SECTION("If Pattern Extracted correctly") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
-        std::unordered_set<std::pair<StmtNum, std::string>> expectedIfVariables = {{5, "i"}, {5, "j"}, {6, "a"},
-                                                                                   {6, "b"}, {6, "c"}, {6, "d"}};
+        std::unordered_set<std::pair<StmtNum, std::string>> expectedIfVariables = {
+            {5, "i"}, {5, "j"}, {6, "a"}, {6, "b"}, {6, "c"}, {6, "d"}, {11, "i"}, {11, "j"}};
         REQUIRE(expectedIfVariables == designExtractor->getIfPattern());
     }
 
