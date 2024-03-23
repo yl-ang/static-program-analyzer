@@ -115,3 +115,9 @@ public:
     NextStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT_STAR) {}
 };
+
+class AffectsTester : public SuchThatTester {
+public:
+    AffectsTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::AFFECTS) {}
+};
