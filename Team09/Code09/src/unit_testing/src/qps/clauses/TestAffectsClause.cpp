@@ -135,38 +135,68 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         AffectsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
     }
 
-    // SECTION("Affects(integer, wildcard)") {
-    //     std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
-    //                                       Stmt{StatementType::ASSIGN, 3}};
+    SECTION("Affects(integer, wildcard)") {
+        std::unordered_set<Variable> variables = {"x", "y"};
+        
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
-    //     std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}, std::pair<int, int>{2, 3}};
-    //     pfw.setNextStore(nextStoreEntries);
+        /**
+         * x = 1 -- assign/modifies x
+         * print x -- print/uses x
+         * x = x + 1 -- assign/modifies x/ uses x
+         * y = x + 1 -- assign/uses x
+        */
 
-    //     std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{3, "x"}};
-    //     pfw.setStatementUsesStore(usesStoreEntries);
+        std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2},
+                                                                std::pair<int, int>{2, 3},
+                                                                std::pair<int, int>{3, 4}};
 
-    //     std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"}};
-    //     pfw.setStatementModifiesStore(modifiesStoreEntries);
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{2, "x"},
+                                                                        std::pair<int, std::string>{3, "x"},
+                                                                        std::pair<int, std::string>{4, "x"}};
 
-    //     AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-    //     AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(true);
-    //     AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
-    //     AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
-    // }
+        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{std::pair<int, std::string>{1, "x"},
+                                                                            std::pair<int, std::string>{3, "x"},
+                                                                            std::pair<int, std::string>{4, "y"}};
 
-    // SECTION("Affects(integer, wildcard) / empty store") {
-    //     std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
-    //                                       Stmt{StatementType::ASSIGN, 3}};
+        pfw.setVariables(variables);
+        pfw.setStmts(stmts);
+        pfw.setNextStore(nextStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-    //     pfw.setNextStore({});
-    //     pfw.setStatementUsesStore({});
-    //     pfw.setStatementModifiesStore({});
+        AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
+        AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(true);
+        AffectsTester{pfr, new Integer("4"), new Wildcard()}.testBoolean(false);
 
-    //     AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-    //     AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(false);
-    //     AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
-    //     AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
-    // }
+        AffectsTester{pfr, new Wildcard(), new Integer("4")}.testBoolean(true);
+        AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(true);
+        AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
+        AffectsTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+    }
+
+    SECTION("Affects(integer, wildcard) / empty store") {
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+
+        pfw.setVariables({});
+        pfw.setStmts(stmts);
+        pfw.setNextStore({});
+        pfw.setStatementUsesStore({});
+        pfw.setStatementModifiesStore({});
+
+        AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, new Integer("4"), new Wildcard()}.testBoolean(false);
+
+        AffectsTester{pfr, new Wildcard(), new Integer("4")}.testBoolean(false);
+        AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(false);
+        AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
+        AffectsTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+    }
 }
 
 // TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
