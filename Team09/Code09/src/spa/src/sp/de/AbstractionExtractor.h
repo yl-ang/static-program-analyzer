@@ -26,4 +26,5 @@ public:
     std::unordered_set<std::pair<Procedure, Procedure>> calls;
     std::unordered_set<std::pair<Procedure, StmtNum>> callStmts;
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> assignmentTraversals;
+    std::unordered_set<std::pair<StmtNum, std::string>> variablesInIfConditionExpr;
 };
