@@ -1553,7 +1553,7 @@ TEST_CASE("Pattern Extractor Tests") {
         DesignExtractor *designExtractor = new DesignExtractor();
         designExtractor->extract(ProgNode);
         std::unordered_set<std::pair<StmtNum, std::string>> expectedWhileVariables = {
-            {2, "c"}, {2, "d"}, {2, "e"}, {2, "f"}};
+            {2, "c"}, {2, "d"}, {2, "e"}, {2, "f"}, {10, "i"}};
         REQUIRE(expectedWhileVariables == designExtractor->getWhilePattern());
     }
 
