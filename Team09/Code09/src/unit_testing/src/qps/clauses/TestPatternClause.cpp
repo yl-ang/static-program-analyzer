@@ -103,7 +103,7 @@ TEST_CASE("Assign Pattern evaluate") {
 
     SECTION("Test Synonym and ExpressionSpec") {
         Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
-        ExpressionSpec varExp = ExpressionSpec("_\"y\"_");
+        ExpressionSpec varExp = ExpressionSpec("_\"(x+y)\"_");
         ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
         ExpressionSpec literalExp_False = ExpressionSpec("_\"1\"_");
 

@@ -15,7 +15,6 @@ std::string removeCharsFrom(const std::string&, const std::string&);
 std::string cleanQuotedIdent(const std::string& str);
 std::vector<std::string> splitByDelimiter(const std::string& str, const std::string& delimiter);
 std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter);
-std::vector<std::string> stringToWordList(const std::string& string);
 std::string trim(const std::string& str);
 
 std::tuple<std::string, std::string> splitResultAndClause(const std::string& str);

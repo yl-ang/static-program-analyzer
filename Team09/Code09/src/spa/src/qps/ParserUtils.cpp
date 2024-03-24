@@ -59,16 +59,6 @@ std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& 
     }
 }
 
-std::vector<std::string> stringToWordList(const std::string& string) {
-    std::vector<std::string> wordList;
-    std::stringstream ss(string);
-    std::string word;
-    while (ss >> word) {
-        wordList.push_back(word);
-    }
-    return wordList;
-}
-
 std::string trim(const std::string& str) {
     size_t start = str.find_first_not_of(QPSConstants::WHITESPACES);
     std::string trimmedString;

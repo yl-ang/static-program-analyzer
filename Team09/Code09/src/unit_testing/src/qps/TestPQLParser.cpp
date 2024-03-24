@@ -728,6 +728,11 @@ TEST_CASE("SyntaxError") {
         REQUIRE_NOTHROW(PQLParserTester::parse(input));
     }
 
+    SECTION("expression spec with brackets, pattern") {
+        vectorString input = {"assign a;", "stmt s1;", "Select s1 pattern a (_, _\"((x + y) / (2))\"_)"};
+        REQUIRE_NOTHROW(PQLParserTester::parse(input));
+    }
+
     SECTION("Syntax Error before undeclared relCond synonym after and, pattern") {
         vectorString input = {"assign a,a1;", "stmt s1;", "Select s1 pattern a (, _) and Modifies (s1, _)"};
         REQUIRE_THROW_SYNTAX_ERROR(PQLParserTester::parse(input));
