@@ -18,6 +18,7 @@ bool isEntRef(const std::string&);
 bool isRelRef(const std::string&);
 
 bool isExpressionSpec(const std::string&);
+bool isPartialExpression(const std::string&);
 bool isQuotedExpr(const std::string& str);
 bool isExpr(const std::string&);
 bool isTerm(const std::string&);

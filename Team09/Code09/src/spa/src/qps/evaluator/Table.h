@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -11,6 +12,8 @@ using SynonymValue = std::string;
 using ColumnData = std::vector<std::string>;
 using RowEntry = std::string;
 using Row = std::unordered_map<SynonymValue, RowEntry>;
+
+using ValueTransformer = std::function<SynonymValue(Synonym, SynonymValue)>;
 
 /**
  * Table class to store the results of a query and perform operations on the results.
@@ -82,6 +85,13 @@ public:
      * @return true if the table contains the header
      */
     bool containsHeader(const Synonym&) const;
+
+    /**
+     * \brief Transforms the values of the columns given by the synonym headers using the transformer function
+     * \param synonyms The columns whose values must be transformed
+     * \param transformer The transformer function
+     */
+    void transformColumn(std::vector<Synonym> synonyms, const ValueTransformer& transformer);
 
     bool isSentinelTable() const;
     bool operator==(const Table&) const;

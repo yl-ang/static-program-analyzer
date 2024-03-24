@@ -235,6 +235,10 @@ TEST_CASE("Test extractResults") {
         std::vector<std::string> result = tableManager.extractResults(synonyms);
 
         std::vector<std::string> expected = {"x", "y", "z"};
+
+        std::sort(result.begin(), result.end());
+        std::sort(expected.begin(), expected.end());
+
         REQUIRE(result == expected);
     }
 
@@ -276,6 +280,8 @@ TEST_CASE("Test extractResults") {
         std::vector<std::string> result = tableManager.extractResults(synonyms);
 
         std::vector<std::string> expected = {"x 4", "y 5", "z testString"};
+        std::sort(result.begin(), result.end());
+        std::sort(expected.begin(), expected.end());
         REQUIRE(result == expected);
     }
 

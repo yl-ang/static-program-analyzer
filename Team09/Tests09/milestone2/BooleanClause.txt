@@ -1,0 +1,20 @@
+20001 - Boolean Clause
+stmt s1, s2;
+Select BOOLEAN
+TRUE
+5000
+20002 - BOOLEAN declared as synonym
+stmt BOOLEAN;
+Select BOOLEAN
+1,10,11,12,13,14,15,16,17,18,19,2,20,21,22,23,24,25,26,27,28,29,3,30,31,32,33,34,35,36,37,38,39,4,40,41,42,43,44,45,46,47,48,5,6,7,8,9
+5000
+20003 - BOOLEAN with such that clause
+stmt s1;
+Select BOOLEAN such that Follows(1, 2)
+TRUE
+5000
+20004 - BOOLEAN no results
+stmt s1;
+Select BOOLEAN such that Follows(1000, 1001)
+FALSE
+5000

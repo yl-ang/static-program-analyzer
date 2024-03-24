@@ -29,4 +29,10 @@ public:
     std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>> getMatchablePattern();
 
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> getAssignmentPattern();
+    std::unordered_set<std::pair<StmtNum, std::string>> getIfPattern();
+    std::unordered_set<std::pair<StmtNum, std::string>> getWhilePattern();
+
+private:
+    bool isInIfCondition = false;
+    bool isInWhileCondition = false;
 };

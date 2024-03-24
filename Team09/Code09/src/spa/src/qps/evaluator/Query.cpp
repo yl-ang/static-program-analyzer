@@ -36,7 +36,57 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
                                       : std::vector{QPSConstants::TRUE_STRING};
     }
 
+    const ValueTransformer transformer = projectSynonymAttributesTransformer(pkb);
+    tableManager.projectAttributes(transformer);
+
     return tableManager.extractResults(selectEntities);
+}
+
+ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb) {
+    return [&pkb](Synonym synonym, SynonymValue value) -> SynonymValue {
+        const auto& attr = synonym.getAttr();
+
+        if (!attr.has_value()) {
+            return value;
+        }
+
+        switch (attr.value()) {
+        case SynonymAttributeType::PROCNAME:
+            if (synonym.getType() == DesignEntityType::CALL) {
+                std::optional procedureName = pkb.getCallFromStmtNum(std::stoi(value));
+                if (procedureName.has_value()) {
+                    return procedureName.value();
+                }
+                throw Exception("No procedure name found for Call Statement");
+            }
+            return value;
+
+        case SynonymAttributeType::VARNAME:
+            if (synonym.getType() == DesignEntityType::READ) {
+                const auto& variables = pkb.getModifiesVariablesByStatement(std::stoi(value));
+                if (variables.size() != 1) {
+                    throw Exception("None or more than 1 variable found when reading Read Statement");
+                }
+                const auto& variable = *variables.begin();
+                return variable;
+            }
+            if (synonym.getType() == DesignEntityType::PRINT) {
+                const auto& variables = pkb.getUsesVariablesByStatement(std::stoi(value));
+                if (variables.size() != 1) {
+                    throw Exception("None or more than 1 variable found when reading Print Statement");
+                }
+                const auto& variable = *variables.begin();
+                return variable;
+            }
+            return value;
+
+        case SynonymAttributeType::VALUE:
+        case SynonymAttributeType::STMTNUM:
+            return value;
+        }
+
+        return value;
+    };
 }
 
 bool Query::hasNoClauses() const {

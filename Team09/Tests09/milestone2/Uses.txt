@@ -1,0 +1,155 @@
+150001 - Uses / no synonyms / literal, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Uses("a5", "a")
+none
+5000
+150002 - Uses / no synonyms / literal, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Uses("a5", _)
+none
+5000
+150003 - Uses / no synonyms / wildcard, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Uses(_, "a")
+SemanticError
+5000
+150004 - Uses / no synonyms / wildcard, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select s1 such that Uses(_,_)
+SemanticError
+5000
+150005 - Uses / no synonyms / wildcard, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Uses(_, 4)
+SyntaxError
+5000
+150006 - Uses / no synonyms / integer, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Uses(5, _)
+if,main,while
+5000
+150007 - Uses / no synonyms / integer, varname
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Uses(13, "c")
+if,main,while
+5000
+150008 - Uses / no synonyms / varname, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
+Select p1 such that Uses("a", 13)
+SyntaxError
+5000
+150009 - Uses / 1 synonyms / integer, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(4, v1)
+a,a1,a3,d
+5000
+150010 - Uses / 1 synonyms / wildcard, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(wildcard, v1)
+SemanticError
+5000
+150011 - Uses / 1 synonyms / literal, Synonym variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses("a5", v1)
+none
+5000
+150012 - Uses / 1 synonyms / Synonym variable, literal
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, "c")
+SemanticError
+5000
+150013 - Uses / 1 synonyms / Synonym variable, wildcard
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, _)
+SemanticError
+5000
+150014 - Uses / 1 synonyms / Synonym variable, integer
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, 10)
+SyntaxError
+5000
+150015 - Uses / 2 synonyms / Synonym variable, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, v2)
+SemanticError
+5000
+150016 - Uses / 2 synonyms / Synonym stmt, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(s1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150017 - Uses / 2 synonyms / Synonym assign, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(a1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150018 - Uses / 2 synonyms / Synonym read, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(r1, v2)
+none
+5000
+150019 - Uses / 2 synonyms / Synonym print, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(pn1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150020 - Uses / 2 synonyms / Synonym call, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(c1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150021 - Uses / 2 synonyms / Synonym while, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(w1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150022 - Uses / 2 synonyms / Synonym if, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(i1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150023 - Uses / 2 synonyms / Synonym procedure, Synonym Variable
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(p1, v2)
+a,a0,a1,a10,a14,a15,a16,a17,a2,a20,a21,a22,a23,a25,a3,a33,a34,a4,a5,a6,a7,a8,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+150024 - Uses / 2 synonyms / Synonym Variable, Synonym Stmt
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, s1)
+SemanticError
+5000
+150025 - Uses / 2 synonyms / Synonym Variable, Synonym Assign
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, a1)
+SemanticError
+5000
+150026 - Uses / 2 synonyms / Synonym Variable, Synonym Read
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, r1)
+SemanticError
+5000
+150027 - Uses / 2 synonyms / Synonym Variable, Synonym Print
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, pn1)
+SemanticError
+5000
+150028 - Uses / 2 synonyms / Synonym Variable, Synonym Call
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, c1)
+SemanticError
+5000
+150029 - Uses / 2 synonyms / Synonym Variable, Synonym While
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, w1)
+SemanticError
+5000
+150030 - Uses / 2 synonyms / Synonym Variable, Synonym If
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, i1)
+SemanticError
+5000
+150031 - Uses / 2 synonyms / Synonym Variable, Synonym Procedure
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
+Select v1 such that Uses(v1, p1)
+SemanticError
+5000

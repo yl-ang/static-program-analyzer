@@ -12,9 +12,14 @@
 class ModifiesExtractor : public AbstractionExtractor {
 public:
     std::unordered_map<std::string, ProcedureNode*> procs;
+    std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>>* extractedProcs;
     std::string currentProc;
 
-    explicit ModifiesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
+    explicit ModifiesExtractor(
+        std::unordered_map<std::string, ProcedureNode*> procs,
+        std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>>* extractedProcs)
+        : procs(procs), extractedProcs(extractedProcs) {}
+
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;
     void visitProcedure(ProcedureNode* node) override;

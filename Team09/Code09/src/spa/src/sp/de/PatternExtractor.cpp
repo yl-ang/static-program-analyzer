@@ -7,16 +7,29 @@
 #include "sp/Utils.h"
 
 void PatternExtractor::visitPrint(PrintNode* node) {}
-void PatternExtractor::visitWhile(WhileNode* node) {}
-void PatternExtractor::visitIf(IfNode* node) {}
+void PatternExtractor::visitWhile(WhileNode* node) {
+    this->isInWhileCondition = true;
+}
+void PatternExtractor::visitIf(IfNode* node) {
+    this->isInIfCondition = true;
+}
 void PatternExtractor::visitProgram(ProgramNode* node) {}
-void PatternExtractor::visitStmtLst(StatementListNode* node) {}
+void PatternExtractor::visitStmtLst(StatementListNode* node) {
+    this->isInIfCondition = false;
+    this->isInWhileCondition = false;
+}
 void PatternExtractor::visitExpression(ExpressionNode* node) {}
 void PatternExtractor::visitFactor(FactorNode* node) {}
 void PatternExtractor::visitTerm(TermNode* node) {}
 void PatternExtractor::visitProcedure(ProcedureNode* node) {}
 void PatternExtractor::visitRead(ReadNode* node) {}
-void PatternExtractor::visitVariable(VariableNode* node) {}
+void PatternExtractor::visitVariable(VariableNode* node) {
+    if (this->isInIfCondition) {
+        this->variablesInIfConditionExpr.insert({node->getStmtNumber(), node->value});
+    } else if (this->isInWhileCondition) {
+        this->variablesInWhileConditionExpr.insert({node->getStmtNumber(), node->value});
+    }
+}
 void PatternExtractor::visitConstant(ConstantNode* node) {}
 void PatternExtractor::visitCall(CallNode* node) {}
 
@@ -54,4 +67,12 @@ PatternExtractor::getMatchablePattern() {
 
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getAssignmentPattern() {
     return this->assignmentTraversals;
+}
+
+std::unordered_set<std::pair<StmtNum, std::string>> PatternExtractor::getIfPattern() {
+    return this->variablesInIfConditionExpr;
+}
+
+std::unordered_set<std::pair<StmtNum, std::string>> PatternExtractor::getWhilePattern() {
+    return this->variablesInWhileConditionExpr;
 }

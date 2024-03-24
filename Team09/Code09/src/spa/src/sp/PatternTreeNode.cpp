@@ -63,7 +63,7 @@ std::shared_ptr<PatternTreeNode> PatternTreeNode::deserializeHelper(std::istring
     in >> val;
     if (val == SERIALISING_DELIMITER)
         return nullptr;
-    std::shared_ptr<PatternTreeNode> root = std::make_shared<PatternTreeNode>(PatternTreeNode(val));
+    std::shared_ptr<PatternTreeNode> root = std::make_shared<PatternTreeNode>(val);
     root->left = deserializeHelper(in);
     root->right = deserializeHelper(in);
     return root;

@@ -1,0 +1,175 @@
+140001 - Select stmt stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select s1.stmt# such that Follows(s1, s2)
+1,10,11,12,13,14,15,16,17,19,2,25,26,27,3,31,34,38,4,41,42,43,47,5,6,7,8,9
+5000
+140002 - Select assign stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select a1.stmt# such that Follows(a1, s2)
+1,12,13,14,15,16,17,2,27,3,31,4,42,5,8,9
+5000
+140003 - Select read stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select r1.stmt# such that Follows(r1, s2)
+25
+5000
+140004 - Select print stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select pn1.stmt# such that Follows(pn1, s2)
+10,11,43,47,6,7
+5000
+140005 - Select call stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select c1.stmt#
+21,29,33,36
+5000
+140006 - Select while stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select w1.stmt# such that Follows(w1, s2)
+38,41
+5000
+140007 - Select if stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select i1.stmt# such that Follows(i1, s2)
+19,26,34
+5000
+140008 - Select multi-tuple stmt#
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select <s1.stmt#, s2> such that Follows(s1, s2)
+1 2,10 11,11 12,12 13,13 14,14 15,15 16,16 17,17 18,19 22,2 3,25 26,26 30,27 28,3 4,31 32,34 37,38 40,4 5,41 45,42 43,43 44,47 48,5 6,6 7,7 8,8 9,9 10
+5000
+140009 - Select variable varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1,v2;
+Select v1.varName such that Uses(s1, v1)
+a,a0,a1,a15,a16,a22,a23,a25,a3,a33,a34,a9,abc,b,b1,c,d,e,else,f,g,gg,h,hh,i,if,ii,m,o,print,q,r,read,t,then,w,while,x,xyz,y,z
+5000
+140010 - Select stmt varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select s1.varName such that Follows(s1, s2)
+SemanticError
+5000
+140011 - Select assign varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select a1.varName such that Follows(a1, s2)
+SemanticError
+5000
+140012 - Select read varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select r1.varName such that Follows(r1, s2)
+read
+5000
+140013 - Select print varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select pn1.varName such that Follows(pn1, s2)
+a,a0,a1,a15,b
+5000
+140014 - Select call varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select c1.varName such that Follows(c1, s2)
+SemanticError
+5000
+140015 - Select while varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select w1.varName such that Follows(w1, s2)
+SemanticError
+5000
+140016 - Select if varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select i1.varName such that Follows(i1, s2)
+SemanticError
+5000
+140017 - Select multi-tuple varName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1, v2;
+Select <v1.varName, s1> such that Uses(s1, v1)
+a 1,a 15,a 16,a 19,a 21,a 22,a 23,a 26,a 29,a 30,a 33,a 34,a 36,a 4,a 40,a 41,a 42,a 45,a 5,a 6,a 8,a 9,a0 10,a0 19,a0 21,a0 22,a0 23,a0 26,a0 29,a0 30,a0 33,a0 34,a0 36,a0 40,a0 41,a0 43,a1 11,a1 15,a1 19,a1 21,a1 22,a1 34,a1 36,a1 4,a15 22,a15 23,a15 26,a15 29,a15 30,a15 33,a15 40,a15 45,a15 46,a15 47,a16 22,a16 23,a16 26,a16 29,a16 30,a16 33,a16 38,a22 22,a22 23,a22 26,a22 29,a22 30,a22 33,a22 40,a22 45,a23 22,a23 23,a23 26,a23 29,a23 30,a23 33,a23 40,a23 45,a23 46,a25 22,a3 15,a3 19,a3 21,a3 22,a3 34,a3 36,a3 4,a33 19,a33 22,a33 34,a34 19,a34 20,a34 22,a34 34,a34 35,a9 19,abc 13,abc 14,abc 19,abc 2,abc 21,abc 22,abc 23,abc 26,abc 29,abc 3,abc 30,abc 33,abc 34,abc 36,abc 37,abc 40,abc 45,abc 46,b 19,b 21,b 22,b 23,b 26,b 29,b 30,b 33,b 34,b 36,b 40,b 41,b 42,b 7,b1 22,b1 23,b1 26,b1 29,b1 30,b1 33,b1 38,c 1,c 13,c 14,c 16,c 19,c 21,c 22,c 23,c 26,c 29,c 3,c 30,c 33,c 34,c 36,c 40,c 41,c 42,c 45,c 46,d 1,d 13,d 14,d 15,d 19,d 21,d 22,d 34,d 36,d 4,e 1,e 17,e 19,e 21,e 22,e 34,e 36,else 22,else 23,else 24,f 1,f 19,f 21,f 22,f 23,f 26,f 29,f 30,f 33,f 34,f 36,f 40,f 45,f 46,g 1,g 19,g 21,g 22,g 34,g 36,gg 22,gg 23,gg 26,gg 29,gg 30,gg 33,gg 40,gg 45,h 1,h 19,h 21,h 22,h 23,h 26,h 29,h 30,h 33,h 34,h 36,h 40,h 41,hh 22,hh 23,hh 26,hh 29,hh 30,hh 33,hh 40,hh 45,i 1,i 19,i 21,i 22,i 34,i 36,if 22,if 23,ii 22,ii 23,ii 26,ii 29,ii 30,ii 33,ii 40,ii 45,m 22,m 23,m 26,m 29,m 30,m 33,m 40,m 41,o 22,o 23,o 26,o 29,o 30,o 33,o 40,o 45,o 46,print 22,print 23,print 26,print 28,print 30,print 32,q 13,q 14,q 15,q 17,q 19,q 21,q 22,q 34,q 36,q 5,q 8,q 9,r 17,r 19,r 21,r 22,r 23,r 26,r 29,r 30,r 33,r 34,r 36,r 40,r 41,read 22,read 23,read 26,read 30,read 34,t 17,t 19,t 21,t 22,t 23,t 26,t 29,t 30,t 33,t 34,t 36,t 40,t 41,then 22,then 23,then 26,then 27,then 30,then 31,w 17,w 19,w 21,w 22,w 34,w 36,w 5,w 8,w 9,while 22,x 22,x 23,x 26,x 29,x 30,x 33,x 40,x 41,xyz 13,xyz 14,xyz 19,xyz 2,xyz 21,xyz 22,xyz 23,xyz 26,xyz 29,xyz 3,xyz 30,xyz 33,xyz 34,xyz 36,xyz 37,xyz 40,xyz 45,xyz 46,y 12,y 17,y 19,y 21,y 22,y 23,y 26,y 29,y 30,y 33,y 34,y 36,y 40,y 41,z 13,z 14,z 15,z 19,z 21,z 22,z 23,z 26,z 29,z 30,z 33,z 34,z 36,z 40,z 41
+5000
+140018 - Select variable procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1,v2;
+Select p1.procName such that Calls(p1, p2)
+SemanticError
+5000
+140019 - Select stmt procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select s1.procName such that Follows(s1, s2)
+SemanticError
+5000
+140020 - Select assign procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select a1.procName such that Follows(a1, s2)
+SemanticError
+5000
+140021 - Select read procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select r1.procName such that Follows(r1, s2)
+SemanticError
+5000
+140022 - Select print procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select pn1.procName such that Follows(pn1, s2)
+SemanticError
+5000
+140023 - Select call procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select c1.procName
+main,while
+5000
+140024 - Select while procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select w1.procName such that Follows(w1, s2)
+SemanticError
+5000
+140025 - Select if procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select i1.procName such that Follows(i1, s2)
+SemanticError
+5000
+140026 - Select multi-tuple procName
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1, v2;
+Select <p1.procName, p2> such that Calls(p1, p2)
+SemanticError
+5000
+140027 - Select variable value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1,v2; constant c1;
+Select c1.value pattern a1(c1, _)
+SemanticError
+5000
+140028 - Select stmt value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select s1.value such that Follows(s1, s2)
+SemanticError
+5000
+140029 - Select assign value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select a1.value such that Follows(a1, s2)
+SemanticError
+5000
+140030 - Select read value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select r1.value such that Follows(r1, s2)
+SemanticError
+5000
+140031 - Select print value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select pn1.value such that Follows(pn1, s2)
+SemanticError
+5000
+140032 - Select call value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select c1.value such that Follows(c1, s2)
+SemanticError
+5000
+140033 - Select while value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select w1.value such that Follows(w1, s2)
+SemanticError
+5000
+140034 - Select if value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2;
+Select i1.value such that Follows(i1, s2)
+SemanticError
+5000
+140035 - Select multi-tuple value
+stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; variable v1, v2;
+Select <c1.value, a1> pattern a1(c1, _)
+SemanticError
+5000

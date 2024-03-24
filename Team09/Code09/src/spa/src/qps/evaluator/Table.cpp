@@ -71,6 +71,14 @@ std::vector<Synonym> Table::getHeaders() const {
     return headers;
 }
 
+void Table::transformColumn(std::vector<Synonym> targetColumnHeaders, const ValueTransformer& transform) {
+    for (Row& row : rows) {
+        for (Synonym header : targetColumnHeaders) {
+            row[header.getValue()] = transform(header, row[header.getValue()]);
+        }
+    }
+}
+
 bool Table::operator==(const Table& other) const {
     if (this->headers.size() != other.headers.size() || this->rows.size() != other.rows.size()) {
         return false;

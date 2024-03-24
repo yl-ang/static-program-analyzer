@@ -13,9 +13,13 @@
 class UsesExtractor : public AbstractionExtractor {
 public:
     std::unordered_map<std::string, ProcedureNode*> procs;
+    std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>>* extractedProcs;
     std::string currentProc;
 
-    explicit UsesExtractor(std::unordered_map<std::string, ProcedureNode*> procs) : procs(procs) {}
+    explicit UsesExtractor(
+        std::unordered_map<std::string, ProcedureNode*> procs,
+        std::unordered_map<std::string, std::unordered_set<std::pair<StmtNum, Variable>>>* extractedProcs)
+        : procs(procs), extractedProcs(extractedProcs) {}
 
     void visitStmtLst(StatementListNode* node) override;
     void visitProgram(ProgramNode* node) override;

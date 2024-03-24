@@ -42,7 +42,7 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 }
 
 std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>>
-        PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
+PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::shared_ptr<SelectEntContainer> selectEntities;
     std::vector<SuchThatClause> suchThatClauses;
     std::vector<PatternClause> patternClauses;

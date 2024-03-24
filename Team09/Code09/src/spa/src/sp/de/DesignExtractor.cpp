@@ -18,17 +18,25 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
     writer->setCallStore(getCalls());
+    writer->setCallStmtStore(getCallStmts());
     writer->setAssignPatternStore(isExactMatch, isPartialMatch, getAssignmentPattern());
+    writer->setIfPatternStore(getIfPattern());
+    writer->setWhilePatternStore(getWhilePattern());
 }
 
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->procedureTracker = new ProcedureTracker();
     dfsVisit(root, procedureTracker);
+#ifdef DEBUG_BUILD
+    std::cout << "done adding procs" << std::endl;
+#endif
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
-    this->usesExtractor = new UsesExtractor(procedureTracker->getProcedures());
-    this->modifiesExtractor = new ModifiesExtractor(procedureTracker->getProcedures());
+    this->usesExtractor =
+        new UsesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedUsesProcs);
+    this->modifiesExtractor =
+        new ModifiesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedModifiesProcs);
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
     this->callsExtractor = new CallsExtractor();
@@ -38,7 +46,14 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
+#ifdef DEBUG_BUILD
+        std::cout << "visited" << std::endl;
+#endif
     }
+
+#ifdef DEBUG_BUILD
+    std::cout << "Completed Visiting" << std::endl;
+#endif
 
     for (auto procedure : root->children) {
         this->nextExtractor->buildCFG(procedure);
@@ -109,6 +124,18 @@ std::unordered_set<std::pair<Procedure, Procedure>> DesignExtractor::getCalls() 
     return callsExtractor->getCalls();
 }
 
+std::unordered_set<std::pair<Procedure, StmtNum>> DesignExtractor::getCallStmts() {
+    return callsExtractor->getCallStmts();
+}
+
 std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getAssignmentPattern() {
     return patternExtractor->getAssignmentPattern();
+}
+
+std::unordered_set<std::pair<StmtNum, std::string>> DesignExtractor::getIfPattern() {
+    return patternExtractor->getIfPattern();
+}
+
+std::unordered_set<std::pair<StmtNum, std::string>> DesignExtractor::getWhilePattern() {
+    return patternExtractor->getWhilePattern();
 }

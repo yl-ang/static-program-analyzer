@@ -24,5 +24,8 @@ public:
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> pattern;
     std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>> matchablePattern;
     std::unordered_set<std::pair<Procedure, Procedure>> calls;
+    std::unordered_set<std::pair<Procedure, StmtNum>> callStmts;
     std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> assignmentTraversals;
+    std::unordered_set<std::pair<StmtNum, std::string>> variablesInIfConditionExpr;
+    std::unordered_set<std::pair<StmtNum, std::string>> variablesInWhileConditionExpr;
 };
