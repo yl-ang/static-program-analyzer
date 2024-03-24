@@ -9,6 +9,8 @@ std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
         throw QPSSyntaxError();
     }
     parameters.pop_back();
+    assignSynonym = trim(assignSynonym);
+    parameters = trim(parameters);
 
     std::vector<std::string> parameterStringsToParse{assignSynonym};
     std::vector<std::string> cleanedParameters = splitByDelimiter(parameters, ",");
