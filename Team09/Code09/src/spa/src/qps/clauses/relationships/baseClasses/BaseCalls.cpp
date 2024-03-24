@@ -78,6 +78,11 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym callerSyn = dynamic_cast<Synonym&>(caller);
     Synonym calleeSyn = dynamic_cast<Synonym&>(callee);
 
+    std::vector<Synonym> synonyms{callerSyn, calleeSyn};
+    if (callerSyn == calleeSyn) {
+        return {synonyms, {}};
+    }
+
     SynonymValues callerValues{};
     SynonymValues calleeValues{};
     for (Procedure callerProc : reader.getProcedures()) {
@@ -88,7 +93,6 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
         }
     }
 
-    std::vector synonyms = {callerSyn, calleeSyn};
     std::vector values = {callerValues, calleeValues};
     return {synonyms, values};
 }
