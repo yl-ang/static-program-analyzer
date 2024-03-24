@@ -1,6 +1,7 @@
 #include "BaseNext.h"
 
 #include "qps/clauseArguments/Integer.h"
+#include "qps/clauses/ClauseEvaluatorUtils.h"
 
 BaseNext::BaseNext(ClauseArgument& currentStmt, ClauseArgument& nextStmt)
     : currentStmt(currentStmt), nextStmt(nextStmt) {}
@@ -61,10 +62,10 @@ ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
         std::unordered_set<StmtNum> stmtNums;
         if (currentStmtIsSynonym) {
             // Check that this stmt has nexter
-            stmtNums = getNexters(reader, stmtNum);
+            stmtNums = reader.getNexter(stmtNum);
         } else {
             // Check that this stmt has nextee
-            stmtNums = getNextees(reader, stmtNum);
+            stmtNums = reader.getNextee(stmtNum);
         }
 
         if (!stmtNums.empty()) {
@@ -92,18 +93,8 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
         return {syn, {}};
     }
 
-    std::vector<std::string> values{};
-    if (syn.getType() == DesignEntityType::STMT) {
-        for (StmtNum stmtNum : synonymStmtNums) {
-            values.push_back(std::to_string(stmtNum));
-        }
-    } else {
-        for (StmtNum stmtNum : synonymStmtNums) {
-            std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-            if (stmt.has_value() && stmt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]) {
-                values.push_back(std::to_string(stmtNum));
-            }
-        }
+    for (StmtNum stmtNum : ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)) {
+        values.push_back(std::to_string(stmtNum));
     }
 
     return {syn, values};
@@ -114,22 +105,21 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym nextSyn = dynamic_cast<Synonym&>(nextStmt);
 
     std::vector<Synonym> synonyms{currentSyn, nextSyn};
-    bool areSameSynonyms = currentSyn == nextSyn;
 
     SynonymValues currentSynValues{}, nextSynValues{};
 
-    for (const Stmt& currStmt : reader.getStmts()) {
-        if (currentSyn.getType() != DesignEntityType::STMT &&
-            currStmt.type != DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[currentSyn.getType()]) {
-            continue;
-        }
+    const std::vector<Stmt>& allStmts =
+        currentSyn.getType() != DesignEntityType::STMT
+            ? reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[currentSyn.getType()])
+            : reader.getStmts();
 
+    for (const Stmt& currStmt : allStmts {
         std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt.stmtNum);
         if (nexters.empty()) {
             continue;
         }
 
-        if (areSameSynonyms) {
+        if (currentSyn == nextSyn) {
             if (nexters.find(currStmt.stmtNum) != nexters.end()) {
                 currentSynValues.push_back(std::to_string(currStmt.stmtNum));
                 nextSynValues.push_back(std::to_string(currStmt.stmtNum));
@@ -138,18 +128,9 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
             continue;
         }
 
-        for (StmtNum nexter : nexters) {
-            if (nextSyn.getType() == DesignEntityType::STMT) {
-                currentSynValues.push_back(std::to_string(currStmt.stmtNum));
-                nextSynValues.push_back(std::to_string(nexter));
-            } else {
-                std::optional<Stmt> nexterStmt = reader.getStatementByStmtNum(nexter);
-                if (nexterStmt.has_value() &&
-                    nexterStmt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[nextSyn.getType()]) {
-                    currentSynValues.push_back(std::to_string(currStmt.stmtNum));
-                    nextSynValues.push_back(std::to_string(nexter));
-                }
-            }
+        for (StmtNum nexter : ClauseEvaluatorUtils::filterStatementsByType(reader, nextSyn.getType(), nexters)) {
+            currentSynValues.push_back(std::to_string(currStmt.stmtNum));
+            nextSynValues.push_back(std::to_string(nexter));
         }
     }
 
