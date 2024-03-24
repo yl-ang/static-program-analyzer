@@ -71,10 +71,16 @@ std::vector<Synonym> Table::getHeaders() const {
     return headers;
 }
 
-void Table::transformColumn(std::vector<Synonym> targetColumnHeaders, const ValueTransformer& transform) {
-    for (Row& row : rows) {
-        for (Synonym header : targetColumnHeaders) {
-            row[header.getValue()] = transform(header, row[header.getValue()]);
+void Table::projectNewColumn(std::vector<Synonym> newHeaders, const HeaderMatcher& matchTargetHeader,
+                             const ValueTransformer& valueTransform) {
+    for (const Synonym& newHeader : newHeaders) {
+        this->headers.push_back(newHeader);
+
+        Synonym projectionTargetHeader = matchTargetHeader(headers, newHeader);
+        for (size_t i = 0; i < rows.size(); i++) {
+            const SynonymValue valueToTransform = rows[i][projectionTargetHeader.getValue()];
+            const SynonymValue valueToInsert{valueTransform(newHeader, valueToTransform)};
+            rows[i][newHeader.getValue()] = valueToInsert;
         }
     }
 }

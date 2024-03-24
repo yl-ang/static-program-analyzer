@@ -14,6 +14,7 @@ using RowEntry = std::string;
 using Row = std::unordered_map<SynonymValue, RowEntry>;
 
 using ValueTransformer = std::function<SynonymValue(Synonym, SynonymValue)>;
+using HeaderMatcher = std::function<Synonym(std::vector<Synonym>, Synonym)>;
 
 /**
  * Table class to store the results of a query and perform operations on the results.
@@ -91,7 +92,7 @@ public:
      * \param synonyms The columns whose values must be transformed
      * \param transformer The transformer function
      */
-    void transformColumn(std::vector<Synonym> synonyms, const ValueTransformer& transformer);
+    void projectNewColumn(std::vector<Synonym>, const HeaderMatcher&, const ValueTransformer&);
 
     bool isSentinelTable() const;
     bool operator==(const Table&) const;
