@@ -93,11 +93,7 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
         return {syn, {}};
     }
 
-    for (StmtNum stmtNum : ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)) {
-        values.push_back(std::to_string(stmtNum));
-    }
-
-    return {syn, values};
+    return {syn, ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)};
 }
 
 ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
@@ -108,12 +104,12 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     SynonymValues currentSynValues{}, nextSynValues{};
 
-    const std::vector<Stmt>& allStmts =
+    const std::unordered_set<Stmt>& allStmts =
         currentSyn.getType() != DesignEntityType::STMT
             ? reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[currentSyn.getType()])
             : reader.getStmts();
 
-    for (const Stmt& currStmt : allStmts {
+    for (const Stmt& currStmt : allStmts) {
         std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt.stmtNum);
         if (nexters.empty()) {
             continue;
@@ -127,11 +123,13 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
             continue;
         }
+        std::vector nexterStmts = ClauseEvaluatorUtils::filterStatementsByType(reader, nextSyn.getType(), nexters);
 
-        for (StmtNum nexter : ClauseEvaluatorUtils::filterStatementsByType(reader, nextSyn.getType(), nexters)) {
-            currentSynValues.push_back(std::to_string(currStmt.stmtNum));
-            nextSynValues.push_back(std::to_string(nexter));
-        }
+        nextSynValues.reserve(nextSynValues.size() + nexterStmts.size());
+        nextSynValues.insert(nextSynValues.end(), nexterStmts.begin(), nexterStmts.end());
+
+        currentSynValues.reserve(currentSynValues.size() + nexterStmts.size());
+        currentSynValues.insert(currentSynValues.end(), nexterStmts.size(), std::to_string(currStmt.stmtNum));
     }
 
     std::vector<SynonymValues> synonymValues{currentSynValues, nextSynValues};

@@ -64,11 +64,13 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
                 varValues.push_back(var);
             }
         } else {
-            std::unordered_set<StmtNum> stmts = reader.getUsesStatementsByVariable(var);
-            for (StmtNum currStmt : ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), stmts)) {
-                userValues.push_back(std::to_string(currStmt));
-                varValues.push_back(var);
-            }
+            std::vector<std::string> userStmts = ClauseEvaluatorUtils::filterStatementsByType(
+                reader, userSyn.getType(), reader.getUsesStatementsByVariable(var));
+            userValues.reserve(userValues.size() + userStmts.size());
+            userValues.insert(userValues.end(), userStmts.begin(), userStmts.end());
+
+            varValues.reserve(varValues.size() + userStmts.size());
+            varValues.insert(varValues.end(), userStmts.size(), var);
         }
     }
 
@@ -91,20 +93,21 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
     if (userSyn.getType() == DesignEntityType::PROCEDURE) {
         for (Variable var : vars) {
             std::unordered_set<Procedure> users = reader.getUsesProceduresByVariable(var);
-            for (Procedure proc : users) {
-                values.push_back(proc);
-            }
+            values.reserve(users.size());
+            values.insert(values.end(), users.begin(), users.end());
         }
     } else {
         std::unordered_set<StmtNum> allStmts{};
         for (Variable var : vars) {
             std::unordered_set<StmtNum> users = reader.getUsesStatementsByVariable(var);
+            allStmts.reserve(users.size());
             allStmts.insert(users.begin(), users.end());
         }
 
-        for (StmtNum stmt : ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), allStmts)) {
-            values.push_back(std::to_string(stmt));
-        }
+        std::vector<std::string> stmts =
+            ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), allStmts);
+        values.reserve(stmts.size());
+        values.insert(values.end(), stmts.begin(), stmts.end());
     }
 
     return {userSyn, values};
