@@ -1,27 +1,24 @@
 #include "PatternStrategy.h"
 
 std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
-    std::smatch argMatch;
-    if (std::regex_search(str, argMatch, QPSRegexes::PATTERN_ARGS)) {
-        if (argMatch.suffix().matched) {
-            throw QPSSyntaxError();
-        }
-        std::string assignSynonym = argMatch[1];
-        std::string parameters = argMatch[2];
-
-        std::vector<std::string> parameterStringsToParse{assignSynonym};
-        std::vector<std::string> cleanedParameters = splitByDelimiter(parameters, ",");
-        Validator::validatePatternSyntax(assignSynonym, parameters);
-
-        parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(),
-                                       cleanedParameters.end());
-        std::vector<ClauseArgument*> entityVector{buildPatternParameters(parameterStringsToParse)};
-        std::unique_ptr<PatternClause> patternClause{std::make_unique<PatternClause>(
-            entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()))};
-        return patternClause;
-    } else {
+    std::string removedPattern = trim(str.substr(QPSConstants::PATTERN.size()));
+    std::string assignSynonym;
+    std::string parameters;
+    std::tie(assignSynonym, parameters) = substringUntilDelimiter(removedPattern, "(");
+    if (parameters.back() != ')') {
         throw QPSSyntaxError();
     }
+    parameters.pop_back();
+
+    std::vector<std::string> parameterStringsToParse{assignSynonym};
+    std::vector<std::string> cleanedParameters = splitByDelimiter(parameters, ",");
+    Validator::validatePatternSyntax(assignSynonym, parameters);
+
+    parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(), cleanedParameters.end());
+    std::vector<ClauseArgument*> entityVector{buildPatternParameters(parameterStringsToParse)};
+    std::unique_ptr<PatternClause> patternClause{
+        std::make_unique<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()))};
+    return patternClause;
 }
 
 std::vector<ClauseArgument*> PatternStrategy::buildPatternParameters(const std::vector<std::string>& strings) {
