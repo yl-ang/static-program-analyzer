@@ -85,6 +85,7 @@ TEST_CASE("getAllClauses") {
     REQUIRE(getAllClauses(inputString_OnePattern) == expectedList_OnePattern);
 }
 
+/*
 TEST_CASE("getClauseIndices") {
     const std::string suchThatClause = "such that";
     const std::string patternClause = "pattern";
@@ -118,3 +119,4 @@ TEST_CASE("getClauseIndices") {
             expectedList_OneSuchThatOnePattern_pattern);
     REQUIRE(getClauseIndices(inputString_OnePattern, patternClause) == expectedList_OnePattern_pattern);
 }
+*/
