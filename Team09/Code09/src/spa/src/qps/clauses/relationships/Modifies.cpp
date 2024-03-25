@@ -64,12 +64,13 @@ ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader) {
                 varValues.push_back(var);
             }
         } else {
-            std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
-            for (StmtNum currStmt :
-                 ClauseEvaluatorUtils::filterStatementsByType(reader, modifierSyn.getType(), stmts)) {
-                modifierValues.push_back(std::to_string(currStmt));
-                varValues.push_back(var);
-            }
+            std::vector<std::string> modifierStmts = ClauseEvaluatorUtils::filterStatementsByType(
+                reader, modifierSyn.getType(), reader.getModifiesStatementsByVariable(var));
+            modifierValues.reserve(modifierValues.size() + modifierStmts.size());
+            modifierValues.insert(modifierValues.end(), modifierStmts.begin(), modifierStmts.end());
+
+            varValues.reserve(varValues.size() + modifierStmts.size());
+            varValues.insert(varValues.end(), modifierStmts.size(), var);
         }
     }
 
@@ -102,10 +103,10 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
             std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
             allStmts.insert(stmts.begin(), stmts.end());
         }
-
-        for (StmtNum currStmt : ClauseEvaluatorUtils::filterStatementsByType(reader, modifierSyn.getType(), allStmts)) {
-            values.push_back(std::to_string(currStmt));
-        }
+        std::vector<std::string> stmts =
+            ClauseEvaluatorUtils::filterStatementsByType(reader, modifierSyn.getType(), allStmts);
+        values.reserve(stmts.size());
+        values.insert(values.end(), stmts.begin(), stmts.end());
     }
 
     return {modifierSyn, values};

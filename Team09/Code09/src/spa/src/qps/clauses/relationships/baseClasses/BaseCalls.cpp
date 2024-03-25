@@ -1,8 +1,8 @@
-#include "CallsStar.h"
+#include "BaseCalls.h"
 
-CallsStar::CallsStar(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
+BaseCalls::BaseCalls(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
 
-bool CallsStar::validateArguments() {
+bool BaseCalls::validateArguments() {
     if (caller.isSynonym()) {
         Synonym first = dynamic_cast<Synonym&>(caller);
         if (first.getType() != DesignEntityType::PROCEDURE) {
@@ -18,7 +18,11 @@ bool CallsStar::validateArguments() {
     return true;
 }
 
-ClauseResult CallsStar::evaluate(PKBFacadeReader& reader) {
+bool BaseCalls::isSimpleResult() const {
+    return !caller.isSynonym() && !callee.isSynonym();
+}
+
+ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader) {
     if (callee.isSynonym() && caller.isSynonym()) {
         return evaluateBothSynonyms(reader);
     }
@@ -31,10 +35,10 @@ ClauseResult CallsStar::evaluate(PKBFacadeReader& reader) {
         return evaluateCallerSynonym(reader);
     }
 
-    return {reader.hasCallStarRelationship(caller, callee)};
+    return {hasCallRelationship(reader)};
 }
 
-ClauseResult CallsStar::evaluateCalleeSynonym(PKBFacadeReader& reader) {
+ClauseResult BaseCalls::evaluateCalleeSynonym(PKBFacadeReader& reader) {
     std::unordered_set<Procedure> callers{};
     if (caller.isWildcard()) {
         callers = reader.getProcedures();
@@ -44,7 +48,7 @@ ClauseResult CallsStar::evaluateCalleeSynonym(PKBFacadeReader& reader) {
 
     SynonymValues values{};
     for (Procedure callerProc : callers) {
-        const std::unordered_set<std::string>& callees = reader.getCalleeStar(callerProc);
+        const std::unordered_set<std::string>& callees = getCallee(reader, callerProc);
         values.insert(values.end(), callees.begin(), callees.end());
     }
 
@@ -52,7 +56,7 @@ ClauseResult CallsStar::evaluateCalleeSynonym(PKBFacadeReader& reader) {
     return {syn, values};
 }
 
-ClauseResult CallsStar::evaluateCallerSynonym(PKBFacadeReader& reader) {
+ClauseResult BaseCalls::evaluateCallerSynonym(PKBFacadeReader& reader) {
     std::unordered_set<Procedure> callees{};
     if (callee.isWildcard()) {
         callees = reader.getProcedures();
@@ -62,7 +66,7 @@ ClauseResult CallsStar::evaluateCallerSynonym(PKBFacadeReader& reader) {
 
     SynonymValues values{};
     for (Procedure calleeProc : callees) {
-        const std::unordered_set<std::string>& callers = reader.getCallerStar(calleeProc);
+        const std::unordered_set<std::string>& callers = getCaller(reader, calleeProc);
         values.insert(values.end(), callers.begin(), callers.end());
     }
 
@@ -70,7 +74,7 @@ ClauseResult CallsStar::evaluateCallerSynonym(PKBFacadeReader& reader) {
     return {syn, values};
 }
 
-ClauseResult CallsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym callerSyn = dynamic_cast<Synonym&>(caller);
     Synonym calleeSyn = dynamic_cast<Synonym&>(callee);
 
@@ -82,7 +86,7 @@ ClauseResult CallsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues callerValues{};
     SynonymValues calleeValues{};
     for (Procedure callerProc : reader.getProcedures()) {
-        const auto& callees = reader.getCalleeStar(callerProc);
+        const auto& callees = getCallee(reader, callerProc);
         for (const auto& calleeProc : callees) {
             callerValues.push_back(callerProc);
             calleeValues.push_back(calleeProc);
@@ -91,8 +95,4 @@ ClauseResult CallsStar::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     std::vector values = {callerValues, calleeValues};
     return {synonyms, values};
-}
-
-bool CallsStar::isSimpleResult() const {
-    return !callee.isSynonym() && !caller.isSynonym();
 }

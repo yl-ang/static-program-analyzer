@@ -7,7 +7,7 @@
 
 class ClauseEvaluatorUtils {
 public:
-    static std::unordered_set<StmtNum> filterStatementsByType(PKBFacadeReader&, DesignEntityType,
-                                                              std::unordered_set<StmtNum>);
+    static std::vector<std::string> filterStatementsByType(PKBFacadeReader&, DesignEntityType,
+                                                           std::unordered_set<StmtNum>);
     static bool isIdentLiteral(const std::string& str);
 };

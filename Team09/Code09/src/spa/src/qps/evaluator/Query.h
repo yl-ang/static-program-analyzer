@@ -30,9 +30,11 @@ private:
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
                                        PKBFacadeReader& pkb);
     static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
+    static Synonym headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym);
 
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
+    void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
     void buildAndJoinSelectTable(const TableManager&, const PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;

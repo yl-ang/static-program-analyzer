@@ -46,11 +46,14 @@ public:
     bool isSynonym() const override;
     std::string getClauseType() const override;
     DesignEntityType getType() const;
+    std::string getName() const;
     std::string getValue() const override;
     std::optional<SynonymAttributeType> getAttr() const;
     static std::string entityTypeToString(DesignEntityType);
     bool updateType(SynonymStore* synonyms);
-    void print();
     bool operator==(const ClauseArgument& other) const override;
     bool validateAttribute() const;
+
+    // Checks that the other Synonym has the same type and value, regardless of attribute.
+    bool equalSynonymValue(const Synonym& other) const;
 };

@@ -45,7 +45,19 @@ DesignEntityType Synonym::getType() const {
     return type;
 }
 
+std::string Synonym::getName() const {
+    return name;
+}
+
 std::string Synonym::getValue() const {
+    if (getAttr().has_value()) {
+        const auto it = std::find_if(STRING_TO_ATTRIBUTE_MAP.begin(), STRING_TO_ATTRIBUTE_MAP.end(),
+                                     [this](const std::pair<std::string, SynonymAttributeType>& pair) {
+                                         return pair.second == this->getAttr().value();
+                                     });
+
+        return name + "." + it->first;
+    }
     return name;
 }
 
@@ -55,12 +67,12 @@ bool Synonym::operator==(const ClauseArgument& other) const {
         return false;
     }
 
-    return this->getType() == (*synonym).getType() && this->getValue() == (*synonym).getValue() &&
-           this->getAttr() == (*synonym).getAttr();
+    return this->getType() == synonym->getType() && this->getValue() == synonym->getValue() &&
+           this->getAttr() == synonym->getAttr();
 }
 
-void Synonym::print() {
-    std::cout << "type, name: " << Synonym::entityTypeToString(type) << ", " << name << "\n";
+bool Synonym::equalSynonymValue(const Synonym& other) const {
+    return this->getType() == other.getType() && this->getName() == other.getName();
 }
 
 bool Synonym::isSynonym() const {

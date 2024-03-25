@@ -36,10 +36,31 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
                                       : std::vector{QPSConstants::TRUE_STRING};
     }
 
-    const ValueTransformer transformer = projectSynonymAttributesTransformer(pkb);
-    tableManager.projectAttributes(transformer);
-
+    projectAttributes(tableManager, pkb);
     return tableManager.extractResults(selectEntities);
+}
+
+void Query::projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const {
+    std::vector<Synonym> synonymsWithAttributes{};
+
+    for (Synonym syn : selectEntities) {
+        if (syn.getAttr().has_value()) {
+            synonymsWithAttributes.push_back(syn);
+        }
+    }
+
+    tm.projectAttributes(synonymsWithAttributes, headerMatcher, projectSynonymAttributesTransformer(pkb));
+}
+
+Synonym Query::headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym) {
+    auto it = std::find_if(synonyms.begin(), synonyms.end(), [&newSynonym](const Synonym& existingSynonym) {
+        return newSynonym.equalSynonymValue(existingSynonym);
+    });
+
+    if (it == synonyms.end()) {
+        throw Exception("Attempting to access attribute of non-existent synonym");
+    }
+    return *it;
 }
 
 ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb) {
@@ -187,27 +208,27 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, const PKBFacadeReade
     }
 
     for (Synonym entity : selectEntities) {
-        ColumnData row{};
+        ColumnData col{};
 
         switch (entity.getType()) {
         case DesignEntityType::VARIABLE:
             for (std::string var : pkb.getVariables()) {
-                row.push_back(var);
+                col.push_back(var);
             }
             break;
         case DesignEntityType::CONSTANT:
             for (std::string con : pkb.getConstants()) {
-                row.push_back(con);
+                col.push_back(con);
             }
             break;
         case DesignEntityType::PROCEDURE:
             for (std::string prod : pkb.getProcedures()) {
-                row.push_back(prod);
+                col.push_back(prod);
             }
             break;
         case DesignEntityType::STMT:
             for (Stmt stmt : pkb.getStmts()) {
-                row.push_back(std::to_string(stmt.stmtNum));
+                col.push_back(std::to_string(stmt.stmtNum));
             }
             break;
         case DesignEntityType::READ:
@@ -217,10 +238,14 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, const PKBFacadeReade
         case DesignEntityType::WHILE:
         case DesignEntityType::IF:
             for (Stmt stmt : pkb.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[entity.getType()])) {
-                row.push_back(std::to_string(stmt.stmtNum));
+                col.push_back(std::to_string(stmt.stmtNum));
             }
             break;
         }
-        tm.join(ClauseResult{entity, row});
+
+        // We only want synonyms without their attributes attached to them when building the Select table,
+        // because we are storing their synonym values in this table rather than their attributes.
+        Synonym header = entity.getAttr().has_value() ? Synonym{entity.getType(), entity.getName()} : entity;
+        tm.join(ClauseResult{header, col});
     }
 }
