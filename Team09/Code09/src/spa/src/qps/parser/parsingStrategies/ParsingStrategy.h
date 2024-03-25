@@ -8,7 +8,6 @@
 #include "../../QPSRegexes.h"
 #include "../../clauses/QueryClause.h"
 #include "../../exceptions/Exception.h"
-#include "StrategyUtils.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/ExpressionSpec.h"
 #include "qps/clauseArguments/Integer.h"

@@ -123,26 +123,6 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     return clauses;
 }
 
-std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
-    size_t offset = 0;
-    size_t clauseIndex = str.find(clause, offset);
-
-    // no such clause found
-    if (clauseIndex == std::string::npos) {
-        return {};
-    }
-
-    std::vector<size_t> clausePositionList = {};
-    while (clauseIndex != std::string::npos) {
-        clausePositionList.push_back(clauseIndex);
-
-        offset = clauseIndex + 1;
-        clauseIndex = str.find(clause, offset);
-    }
-
-    return clausePositionList;
-}
-
 std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {
     std::vector<size_t> indices;
     auto words_begin = std::sregex_iterator(str.begin(), str.end(), regexPattern);

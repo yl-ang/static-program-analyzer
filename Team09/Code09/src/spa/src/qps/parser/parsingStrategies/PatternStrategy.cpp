@@ -100,7 +100,7 @@ std::vector<ClauseArgument*> PatternStrategy::buildThreeParameters(const std::ve
         throw QPSSyntaxError();
     }
 
-    // third argument is wildcard
+    // last argument is wildcard
     if (isWildcard(wildcard2)) {
         results.push_back(new Wildcard());
     } else {
