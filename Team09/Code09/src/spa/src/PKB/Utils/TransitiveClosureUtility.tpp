@@ -6,9 +6,8 @@ void TransitiveClosureUtility<KeyType>::computeTransitiveClosure(
     // Precompute the closure for each key pair
     for (auto& entry : *starMap) {
         KeyType s1 = entry.first;
-        std::unordered_set<KeyType> closure;
+        std::unordered_set<KeyType>& closure = entry.second;
         computeClosureForKey(s1, &closure, starMap);
-        entry.second = closure;
     }
 }
 
