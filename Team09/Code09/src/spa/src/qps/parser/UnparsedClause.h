@@ -6,7 +6,6 @@
 #include "../clauses/QueryClause.h"
 #include "parsingStrategies/ParsingStrategy.h"
 #include "parsingStrategies/PatternStrategy.h"
-#include "parsingStrategies/StrategyUtils.h"
 #include "parsingStrategies/SuchThatStrategy.h"
 
 class UnparsedClause {
