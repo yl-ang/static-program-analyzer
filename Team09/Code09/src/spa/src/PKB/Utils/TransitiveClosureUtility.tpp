@@ -3,22 +3,33 @@ void TransitiveClosureUtility<KeyType>::computeTransitiveClosure(
         std::unordered_map<KeyType, std::unordered_set<KeyType>>* starMap) {
     int size = starMap->size();
 
-    for (int k = 1; k <= size; ++k) {
-        for (const auto& entry : *starMap) {
-            KeyType s1 = entry.first;
-            for (const auto& s2 : entry.second) {
-                updateTransitiveClosure(s1, s2, starMap);
-            }
-        }
+    // Precompute the closure for each key pair
+    for (auto& entry : *starMap) {
+        KeyType s1 = entry.first;
+        std::unordered_set<KeyType>& closure = entry.second;
+        computeClosureForKey(s1, &closure, starMap);
     }
 }
 
 template<typename KeyType>
-void TransitiveClosureUtility<KeyType>::updateTransitiveClosure(
-        KeyType s1, KeyType s2, std::unordered_map<KeyType, std::unordered_set<KeyType>>* starMap) {
-    if (starMap->count(s2)) {
-        for (const auto& s3 : (*starMap)[s2]) {
-            (*starMap)[s1].insert(s3);
+void TransitiveClosureUtility<KeyType>::computeClosureForKey(
+        KeyType startNode, std::unordered_set<KeyType>* reachableNodes,
+        std::unordered_map<KeyType, std::unordered_set<KeyType>>* starMap) {
+    std::stack<KeyType> stack;
+    std::unordered_set<KeyType> visited;
+
+    stack.push(startNode);
+    visited.insert(startNode);
+
+    while (!stack.empty()) {
+        KeyType current = stack.top();
+        stack.pop();
+        for (const auto& next : (*starMap)[current]) {
+            if (visited.find(next) == visited.end()) {
+                reachableNodes->insert(next);
+                stack.push(next);
+                visited.insert(next);
+            }
         }
     }
 }
