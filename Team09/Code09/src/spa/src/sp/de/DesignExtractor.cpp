@@ -15,7 +15,6 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
     writer->setProcedureModifiesStore(getProcedureModifies());
     writer->setStatementUsesStore(getUses());
     writer->setProcedureUsesStore(getProcedureUses());
-    writer->setPatternStore(getPattern());
     writer->setNextStore(getNext());
     writer->setCallStore(getCalls());
     writer->setCallStmtStore(getCallStmts());
