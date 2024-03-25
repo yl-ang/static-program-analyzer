@@ -56,10 +56,6 @@ void PatternExtractor::visitAssign(AssignmentNode* node) {
     this->assignmentTraversals.insert({stmtNum, {treeLHS, treeRHS}});
 }
 
-std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> PatternExtractor::getPattern() {
-    return this->pattern;
-}
-
 std::unordered_map<StmtNum, std::pair<std::string, std::shared_ptr<Matchable>>>
 PatternExtractor::getMatchablePattern() {
     return this->matchablePattern;
