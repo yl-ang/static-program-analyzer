@@ -111,10 +111,6 @@ std::unordered_set<std::pair<Procedure, Variable>> DesignExtractor::getProcedure
     return modifiesExtractor->getProcedureModifies();
 }
 
-std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> DesignExtractor::getPattern() {
-    return patternExtractor->getPattern();
-}
-
 std::unordered_set<std::pair<StmtNum, StmtNum>> DesignExtractor::getNext() {
     return nextExtractor->getNextRelationships();
 }
