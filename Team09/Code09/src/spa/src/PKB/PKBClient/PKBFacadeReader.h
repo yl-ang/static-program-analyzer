@@ -14,9 +14,6 @@ public:
     [[nodiscard]] std::unordered_set<Variable> getVariables() const;
     [[nodiscard]] std::unordered_set<Constant> getConstants() const;
     [[nodiscard]] std::unordered_set<Procedure> getProcedures() const;
-    [[nodiscard]] bool containsVariable(const Variable& variable) const;
-    [[nodiscard]] bool containsConstant(const Constant& constant) const;
-    [[nodiscard]] bool containsProcedure(const Procedure& procedure) const;
 
     // Getters for Statements
     [[nodiscard]] std::unordered_set<Stmt> getStmts() const;
@@ -28,8 +25,6 @@ public:
     std::optional<StmtNum> getFollowee(StmtNum s2);
     std::unordered_set<StmtNum> getFollowersStar(StmtNum s);
     std::unordered_set<StmtNum> getFolloweesStar(StmtNum s);
-    bool hasFollowRelationship(StmtNum s1, StmtNum s2);
-    bool hasFollowStarRelationship(StmtNum s1, StmtNum s2);
     bool hasFollowRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasFollowStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
@@ -63,19 +58,12 @@ public:
     [[nodiscard]] std::unordered_set<Procedure> getUsesProceduresByVariable(const Variable& variable) const;
     [[nodiscard]] bool hasProcedureVariableUseRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
-    // TODO(yl-ang): REMOVE AFTER ASSIGN PATTERN STORE IS DONE
-    // Getters for PatternStore
-    [[nodiscard]] bool hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs);
-    [[nodiscard]] bool hasPattern(StmtNum stmtNum, ClauseArgument& arg1, ClauseArgument& arg2);
-
     // Getters for NextStore
     [[nodiscard]] std::unordered_set<StmtNum> getNexter(StmtNum nextee);
     [[nodiscard]] std::unordered_set<StmtNum> getNextee(StmtNum nexter);
     [[nodiscard]] std::unordered_set<StmtNum> getNexterStar(StmtNum nextee);
     [[nodiscard]] std::unordered_set<StmtNum> getNexteeStar(StmtNum nexter);
-    [[nodiscard]] bool hasNextRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
-    [[nodiscard]] bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for CallStore (Call and Call relationships)
