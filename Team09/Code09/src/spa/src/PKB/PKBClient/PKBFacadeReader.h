@@ -25,6 +25,8 @@ public:
     std::optional<StmtNum> getFollowee(StmtNum s2);
     std::unordered_set<StmtNum> getFollowersStar(StmtNum s);
     std::unordered_set<StmtNum> getFolloweesStar(StmtNum s);
+    bool hasFollowRelationship(StmtNum s1, StmtNum s2);
+    bool hasFollowStarRelationship(StmtNum s1, StmtNum s2);
     bool hasFollowRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasFollowStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
@@ -63,7 +65,9 @@ public:
     [[nodiscard]] std::unordered_set<StmtNum> getNextee(StmtNum nexter);
     [[nodiscard]] std::unordered_set<StmtNum> getNexterStar(StmtNum nextee);
     [[nodiscard]] std::unordered_set<StmtNum> getNexteeStar(StmtNum nexter);
+    [[nodiscard]] bool hasNextRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
+    [[nodiscard]] bool hasNextStarRelationship(StmtNum s1, StmtNum s2);
     [[nodiscard]] bool hasNextStarRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
 
     // Getters for CallStore (Call and Call relationships)

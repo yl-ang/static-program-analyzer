@@ -46,6 +46,14 @@ std::unordered_set<StmtNum> PKBFacadeReader::getFolloweesStar(StmtNum s) {
     return pkbReference->followsStore->getFolloweesStar(s);
 }
 
+bool PKBFacadeReader::hasFollowRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->followsStore->hasFollowRelationship(s1, s2);
+}
+
+bool PKBFacadeReader::hasFollowStarRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->followsStore->hasFollowStarRelationship(s1, s2);
+}
+
 bool PKBFacadeReader::hasFollowRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->followsStore->hasFollowRelationship(arg1, arg2);
 }
@@ -142,6 +150,10 @@ std::unordered_set<StmtNum> PKBFacadeReader::getNextee(StmtNum nexter) {
     return pkbReference->nextStore->getNextee(nexter);
 }
 
+bool PKBFacadeReader::hasNextRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+}
+
 bool PKBFacadeReader::hasNextRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->nextStore->hasNextRelationship(arg1, arg2);
 }
@@ -152,6 +164,10 @@ std::unordered_set<StmtNum> PKBFacadeReader::getNexterStar(StmtNum nextee) {
 
 std::unordered_set<StmtNum> PKBFacadeReader::getNexteeStar(StmtNum nexter) {
     return pkbReference->nextStore->getNexteeStar(nexter);
+}
+
+bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
+    return pkbReference->nextStore->hasNextRelationship(s1, s2);
 }
 
 bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
