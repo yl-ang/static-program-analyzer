@@ -17,6 +17,9 @@ private:
     ClauseResult evaluateWildcardInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
+    bool checkSynonym(ClauseArgument& clauseArgument);
+    bool checkAssign(ClauseArgument& clauseArgument);
+
 protected:
     std::unordered_set<StmtNum> Affects::getNextStmtNums(const std::pair<Variable, StmtNum>&, PKBFacadeReader&);
     std::unordered_set<std::pair<Variable, StmtNum>> getAssignStatements(PKBFacadeReader&);
