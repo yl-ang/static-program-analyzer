@@ -1,7 +1,5 @@
 #include "ExpressionNode.h"
 
-#include <stdexcept>
-
 #include "ConstantNode.h"
 #include "VariableNode.h"
 
@@ -51,12 +49,4 @@ void ExpressionNode::findConstants(const std::vector<std::shared_ptr<ASTNode>>& 
         // Recursively traverse child nodes
         findConstants(child->getChildren());
     }
-}
-
-bool ExpressionNode::match(std::shared_ptr<Matchable> input) {
-    if (auto expressionNodePtr = std::dynamic_pointer_cast<ExpressionNode>(input)) {
-        return *this == *expressionNodePtr;
-    }
-
-    return false;
 }

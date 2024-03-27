@@ -6,13 +6,12 @@
 
 #include "sp/Utils.h"
 #include "sp/ast/AstNode.h"
-#include "sp/ast/Matchable.h"
 
 /*
 Covers every expression including conditionals. Since NOT is a single conditional with 1 child, the right child becomes
 a nullptr when called with the appropriate constructor. In otherwords, expression node will always have a left child.
 */
-class ExpressionNode : public ASTNode, public Matchable {
+class ExpressionNode : public ASTNode {
 private:
     std::vector<std::string> variables;
     std::vector<std::string> constants;
@@ -49,7 +48,4 @@ public:
 
     void findVariables(const std::vector<std::shared_ptr<ASTNode>>& children);
     void findConstants(const std::vector<std::shared_ptr<ASTNode>>& children);
-
-    // Matchable interface
-    bool match(std::shared_ptr<Matchable> input) override;
 };
