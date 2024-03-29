@@ -9,11 +9,12 @@
 
 class CallsStar : public BaseCalls {
 public:
-    CallsStar(ClauseArgument& caller, ClauseArgument& callee) : BaseCalls(caller, callee) {}
+    CallsStar(std::shared_ptr<ClauseArgument> caller, std::shared_ptr<ClauseArgument> callee)
+        : BaseCalls(caller, callee) {}
 
 private:
     bool hasCallRelationship(PKBFacadeReader& reader) override {
-        return reader.hasCallStarRelationship(this->caller, this->callee);
+        return reader.hasCallStarRelationship(*caller, *callee);
     }
 
     ProcedureSet getCallee(PKBFacadeReader& reader, const Procedure& caller) override {

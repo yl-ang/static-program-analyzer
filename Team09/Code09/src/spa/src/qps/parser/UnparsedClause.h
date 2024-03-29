@@ -15,5 +15,5 @@ private:
 
 public:
     UnparsedClause(std::string str, std::unique_ptr<ParsingStrategy>&& strategy);
-    std::unique_ptr<QueryClause> execute();
+    std::shared_ptr<QueryClause> execute();
 };

@@ -1,6 +1,6 @@
 #include "PatternStrategy.h"
 
-std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
+std::shared_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     std::string removedPattern = trim(str.substr(QPSConstants::PATTERN.size()));
     std::string assignSynonym;
     std::string parameters;
@@ -17,13 +17,14 @@ std::unique_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     Validator::validatePatternSyntax(assignSynonym, parameters);
 
     parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(), cleanedParameters.end());
-    std::vector<ClauseArgument*> entityVector{buildPatternParameters(parameterStringsToParse)};
-    std::unique_ptr<PatternClause> patternClause{
-        std::make_unique<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()))};
+    std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildPatternParameters(parameterStringsToParse)};
+    std::shared_ptr<PatternClause> patternClause{
+        std::make_shared<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()))};
     return patternClause;
 }
 
-std::vector<ClauseArgument*> PatternStrategy::buildPatternParameters(const std::vector<std::string>& strings) {
+std::vector<std::shared_ptr<ClauseArgument>> PatternStrategy::buildPatternParameters(
+    const std::vector<std::string>& strings) {
     if (strings.size() == 3) {
         return buildTwoParameters(strings);
     } else if (strings.size() == 4) {
@@ -39,40 +40,42 @@ std::vector<ClauseArgument*> PatternStrategy::buildPatternParameters(const std::
  * second parameter is always entRef
  * third parameter is either wildcard or expression spec
  */
-std::vector<ClauseArgument*> PatternStrategy::buildTwoParameters(const std::vector<std::string>& strings) {
-    std::vector<ClauseArgument*> results{};
+std::vector<std::shared_ptr<ClauseArgument>> PatternStrategy::buildTwoParameters(
+    const std::vector<std::string>& strings) {
+    std::vector<std::shared_ptr<ClauseArgument>> results{};
 
     std::string ptSynonym = strings[0];
     std::string ptEntRef = strings[1];
     std::string ptExpressionSpec = strings[2];
 
     // first argument is synonym
-    results.push_back(new Synonym(DesignEntityType::UNKNOWN, ptSynonym));
+    results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, ptSynonym));
 
     // second argument is ent-ref
     if (isWildcard(ptEntRef)) {
-        results.push_back(new Wildcard());
+        results.push_back(std::make_shared<Wildcard>());
     } else if (isQuotedIdent(ptEntRef)) {
-        results.push_back(new Literal(cleanQuotedIdent(ptEntRef)));
+        results.push_back(std::make_shared<Literal>(cleanQuotedIdent(ptEntRef)));
     } else if (isSynonym(ptEntRef)) {
-        results.push_back(new Synonym(DesignEntityType::UNKNOWN, ptEntRef));
+        results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, ptEntRef));
     } else {
         throw QPSSyntaxError();
     }
 
     // third argument is expression-spec OR wildcard
     if (isWildcard(ptExpressionSpec)) {
-        results.push_back(new Wildcard());
+        results.push_back(std::make_shared<Wildcard>());
     } else if (isExpressionSpec(ptExpressionSpec)) {
-        results.push_back(new ExpressionSpec(removeCharsFrom(ptExpressionSpec, QPSConstants::SPACE)));
+        results.push_back(std::make_shared<ExpressionSpec>(removeCharsFrom(ptExpressionSpec, QPSConstants::SPACE)));
     } else {
         throw QPSSyntaxError();
     }
     return results;
 }
 
-std::vector<ClauseArgument*> PatternStrategy::buildThreeParameters(const std::vector<std::string>& strings) {
-    std::vector<ClauseArgument*> results{};
+std::vector<std::shared_ptr<ClauseArgument>> PatternStrategy::buildThreeParameters(
+    const std::vector<std::string>& strings) {
+    std::vector<std::shared_ptr<ClauseArgument>> results{};
 
     std::string ptSynonym = strings[0];
     std::string ptEntRef = strings[1];
@@ -80,29 +83,29 @@ std::vector<ClauseArgument*> PatternStrategy::buildThreeParameters(const std::ve
     std::string wildcard2 = strings[3];
 
     // first argument is synonym
-    results.push_back(new Synonym(DesignEntityType::UNKNOWN, ptSynonym));
+    results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, ptSynonym));
 
     // second argument is ent-ref
     if (isWildcard(ptEntRef)) {
-        results.push_back(new Wildcard());
+        results.push_back(std::make_shared<Wildcard>());
     } else if (isQuotedIdent(ptEntRef)) {
-        results.push_back(new Literal(cleanQuotedIdent(ptEntRef)));
+        results.push_back(std::make_shared<Literal>(cleanQuotedIdent(ptEntRef)));
     } else if (isSynonym(ptEntRef)) {
-        results.push_back(new Synonym(DesignEntityType::UNKNOWN, ptEntRef));
+        results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, ptEntRef));
     } else {
         throw QPSSyntaxError();
     }
 
     // third argument is wildcard
     if (isWildcard(wildcard1)) {
-        results.push_back(new Wildcard());
+        results.push_back(std::make_shared<Wildcard>());
     } else {
         throw QPSSyntaxError();
     }
 
     // last argument is wildcard
     if (isWildcard(wildcard2)) {
-        results.push_back(new Wildcard());
+        results.push_back(std::make_shared<Wildcard>());
     } else {
         throw QPSSyntaxError();
     }

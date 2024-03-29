@@ -6,8 +6,8 @@ using StmtSet = std::unordered_set<StmtNum>;
 
 class BaseFollows : public Relationship {
 protected:
-    ClauseArgument& followee;
-    ClauseArgument& follower;
+    std::shared_ptr<ClauseArgument> followee;
+    std::shared_ptr<ClauseArgument> follower;
 
 private:
     bool isSimpleResult() const;
@@ -21,7 +21,7 @@ private:
     virtual StmtSet getFollowees(PKBFacadeReader&, const StmtNum&) = 0;
 
 public:
-    BaseFollows(ClauseArgument&, ClauseArgument&);
+    BaseFollows(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

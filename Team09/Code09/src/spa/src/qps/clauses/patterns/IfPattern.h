@@ -7,16 +7,16 @@
 
 class IfPattern : public Pattern {
 private:
-    ClauseArgument& ifSyn;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
-    ClauseArgument& thirdArg;
+    std::shared_ptr<ClauseArgument> ifSyn;
+    std::shared_ptr<ClauseArgument> firstArg;
+    std::shared_ptr<ClauseArgument> secondArg;
+    std::shared_ptr<ClauseArgument> thirdArg;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
     ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
 
 public:
-    IfPattern(ClauseArgument* ifSyn, std::vector<ClauseArgument*> args);
+    IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
 };

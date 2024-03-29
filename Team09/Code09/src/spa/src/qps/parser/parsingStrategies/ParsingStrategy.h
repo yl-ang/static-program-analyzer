@@ -18,5 +18,5 @@
 class ParsingStrategy {
 public:
     virtual ~ParsingStrategy(){};
-    virtual std::unique_ptr<QueryClause> execute(std::string str) const = 0;
+    virtual std::shared_ptr<QueryClause> execute(std::string str) const = 0;
 };

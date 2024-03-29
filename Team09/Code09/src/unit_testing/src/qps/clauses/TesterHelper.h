@@ -15,7 +15,7 @@ public:  // NOLINT
         : pkb{pkb},
           firstArg{firstArg},
           secondArg{secondArg},
-          result{SuchThatClause(rsType, firstArg, secondArg).evaluate(pkb)} {}
+          result{std::make_shared<SuchThatClause>(rsType, firstArg, secondArg)->evaluate(pkb)} {}
 
     void testBoolean(bool expected) {
         REQUIRE(result.isBoolean());

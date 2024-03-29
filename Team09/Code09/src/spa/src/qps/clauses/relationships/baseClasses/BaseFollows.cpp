@@ -2,20 +2,21 @@
 
 #include "qps/clauseArguments/Integer.h"
 
-BaseFollows::BaseFollows(ClauseArgument& followee, ClauseArgument& follower) : followee(followee), follower(follower) {}
+BaseFollows::BaseFollows(std::shared_ptr<ClauseArgument> followee, std::shared_ptr<ClauseArgument> follower)
+    : followee(followee), follower(follower) {}
 
 bool BaseFollows::validateArguments() {
-    if (followee.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(followee);
-        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
-            first.getType() == DesignEntityType::PROCEDURE) {
+    if (followee->isSynonym()) {
+        std::shared_ptr<Synonym> first = std::dynamic_pointer_cast<Synonym>(followee);
+        if (first->getType() == DesignEntityType::VARIABLE || first->getType() == DesignEntityType::CONSTANT ||
+            first->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
-    if (follower.isSynonym()) {
-        Synonym second = dynamic_cast<Synonym&>(follower);
-        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
-            second.getType() == DesignEntityType::PROCEDURE) {
+    if (follower->isSynonym()) {
+        std::shared_ptr<Synonym> second = std::dynamic_pointer_cast<Synonym>(follower);
+        if (second->getType() == DesignEntityType::VARIABLE || second->getType() == DesignEntityType::CONSTANT ||
+            second->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
@@ -27,11 +28,11 @@ ClauseResult BaseFollows::evaluate(PKBFacadeReader& reader) {
         return {hasFollowRelationship(reader)};
     }
 
-    if ((followee.isSynonym() && follower.isWildcard()) || (followee.isWildcard() && follower.isSynonym())) {
+    if ((followee->isSynonym() && follower->isWildcard()) || (followee->isWildcard() && follower->isSynonym())) {
         return evaluateSynonymWildcard(reader);
     }
 
-    if ((followee.isSynonym() && follower.isInteger()) || (followee.isInteger() && follower.isSynonym())) {
+    if ((followee->isSynonym() && follower->isInteger()) || (followee->isInteger() && follower->isSynonym())) {
         return evaluateSynonymInteger(reader);
     }
 
@@ -39,12 +40,12 @@ ClauseResult BaseFollows::evaluate(PKBFacadeReader& reader) {
 }
 
 bool BaseFollows::isSimpleResult() const {
-    return !followee.isSynonym() && !follower.isSynonym();
+    return !followee->isSynonym() && !follower->isSynonym();
 }
 
 ClauseResult BaseFollows::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    bool followeeIsSynonym = followee.isSynonym();
-    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
+    bool followeeIsSynonym = followee->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(followeeIsSynonym ? this->followee : this->follower);
 
     std::unordered_set<Stmt> allStmts{};
 
@@ -75,21 +76,15 @@ ClauseResult BaseFollows::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseFollows::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    bool followeeIsSynonym = followee.isSynonym();
-    Synonym syn = dynamic_cast<Synonym&>(followeeIsSynonym ? this->followee : this->follower);
-    Integer integer = dynamic_cast<Integer&>(followeeIsSynonym ? this->follower : this->followee);
+    bool followeeIsSynonym = followee->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(followeeIsSynonym ? this->followee : this->follower);
+    StmtNum stmtNum = std::stoi(followeeIsSynonym ? this->follower->getValue() : this->followee->getValue());
 
-    StmtNum stmtNum = std::stoi(integer.getValue());
     std::unordered_set<StmtNum> stmtNums;
     if (followeeIsSynonym) {
         stmtNums = getFollowees(reader, stmtNum);
     } else {
         stmtNums = getFollowers(reader, stmtNum);
-    }
-
-    // TODO(Ezekiel): Can remove this redundant
-    if (stmtNums.empty()) {
-        return {syn, {}};
     }
 
     if (syn.getType() == DesignEntityType::STMT) {
@@ -116,8 +111,8 @@ ClauseResult BaseFollows::evaluateSynonymInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseFollows::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym followeeSyn = dynamic_cast<Synonym&>(followee);
-    Synonym followerSyn = dynamic_cast<Synonym&>(follower);
+    Synonym followeeSyn = *std::dynamic_pointer_cast<Synonym>(followee);
+    Synonym followerSyn = *std::dynamic_pointer_cast<Synonym>(follower);
 
     std::vector<Synonym> synonyms = {followeeSyn, followerSyn};
     if (followeeSyn == followerSyn) {
@@ -132,7 +127,7 @@ ClauseResult BaseFollows::evaluateBothSynonyms(PKBFacadeReader& reader) {
             DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[followeeSyn.getType()] != followee.type) {
             continue;
         }
-        std::unordered_set followers{getFollowers(reader, followee.stmtNum)};
+        StmtSet followers{getFollowers(reader, followee.stmtNum)};
         for (StmtNum followerStmtNum : followers) {
             std::optional<Stmt> followerStmtOpt = reader.getStatementByStmtNum(followerStmtNum);
             if (followerSyn.getType() == DesignEntityType::STMT ||

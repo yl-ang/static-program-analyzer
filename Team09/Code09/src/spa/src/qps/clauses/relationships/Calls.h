@@ -7,11 +7,11 @@
 
 class Calls : public BaseCalls {
 public:
-    Calls(ClauseArgument& caller, ClauseArgument& callee) : BaseCalls(caller, callee) {}
+    Calls(std::shared_ptr<ClauseArgument> caller, std::shared_ptr<ClauseArgument> callee) : BaseCalls(caller, callee) {}
 
 private:
     bool hasCallRelationship(PKBFacadeReader& reader) override {
-        return reader.hasCallRelationship(this->caller, this->callee);
+        return reader.hasCallRelationship(*caller, *callee);
     }
 
     ProcedureSet getCallee(PKBFacadeReader& reader, const Procedure& caller) override {

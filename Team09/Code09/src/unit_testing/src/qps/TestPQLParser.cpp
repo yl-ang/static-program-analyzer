@@ -171,13 +171,13 @@ TEST_CASE("PQLParserTester: Parent (1)") {
     containerPtr result_02 = std::get<0>(parsedClauses_2);
     containerPtr result_03 = std::get<0>(parsedClauses_3);
 
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -192,22 +192,19 @@ TEST_CASE("PQLParserTester: Parent (1)") {
     REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03->getSynonyms()[0]);
 
     // Such that checking
-    Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
-    Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    Wildcard w = Wildcard();
-    Integer i = Integer("4");
-    SuchThatClause ans1 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans2 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&w));
-    SuchThatClause ans3 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&i));
+    std::shared_ptr<Synonym> s1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+    std::shared_ptr<Synonym> s2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
+    std::shared_ptr<Wildcard> w = std::make_shared<Wildcard>();
+    std::shared_ptr<Integer> i = std::make_shared<Integer>("4");
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, s1, s2);
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, s1, w);
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, s1, i);
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(result_11[0]));
-    REQUIRE(ans2.equals(result_12[0]));
-    REQUIRE(ans3.equals(result_13[0]));
+    REQUIRE(ans1.equals(*(result_11[0])));
+    REQUIRE(ans2.equals(*(result_12[0])));
+    REQUIRE(ans3.equals(*(result_13[0])));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -231,13 +228,13 @@ TEST_CASE("PQLParserTester: Parent (2)") {
     containerPtr result_02 = std::get<0>(parsedClauses_2);
     containerPtr result_03 = std::get<0>(parsedClauses_3);
 
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -252,22 +249,19 @@ TEST_CASE("PQLParserTester: Parent (2)") {
     REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03->getSynonyms()[0]);
 
     // Such that checking
-    Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
-    Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    Wildcard w = Wildcard();
-    Integer i = Integer("4");
-    SuchThatClause ans1 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s2), static_cast<ClauseArgument*>(&w));
-    SuchThatClause ans2 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s2), static_cast<ClauseArgument*>(&i));
-    SuchThatClause ans3 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s2), static_cast<ClauseArgument*>(&s1));
+    std::shared_ptr<Synonym> s1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+    std::shared_ptr<Synonym> s2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
+    std::shared_ptr<Wildcard> w = std::make_shared<Wildcard>();
+    std::shared_ptr<Integer> i = std::make_shared<Integer>("4");
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, s2, w);
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, s2, i);
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, s2, s1);
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(result_11[0]));
-    REQUIRE(ans2.equals(result_12[0]));
-    REQUIRE(ans3.equals(result_13[0]));
+    REQUIRE(ans1.equals(*(result_11[0])));
+    REQUIRE(ans2.equals(*(result_12[0])));
+    REQUIRE(ans3.equals(*(result_13[0])));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -292,13 +286,13 @@ TEST_CASE("PQLParserTester: Parent (3)") {
     containerPtr result_02 = std::get<0>(parsedClauses_2);
     containerPtr result_03 = std::get<0>(parsedClauses_3);
 
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -313,24 +307,20 @@ TEST_CASE("PQLParserTester: Parent (3)") {
     REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_03->getSynonyms()[0]);
 
     // Such that checking
-    Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
-    Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    Wildcard w = Wildcard();
-    Integer i = Integer("4");
-    SuchThatClause ans1 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&w), static_cast<ClauseArgument*>(&s1));
-    SuchThatClause ans2 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&i), static_cast<ClauseArgument*>(&s1));
-    SuchThatClause ans3 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&w), static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans4 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&i), static_cast<ClauseArgument*>(&s2));
+    std::shared_ptr<Synonym> s1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+    std::shared_ptr<Synonym> s2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
+    std::shared_ptr<Wildcard> w = std::make_shared<Wildcard>();
+    std::shared_ptr<Integer> i = std::make_shared<Integer>("4");
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, w, s1);
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT, i, s1);
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::PARENT, w, s2);
+    SuchThatClause ans4 = SuchThatClause(RelationshipType::PARENT, i, s2);
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(result_11[0]));
-    REQUIRE(ans2.equals(result_12[0]));
-    REQUIRE(ans3.equals(result_13[0]));
+    REQUIRE(ans1.equals(*(result_11[0])));
+    REQUIRE(ans2.equals(*(result_12[0])));
+    REQUIRE(ans3.equals(*(result_13[0])));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -359,15 +349,15 @@ TEST_CASE("PQLParserTester: Parent (4)") {
     containerPtr result_03 = std::get<0>(parsedClauses_3);
     containerPtr result_04 = std::get<0>(parsedClauses_4);
 
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
-    std::vector<SuchThatClause> result_14 = std::get<1>(parsedClauses_4);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_14 = std::get<1>(parsedClauses_4);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
-    std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_24 = std::get<2>(parsedClauses_4);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
@@ -385,24 +375,20 @@ TEST_CASE("PQLParserTester: Parent (4)") {
     REQUIRE(Synonym(DesignEntityType::STMT, "s1") == result_04->getSynonyms()[0]);
 
     // Such that checking
-    Synonym s1 = Synonym(DesignEntityType::STMT, "s1");
-    Synonym s2 = Synonym(DesignEntityType::STMT, "s2");
-    SuchThatClause ans1 =
-        SuchThatClause(RelationshipType::PARENT, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT_STAR, static_cast<ClauseArgument*>(&s1),
-                                         static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans3 =
-        SuchThatClause(RelationshipType::FOLLOWS, static_cast<ClauseArgument*>(&s1), static_cast<ClauseArgument*>(&s2));
-    SuchThatClause ans4 = SuchThatClause(RelationshipType::FOLLOWS_STAR, static_cast<ClauseArgument*>(&s1),
-                                         static_cast<ClauseArgument*>(&s2));
+    std::shared_ptr<Synonym> s1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+    std::shared_ptr<Synonym> s2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
+    SuchThatClause ans1 = SuchThatClause(RelationshipType::PARENT, s1, s2);
+    SuchThatClause ans2 = SuchThatClause(RelationshipType::PARENT_STAR, s1, s2);
+    SuchThatClause ans3 = SuchThatClause(RelationshipType::FOLLOWS, s1, s2);
+    SuchThatClause ans4 = SuchThatClause(RelationshipType::FOLLOWS_STAR, s1, s2);
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
     REQUIRE(result_14.size() == 1);
-    REQUIRE(ans1.equals(result_11[0]));
-    REQUIRE(ans2.equals(result_12[0]));
-    REQUIRE(ans3.equals(result_13[0]));
-    REQUIRE(ans4.equals(result_14[0]));
+    REQUIRE(ans1.equals(*(result_11[0])));
+    REQUIRE(ans2.equals(*(result_12[0])));
+    REQUIRE(ans3.equals(*(result_13[0])));
+    REQUIRE(ans4.equals(*(result_14[0])));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -446,35 +432,34 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     containerPtr result_04 = std::get<0>(parsedClauses_4);
 
     // ignore
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
-    std::vector<SuchThatClause> result_14 = std::get<1>(parsedClauses_4);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_14 = std::get<1>(parsedClauses_4);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
-    std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_24 = std::get<2>(parsedClauses_4);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
     Validator::validateClauses(&entities, result_03, result_13, result_23);
     Validator::validateClauses(&entities, result_04, result_14, result_24);
 
-    Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-    Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    ExpressionSpec l = ExpressionSpec("\"x+y\"");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
-                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
+    std::shared_ptr<Synonym> a1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a1");
+    std::shared_ptr<Synonym> v1 = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v1");
+    std::shared_ptr<ExpressionSpec> l = std::make_shared<ExpressionSpec>("\"x+y\"");
+    PatternClause ans1 = PatternClause(a1, {v1, l});
 
     REQUIRE(result_21.size() == 1);
     REQUIRE(result_22.size() == 1);
     REQUIRE(result_23.size() == 1);
     REQUIRE(result_24.size() == 1);
-    REQUIRE(ans1.equals(result_21[0]));
-    REQUIRE(ans1.equals(result_22[0]));
-    REQUIRE(ans1.equals(result_23[0]));
-    REQUIRE(ans1.equals(result_24[0]));
+    REQUIRE(ans1.equals(*(result_21[0])));
+    REQUIRE(ans1.equals(*(result_22[0])));
+    REQUIRE(ans1.equals(*(result_23[0])));
+    REQUIRE(ans1.equals(*(result_24[0])));
 }
 
 TEST_CASE("PQLParserTester: Select ... pattern (2)") {
@@ -498,31 +483,31 @@ TEST_CASE("PQLParserTester: Select ... pattern (2)") {
     containerPtr result_03 = std::get<0>(parsedClauses_3);
     containerPtr result_04 = std::get<0>(parsedClauses_4);
 
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<SuchThatClause> result_12 = std::get<1>(parsedClauses_2);
-    std::vector<SuchThatClause> result_13 = std::get<1>(parsedClauses_3);
-    std::vector<SuchThatClause> result_14 = std::get<1>(parsedClauses_4);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_12 = std::get<1>(parsedClauses_2);
+    std::vector<std::shared_ptr<SuchThatClause>> result_13 = std::get<1>(parsedClauses_3);
+    std::vector<std::shared_ptr<SuchThatClause>> result_14 = std::get<1>(parsedClauses_4);
 
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
-    std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
-    std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_22 = std::get<2>(parsedClauses_2);
+    std::vector<std::shared_ptr<PatternClause>> result_23 = std::get<2>(parsedClauses_3);
+    std::vector<std::shared_ptr<PatternClause>> result_24 = std::get<2>(parsedClauses_4);
 
     Validator::validateClauses(&entities, result_01, result_11, result_21);
     Validator::validateClauses(&entities, result_02, result_12, result_22);
     Validator::validateClauses(&entities, result_03, result_13, result_23);
     Validator::validateClauses(&entities, result_04, result_14, result_24);
 
-    Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-    Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
-    ExpressionSpec l = ExpressionSpec("_\"x+y\"_");
-    PatternClause ans1 = PatternClause(static_cast<ClauseArgument*>(&a1),
-                                       {static_cast<ClauseArgument*>(&v1), static_cast<ClauseArgument*>(&l)});
+    std::shared_ptr<Synonym> a1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a1");
+    std::shared_ptr<Synonym> v1 = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v1");
+    std::shared_ptr<ExpressionSpec> l = std::make_shared<ExpressionSpec>("_\"x+y\"_");
+    std::vector<std::shared_ptr<ClauseArgument>> args = {v1, l};
+    PatternClause ans1 = PatternClause(a1, args);
 
-    REQUIRE(result_21[0].equals(ans1));
-    REQUIRE(result_22[0].equals(ans1));
-    REQUIRE(result_23[0].equals(ans1));
-    REQUIRE(result_24[0].equals(ans1));
+    REQUIRE(ans1.equals(*(result_21[0])));
+    REQUIRE(ans1.equals(*(result_22[0])));
+    REQUIRE(ans1.equals(*(result_23[0])));
+    REQUIRE(ans1.equals(*(result_24[0])));
 }
 
 TEST_CASE("PQLParserTester: Select ... pattern (4)") {
@@ -536,23 +521,21 @@ TEST_CASE("PQLParserTester: Select ... pattern (4)") {
 
     // ignore one line below
     containerPtr result_01 = std::get<0>(parsedClauses_1);
-    std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
-    std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
+    std::vector<std::shared_ptr<SuchThatClause>> result_11 = std::get<1>(parsedClauses_1);
+    std::vector<std::shared_ptr<PatternClause>> result_21 = std::get<2>(parsedClauses_1);
     Validator::validateClauses(&entities, result_01, result_11, result_21);
 
-    Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
-    Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
-    Synonym v = Synonym(DesignEntityType::VARIABLE, "v");
-    ExpressionSpec temp = ExpressionSpec("_\"temp\"_");
+    std::shared_ptr<Synonym> a = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a");
+    std::shared_ptr<Synonym> a1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a1");
+    std::shared_ptr<Synonym> v = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+    std::shared_ptr<ExpressionSpec> temp = std::make_shared<ExpressionSpec>("_\"temp\"_");
 
-    SuchThatClause s =
-        SuchThatClause(RelationshipType::USES, static_cast<ClauseArgument*>(&a1), static_cast<ClauseArgument*>(&v));
-    PatternClause p = PatternClause(static_cast<ClauseArgument*>(&a),
-                                    {static_cast<ClauseArgument*>(&v), static_cast<ClauseArgument*>(&temp)});
+    SuchThatClause s = SuchThatClause(RelationshipType::USES, a1, v);
+    PatternClause p = PatternClause(a, {v, temp});
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_21.size() == 1);
-    REQUIRE(s.equals(result_11[0]));
-    REQUIRE(p.equals(result_21[0]));
+    REQUIRE(s.equals(*(result_11[0])));
+    REQUIRE(p.equals(*(result_21[0])));
 }
 
 TEST_CASE("And (1)") {

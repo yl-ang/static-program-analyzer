@@ -1,17 +1,18 @@
 #include "BaseCalls.h"
 
-BaseCalls::BaseCalls(ClauseArgument& caller, ClauseArgument& callee) : caller(caller), callee(callee) {}
+BaseCalls::BaseCalls(std::shared_ptr<ClauseArgument> caller, std::shared_ptr<ClauseArgument> callee)
+    : caller(caller), callee(callee) {}
 
 bool BaseCalls::validateArguments() {
-    if (caller.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(caller);
-        if (first.getType() != DesignEntityType::PROCEDURE) {
+    if (caller->isSynonym()) {
+        std::shared_ptr<Synonym> first = std::dynamic_pointer_cast<Synonym>(caller);
+        if (first->getType() != DesignEntityType::PROCEDURE) {
             return false;
         }
     }
-    if (callee.isSynonym()) {
-        Synonym second = dynamic_cast<Synonym&>(callee);
-        if (second.getType() != DesignEntityType::PROCEDURE) {
+    if (callee->isSynonym()) {
+        std::shared_ptr<Synonym> second = std::dynamic_pointer_cast<Synonym>(callee);
+        if (second->getType() != DesignEntityType::PROCEDURE) {
             return false;
         }
     }
@@ -19,19 +20,19 @@ bool BaseCalls::validateArguments() {
 }
 
 bool BaseCalls::isSimpleResult() const {
-    return !caller.isSynonym() && !callee.isSynonym();
+    return !caller->isSynonym() && !callee->isSynonym();
 }
 
 ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader) {
-    if (callee.isSynonym() && caller.isSynonym()) {
+    if (callee->isSynonym() && caller->isSynonym()) {
         return evaluateBothSynonyms(reader);
     }
 
-    if (callee.isSynonym()) {
+    if (callee->isSynonym()) {
         return evaluateCalleeSynonym(reader);
     }
 
-    if (caller.isSynonym()) {
+    if (caller->isSynonym()) {
         return evaluateCallerSynonym(reader);
     }
 
@@ -40,10 +41,10 @@ ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader) {
 
 ClauseResult BaseCalls::evaluateCalleeSynonym(PKBFacadeReader& reader) {
     std::unordered_set<Procedure> callers{};
-    if (caller.isWildcard()) {
+    if (caller->isWildcard()) {
         callers = reader.getProcedures();
     } else {
-        callers.insert(caller.getValue());
+        callers.insert(caller->getValue());
     }
 
     SynonymValues values{};
@@ -52,16 +53,16 @@ ClauseResult BaseCalls::evaluateCalleeSynonym(PKBFacadeReader& reader) {
         values.insert(values.end(), callees.begin(), callees.end());
     }
 
-    Synonym syn = dynamic_cast<Synonym&>(callee);
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(callee);
     return {syn, values};
 }
 
 ClauseResult BaseCalls::evaluateCallerSynonym(PKBFacadeReader& reader) {
     std::unordered_set<Procedure> callees{};
-    if (callee.isWildcard()) {
+    if (callee->isWildcard()) {
         callees = reader.getProcedures();
     } else {
-        callees.insert(callee.getValue());
+        callees.insert(callee->getValue());
     }
 
     SynonymValues values{};
@@ -70,13 +71,13 @@ ClauseResult BaseCalls::evaluateCallerSynonym(PKBFacadeReader& reader) {
         values.insert(values.end(), callers.begin(), callers.end());
     }
 
-    Synonym syn = dynamic_cast<Synonym&>(caller);
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(caller);
     return {syn, values};
 }
 
 ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym callerSyn = dynamic_cast<Synonym&>(caller);
-    Synonym calleeSyn = dynamic_cast<Synonym&>(callee);
+    Synonym callerSyn = *std::dynamic_pointer_cast<Synonym>(caller);
+    Synonym calleeSyn = *std::dynamic_pointer_cast<Synonym>(callee);
 
     std::vector<Synonym> synonyms{callerSyn, calleeSyn};
     if (callerSyn == calleeSyn) {

@@ -1,10 +1,11 @@
 #include "AssignPattern.h"
 
-AssignPattern::AssignPattern(ClauseArgument* assignSyn, std::vector<ClauseArgument*> args)
-    : assignSyn(*assignSyn), firstArg(*args[0]), secondArg(*args[1]) {}
+AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
+                             std::vector<std::shared_ptr<ClauseArgument>> args)
+    : assignSyn(assignSyn), firstArg(args[0]), secondArg(args[1]) {}
 
 ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader) {
-    if (firstArg.isSynonym()) {
+    if (firstArg->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else {
         return evaluateNoArgsSyns(reader);
@@ -12,8 +13,8 @@ ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
-    Synonym aSyn = dynamic_cast<Synonym&>(assignSyn);
-    Synonym fSyn = dynamic_cast<Synonym&>(firstArg);  // This is 100% variable
+    Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(firstArg);  // This is 100% variable
 
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -21,9 +22,9 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     std::vector<std::string> stmtNumbers = {};
     std::vector<std::string> synValues = {};
 
-    std::string secondString = secondArg.getValue();
+    std::string secondString = secondArg->getValue();
     bool isPartial = false;
-    if (secondArg.isExpressionSpec()) {
+    if (secondArg->isExpressionSpec()) {
         if (isPartialExpression(secondString)) {
             secondString = removeCharsFrom(secondString, QPSConstants::WILDCARD);
             isPartial = true;
@@ -60,21 +61,21 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
 }
 
 ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader) {
-    Synonym aSyn = dynamic_cast<Synonym&>(assignSyn);
+    Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::vector<std::string> stmtNumbers = {};
 
-    if (firstArg.isWildcard() && secondArg.isWildcard()) {
+    if (firstArg->isWildcard() && secondArg->isWildcard()) {
         for (Stmt stmt : assignStmts) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
         return {aSyn, stmtNumbers};
     }
 
-    std::string firstString = firstArg.getValue();
-    std::string secondString = secondArg.getValue();
+    std::string firstString = firstArg->getValue();
+    std::string secondString = secondArg->getValue();
     bool isPartial = false;
-    if (secondArg.isExpressionSpec()) {
+    if (secondArg->isExpressionSpec()) {
         if (isPartialExpression(secondString)) {
             secondString = removeCharsFrom(secondString, QPSConstants::WILDCARD);
             isPartial = true;
