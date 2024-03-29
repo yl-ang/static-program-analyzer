@@ -10,7 +10,7 @@
 class PatternClause : public QueryClause {
 protected:
     std::shared_ptr<ClauseArgument> synonym;
-    std::vector<std::shared_ptr<ClauseArgument>> args;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
 public:
     PatternClause(std::shared_ptr<ClauseArgument>, std::vector<std::shared_ptr<ClauseArgument>>);

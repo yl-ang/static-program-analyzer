@@ -18,8 +18,8 @@ std::shared_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
 
     parameterStringsToParse.insert(parameterStringsToParse.end(), cleanedParameters.begin(), cleanedParameters.end());
     std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildPatternParameters(parameterStringsToParse)};
-    std::shared_ptr<PatternClause> patternClause{
-        std::make_shared<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()))};
+    std::shared_ptr<PatternClause> patternClause =
+        std::make_shared<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()));
     return patternClause;
 }
 

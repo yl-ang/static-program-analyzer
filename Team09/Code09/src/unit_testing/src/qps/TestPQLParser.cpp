@@ -202,9 +202,9 @@ TEST_CASE("PQLParserTester: Parent (1)") {
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(*(result_11[0])));
-    REQUIRE(ans2.equals(*(result_12[0])));
-    REQUIRE(ans3.equals(*(result_13[0])));
+    REQUIRE(ans1.equals(*result_11[0]));
+    REQUIRE(ans2.equals(*result_12[0]));
+    REQUIRE(ans3.equals(*result_13[0]));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -259,9 +259,9 @@ TEST_CASE("PQLParserTester: Parent (2)") {
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(*(result_11[0])));
-    REQUIRE(ans2.equals(*(result_12[0])));
-    REQUIRE(ans3.equals(*(result_13[0])));
+    REQUIRE(ans1.equals(*result_11[0]));
+    REQUIRE(ans2.equals(*result_12[0]));
+    REQUIRE(ans3.equals(*result_13[0]));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -318,9 +318,9 @@ TEST_CASE("PQLParserTester: Parent (3)") {
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
-    REQUIRE(ans1.equals(*(result_11[0])));
-    REQUIRE(ans2.equals(*(result_12[0])));
-    REQUIRE(ans3.equals(*(result_13[0])));
+    REQUIRE(ans1.equals(*result_11[0]));
+    REQUIRE(ans2.equals(*result_12[0]));
+    REQUIRE(ans3.equals(*result_13[0]));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -385,10 +385,10 @@ TEST_CASE("PQLParserTester: Parent (4)") {
     REQUIRE(result_12.size() == 1);
     REQUIRE(result_13.size() == 1);
     REQUIRE(result_14.size() == 1);
-    REQUIRE(ans1.equals(*(result_11[0])));
-    REQUIRE(ans2.equals(*(result_12[0])));
-    REQUIRE(ans3.equals(*(result_13[0])));
-    REQUIRE(ans4.equals(*(result_14[0])));
+    REQUIRE(ans1.equals(*result_11[0]));
+    REQUIRE(ans2.equals(*result_12[0]));
+    REQUIRE(ans3.equals(*result_13[0]));
+    REQUIRE(ans4.equals(*result_14[0]));
 
     // Pattern checking
     REQUIRE(result_21.size() == 0);
@@ -456,10 +456,10 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     REQUIRE(result_22.size() == 1);
     REQUIRE(result_23.size() == 1);
     REQUIRE(result_24.size() == 1);
-    REQUIRE(ans1.equals(*(result_21[0])));
-    REQUIRE(ans1.equals(*(result_22[0])));
-    REQUIRE(ans1.equals(*(result_23[0])));
-    REQUIRE(ans1.equals(*(result_24[0])));
+    REQUIRE(ans1.equals(*result_21[0]));
+    REQUIRE(ans1.equals(*result_22[0]));
+    REQUIRE(ans1.equals(*result_23[0]));
+    REQUIRE(ans1.equals(*result_24[0]));
 }
 
 TEST_CASE("PQLParserTester: Select ... pattern (2)") {
@@ -504,10 +504,10 @@ TEST_CASE("PQLParserTester: Select ... pattern (2)") {
     std::vector<std::shared_ptr<ClauseArgument>> args = {v1, l};
     PatternClause ans1 = PatternClause(a1, args);
 
-    REQUIRE(ans1.equals(*(result_21[0])));
-    REQUIRE(ans1.equals(*(result_22[0])));
-    REQUIRE(ans1.equals(*(result_23[0])));
-    REQUIRE(ans1.equals(*(result_24[0])));
+    REQUIRE(ans1.equals(*result_21[0]));
+    REQUIRE(ans1.equals(*result_22[0]));
+    REQUIRE(ans1.equals(*result_23[0]));
+    REQUIRE(ans1.equals(*result_24[0]));
 }
 
 TEST_CASE("PQLParserTester: Select ... pattern (4)") {
@@ -534,8 +534,8 @@ TEST_CASE("PQLParserTester: Select ... pattern (4)") {
     PatternClause p = PatternClause(a, {v, temp});
     REQUIRE(result_11.size() == 1);
     REQUIRE(result_21.size() == 1);
-    REQUIRE(s.equals(*(result_11[0])));
-    REQUIRE(p.equals(*(result_21[0])));
+    REQUIRE(s.equals(*result_11[0]));
+    REQUIRE(p.equals(*result_21[0]));
 }
 
 TEST_CASE("And (1)") {

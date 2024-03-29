@@ -1,27 +1,27 @@
 #include "PatternClause.h"
 
 PatternClause::PatternClause(std::shared_ptr<ClauseArgument> syn, std::vector<std::shared_ptr<ClauseArgument>> args)
-    : synonym(syn), args(args) {}
+    : synonym(syn), arguments(args) {}
 
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
     DesignEntityType synType = syn->getType();
-    std::unique_ptr<Pattern> evaluator = PatternBuilder::buildPattern(synType, syn, args);
+    std::unique_ptr<Pattern> evaluator = PatternBuilder::buildPattern(synType, syn, arguments);
     return evaluator->evaluate(reader);
 }
 
 bool PatternClause::equals(const QueryClause& other) const {
-    if (const std::shared_ptr<PatternClause> ptr = std::make_shared<PatternClause>(other)) {
+    if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
         // !( == ) is used as oppose to !=
         // This is because operator for != is not implemented
-        if (!(synonym == ptr->synonym)) {
+        if (!(*synonym == *(ptr->synonym))) {
             return false;
         }
-        if (args.size() != ptr->args.size()) {
+        if (arguments.size() != ptr->arguments.size()) {
             return false;
         }
-        for (int i = 0; i < args.size(); i++) {
-            if (!(*args[i] == *(ptr->args[i]))) {
+        for (int i = 0; i < arguments.size(); i++) {
+            if (!(*arguments[i] == *(ptr->arguments[i]))) {
                 return false;
             }
         }
@@ -38,7 +38,7 @@ bool PatternClause::containsSynonym(const Synonym& syn) const {
     if (*synonym == syn) {
         return true;
     }
-    for (auto arg : args) {
+    for (auto arg : arguments) {
         if (*arg == syn) {
             return true;
         }
@@ -52,7 +52,7 @@ std::vector<Synonym> PatternClause::getSynonyms() const {
     if (synonym->isSynonym()) {
         synonyms.push_back(*std::dynamic_pointer_cast<Synonym>(synonym));
     }
-    for (auto arg : args) {
+    for (auto arg : arguments) {
         if (arg->isSynonym()) {
             synonyms.push_back(*std::dynamic_pointer_cast<Synonym>(arg));
         }
@@ -66,8 +66,8 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         return false;
     }
 
-    if ((*args[0]).isSynonym()) {
-        std::shared_ptr<Synonym> fSyn = std::dynamic_pointer_cast<Synonym>((args[0]));
+    if ((*arguments[0]).isSynonym()) {
+        std::shared_ptr<Synonym> fSyn = std::dynamic_pointer_cast<Synonym>((arguments[0]));
         if (!fSyn->updateType(store)) {
             return false;
         }
@@ -80,17 +80,17 @@ bool PatternClause::validateArguments(SynonymStore* store) {
     DesignEntityType synType = syn->getType();
     switch (synType) {
     case DesignEntityType::WHILE:
-        if (!(*args[1]).isWildcard()) {
+        if (!(*arguments[1]).isWildcard()) {
             throw QPSSyntaxError();
         }
         [[fallthrough]];
     case DesignEntityType::ASSIGN:
-        if (args.size() != 2) {
+        if (arguments.size() != 2) {
             throw QPSSyntaxError();
         }
         break;
     case DesignEntityType::IF:
-        if (args.size() != 3) {
+        if (arguments.size() != 3) {
             throw QPSSyntaxError();
         }
         break;

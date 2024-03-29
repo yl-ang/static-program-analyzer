@@ -12,46 +12,46 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with no synonyms") {
     SECTION("Follows(Integer, Integer)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        FollowsTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(true);
-        FollowsTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
-        FollowsTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-        FollowsTester{pfr, new Integer("2"), new Integer("2")}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
     }
 
     SECTION("Follows(Integer, Integer) / empty store") {
         pfw.setFollowsStore({});
-        FollowsTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(false);
     }
 
     SECTION("Follows(Integer, Wildcard)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        FollowsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-        FollowsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 
     SECTION("Follows(Integer, Wildcard) / empty store") {
         pfw.setFollowsStore({});
-        FollowsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-        FollowsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 
     SECTION("Follows(Wildcard, Integer)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        FollowsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(true);
-        FollowsTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("2")}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("1")}.testBoolean(false);
     }
 
     SECTION("Follows(Wildcard, Wildcard)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        FollowsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(true);
     }
 
     SECTION("Follows(Wildcard, Wildcard) / empty store") {
         pfw.setFollowsStore({});
-        FollowsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 }
 
@@ -63,29 +63,29 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
     SECTION("Follows(Synonym, Integer)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that Follows(s, 2)
-        FollowsTester{pfr, stmtSyn, new Integer("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
         // Select s such that Follows(s, 1)
-        FollowsTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that Follows(s, 5), out of bounds
-        FollowsTester{pfr, stmtSyn, new Integer("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("Follows(Integer, Synonym)") {
         std::unordered_set<std::pair<int, int>> followsStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setFollowsStore(followsStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that Follows(1, s)
-        FollowsTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
+        FollowsTester{pfr, std::make_shared<Integer>("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
         // Select s such that Follows(2, s)
-        FollowsTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that Follows(5, s), out of bounds
-        FollowsTester{pfr, new Integer("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("Follows(Synonym, Wildcard)") {
@@ -97,10 +97,12 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
 
         pfw.setStmts(stmts);
         pfw.setFollowsStore(followsStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that Follows(s, _)
-        FollowsTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "2"}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Wildcard>()}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"1", "2"}});
     }
 
     SECTION("Follows(Wildcard, Synonym)") {
@@ -112,10 +114,12 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
 
         pfw.setStmts(stmts);
         pfw.setFollowsStore(followsStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that Follows(_, s)
-        FollowsTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2", "3"}});
+        FollowsTester{pfr, std::make_shared<Wildcard>(), stmtSyn}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"2", "3"}});
     }
 }
 
@@ -133,8 +137,8 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 2 synonyms") {
 
         pfw.setStmts(stmts);
         pfw.setFollowsStore(followsStoreEntries);
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+        std::shared_ptr<Synonym> stmtSyn1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+        std::shared_ptr<Synonym> stmtSyn2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
 
         // Select s1 such that Follows(s1, s2)
         FollowsTester{pfr, stmtSyn1, stmtSyn2}
