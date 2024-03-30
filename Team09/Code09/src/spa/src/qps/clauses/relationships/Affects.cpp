@@ -415,27 +415,19 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym affectedSyn = dynamic_cast<Synonym&>(affected);
     std::vector<Synonym> synonyms{affectorSyn, affectedSyn};
 
-    std::unordered_set<StmtNum> affectorValuesSet;
-    std::unordered_set<StmtNum> affectedValuesSet;
+    SynonymValues affectorValues;
+    SynonymValues affectedValues;
 
     std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
     if (checkAssign(affectorSyn) && checkAssign(affectedSyn)) {
         AffectsSet resultSet = generateAffectsRelation(reader);
         for (std::pair<StmtNum, StmtNum> result: resultSet) {
-            affectorValuesSet.insert(result.first);
-            affectedValuesSet.insert(result.second);
+            affectorValues.push_back(std::to_string(result.first));
+            affectedValues.push_back(std::to_string(result.second));
         }
     }
 
-    SynonymValues affectorValues;
-    SynonymValues affectedValues;
-    for (int affectorValue : affectorValuesSet) {
-        affectorValues.push_back(std::to_string(affectorValue));
-    }
-    for (int affectedValue : affectedValuesSet) {
-        affectedValues.push_back(std::to_string(affectedValue));
-    }
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
     return {headers, values};
 }
