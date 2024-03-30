@@ -377,15 +377,11 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
 
         // wildcard is affected  
         if (affectorIsInteger) {
-            // generateAffectsfromAffector(resultSet, stmtNum, reader);
             return isAffectsfromAffector(stmtNum, reader);
         // wildcard is affector
         } else {
-            // generateAffectsfromAffected(resultSet, stmtNum, reader);
             return isAffectsfromAffected(stmtNum, reader);
         }
-
-        // return !resultSet.empty();
     }
     return false;
 }
@@ -506,12 +502,10 @@ ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
     AffectsSet result;
 
     for (StmtNum assignStmt : assignStmtSet) {
-        // generateAffectsfromAffector(result, assignStmt, reader);
         if (isAffectsfromAffector(assignStmt, reader)) {
             return true;
         }
     }
 
-    // return !result.empty();
     return false;
 }
