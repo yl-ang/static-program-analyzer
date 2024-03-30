@@ -90,7 +90,7 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
 
 // Helper Affected template (1)
 template <typename Func>
-void processAffected(Func& func, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
+void processAffected(const Func& func, const StmtNum& affectedStmtNum, const PKBFacadeReader& reader) {
     auto usesVariables = reader.getUsesVariablesByStatement(affectedStmtNum);
 
     // IMPORTANT: For each variable used
@@ -149,7 +149,7 @@ void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Var
         }
     }
 
-    auto previousStmtSet = reader.getNextee(stmtNum);
+    const auto previousStmtSet = reader.getNextee(stmtNum);
     for (const auto previousStmt : previousStmtSet) {
         if (visited.find(previousStmt) == visited.end()) {
             stack.emplace_back(previousStmt);
@@ -197,7 +197,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
 
 // Helper Affector template (1)
 template <typename Func>
-void processAffects(Func& func, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+void processAffects(const Func& func, const StmtNum& affectorStmtNum, const PKBFacadeReader& reader) {
     // keep track of visited
     std::unordered_set<StmtNum> visited;
     std::vector<StmtNum> stack;
@@ -247,7 +247,7 @@ void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Var
             return;
         }
     }
-    auto nextStmtSet = reader.getNexter(stmtNum);
+    const auto nextStmtSet = reader.getNexter(stmtNum);
     for (const auto nextStmt : nextStmtSet) {
         if (visited.find(nextStmt) == visited.end()) {
             stack.emplace_back(nextStmt);
