@@ -267,10 +267,19 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
     StmtNum affectorStmtNum = std::stoi(affectorInt.getValue());
     StmtNum affectedStmtNum = std::stoi(affectedInt.getValue());
 
-    AffectsSet resultSet = generateAffectsRelation(reader);
+    std::optional<Stmt> affectorStmt = reader.getStatementByStmtNum(affectorStmtNum);
+    std::optional<Stmt> affectedStmt = reader.getStatementByStmtNum(affectedStmtNum);
+    if (!affectorStmt.has_value() || !affectedStmt.has_value() ||
+            (affectorStmt.value().type != StatementType::ASSIGN) ||
+            (affectedStmt.value().type != StatementType::ASSIGN)) {
+        return false;
+    }
+
+    AffectsSet resultSet;
+    generateAffectsfromAffector(resultSet, affectorStmtNum, reader);
 
     for (const auto& pair : resultSet) {
-        if (pair.first == affectorStmtNum && pair.second == affectedStmtNum) {
+        if (pair.second == affectedStmtNum) {
             return true;
         }
     }
