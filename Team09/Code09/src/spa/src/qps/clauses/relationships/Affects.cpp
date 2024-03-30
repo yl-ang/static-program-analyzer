@@ -89,8 +89,9 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
 }
 
 // Helper Affected template (1)
+// NOLINTBEGIN
 template <typename Func>
-void processAffected(const Func& func, const StmtNum& affectedStmtNum, const PKBFacadeReader& reader) {
+void processAffected(Func& func, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     auto usesVariables = reader.getUsesVariablesByStatement(affectedStmtNum);
 
     // IMPORTANT: For each variable used
@@ -136,6 +137,7 @@ void processAffected(const Func& func, const StmtNum& affectedStmtNum, const PKB
         }
     }
 }
+// NOLINTEND
 
 // Helper Affected function (2)
 void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
@@ -149,7 +151,7 @@ void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Var
         }
     }
 
-    const auto previousStmtSet = reader.getNextee(stmtNum);
+    auto previousStmtSet = reader.getNextee(stmtNum);
     for (const auto previousStmt : previousStmtSet) {
         if (visited.find(previousStmt) == visited.end()) {
             stack.emplace_back(previousStmt);
@@ -196,8 +198,9 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
 }
 
 // Helper Affector template (1)
+// NOLINTBEGIN
 template <typename Func>
-void processAffects(const Func& func, const StmtNum& affectorStmtNum, const PKBFacadeReader& reader) {
+void processAffects(Func& func, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
     // keep track of visited
     std::unordered_set<StmtNum> visited;
     std::vector<StmtNum> stack;
@@ -235,6 +238,7 @@ void processAffects(const Func& func, const StmtNum& affectorStmtNum, const PKBF
         func(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, stack, visited);
     }
 }
+// NOLINTEND
 
 // Helper Affector function (2)
 void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
@@ -247,7 +251,7 @@ void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Var
             return;
         }
     }
-    const auto nextStmtSet = reader.getNexter(stmtNum);
+    auto nextStmtSet = reader.getNexter(stmtNum);
     for (const auto nextStmt : nextStmtSet) {
         if (visited.find(nextStmt) == visited.end()) {
             stack.emplace_back(nextStmt);
