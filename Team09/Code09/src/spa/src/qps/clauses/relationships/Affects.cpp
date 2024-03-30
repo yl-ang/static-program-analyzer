@@ -75,14 +75,12 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     // get all assign statements
     std::unordered_set<Stmt> allStmts = reader.getStmts();
-    std::unordered_set<StmtNum> allStmtNums{};
+    std::unordered_set<StmtNum> assignStmtSet;
     for (Stmt stmt : allStmts) {
         if (stmt.type == StatementType::ASSIGN) {
-            allStmtNums.insert(stmt.stmtNum);
+            assignStmtSet.insert(stmt.stmtNum);
         }
     }
-    std::unordered_set<StmtNum> assignStmtSet = ClauseEvaluatorUtils::filterStatementsByType(
-                                                reader, DesignEntityType::ASSIGN, allStmtNums);
     AffectsSet result;
     for (StmtNum assignStmt : assignStmtSet) {
         generateAffectsfromAffector(result, assignStmt, reader);
@@ -428,14 +426,13 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Variable> allVar = reader.getVariables();
-    std::unordered_set<StmtNum> allStmts{};
-    for (Variable var : allVar) {
-        std::unordered_set<StmtNum> modifiesStmts = reader.getModifiesStatementsByVariable(var);
-        allStmts.insert(modifiesStmts.begin(), modifiesStmts.end());
+    std::unordered_set<Stmt> allStmts = reader.getStmts();
+    std::unordered_set<StmtNum> assignStmtSet;
+    for (Stmt stmt : allStmts) {
+        if (stmt.type == StatementType::ASSIGN) {
+            assignStmtSet.insert(stmt.stmtNum);
+        }
     }
-    std::unordered_set<StmtNum> assignStmtSet = ClauseEvaluatorUtils::filterStatementsByType(
-                                                reader, DesignEntityType::ASSIGN, allStmts);
     AffectsSet result;
 
     for (StmtNum assignStmt : assignStmtSet) {
