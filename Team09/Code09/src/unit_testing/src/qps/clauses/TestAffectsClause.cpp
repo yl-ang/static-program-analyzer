@@ -11,7 +11,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
 
     SECTION("Affects(integer, integer)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -91,7 +91,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
 
     SECTION("Affects(wildcard, wildcard)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -137,7 +137,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
 
     SECTION("Affects(integer, wildcard)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -206,7 +206,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
 
     SECTION("Affects(synonym, integer)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -252,7 +252,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
 
     SECTION("Affects(integer, synonym)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -298,7 +298,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
 
     SECTION("Affects(synonym, wildcard)") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -334,7 +334,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
 
     SECTION("Affects(wildcard, synonym) / empty store") {
         std::unordered_set<Variable> variables = {"x", "y"};
-        
+
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
@@ -379,7 +379,8 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
 //     PKBFacadeReader pfr{pkb};
 
 //     SECTION("ParentT(Synonym, Synonym)") {
-//         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2}, std::pair<int, int>{1, 3},
+//         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
+//                                                                    std::pair<int, int>{1, 3},
 //                                                                    std::pair<int, int>{3, 4}};
 
 //         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
