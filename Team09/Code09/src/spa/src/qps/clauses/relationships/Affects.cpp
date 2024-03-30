@@ -196,64 +196,22 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
-    /**
-     * Get control flow from established statement number
-    */
-    std::unordered_set<StmtNum> nextStmtNums =
-        affectorIsInteger ? reader.getNexterStar(stmtNum) : reader.getNexteeStar(stmtNum);
-
-    /**
-     * If affectorIsInteger: start from affector statement and work downwards
-     * Else: start from affected statement and work upwards
-    */
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-    if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
+    if (!stmt.has_value() || (stmt.value().type != StatementType::ASSIGN)) {
         return false;
     }
 
+    // wildcard is affected
     if (affectorIsInteger) {
-        std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        for (Variable modifiedVariable : modifiedVariables) {
-            for (StmtNum nextStmtNum : nextStmtNums) {
-                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
-                // Checking if uses the affector variable
-                for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                    if (!nextStmt.has_value()) {
-                        return false;
-                    } else {
-                        if (nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {
-                            return true;
-                        }
-                    }
-                }
-                // Checking if modifies the affector variable AND not nextStmtNum
-                for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
-                    if (currVar == modifiedVariable) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return false;
+        AffectsSet resultSet;
+        generateAffectsfromAffector(resultSet, stmtNum, reader);
+        return !resultSet.empty();
+    // wildcard is affector
     } else {
-        std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
-        for (Variable usesVariable : usesVariables) {
-            for (StmtNum nextStmtNum : nextStmtNums) {
-                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
-                // Checking if modified affected variable
-                if (!nextStmt.has_value()) {
-                    return false;
-                } else {
-                    for (Variable modifiedVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
-                        if (modifiedVar == usesVariable) {
-                            // If statement assign then mark as value element
-                            if (nextStmt.value().type == StatementType::ASSIGN) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    }
-                }
+        AffectsSet resultSet = generateAffectsRelation(reader);
+        for (const auto& pair : resultSet) {
+            if (pair.second == stmtNum) {
+                return true;
             }
         }
         return false;
