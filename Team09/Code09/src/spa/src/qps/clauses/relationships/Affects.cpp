@@ -89,69 +89,69 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     return result;
 }
 
-/**
- * Get Affects Relationship from Affector Statement
-*/
-void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
-    // keep track of visited
-    std::unordered_set<StmtNum> visited;
-    std::vector<StmtNum> stack;
+// /**
+//  * Get Affects Relationship from Affector Statement
+// */
+// void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+//     // keep track of visited
+//     std::unordered_set<StmtNum> visited;
+//     std::vector<StmtNum> stack;
 
-    // Place the statement itself inside stack
-    stack.emplace_back(affectorStmtNum);
+//     // Place the statement itself inside stack
+//     stack.emplace_back(affectorStmtNum);
 
-    // get the immendiate set of next of affectorStmtNum
-    auto startingSet = reader.getNexter(affectorStmtNum);
-    /**
-     * For each statement stmt in startingSet, this line adds stmt to the back of the stack using emplace_back(). 
-     * emplace_back() is a function that constructs an object in-place at the end of the container.
-    */
-    for (auto stmt : startingSet) {
-        stack.emplace_back(stmt);
-    }
-    // get variables modified by affectorStmtNum
-    auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
+//     // get the immendiate set of next of affectorStmtNum
+//     auto startingSet = reader.getNexter(affectorStmtNum);
+//     /**
+//      * For each statement stmt in startingSet, this line adds stmt to the back of the stack using emplace_back(). 
+//      * emplace_back() is a function that constructs an object in-place at the end of the container.
+//     */
+//     for (auto stmt : startingSet) {
+//         stack.emplace_back(stmt);
+//     }
+//     // get variables modified by affectorStmtNum
+//     auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
 
-    while (!stack.empty()) {
-        // Get first element of stack and erase
-        StmtNum stmtNum = stack[0];
-        stack.erase(stack.begin());
+//     while (!stack.empty()) {
+//         // Get first element of stack and erase
+//         StmtNum stmtNum = stack[0];
+//         stack.erase(stack.begin());
 
-        // If not visited, continue
-        // insert into visited
-        if (visited.find(stmtNum) != visited.end()) {
-            continue;
-        }
-        visited.insert(stmtNum);
+//         // If not visited, continue
+//         // insert into visited
+//         if (visited.find(stmtNum) != visited.end()) {
+//             continue;
+//         }
+//         visited.insert(stmtNum);
 
-        // get statement type of statement
-        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-        if (!stmt.has_value()) {
-            throw Exception("Statement does not have value");
-        }
-        StatementType stmtType = stmt.value().type;
+//         // get statement type of statement
+//         std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+//         if (!stmt.has_value()) {
+//             throw Exception("Statement does not have value");
+//         }
+//         StatementType stmtType = stmt.value().type;
 
-        if (stmtType == StatementType::ASSIGN) {
-            auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
-            if (hasCommonValue(modifiedVariables, curUsedVariables)) {
-                result.insert({affectorStmtNum, stmtNum});
-            }
-        }
-        // if modified, skip rest of loop
-        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-            if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
-                continue;
-            }
-        }
-        auto nextStmtSet = reader.getNexter(stmtNum);
-        for (const auto nextStmt : nextStmtSet) {
-            if (visited.find(nextStmt) == visited.end()) {
-                stack.emplace_back(nextStmt);
-            }
-        }
-    }
-}
+//         if (stmtType == StatementType::ASSIGN) {
+//             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
+//             if (hasCommonValue(modifiedVariables, curUsedVariables)) {
+//                 result.insert({affectorStmtNum, stmtNum});
+//             }
+//         }
+//         // if modified, skip rest of loop
+//         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+//             auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+//             if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
+//                 continue;
+//             }
+//         }
+//         auto nextStmtSet = reader.getNexter(stmtNum);
+//         for (const auto nextStmt : nextStmtSet) {
+//             if (visited.find(nextStmt) == visited.end()) {
+//                 stack.emplace_back(nextStmt);
+//             }
+//         }
+//     }
+// }
 
 /**
  * Get Affects Relationship from Affected Statement
@@ -223,67 +223,67 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
 /**
  * Get is Affects from Affector Statement
 */
-bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
-    // keep track of visited
-    std::unordered_set<StmtNum> visited;
-    std::vector<StmtNum> stack;
+// bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+//     // keep track of visited
+//     std::unordered_set<StmtNum> visited;
+//     std::vector<StmtNum> stack;
 
-    // Place the statement itself inside stack
-    stack.emplace_back(affectorStmtNum);
+//     // Place the statement itself inside stack
+//     stack.emplace_back(affectorStmtNum);
 
-    // get the immendiate set of next of affectorStmtNum
-    auto startingSet = reader.getNexter(affectorStmtNum);
-    /**
-     * For each statement stmt in startingSet, this line adds stmt to the back of the stack using emplace_back(). 
-     * emplace_back() is a function that constructs an object in-place at the end of the container.
-    */
-    for (auto stmt : startingSet) {
-        stack.emplace_back(stmt);
-    }
-    // get variables modified by affectorStmtNum
-    auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
+//     // get the immendiate set of next of affectorStmtNum
+//     auto startingSet = reader.getNexter(affectorStmtNum);
+//     /**
+//      * For each statement stmt in startingSet, this line adds stmt to the back of the stack using emplace_back(). 
+//      * emplace_back() is a function that constructs an object in-place at the end of the container.
+//     */
+//     for (auto stmt : startingSet) {
+//         stack.emplace_back(stmt);
+//     }
+//     // get variables modified by affectorStmtNum
+//     auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
 
-    while (!stack.empty()) {
-        // Get first element of stack and erase
-        StmtNum stmtNum = stack[0];
-        stack.erase(stack.begin());
+//     while (!stack.empty()) {
+//         // Get first element of stack and erase
+//         StmtNum stmtNum = stack[0];
+//         stack.erase(stack.begin());
 
-        // If not visited, continue
-        // insert into visited
-        if (visited.find(stmtNum) != visited.end()) {
-            continue;
-        }
-        visited.insert(stmtNum);
+//         // If not visited, continue
+//         // insert into visited
+//         if (visited.find(stmtNum) != visited.end()) {
+//             continue;
+//         }
+//         visited.insert(stmtNum);
 
-        // get statement type of statement
-        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-        if (!stmt.has_value()) {
-            throw Exception("Statement does not have value");
-        }
-        StatementType stmtType = stmt.value().type;
+//         // get statement type of statement
+//         std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+//         if (!stmt.has_value()) {
+//             throw Exception("Statement does not have value");
+//         }
+//         StatementType stmtType = stmt.value().type;
 
-        if (stmtType == StatementType::ASSIGN) {
-            auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
-            if (hasCommonValue(modifiedVariables, curUsedVariables)) {
-                return true;
-            }
-        }
-        // if modified, skip rest of loop
-        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-            if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
-                continue;
-            }
-        }
-        auto nextStmtSet = reader.getNexter(stmtNum);
-        for (const auto nextStmt : nextStmtSet) {
-            if (visited.find(nextStmt) == visited.end()) {
-                stack.emplace_back(nextStmt);
-            }
-        }
-    }
-    return false;
-}
+//         if (stmtType == StatementType::ASSIGN) {
+//             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
+//             if (hasCommonValue(modifiedVariables, curUsedVariables)) {
+//                 return true;
+//             }
+//         }
+//         // if modified, skip rest of loop
+//         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+//             auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+//             if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
+//                 continue;
+//             }
+//         }
+//         auto nextStmtSet = reader.getNexter(stmtNum);
+//         for (const auto nextStmt : nextStmtSet) {
+//             if (visited.find(nextStmt) == visited.end()) {
+//                 stack.emplace_back(nextStmt);
+//             }
+//         }
+//     }
+//     return false;
+// }
 
 /**
  * Get is Affects from Affected Statement
@@ -364,6 +364,92 @@ bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
         }
     }
     return false; // No common value found
+}
+
+template <typename Func>
+void processAffects(Func& func, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+    // keep track of visited
+    std::unordered_set<StmtNum> visited;
+    std::vector<StmtNum> stack;
+
+    // Place the statement itself inside stack
+    stack.emplace_back(affectorStmtNum);
+
+    // get the immediate set of next of affectorStmtNum
+    auto startingSet = reader.getNexter(affectorStmtNum);
+    for (auto stmt : startingSet) {
+        stack.emplace_back(stmt);
+    }
+    // get variables modified by affectorStmtNum
+    auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
+
+    while (!stack.empty()) {
+        // Get first element of stack and erase
+        StmtNum stmtNum = stack[0];
+        stack.erase(stack.begin());
+
+        // If not visited, continue
+        // insert into visited
+        if (visited.find(stmtNum) != visited.end()) {
+            continue;
+        }
+        visited.insert(stmtNum);
+
+        // get statement type of statement
+        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+        if (!stmt.has_value()) {
+            throw Exception("Statement does not have value");
+        }
+        StatementType stmtType = stmt.value().type;
+
+        func(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+    }
+}
+
+void Affects::handleCommonLogic(StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                        StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        std::unordered_set<StmtNum>& visited) {
+    // if modified, skip rest of loop
+    if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
+            return;
+        }
+    }
+    auto nextStmtSet = reader.getNexter(stmtNum);
+    for (const auto nextStmt : nextStmtSet) {
+        if (visited.find(nextStmt) == visited.end()) {
+            stack.emplace_back(nextStmt);
+        }
+    }
+}
+
+bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+    bool result = false;
+    processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        std::unordered_set<StmtNum>& visited) {
+        if (stmtType == StatementType::ASSIGN) {
+            auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
+            if (hasCommonValue(modifiedVariables, curUsedVariables)) {
+                result = true;
+            }
+        }
+        handleCommonLogic(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+    }, affectorStmtNum, reader);
+    return result;
+}
+
+void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+    processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, auto& modifiedVariables, auto stmtType, auto& reader, auto& stack, auto& visited) {
+        if (stmtType == StatementType::ASSIGN) {
+            auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
+            if (hasCommonValue(modifiedVariables, curUsedVariables)) {
+                result.insert({affectorStmtNum, stmtNum});
+            }
+        }
+        handleCommonLogic(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+    }, affectorStmtNum, reader);
 }
 
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {

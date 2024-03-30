@@ -29,6 +29,9 @@ private:
     bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
     bool checkSynonym(ClauseArgument& clauseArgument);
     bool checkAssign(ClauseArgument& clauseArgument);
+    void handleCommonLogic(StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                        StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        std::unordered_set<StmtNum>& visited);
 
 public:
     Affects(ClauseArgument& affector, ClauseArgument& affected);
