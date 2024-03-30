@@ -250,6 +250,10 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 
     SynonymValues values{};
 
+    if (!checkAssign(syn)) {
+        return {syn, {}};
+    }
+
     AffectsSet resultSet = generateAffectsRelation(reader);
 
     for (std::pair<StmtNum, StmtNum> result: resultSet) {
@@ -280,62 +284,21 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
 
     SynonymValues values{};
 
-    /**
-     * Get control flow from established statement number
-    */
-    std::unordered_set<StmtNum> nextStmtNums =
-        affectorIsInteger ? reader.getNexterStar(stmtNum) : reader.getNexteeStar(stmtNum);
-
-    /**
-     * If !affectorIsSynonym:
-     * - start from affector statement and work downwards
-     * Else:
-     * - start from affected statement and work upwards
-    */
+    // synonym is affected
     if (affectorIsInteger) {
-        std::unordered_set<Variable> modifiedVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        for (Variable modifiedVariable : modifiedVariables) {
-            bool modified = false;
-            for (StmtNum nextStmtNum : nextStmtNums) {
-                if (modified) {
-                    break;
-                }
-                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
-                // Checking if uses the affector variable
-                for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                    if (nextStmt.has_value() && nextStmt.value().type == StatementType::ASSIGN && currVar == modifiedVariable) {
-                        values.push_back(std::to_string(nextStmtNum));
-                    }
-                }
-                // Checking if modifies the affector variable AND not nextStmtNum
-                for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
-                    if (currVar == modifiedVariable) {
-                        modified = true;
-                        break;  // Break out of inner loop for current affector statement
-                    }
-                }
+        AffectsSet resultSet;
+        generateAffectsfromAffector(resultSet, stmtNum, reader);
+        for (const auto& pair : resultSet) {
+            if (pair.first == stmtNum) {
+                values.push_back(std::to_string(pair.second));
             }
         }
+    // synonym is affector
     } else {
-        std::unordered_set<Variable> usesVariables = reader.getUsesVariablesByStatement(stmtNum);
-        for (Variable usesVariable : usesVariables) {
-            bool modified = false;
-            for (StmtNum nextStmtNum : nextStmtNums) {
-                if (modified) {
-                    break;
-                }
-                std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
-                // Checking if modified affected variable
-                for (Variable modifiedVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
-                    if (modifiedVar == usesVariable) {
-                        // If statement assign then mark as value element
-                        if (nextStmt.has_value() && nextStmt.value().type == StatementType::ASSIGN) {
-                            values.push_back(std::to_string(nextStmtNum));
-                        }
-                        modified = true;
-                        break;
-                    }
-                }
+        AffectsSet resultSet = generateAffectsRelation(reader);
+        for (const auto& pair : resultSet) {
+            if (pair.second == stmtNum) {
+                values.push_back(std::to_string(pair.first));
             }
         }
     }
