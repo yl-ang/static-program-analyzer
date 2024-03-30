@@ -5,6 +5,24 @@
 Affects::Affects(ClauseArgument& affector, ClauseArgument& affected)
     : affector(affector), affected(affected) {}
 
+bool Affects::validateArguments() {
+    return checkSynonym(affector) && checkSynonym(affected);
+}
+
+bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
+    if (clauseArgument.isSynonym()) {
+        Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
+        DesignEntityType sType = s.getType();
+        if (sType != DesignEntityType::ASSIGN && sType != DesignEntityType::READ &&
+            sType != DesignEntityType::CALL && sType != DesignEntityType::PRINT &&
+            sType != DesignEntityType::WHILE && sType != DesignEntityType::IF &&
+            sType != DesignEntityType::STMT) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Affects::checkAssign(ClauseArgument& clauseArgument) {
     if (clauseArgument.isSynonym()) {
         Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
