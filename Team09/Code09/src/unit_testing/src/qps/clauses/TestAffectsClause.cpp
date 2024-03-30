@@ -56,7 +56,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
 
         AffectsTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
         AffectsTester{pfr, new Integer("2"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("3")}.testBoolean(false);
+        AffectsTester{pfr, new Integer("3"), new Integer("3")}.testBoolean(true);
         AffectsTester{pfr, new Integer("4"), new Integer("4")}.testBoolean(false);
     }
 
