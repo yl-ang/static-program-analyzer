@@ -23,6 +23,7 @@ private:
 
     AffectsSet generateAffectsRelation(PKBFacadeReader& reader);
     void generateAffectsfromAffector(AffectsSet&, StmtNum&, PKBFacadeReader&);
+    void generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
     bool checkSynonym(ClauseArgument& clauseArgument);
     bool checkAssign(ClauseArgument& clauseArgument);
