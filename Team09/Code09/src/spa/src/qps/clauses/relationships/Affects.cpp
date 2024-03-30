@@ -90,7 +90,7 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
 
 // Helper Affected template (1)
 template <typename Func>
-void processAffected(Func func, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
+void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader) {
     auto usesVariables = reader.getUsesVariablesByStatement(affectedStmtNum);
 
     // IMPORTANT: For each variable used
@@ -197,7 +197,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
 
 // Helper Affector template (1)
 template <typename Func>
-void processAffects(Func func, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) {
     // keep track of visited
     std::unordered_set<StmtNum> visited;
     std::vector<StmtNum> stack;
