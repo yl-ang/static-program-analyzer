@@ -267,63 +267,14 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
     StmtNum affectorStmtNum = std::stoi(affectorInt.getValue());
     StmtNum affectedStmtNum = std::stoi(affectedInt.getValue());
 
-    std::optional<Stmt> affectorStmt = reader.getStatementByStmtNum(affectorStmtNum);
-    std::optional<Stmt> affectedStmt = reader.getStatementByStmtNum(affectedStmtNum);
-    if (!affectorStmt.has_value() || !affectedStmt.has_value() ||
-            (affectorStmt.value().type != StatementType::ASSIGN) ||
-            (affectedStmt.value().type != StatementType::ASSIGN)) {
-        return false;
-    }
+    AffectsSet resultSet = generateAffectsRelation(reader);
 
-    bool usesModifiedVariable = false;
-
-    /**
-     * Check that affectedStatement Uses Modified variable
-    */
-    std::unordered_set<Variable> affectorVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
-    std::unordered_set<Variable> affectedVariables = reader.getUsesVariablesByStatement(affectedStmtNum);
-    for (Variable affectorVariable: affectorVariables) {
-        for (Variable affectedVariable: affectedVariables) {
-            if (affectorVariable == affectedVariable) {
-                usesModifiedVariable = true;
-            }
+    for (const auto& pair : resultSet) {
+        if (pair.first == affectorStmtNum && pair.second == affectedStmtNum) {
+            return true;
         }
     }
-
-    /**
-     * Check that Uses Modified variable is not Modified inbetween
-    */
-    std::unordered_set<StmtNum> nextStmtNums = reader.getNexterStar(affectorStmtNum);
-
-    /**
-     * For each Nextee:
-     * - for all statements, CHECK that does not modify the variable
-     * -- if modified, mark notModifiedBetween as false, and exit loop
-     * -- else if goal statement, exit loop
-    */
-    bool modifiedBetween = false;
-    for (StmtNum nextStmtNum : nextStmtNums) {
-        if ((nextStmtNum == affectedStmtNum) || modifiedBetween) {
-            break;
-        } else {
-            std::optional<Stmt> nextStmt = reader.getStatementByStmtNum(nextStmtNum);
-            if (nextStmt.value().type != StatementType::IF && nextStmt.value().type != StatementType::WHILE) {
-                std::unordered_set<Variable> nextStmtVariables = reader.getModifiesVariablesByStatement(nextStmtNum);
-                for (Variable nextStmtVariable : nextStmtVariables) {
-                    for (Variable affectorVariable : affectorVariables) {
-                        if (nextStmtVariable == affectorVariable) {
-                            modifiedBetween = true;
-                            break;
-                        }
-                    }
-                    if (modifiedBetween) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    return usesModifiedVariable && !(modifiedBetween);
+    return false;
 }
 
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
