@@ -6,6 +6,9 @@
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
+// Define AffectsSet
+using AffectsSet = std::unordered_set<std::pair<StmtNum, StmtNum>>;
+
 class Affects : public Relationship {
 private:
     ClauseArgument& affector;
@@ -14,6 +17,9 @@ private:
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateBothIntegers(PKBFacadeReader&);
     ClauseResult evaluateBothWildcards(PKBFacadeReader&);
+    AffectsSet generateAffectsRelation(PKBFacadeReader& reader);
+    void generateAffectsfromAffector(AffectsSet&, StmtNum&, PKBFacadeReader&);
+    bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
     ClauseResult evaluateWildcardInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
