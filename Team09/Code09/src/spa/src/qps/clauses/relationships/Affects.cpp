@@ -34,14 +34,14 @@ bool Affects::checkAssign(Synonym& synonym) {
     return false;
 }
 
-bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1, 
+bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
                             const std::unordered_set<Variable>& set2) {
     for (const auto value : set1) {
         if (set2.find(value) != set2.end()) {
-            return true; // A common value is found
+            return true;  // A common value is found
         }
     }
-    return false; // No common value found
+    return false;  // No common value found
 }
 
 ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
@@ -67,7 +67,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     if ((affector.isWildcard() && affected.isSynonym()) || (affector.isSynonym() && affected.isWildcard())) {
         return evaluateSynonymWildcard(reader);
     }
-    
+
     return evaluateBothSynonyms(reader);
 }
 
@@ -92,9 +92,9 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
 
 // Helper Affected template (1)
 template <typename Func>
-void processAffected(Func& func, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
+void processAffected(const Func& func, const StmtNum& affectedStmtNum, const PKBFacadeReader& reader) {
     auto usesVariables = reader.getUsesVariablesByStatement(affectedStmtNum);
-    
+
     // IMPORTANT: For each variable used
     for (auto usesVariable : usesVariables) {
         // keep track of visited
@@ -114,8 +114,6 @@ void processAffected(Func& func, StmtNum& affectedStmtNum, PKBFacadeReader& read
             stack.emplace_back(stmt);
         }
         // get variables used by affectedStmtNum
-        
-
         while (!stack.empty()) {
             // Get first element of stack and erase
             StmtNum stmtNum = stack[0];
@@ -152,7 +150,7 @@ void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Var
             return;
         }
     }
-    
+
     auto previousStmtSet = reader.getNextee(stmtNum);
     for (const auto previousStmt : previousStmtSet) {
         if (visited.find(previousStmt) == visited.end()) {
@@ -201,7 +199,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
 
 // Helper Affector template (1)
 template <typename Func>
-void processAffects(Func& func, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
+void processAffects(const Func& func, const StmtNum& affectorStmtNum, const PKBFacadeReader& reader) {
     // keep track of visited
     std::unordered_set<StmtNum> visited;
     std::vector<StmtNum> stack;
@@ -321,7 +319,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     if (stmt.has_value() && (stmt.value().type == StatementType::ASSIGN)) {
         AffectsSet resultSet;
 
-        // wildcard is affected  
+        // wildcard is affected
         if (affectorIsInteger) {
             return isAffectsfromAffector(stmtNum, reader);
         // wildcard is affector
@@ -345,7 +343,6 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
     if (affectorStmt.has_value() && affectedStmt.has_value() &&
         (affectorStmt.value().type == StatementType::ASSIGN) &&
         (affectedStmt.value().type == StatementType::ASSIGN)) {
-
         return intAffectsfromAffector(affectorStmtNum, affectedStmtNum, reader);
     }
     return false;
@@ -365,7 +362,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
                 values.push_back(std::to_string(result.first));
             } else {
                 values.push_back(std::to_string(result.second));
-            }     
+            }
         }
     }
 
