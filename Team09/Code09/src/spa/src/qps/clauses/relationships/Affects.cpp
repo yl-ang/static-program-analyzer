@@ -68,36 +68,6 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     return evaluateBothSynonyms(reader);
 }
 
-/**
- * Helper function
-*/
-std::unordered_set<std::pair<Variable, StmtNum>> Affects::getAssignStatements(PKBFacadeReader& reader) {
-    std::unordered_set<Variable> allVar = reader.getVariables();
-    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList{};
-    for (Variable var : allVar) {
-        std::unordered_set<StmtNum> allStmts = reader.getModifiesStatementsByVariable(var);
-        std::unordered_set<StmtNum> assignStmts = ClauseEvaluatorUtils::filterStatementsByType(
-                                                    reader, DesignEntityType::ASSIGN, allStmts);
-        for (StmtNum assignStmt : assignStmts) {
-            varAndAffectorStmtList.insert(std::make_pair(var, assignStmt));
-        }
-    }
-    return varAndAffectorStmtList;
-}
-
-// /**
-//  * Helper function
-// */
-// std::unordered_set<StmtNum> Affects::getNextStmtNums(
-//         const std::pair<Variable, StmtNum>& varAndAffectorStmt, PKBFacadeReader& reader) {
-//     std::unordered_set<StmtNum> nextStmtNums{};
-//     // Get NextStar Control Flow - all StmtNums that follow that assign statement
-//     StmtNum affectorStmtNum = std::get<StmtNum>(varAndAffectorStmt);
-//     std::unordered_set<StmtNum> CFAffector = reader.getNexterStar(affectorStmtNum);
-//     nextStmtNums.insert(CFAffector.begin(), CFAffector.end());
-//     return nextStmtNums;
-// }
-
 AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     // get all assign statements
     std::unordered_set<Variable> allVar = reader.getVariables();
@@ -327,36 +297,21 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
-    std::unordered_set<std::pair<Variable, StmtNum>> varAndAffectorStmtList = getAssignStatements(reader);
-    
+    // get all assign statements
+    std::unordered_set<Variable> allVar = reader.getVariables();
+    std::unordered_set<StmtNum> allStmts;
+    for (Variable var : allVar) {
+        std::unordered_set<StmtNum> modifiesStmts = reader.getModifiesStatementsByVariable(var);
+        allStmts.insert(modifiesStmts.begin(), modifiesStmts.end());
+    }
+    std::unordered_set<StmtNum> assignStmtSet = ClauseEvaluatorUtils::filterStatementsByType(
+                                                reader, DesignEntityType::ASSIGN, allStmts);
+    AffectsSet result;
 
-    for (const std::pair<Variable, StmtNum>& varAndAffectorStmt : varAndAffectorStmtList) {
-        std::unordered_set<StmtNum> nextStmtNums = getNextStmtNums(varAndAffectorStmt, reader);
-        StmtNum stmtNum = std::get<StmtNum>(varAndAffectorStmt);
-        Variable variable = std::get<Variable>(varAndAffectorStmt);
-        bool modified = false;
-        for (StmtNum nextStmtNum : nextStmtNums) {
-            std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-            if (modified) {
-                break;
-            }
-            // Checking if uses the affector variable
-            for (Variable currVar : reader.getUsesVariablesByStatement(nextStmtNum)) {
-                if (!stmt.has_value()) {
-                    return false;
-                } else { 
-                    if (stmt.value().type == StatementType::ASSIGN && currVar == variable) {
-                        return true;
-                    }
-                }
-            }
-            // Checking if modifies the affector variable AND not nextStmtNum
-            for (Variable currVar : reader.getModifiesVariablesByStatement(nextStmtNum)) {
-                if (currVar == variable) {
-                    modified = true;
-                    break;  // Break out of inner loop for current affector statement
-                }
-            }
+    for (StmtNum assignStmt : assignStmtSet) {
+        generateAffectsfromAffector(result, assignStmt, reader);
+        if (!result.empty()) {
+            return true;
         }
     }
     return false;
