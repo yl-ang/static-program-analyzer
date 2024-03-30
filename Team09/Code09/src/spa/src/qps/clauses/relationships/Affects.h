@@ -25,6 +25,7 @@ private:
     void generateAffectsfromAffector(AffectsSet&, StmtNum&, PKBFacadeReader&);
     void generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     bool isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader);
+    bool intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
                                    StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
                                    std::unordered_set<StmtNum>& visited);

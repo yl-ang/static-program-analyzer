@@ -279,6 +279,23 @@ bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& r
     return result;
 }
 
+// Used for Integer/Integer Affector
+bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
+    bool result = false;
+    processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        std::unordered_set<StmtNum>& visited) {
+        if (stmtType == StatementType::ASSIGN) {
+            auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
+            if (hasCommonValue(modifiedVariables, curUsedVariables) && (stmtNum == affectedStmtNum)) {
+                result = true;
+            }
+        }
+        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+    }, affectorStmtNum, reader);
+    return result;
+}
+
 // Used for Synonym Affector
 void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
     processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
@@ -332,13 +349,7 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
         (affectorStmt.value().type == StatementType::ASSIGN) &&
         (affectedStmt.value().type == StatementType::ASSIGN)) {
 
-        AffectsSet resultSet;
-        generateAffectsfromAffector(resultSet, affectorStmtNum, reader);
-        for (const auto& pair : resultSet) {
-            if (pair.second == affectedStmtNum) {
-                return true;
-            }
-        }
+        return intAffectsfromAffector(affectorStmtNum, affectedStmtNum, reader);
     }
     return false;
 }
