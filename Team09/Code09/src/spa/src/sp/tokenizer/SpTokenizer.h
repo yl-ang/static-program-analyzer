@@ -26,11 +26,6 @@ public:
     std::vector<Token> tokenize(std::vector<std::string>);
 
     /**
-     * @brief Tokenizes, but does not validate the syntax of the input. Primarily used for pattern
-     */
-    std::vector<Token> tokenizeWithoutValidation(std::vector<std::string> input);
-
-    /**
      * @brief Tokenizes for pattern
      */
     std::vector<Token> tokenizeForPattern(std::vector<std::string> input);
