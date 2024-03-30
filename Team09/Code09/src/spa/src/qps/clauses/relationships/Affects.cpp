@@ -26,15 +26,12 @@ bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
     return true;
 }
 
-bool Affects::checkAssign(ClauseArgument& clauseArgument) {
-    if (clauseArgument.isSynonym()) {
-        Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
-        DesignEntityType sType = s.getType();
-        if (sType != DesignEntityType::ASSIGN && sType != DesignEntityType::STMT) {
-            return false;
-        }
+bool Affects::checkAssign(Synonym& synonym) {
+    DesignEntityType sType = synonym.getType();
+    if (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT) {
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1, 
