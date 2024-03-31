@@ -71,16 +71,10 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 // Get All Affects Relationship
 AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Stmt> allStmts = reader.getStmts();
-    std::unordered_set<StmtNum> assignStmtSet;
-    for (Stmt stmt : allStmts) {
-        if (stmt.type == StatementType::ASSIGN) {
-            assignStmtSet.insert(stmt.stmtNum);
-        }
-    }
+    std::unordered_set<Stmt> assignStmtSet= reader.getStatementsByType(StatementType::ASSIGN);
     AffectsSet result;
-    for (StmtNum assignStmt : assignStmtSet) {
-        generateAffectsfromAffector(result, assignStmt, reader);
+    for (Stmt assignStmt : assignStmtSet) {
+        generateAffectsfromAffector(result, assignStmt.stmtNum, reader);
     }
     return result;
 }
