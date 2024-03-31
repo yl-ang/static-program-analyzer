@@ -372,29 +372,31 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
 
     std::unordered_set<StmtNum> stmtNumValues;
 
-    if (checkAssign(syn)) {
-        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-        if (stmt.has_value() && stmt.value().type == StatementType::ASSIGN) {
-            AffectsSet resultSet;
-            // synonym is affected
-            if (affectorIsInteger) {
-                generateAffectsfromAffector(resultSet, stmtNum, reader);
-                for (const auto& pair : resultSet) {
-                    if (pair.first == stmtNum) {
-                        stmtNumValues.insert(pair.second);
-                    }
-                }
-            // synonym is affector
-            } else {
-                generateAffectsfromAffected(resultSet, stmtNum, reader);
-                for (const auto& pair : resultSet) {
-                    if (pair.second == stmtNum) {
-                        stmtNumValues.insert(pair.first);
-                    }
-                }
+    if (!checkAssign(syn)) {
+        return {syn, {}};
+    }
+    std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+    if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
+        return  {syn, {}};
+    }
+    AffectsSet resultSet;
+    // synonym is affected
+    if (affectorIsInteger) {
+        generateAffectsfromAffector(resultSet, stmtNum, reader);
+        for (const auto& pair : resultSet) {
+            if (pair.first == stmtNum) {
+                stmtNumValues.insert(pair.second);
             }
         }
-    }
+    // synonym is affector
+    } else {
+        generateAffectsfromAffected(resultSet, stmtNum, reader);
+        for (const auto& pair : resultSet) {
+            if (pair.second == stmtNum) {
+                stmtNumValues.insert(pair.first);
+            }
+        }
+    }```
 
     SynonymValues values;
     for (int stmtNumValue : stmtNumValues) {
