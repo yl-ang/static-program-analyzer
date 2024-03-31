@@ -97,25 +97,25 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
     for (auto usesVariable : usesVariables) {
         // keep track of visited
         std::unordered_set<StmtNum> visited;
-        std::vector<StmtNum> stack;
+        std::vector<StmtNum> queue;
 
-        // Place the statement itself inside stack
-        stack.emplace_back(affectedStmtNum);
+        // Place the statement itself inside queue
+        queue.emplace_back(affectedStmtNum);
 
         // get the immendiate set of next of affectedStmtNum
         auto startingSet = reader.getNextee(affectedStmtNum);
         /**
-         * For each statement stmt in startingSet, this line adds stmt to the back of the stack using emplace_back(). 
+         * For each statement stmt in startingSet, this line adds stmt to the back of the queue using emplace_back(). 
          * emplace_back() is a function that constructs an object in-place at the end of the container.
         */
         for (auto stmt : startingSet) {
-            stack.emplace_back(stmt);
+            queue.emplace_back(stmt);
         }
         // get variables used by affectedStmtNum
-        while (!stack.empty()) {
-            // Get first element of stack and erase
-            StmtNum stmtNum = stack[0];
-            stack.erase(stack.begin());
+        while (!queue.empty()) {
+            // Get first element of queue and erase
+            StmtNum stmtNum = queue[0];
+            queue.erase(queue.begin());
 
             // If not visited, continue
             // insert into visited
@@ -132,7 +132,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
             StatementType stmtType = stmt.value().type;
 
             std::unordered_set<Variable> usesVariableOneSet = {usesVariable};
-            func(affectedStmtNum, stmtNum, usesVariableOneSet, stmtType, reader, stack, visited);
+            func(affectedStmtNum, stmtNum, usesVariableOneSet, stmtType, reader, queue, visited);
         }
     }
 }
@@ -140,7 +140,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
 // Helper Affected function (2)
 void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                                         StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
     // if modified, skip rest of loop
     if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
@@ -152,7 +152,7 @@ void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Var
     auto previousStmtSet = reader.getNextee(stmtNum);
     for (const auto previousStmt : previousStmtSet) {
         if (visited.find(previousStmt) == visited.end()) {
-            stack.emplace_back(previousStmt);
+            queue.emplace_back(previousStmt);
         }
     }
 }
@@ -162,7 +162,7 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
     bool result = false;
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                         StatementType stmtType, PKBFacadeReader& reader,
-                        std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
             auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
@@ -172,7 +172,7 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
                 return;
             }
         }
-        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, stack, visited);
+        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, queue, visited);
     }, affectedStmtNum, reader);
     return result;
 }
@@ -181,7 +181,7 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
 void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                     StatementType& stmtType, PKBFacadeReader& reader,
-                    std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+                    std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
             auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
@@ -191,7 +191,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
                 return;
             }
         }
-        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, stack, visited);
+        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, queue, visited);
     }, affectedStmtNum, reader);
 }
 
@@ -200,23 +200,23 @@ template <typename Func>
 void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) {
     // keep track of visited
     std::unordered_set<StmtNum> visited;
-    std::vector<StmtNum> stack;
+    std::vector<StmtNum> queue;
 
-    // Place the statement itself inside stack
-    stack.emplace_back(affectorStmtNum);
+    // Place the statement itself inside queue
+    queue.emplace_back(affectorStmtNum);
 
     // get the immediate set of next of affectorStmtNum
     auto startingSet = reader.getNexter(affectorStmtNum);
     for (auto stmt : startingSet) {
-        stack.emplace_back(stmt);
+        queue.emplace_back(stmt);
     }
     // get variables modified by affectorStmtNum
     auto modifiedVariables = reader.getModifiesVariablesByStatement(affectorStmtNum);
 
-    while (!stack.empty()) {
-        // Get first element of stack and erase
-        StmtNum stmtNum = stack[0];
-        stack.erase(stack.begin());
+    while (!queue.empty()) {
+        // Get first element of queue and erase
+        StmtNum stmtNum = queue[0];
+        queue.erase(queue.begin());
 
         // If not visited, continue
         // insert into visited
@@ -232,14 +232,14 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
         }
         StatementType stmtType = stmt.value().type;
 
-        func(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+        func(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, queue, visited);
     }
 }
 
 // Helper Affector function (2)
 void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
                                         StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
     // if modified, skip rest of loop
     if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
@@ -250,7 +250,7 @@ void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Var
     auto nextStmtSet = reader.getNexter(stmtNum);
     for (const auto nextStmt : nextStmtSet) {
         if (visited.find(nextStmt) == visited.end()) {
-            stack.emplace_back(nextStmt);
+            queue.emplace_back(nextStmt);
         }
     }
 }
@@ -259,7 +259,7 @@ void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Var
 bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
     bool result = false;
     processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& queue,
                         std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN) {
             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
@@ -267,7 +267,7 @@ bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& r
                 result = true;
             }
         }
-        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
     }, affectorStmtNum, reader);
     return result;
 }
@@ -276,7 +276,7 @@ bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& r
 bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     bool result = false;
     processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                        StatementType stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& queue,
                         std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN) {
             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
@@ -284,7 +284,7 @@ bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affected
                 result = true;
             }
         }
-        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
     }, affectorStmtNum, reader);
     return result;
 }
@@ -292,7 +292,7 @@ bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affected
 // Used for Synonym Affector
 void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
     processAffects([&](StmtNum& affectorStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                    StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                    StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& queue,
                     std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN) {
             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
@@ -300,7 +300,7 @@ void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorS
                 result.insert({affectorStmtNum, stmtNum});
             }
         }
-        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, stack, visited);
+        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
     }, affectorStmtNum, reader);
 }
 
