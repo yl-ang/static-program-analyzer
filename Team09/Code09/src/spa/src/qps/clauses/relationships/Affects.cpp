@@ -120,7 +120,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
             if (!stmt.has_value()) {
                 throw Exception("Statement does not have value");
             }
-            StatementType stmtType = stmt.value().type;
+            StatementType stmtType = stmt->type;
 
             std::unordered_set<Variable> usesVariableOneSet = {usesVariable};
             func(affectedStmtNum, stmtNum, usesVariableOneSet, stmtType, reader, stack, visited);
