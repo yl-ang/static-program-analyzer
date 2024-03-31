@@ -173,7 +173,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
                     StatementType& stmtType, PKBFacadeReader& reader,
                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);       
+            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
                 if (stmtType == StatementType::ASSIGN) {
                     result.insert({stmtNum, affectedStmtNum});
