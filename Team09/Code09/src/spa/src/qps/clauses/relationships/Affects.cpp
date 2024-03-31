@@ -16,22 +16,22 @@ bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
     if (clauseArgument.isSynonym()) {
         Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
         DesignEntityType sType = s.getType();
-        if (sType != DesignEntityType::ASSIGN && sType != DesignEntityType::READ &&
-            sType != DesignEntityType::CALL && sType != DesignEntityType::PRINT &&
-            sType != DesignEntityType::WHILE && sType != DesignEntityType::IF &&
-            sType != DesignEntityType::STMT) {
+        if (sType == DesignEntityType::VARIABLE || sType == DesignEntityType::PROCEDURE ||
+            sType == DesignEntityType::CONSTANT) {
             return false;
         }
     }
     return true;
 }
 
+bool Affects::checkStmtNum(StmtNum& stmtNum, PKBFacadeReader& reader) {
+    std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+    return stmt.has_value();
+}
+
 bool Affects::checkAssign(Synonym& synonym) {
     DesignEntityType sType = synonym.getType();
-    if (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT) {
-        return true;
-    }
-    return false;
+    return (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT);
 }
 
 bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
@@ -74,16 +74,10 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 // Get All Affects Relationship
 AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Stmt> allStmts = reader.getStmts();
-    std::unordered_set<StmtNum> assignStmtSet;
-    for (Stmt stmt : allStmts) {
-        if (stmt.type == StatementType::ASSIGN) {
-            assignStmtSet.insert(stmt.stmtNum);
-        }
-    }
+    std::unordered_set<Stmt> assignStmtSet= reader.getStatementsByType(StatementType::ASSIGN);
     AffectsSet result;
-    for (StmtNum assignStmt : assignStmtSet) {
-        generateAffectsfromAffector(result, assignStmt, reader);
+    for (Stmt assignStmt : assignStmtSet) {
+        generateAffectsfromAffector(result, assignStmt.stmtNum, reader);
     }
     return result;
 }
@@ -127,9 +121,9 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
             // get statement type of statement
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
             if (!stmt.has_value()) {
-                throw Exception("Statement does not have value");
+                throw Exception("This is not supposed to happen. There are supposed to be checks that return empty value/ false.");
             }
-            StatementType stmtType = stmt.value().type;
+            StatementType stmtType = stmt->type;
 
             std::unordered_set<Variable> usesVariableOneSet = {usesVariable};
             func(affectedStmtNum, stmtNum, usesVariableOneSet, stmtType, reader, queue, visited);
@@ -181,17 +175,19 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
 void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                     StatementType& stmtType, PKBFacadeReader& reader,
-                    std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
-        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-            if (hasCommonValue(usesVariable, curModifiesVariables)) {
-                if (stmtType == StatementType::ASSIGN) {
-                    result.insert({stmtNum, affectedStmtNum});
-                }
-                return;
-            }
+                    std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+        if (stmtType != StatementType::ASSIGN && stmtType != StatementType::READ && stmtType == StatementType::CALL) {
+            return;
         }
-        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, queue, visited);
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (!hasCommonValue(usesVariable, curModifiesVariables)) {
+            return;
+        }
+        if (stmtType == StatementType::ASSIGN) {
+            result.insert({stmtNum, affectedStmtNum});
+        }
+        return;
+        handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, stack, visited);
     }, affectedStmtNum, reader);
 }
 
@@ -228,7 +224,7 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
         // get statement type of statement
         std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
         if (!stmt.has_value()) {
-            throw Exception("Statement does not have value");
+            throw Exception("This is not supposed to happen. There are supposed to be checks that return empty value/ false.");
         }
         StatementType stmtType = stmt.value().type;
 
@@ -434,17 +430,11 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Stmt> allStmts = reader.getStmts();
-    std::unordered_set<StmtNum> assignStmtSet;
-    for (Stmt stmt : allStmts) {
-        if (stmt.type == StatementType::ASSIGN) {
-            assignStmtSet.insert(stmt.stmtNum);
-        }
-    }
+    std::unordered_set<Stmt> assignStmtSet= reader.getStatementsByType(StatementType::ASSIGN);
     AffectsSet result;
 
-    for (StmtNum assignStmt : assignStmtSet) {
-        if (isAffectsfromAffector(assignStmt, reader)) {
+    for (Stmt assignStmt : assignStmtSet) {
+        if (isAffectsfromAffector(assignStmt.stmtNum, reader)) {
             return true;
         }
     }
