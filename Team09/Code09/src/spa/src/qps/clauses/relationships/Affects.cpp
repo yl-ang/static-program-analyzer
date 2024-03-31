@@ -16,10 +16,8 @@ bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
     if (clauseArgument.isSynonym()) {
         Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
         DesignEntityType sType = s.getType();
-        if (sType != DesignEntityType::ASSIGN && sType != DesignEntityType::READ &&
-            sType != DesignEntityType::CALL && sType != DesignEntityType::PRINT &&
-            sType != DesignEntityType::WHILE && sType != DesignEntityType::IF &&
-            sType != DesignEntityType::STMT) {
+        if (sType == DesignEntityType::VARIABLE || sType == DesignEntityType::PROCEDURE ||
+            sType == DesignEntityType::CONSTANT) {
             return false;
         }
     }
