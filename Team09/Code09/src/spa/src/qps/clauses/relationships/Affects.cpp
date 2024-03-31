@@ -28,10 +28,7 @@ bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
 
 bool Affects::checkAssign(Synonym& synonym) {
     DesignEntityType sType = synonym.getType();
-    if (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT) {
-        return true;
-    }
-    return false;
+    return sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT);
 }
 
 bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
