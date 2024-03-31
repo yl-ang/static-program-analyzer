@@ -406,12 +406,10 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     Synonym affectorSyn = dynamic_cast<Synonym&>(affector);
     Synonym affectedSyn = dynamic_cast<Synonym&>(affected);
-    std::vector<Synonym> synonyms{affectorSyn, affectedSyn};
+    std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
     SynonymValues affectorValues;
     SynonymValues affectedValues;
-
-    std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
     if (checkAssign(affectorSyn) && checkAssign(affectedSyn)) {
         AffectsSet resultSet = generateAffectsRelation(reader);
