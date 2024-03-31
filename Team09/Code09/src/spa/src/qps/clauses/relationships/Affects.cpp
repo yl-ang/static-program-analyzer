@@ -153,12 +153,14 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                         StatementType stmtType, PKBFacadeReader& reader,
                         std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (stmtType == StatementType::ASSIGN) {
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {   
+                result = true;
+            }
+        }
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
-                if (stmtType == StatementType::ASSIGN) {
-                    result = true;
-                }
                 return;
             }
         }
@@ -172,12 +174,14 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                     StatementType& stmtType, PKBFacadeReader& reader,
                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (stmtType == StatementType::ASSIGN) {
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {   
+                result.insert({stmtNum, affectedStmtNum});
+            }
+        }
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
-                if (stmtType == StatementType::ASSIGN) {
-                    result.insert({stmtNum, affectedStmtNum});
-                }
                 return;
             }
         }
@@ -305,18 +309,18 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-    if (stmt.has_value() && (stmt.value().type == StatementType::ASSIGN)) {
-        AffectsSet resultSet;
-
-        // wildcard is affected
-        if (affectorIsInteger) {
-            return isAffectsfromAffector(stmtNum, reader);
-        // wildcard is affector
-        } else {
-            return isAffectsfromAffected(stmtNum, reader);
-        }
+    if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
+        return false;
     }
-    return false;
+
+    AffectsSet resultSet;
+    // wildcard is affected
+    if (affectorIsInteger) {
+        return isAffectsfromAffector(stmtNum, reader);
+    // wildcard is affector
+    } else {
+        return isAffectsfromAffected(stmtNum, reader);
+    }
 }
 
 ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
@@ -412,7 +416,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues affectedValues;
 
     if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
-        return {headers, {affectorValues, affectedValues}};
+        return {headers, {{}, {}}};
     }
     AffectsSet resultSet = generateAffectsRelation(reader);
     for (std::pair<StmtNum, StmtNum> result: resultSet) {
