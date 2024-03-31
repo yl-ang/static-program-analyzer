@@ -24,11 +24,6 @@ bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
     return true;
 }
 
-bool Affects::checkStmtNum(StmtNum& stmtNum, PKBFacadeReader& reader) {
-    std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-    return stmt.has_value();
-}
-
 bool Affects::checkAssign(Synonym& synonym) {
     DesignEntityType sType = synonym.getType();
     return (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT);
@@ -74,7 +69,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 // Get All Affects Relationship
 AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Stmt> assignStmtSet= reader.getStatementsByType(StatementType::ASSIGN);
+    std::unordered_set<Stmt> assignStmtSet = reader.getStatementsByType(StatementType::ASSIGN);
     AffectsSet result;
     for (Stmt assignStmt : assignStmtSet) {
         generateAffectsfromAffector(result, assignStmt.stmtNum, reader);
@@ -121,7 +116,8 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
             // get statement type of statement
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
             if (!stmt.has_value()) {
-                throw Exception("This is not supposed to happen. There are supposed to be checks that return empty value/ false.");
+                throw Exception(
+                    "Not supposed to happen. Check to return empty value/ false.");
             }
             StatementType stmtType = stmt->type;
 
@@ -224,7 +220,8 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
         // get statement type of statement
         std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
         if (!stmt.has_value()) {
-            throw Exception("This is not supposed to happen. There are supposed to be checks that return empty value/ false.");
+            throw Exception(
+                "Not supposed to happen. Check to return empty value/ false.");
         }
         StatementType stmtType = stmt.value().type;
 
@@ -430,7 +427,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateBothWildcards(PKBFacadeReader& reader) {
     // get all assign statements
-    std::unordered_set<Stmt> assignStmtSet= reader.getStatementsByType(StatementType::ASSIGN);
+    std::unordered_set<Stmt> assignStmtSet = reader.getStatementsByType(StatementType::ASSIGN);
     AffectsSet result;
 
     for (Stmt assignStmt : assignStmtSet) {
