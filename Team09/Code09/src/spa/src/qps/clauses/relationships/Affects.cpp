@@ -372,26 +372,28 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
 
     std::unordered_set<StmtNum> stmtNumValues;
 
-    if (checkAssign(syn)) {
-        std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
-        if (stmt.has_value() && stmt.value().type == StatementType::ASSIGN) {
-            AffectsSet resultSet;
-            // synonym is affected
-            if (affectorIsInteger) {
-                generateAffectsfromAffector(resultSet, stmtNum, reader);
-                for (const auto& pair : resultSet) {
-                    if (pair.first == stmtNum) {
-                        stmtNumValues.insert(pair.second);
-                    }
-                }
-            // synonym is affector
-            } else {
-                generateAffectsfromAffected(resultSet, stmtNum, reader);
-                for (const auto& pair : resultSet) {
-                    if (pair.second == stmtNum) {
-                        stmtNumValues.insert(pair.first);
-                    }
-                }
+    if (!checkAssign(syn)) {
+        return {syn, {}};
+    }
+    std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
+    if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
+        return  {syn, {}};
+    }
+    AffectsSet resultSet;
+    // synonym is affected
+    if (affectorIsInteger) {
+        generateAffectsfromAffector(resultSet, stmtNum, reader);
+        for (const auto& pair : resultSet) {
+            if (pair.first == stmtNum) {
+                stmtNumValues.insert(pair.second);
+            }
+        }
+    // synonym is affector
+    } else {
+        generateAffectsfromAffected(resultSet, stmtNum, reader);
+        for (const auto& pair : resultSet) {
+            if (pair.second == stmtNum) {
+                stmtNumValues.insert(pair.first);
             }
         }
     }
@@ -411,12 +413,15 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues affectorValues;
     SynonymValues affectedValues;
 
-    if (checkAssign(affectorSyn) && checkAssign(affectedSyn)) {
-        AffectsSet resultSet = generateAffectsRelation(reader);
-        for (std::pair<StmtNum, StmtNum> result: resultSet) {
-            affectorValues.push_back(std::to_string(result.first));
-            affectedValues.push_back(std::to_string(result.second));
-        }
+    std::vector<Synonym> headers = {affectorSyn, affectedSyn};
+
+    if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
+        return {headers, {affectorValues, affectedValues}};
+    }
+    AffectsSet resultSet = generateAffectsRelation(reader);
+    for (std::pair<StmtNum, StmtNum> result: resultSet) {
+        affectorValues.push_back(std::to_string(result.first));
+        affectedValues.push_back(std::to_string(result.second));
     }
 
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
