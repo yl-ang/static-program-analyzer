@@ -172,17 +172,15 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
     processAffected([&](StmtNum& affectedStmtNum, StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
                     StatementType& stmtType, PKBFacadeReader& reader,
                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
-        if (stmtType != StatementType::ASSIGN && stmtType != StatementType::READ && stmtType == StatementType::CALL) {
-            return;
+        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+            auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);       
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {
+                if (stmtType == StatementType::ASSIGN) {
+                    result.insert({stmtNum, affectedStmtNum});
+                }
+                return;
+            }
         }
-        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        if (!hasCommonValue(usesVariable, curModifiesVariables)) {
-            return;
-        }
-        if (stmtType == StatementType::ASSIGN) {
-            result.insert({stmtNum, affectedStmtNum});
-        }
-        return;
         handleCommonAffectedLogic(stmtNum, usesVariable, stmtType, reader, stack, visited);
     }, affectedStmtNum, reader);
 }
@@ -412,8 +410,6 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     SynonymValues affectorValues;
     SynonymValues affectedValues;
-
-    std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
     if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
         return {headers, {affectorValues, affectedValues}};
