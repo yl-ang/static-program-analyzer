@@ -413,12 +413,13 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
-    if (checkAssign(affectorSyn) && checkAssign(affectedSyn)) {
-        AffectsSet resultSet = generateAffectsRelation(reader);
-        for (std::pair<StmtNum, StmtNum> result: resultSet) {
-            affectorValues.push_back(std::to_string(result.first));
-            affectedValues.push_back(std::to_string(result.second));
-        }
+    if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
+        return {headers, {{}, {}}}
+    }
+    AffectsSet resultSet = generateAffectsRelation(reader);
+    for (std::pair<StmtNum, StmtNum> result: resultSet) {
+        affectorValues.push_back(std::to_string(result.first));
+        affectedValues.push_back(std::to_string(result.second));
     }
 
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
