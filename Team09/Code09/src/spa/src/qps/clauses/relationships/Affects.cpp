@@ -155,7 +155,7 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
                         std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
         if (stmtType == StatementType::ASSIGN) {
-            if (hasCommonValue(usesVariable, curModifiesVariables)) {   
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {
                 result = true;
             }
         }
@@ -176,7 +176,7 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
         if (stmtType == StatementType::ASSIGN) {
-            if (hasCommonValue(usesVariable, curModifiesVariables)) {   
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {
                 result.insert({stmtNum, affectedStmtNum});
             }
         }
