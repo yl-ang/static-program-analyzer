@@ -15,7 +15,7 @@ std::shared_ptr<Pattern> PatternClause::getPattern() {
         if (synType == DesignEntityType::UNKNOWN) {
             throw Exception("Pattern type not determined yet");
         }
-        pattern = PatternBuilder::buildPattern(synType, &syn, args);
+        pattern = PatternBuilder::buildPattern(synType, syn, arguments);
     }
 
     return pattern.value();
