@@ -5,7 +5,6 @@ std::unique_ptr<QueryClause> WithStrategy::execute(std::string str) const {
     std::string mainClause;
     std::tie(prefix, mainClause) = substringUntilDelimiter(str, QPSConstants::SPACE);
 
-    mainClause = trim(mainClause);
     Validator::validateWithSyntax(mainClause);
     std::vector<std::string> parameterStringsToParse = splitByDelimiter(mainClause, "=");
     std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildWithParameters(parameterStringsToParse)};
