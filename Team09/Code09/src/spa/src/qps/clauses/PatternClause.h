@@ -9,11 +9,11 @@
 
 class PatternClause : public QueryClause {
 protected:
-    ClauseArgument& synonym;
-    std::vector<ClauseArgument*> args;
+    std::shared_ptr<ClauseArgument> synonym;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
 public:
-    PatternClause(ClauseArgument*, std::vector<ClauseArgument*>);
+    PatternClause(std::shared_ptr<ClauseArgument>, std::vector<std::shared_ptr<ClauseArgument>>);
     bool equals(const QueryClause&) const override;
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;

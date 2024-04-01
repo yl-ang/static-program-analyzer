@@ -8,8 +8,8 @@
 
 class Uses : public Relationship {
 private:
-    ClauseArgument& user;
-    ClauseArgument& var;
+    std::shared_ptr<ClauseArgument> user;
+    std::shared_ptr<ClauseArgument> var;
 
     /**
      * Check if the result is a simple boolean result.
@@ -24,7 +24,7 @@ private:
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Uses(ClauseArgument&, ClauseArgument&);
+    Uses(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

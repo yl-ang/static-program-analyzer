@@ -6,8 +6,8 @@ using ProcedureSet = std::unordered_set<Procedure>;
 
 class BaseCalls : public Relationship {
 protected:
-    ClauseArgument& caller;
-    ClauseArgument& callee;
+    std::shared_ptr<ClauseArgument> caller;
+    std::shared_ptr<ClauseArgument> callee;
 
 private:
     bool isSimpleResult() const;
@@ -21,7 +21,7 @@ private:
     virtual ProcedureSet getCaller(PKBFacadeReader&, const Procedure&) = 0;
 
 public:
-    BaseCalls(ClauseArgument&, ClauseArgument&);
+    BaseCalls(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

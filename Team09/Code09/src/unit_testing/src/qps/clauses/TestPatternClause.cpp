@@ -46,86 +46,86 @@ TEST_CASE("Assign Pattern evaluate") {
         {2, {"x # # ", "add x # # y # # "}}, {3, {"x # # ", "mul 2 # # x # # "}}, {4, {"x # # ", "2 # # "}}};
     writer.setAssignPatternStore(isExactMatch, isPartialMatch, assignPatternStoreEntries);
 
-    Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
+    std::shared_ptr<Synonym> assignSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a");
 
-    Literal literal = Literal("1");
+    std::shared_ptr<Literal> literal = std::make_shared<Literal>("1");
     SECTION("Test Wildcard and Wildcard") {
-        Wildcard wildcard = Wildcard();
+        std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
-        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &wildcard});
+        PatternClause pc = PatternClause(assignSyn, {wildcard, wildcard});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"2", "3", "4"}));
     }
 
     SECTION("Test Wildcard and ExpressionSpec") {
-        Wildcard wildcard = Wildcard();
-        ExpressionSpec varExp = ExpressionSpec("_\"y\"_");
-        ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
-        ExpressionSpec literalExp_False = ExpressionSpec("_\"1\"_");
+        std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
+        std::shared_ptr<ExpressionSpec> varExp = std::make_shared<ExpressionSpec>("_\"y\"_");
+        std::shared_ptr<ExpressionSpec> literalExp = std::make_shared<ExpressionSpec>("_\"2\"_");
+        std::shared_ptr<ExpressionSpec> literalExp_False = std::make_shared<ExpressionSpec>("_\"1\"_");
 
-        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &varExp});
+        PatternClause pc = PatternClause(assignSyn, {wildcard, varExp});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}});
 
-        PatternClause pc2 = PatternClause(&assignSyn, {&wildcard, &literalExp});
+        PatternClause pc2 = PatternClause(assignSyn, {wildcard, literalExp});
         result = pc2.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
         REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"3", "4"}));
 
-        PatternClause pc3 = PatternClause(&assignSyn, {&wildcard, &literalExp_False});
+        PatternClause pc3 = PatternClause(assignSyn, {wildcard, literalExp_False});
         result = pc3.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{}});
     }
 
     SECTION("Test Synonym and Wildcard") {
-        Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
-        Wildcard wildcard = Wildcard();
+        std::shared_ptr<Synonym> variableSyn = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+        std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
-        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &wildcard});
+        PatternClause pc = PatternClause(assignSyn, {variableSyn, wildcard});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"2", "3", "4"}));
         REQUIRE_EQUAL_VECTORS(synValues[1], std::vector<std::string>({"x", "x", "x"}));
     }
 
     SECTION("Test Synonym and ExpressionSpec") {
-        Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
-        ExpressionSpec varExp = ExpressionSpec("_\"(x+y)\"_");
-        ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
-        ExpressionSpec literalExp_False = ExpressionSpec("_\"1\"_");
+        std::shared_ptr<Synonym> variableSyn = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+        std::shared_ptr<ExpressionSpec> varExp = std::make_shared<ExpressionSpec>("_\"(x+y)\"_");
+        std::shared_ptr<ExpressionSpec> literalExp = std::make_shared<ExpressionSpec>("_\"2\"_");
+        std::shared_ptr<ExpressionSpec> literalExp_False = std::make_shared<ExpressionSpec>("_\"1\"_");
 
-        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &varExp});
+        PatternClause pc = PatternClause(assignSyn, {variableSyn, varExp});
         ClauseResult result = pc.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}, {"x"}});
 
-        PatternClause pc2 = PatternClause(&assignSyn, {&variableSyn, &literalExp});
+        PatternClause pc2 = PatternClause(assignSyn, {variableSyn, literalExp});
         result = pc2.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
         REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"4", "3"}));
         REQUIRE_EQUAL_VECTORS(synValues[1], std::vector<std::string>({"x", "x"}));
 
-        PatternClause pc3 = PatternClause(&assignSyn, {&variableSyn, &literalExp_False});
+        PatternClause pc3 = PatternClause(assignSyn, {variableSyn, literalExp_False});
         result = pc3.evaluate(reader);
         REQUIRE_FALSE(result.isBoolean());
-        REQUIRE(result.getSynonyms() == std::vector<Synonym>{assignSyn, variableSyn});
+        REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{}, {}});
     }
@@ -134,27 +134,27 @@ TEST_CASE("Assign Pattern evaluate") {
 // ai-gen start(copilot, 0, e)
 // prompt: use copilot
 TEST_CASE("Test pattern getSynonyms") {
-    Synonym assignSyn = Synonym(DesignEntityType::ASSIGN, "a");
-    Synonym variableSyn = Synonym(DesignEntityType::VARIABLE, "v");
-    Wildcard wildcard = Wildcard();
-    ExpressionSpec varExp = ExpressionSpec("_\"y\"_");
-    ExpressionSpec literalExp = ExpressionSpec("_\"2\"_");
+    std::shared_ptr<Synonym> assignSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a");
+    std::shared_ptr<Synonym> variableSyn = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+    std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
+    std::shared_ptr<ExpressionSpec> varExp = std::make_shared<ExpressionSpec>("_\"y\"_");
+    std::shared_ptr<ExpressionSpec> literalExp = std::make_shared<ExpressionSpec>("_\"2\"_");
 
     SECTION("Test Wildcard and Wildcard") {
-        PatternClause pc = PatternClause(&assignSyn, {&wildcard, &wildcard});
+        PatternClause pc = PatternClause(assignSyn, {wildcard, wildcard});
         std::vector<Synonym> synonyms = pc.getSynonyms();
-        REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
+        REQUIRE(synonyms == std::vector<Synonym>{*assignSyn});
     }
 
     SECTION("Test variable") {
-        PatternClause pc = PatternClause(&assignSyn, {&variableSyn, &varExp});
+        PatternClause pc = PatternClause(assignSyn, {variableSyn, varExp});
         std::vector<Synonym> synonyms = pc.getSynonyms();
-        REQUIRE(synonyms == std::vector<Synonym>{assignSyn, variableSyn});
+        REQUIRE(synonyms == std::vector<Synonym>{*assignSyn, *variableSyn});
     }
     SECTION("Test wildcard and literal") {
-        PatternClause pc3 = PatternClause(&assignSyn, {&wildcard, &literalExp});
+        PatternClause pc3 = PatternClause(assignSyn, {wildcard, literalExp});
         std::vector<Synonym> synonyms = pc3.getSynonyms();
-        REQUIRE(synonyms == std::vector<Synonym>{assignSyn});
+        REQUIRE(synonyms == std::vector<Synonym>{*assignSyn});
     }
 }
 // ai-gen end
@@ -197,56 +197,56 @@ TEST_CASE("While Pattern evaluate") {
     std::vector<std::string> allWhileStmtsWithVariables{"3", "3", "3", "6", "6"};
     std::vector<std::string> allVarsInWhile{"x", "y", "abc", "z", "y"};
 
-    Synonym whileSyn{DesignEntityType::WHILE, "w"};
-    Synonym varSyn{DesignEntityType::VARIABLE, "v"};
-    Literal literalValue{"x"};
-    Wildcard wildcard{};
+    std::shared_ptr<Synonym> whileSyn = std::make_shared<Synonym>(DesignEntityType::WHILE, "w");
+    std::shared_ptr<Synonym> varSyn = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+    std::shared_ptr<Literal> literalValue = std::make_shared<Literal>("x");
+    std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
     SECTION("While(Variable, _)") {
-        PatternClause whilePattern = {&whileSyn, {&varSyn, &wildcard}};
+        PatternClause whilePattern = {whileSyn, {varSyn, wildcard}};
         ClauseResult clauseResult = whilePattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{whileSyn, varSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*whileSyn, *varSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], allWhileStmtsWithVariables);
         REQUIRE_EQUAL_VECTORS(valueResults[1], allVarsInWhile);
     }
 
     SECTION("While(\"x\", _)") {
-        PatternClause whilePattern = {&whileSyn, {&literalValue, &wildcard}};
+        PatternClause whilePattern = {whileSyn, {literalValue, wildcard}};
         ClauseResult clauseResult = whilePattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{whileSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {"3"});
     }
 
     SECTION("While(Literal not in store, _)") {
-        Literal notInStoreLiteral{"l"};
-        PatternClause whilePattern = {&whileSyn, {&notInStoreLiteral, &wildcard}};
+        std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("l");
+        PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
         ClauseResult clauseResult = whilePattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{whileSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {});
     }
 
     SECTION("While(Literal in store not in condition, _)") {
-        Literal notInStoreLiteral{"s"};
-        PatternClause whilePattern = {&whileSyn, {&notInStoreLiteral, &wildcard}};
+        std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("s");
+        PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
         ClauseResult clauseResult = whilePattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{whileSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {});
     }
 
     SECTION("While(_, _)") {
-        PatternClause whilePattern = {&whileSyn, {&wildcard, &wildcard}};
+        PatternClause whilePattern = {whileSyn, {wildcard, wildcard}};
         ClauseResult clauseResult = whilePattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{whileSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {allWhileStmtsWithVariables});
     }
 }
@@ -295,56 +295,56 @@ TEST_CASE("If Pattern evaluate") {
     std::vector<std::string> allIfStmtsWithVariables{"5", "5", "6", "6", "6", "9"};
     std::vector<std::string> allVarsInIf{"x", "y", "z", "w", "y", "z"};
 
-    Synonym ifSyn{DesignEntityType::IF, "ii"};
-    Synonym varSyn{DesignEntityType::VARIABLE, "v"};
-    Literal literalValue{"y"};
-    Wildcard wildcard{};
+    std::shared_ptr<Synonym> ifSyn = std::make_shared<Synonym>(DesignEntityType::IF, "ii");
+    std::shared_ptr<Synonym> varSyn = std::make_shared<Synonym>(DesignEntityType::VARIABLE, "v");
+    std::shared_ptr<Literal> literalValue = std::make_shared<Literal>("y");
+    std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
     SECTION("If(Variable, _)") {
-        PatternClause ifPattern = {&ifSyn, {&varSyn, &wildcard, &wildcard}};
+        PatternClause ifPattern = {ifSyn, {varSyn, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{ifSyn, varSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*ifSyn, *varSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], allIfStmtsWithVariables);
         REQUIRE_EQUAL_VECTORS(valueResults[1], allVarsInIf);
     }
 
     SECTION("If(\"y\", _)") {
-        PatternClause ifPattern = {&ifSyn, {&literalValue, &wildcard, &wildcard}};
+        PatternClause ifPattern = {ifSyn, {literalValue, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{ifSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], std::vector<std::string>({"5", "6"}));
     }
 
     SECTION("If(Literal not in store, _)") {
-        Literal notInStoreLiteral{"l"};
-        PatternClause ifPattern = {&ifSyn, {&notInStoreLiteral, &wildcard, &wildcard}};
+        std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("l");
+        PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{ifSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {});
     }
 
     SECTION("If(Literal in store not in condition, _)") {
-        Literal notInStoreLiteral{"abc"};
-        PatternClause ifPattern = {&ifSyn, {&notInStoreLiteral, &wildcard, &wildcard}};
+        std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("abc");
+        PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{ifSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {});
     }
 
     SECTION("If(_, _)") {
-        PatternClause ifPattern = {&ifSyn, {&wildcard, &wildcard, &wildcard}};
+        PatternClause ifPattern = {ifSyn, {wildcard, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.evaluate(reader);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
-        REQUIRE(synResults == std::vector<Synonym>{ifSyn});
+        REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
         REQUIRE_EQUAL_VECTORS(valueResults[0], {allIfStmtsWithVariables});
     }
 }

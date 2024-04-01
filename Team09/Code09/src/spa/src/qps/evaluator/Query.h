@@ -19,15 +19,15 @@ struct ArrangedClauses {
 
 class Query {
 public:
-    Query(const std::vector<Synonym>&, const std::vector<SuchThatClause>&, const std::vector<PatternClause>&,
-          const std::vector<WithClause>&);
+    Query(const std::vector<Synonym>&, const std::vector<std::shared_ptr<SuchThatClause>>&,
+          const std::vector<std::shared_ptr<PatternClause>>&, const std::vector<std::shared_ptr<WithClause>>&);
     std::vector<std::string> evaluate(PKBFacadeReader&) const;
 
 private:
     std::vector<Synonym> selectEntities;
-    std::vector<SuchThatClause> suchThatClauses;
-    std::vector<PatternClause> patternClauses;
-    std::vector<WithClause> withClauses;
+    std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses;
+    std::vector<std::shared_ptr<PatternClause>> patternClauses;
+    std::vector<std::shared_ptr<WithClause>> withClauses;
 
     static bool evaluateAndJoinClauses(const TableManager& tm,
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,

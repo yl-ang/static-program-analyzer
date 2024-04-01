@@ -44,8 +44,9 @@ void Validator::validateWithSyntax(const std::string& arguments) {
 }
 
 void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
-                                std::vector<SuchThatClause>& suchThatClauses,
-                                std::vector<PatternClause>& patternClauses, std::vector<WithClause>& withClauses) {
+                                std::vector<std::shared_ptr<SuchThatClause>>& suchThatClauses,
+                                std::vector<std::shared_ptr<PatternClause>>& patternClauses,
+                                std::vector<std::shared_ptr<WithClause>>& withClauses) {
     bool hasSemanticError = false;
     if (!store->isValidStore()) {
         hasSemanticError = true;
@@ -55,18 +56,18 @@ void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntCo
         hasSemanticError = true;
     }
 
-    for (SuchThatClause& clause : suchThatClauses) {
-        if (!clause.validateArguments(store)) {
+    for (auto& clause : suchThatClauses) {
+        if (!clause->validateArguments(store)) {
             hasSemanticError = true;
         }
     }
-    for (PatternClause& clause : patternClauses) {
-        if (!clause.validateArguments(store)) {
+    for (auto& clause : patternClauses) {
+        if (!clause->validateArguments(store)) {
             hasSemanticError = true;
         }
     }
-    for (WithClause& clause : withClauses) {
-        if (!clause.validateArguments(store)) {
+    for (auto& clause : withClauses) {
+        if (!clause->validateArguments(store)) {
             hasSemanticError = true;
         }
     }

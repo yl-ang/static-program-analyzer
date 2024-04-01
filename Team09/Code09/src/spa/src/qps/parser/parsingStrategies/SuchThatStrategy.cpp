@@ -1,6 +1,6 @@
 #include "SuchThatStrategy.h"
 
-std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
+std::shared_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
     std::smatch argMatch;
     if (std::regex_search(str, argMatch, QPSRegexes::SUCHTHAT_ARGS)) {
         if (argMatch.suffix().matched) {
@@ -11,9 +11,9 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
 
         Validator::validateSuchThatSyntax(type, parameters);
         std::vector<std::string> parameterStringsToParse = splitByDelimiter(parameters, ",");
-        std::vector<ClauseArgument*> entityVector{buildSTParameters(parameterStringsToParse)};
-        std::unique_ptr<SuchThatClause> suchThatClause{std::make_unique<SuchThatClause>(
-            RelationshipBuilder::determineRelationshipType(type), entityVector[0], entityVector[1])};
+        std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildSTParameters(parameterStringsToParse)};
+        std::shared_ptr<SuchThatClause> suchThatClause = std::make_shared<SuchThatClause>(
+            RelationshipBuilder::determineRelationshipType(type), entityVector[0], entityVector[1]);
 
         return suchThatClause;
     } else {
@@ -27,17 +27,18 @@ std::unique_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
  * Determine if parameters are:
  * literal, wildcard, integer, synonym
  */
-std::vector<ClauseArgument*> SuchThatStrategy::buildSTParameters(const std::vector<std::string>& strings) {
-    std::vector<ClauseArgument*> results{};
+std::vector<std::shared_ptr<ClauseArgument>> SuchThatStrategy::buildSTParameters(
+    const std::vector<std::string>& strings) {
+    std::vector<std::shared_ptr<ClauseArgument>> results{};
     for (const std::string& str : strings) {
         if (isQuotedIdent(str)) {
-            results.push_back(new Literal(cleanQuotedIdent(str)));
+            results.push_back(std::make_shared<Literal>(cleanQuotedIdent(str)));
         } else if (isWildcard(str)) {
-            results.push_back(new Wildcard());
+            results.push_back(std::make_shared<Wildcard>());
         } else if (isInteger(str)) {
-            results.push_back(new Integer(str));
+            results.push_back(std::make_shared<Integer>(str));
         } else if (isSynonym(str)) {
-            results.push_back(new Synonym(DesignEntityType::UNKNOWN, str));
+            results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, str));
         } else {
             throw QPSSyntaxError();
         }

@@ -6,8 +6,8 @@
 
 class SuchThatStrategy : public ParsingStrategy {
 private:
-    static std::vector<ClauseArgument*> buildSTParameters(const std::vector<std::string>&);
+    static std::vector<std::shared_ptr<ClauseArgument>> buildSTParameters(const std::vector<std::string>&);
 
 public:
-    std::unique_ptr<QueryClause> execute(std::string str) const override;
+    std::shared_ptr<QueryClause> execute(std::string str) const override;
 };

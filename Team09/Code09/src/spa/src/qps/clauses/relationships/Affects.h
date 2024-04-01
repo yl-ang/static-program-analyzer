@@ -8,11 +8,12 @@
 
 class Affects : public Relationship {
 private:
-    ClauseArgument& affector;
-    ClauseArgument& affected;
+    std::shared_ptr<ClauseArgument> affector;
+    std::shared_ptr<ClauseArgument> affected;
 
 public:
-    Affects(ClauseArgument& affector, ClauseArgument& affected) : affector(affector), affected(affected) {}
+    Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected)
+        : affector(affector), affected(affected) {}
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

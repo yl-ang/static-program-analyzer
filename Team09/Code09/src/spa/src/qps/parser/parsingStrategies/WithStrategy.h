@@ -9,5 +9,5 @@ private:
     static std::vector<std::shared_ptr<ClauseArgument>> buildWithParameters(const std::vector<std::string>&);
 
 public:
-    std::unique_ptr<QueryClause> execute(std::string str) const override;
+    std::shared_ptr<QueryClause> execute(std::string str) const override;
 };

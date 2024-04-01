@@ -2,8 +2,8 @@
 
 #include <queue>
 
-Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& stc,
-             const std::vector<PatternClause>& pc, const std::vector<WithClause>& wc)
+Query::Query(const std::vector<Synonym>& se, const std::vector<std::shared_ptr<SuchThatClause>>& stc,
+             const std::vector<std::shared_ptr<PatternClause>>& pc, const std::vector<std::shared_ptr<WithClause>>& wc)
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc), withClauses(wc) {}
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
@@ -168,8 +168,8 @@ ArrangedClauses Query::arrangeClauses() const {
 }
 
 bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
-    for (SuchThatClause stc : suchThatClauses) {
-        if (stc.isBooleanResult() && !stc.evaluate(pkb).getBoolean()) {
+    for (auto stc : suchThatClauses) {
+        if (stc->isBooleanResult() && !stc->evaluate(pkb).getBoolean()) {
             return false;
         }
     }
@@ -180,14 +180,14 @@ std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
     std::vector<QueryClausePtr> nonBooleanClauses{};
 
     // Convert patternClauses to shared_ptr
-    for (PatternClause pc : patternClauses) {
-        nonBooleanClauses.push_back(std::make_shared<PatternClause>(pc));
+    for (auto pc : patternClauses) {
+        nonBooleanClauses.push_back(pc);
     }
 
     // Convert suchThatClauses to shared_ptr if they are not boolean result
-    for (SuchThatClause stc : suchThatClauses) {
-        if (!stc.isBooleanResult()) {
-            nonBooleanClauses.push_back(std::make_shared<SuchThatClause>(stc));
+    for (auto stc : suchThatClauses) {
+        if (!stc->isBooleanResult()) {
+            nonBooleanClauses.push_back(stc);
         }
     }
     return nonBooleanClauses;

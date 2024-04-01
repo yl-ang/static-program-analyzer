@@ -20,8 +20,9 @@ public:
     static void validateSuchThatSyntax(const std::string& relType, const std::string& arguments);
     static void validateWithSyntax(const std::string& arguments);
     static void validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
-                                std::vector<SuchThatClause>& suchThatClauses,
-                                std::vector<PatternClause>& patternClauses, std::vector<WithClause>& withClauses);
+                                std::vector<std::shared_ptr<SuchThatClause>>& suchThatClauses,
+                                std::vector<std::shared_ptr<PatternClause>>& patternClauses,
+                                std::vector<std::shared_ptr<WithClause>>& withClauses);
 
 private:
     static void validatePatternTwoArg(const std::vector<std::string>& arguments);

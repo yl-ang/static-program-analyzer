@@ -6,8 +6,8 @@ using StmtSet = std::unordered_set<StmtNum>;
 
 class BaseNext : public Relationship {
 protected:
-    ClauseArgument& currentStmt;
-    ClauseArgument& nextStmt;
+    std::shared_ptr<ClauseArgument> currentStmt;
+    std::shared_ptr<ClauseArgument> nextStmt;
 
 private:
     bool isSimpleResult() const;
@@ -21,7 +21,7 @@ private:
     virtual StmtSet getNextees(PKBFacadeReader&, const StmtNum&) = 0;
 
 public:
-    BaseNext(ClauseArgument&, ClauseArgument&);
+    BaseNext(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

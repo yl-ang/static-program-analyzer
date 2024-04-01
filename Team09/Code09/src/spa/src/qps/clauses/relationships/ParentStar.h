@@ -7,11 +7,12 @@
 
 class ParentStar : public BaseParent {
 public:
-    ParentStar(ClauseArgument& parent, ClauseArgument& child) : BaseParent(parent, child) {}
+    ParentStar(std::shared_ptr<ClauseArgument> parent, std::shared_ptr<ClauseArgument> child)
+        : BaseParent(parent, child) {}
 
 private:
     bool hasParentRelationship(PKBFacadeReader& reader) override {
-        return reader.hasParentStarRelationship(parent, child);
+        return reader.hasParentStarRelationship(*parent, *child);
     }
 
     StmtSet getParents(PKBFacadeReader& reader, const StmtNum& child) override {
