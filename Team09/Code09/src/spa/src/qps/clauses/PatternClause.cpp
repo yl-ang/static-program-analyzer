@@ -1,6 +1,7 @@
 #include "PatternClause.h"
 
-PatternClause::PatternClause(ClauseArgument* syn, std::vector<ClauseArgument*> args) : synonym(*syn), args(args) {}
+PatternClause::PatternClause(std::shared_ptr<ClauseArgument> syn, std::vector<std::shared_ptr<ClauseArgument>> args)
+    : synonym(syn), arguments(args) {}
 
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
     std::shared_ptr<Pattern> evaluator = getPattern();
@@ -9,8 +10,8 @@ ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
 
 std::shared_ptr<Pattern> PatternClause::getPattern() {
     if (!pattern.has_value()) {
-        Synonym& syn = dynamic_cast<Synonym&>(synonym);
-        DesignEntityType synType = syn.getType();
+        std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
+        DesignEntityType synType = syn->getType();
         if (synType == DesignEntityType::UNKNOWN) {
             throw Exception("Pattern type not determined yet");
         }
@@ -24,14 +25,14 @@ bool PatternClause::equals(const QueryClause& other) const {
     if (const PatternClause* ptr = dynamic_cast<const PatternClause*>(&other)) {
         // !( == ) is used as oppose to !=
         // This is because operator for != is not implemented
-        if (!(synonym == ptr->synonym)) {
+        if (!(*synonym == *(ptr->synonym))) {
             return false;
         }
-        if (args.size() != ptr->args.size()) {
+        if (arguments.size() != ptr->arguments.size()) {
             return false;
         }
-        for (int i = 0; i < args.size(); i++) {
-            if (!(*args[i] == *(ptr->args[i]))) {
+        for (int i = 0; i < arguments.size(); i++) {
+            if (!(*arguments[i] == *(ptr->arguments[i]))) {
                 return false;
             }
         }
@@ -45,10 +46,10 @@ bool PatternClause::isBooleanResult() const {
 }
 
 bool PatternClause::containsSynonym(const Synonym& syn) const {
-    if (synonym == syn) {
+    if (*synonym == syn) {
         return true;
     }
-    for (auto arg : args) {
+    for (auto arg : arguments) {
         if (*arg == syn) {
             return true;
         }
@@ -59,25 +60,25 @@ bool PatternClause::containsSynonym(const Synonym& syn) const {
 std::vector<Synonym> PatternClause::getSynonyms() const {
     std::vector<Synonym> synonyms;
 
-    if (synonym.isSynonym()) {
-        synonyms.push_back(dynamic_cast<Synonym&>(synonym));
+    if (synonym->isSynonym()) {
+        synonyms.push_back(*std::dynamic_pointer_cast<Synonym>(synonym));
     }
-    for (auto arg : args) {
-        if ((*arg).isSynonym()) {
-            synonyms.push_back(dynamic_cast<Synonym&>(*arg));
+    for (auto arg : arguments) {
+        if (arg->isSynonym()) {
+            synonyms.push_back(*std::dynamic_pointer_cast<Synonym>(arg));
         }
     }
     return synonyms;
 }
 
 bool PatternClause::validateArguments(SynonymStore* store) {
-    Synonym& syn = dynamic_cast<Synonym&>(synonym);
-    if (!syn.updateType(store)) {
+    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
+    if (!syn->updateType(store)) {
         return false;
     }
 
-    if ((*args[0]).isSynonym()) {
-        Synonym* fSyn = dynamic_cast<Synonym*>((args[0]));
+    if ((*arguments[0]).isSynonym()) {
+        std::shared_ptr<Synonym> fSyn = std::dynamic_pointer_cast<Synonym>((arguments[0]));
         if (!fSyn->updateType(store)) {
             return false;
         }

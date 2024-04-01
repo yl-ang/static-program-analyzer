@@ -7,15 +7,15 @@
 
 class WhilePattern : public Pattern {
 private:
-    ClauseArgument& whileSyn;
-    std::vector<ClauseArgument*> arguments;
+    std::shared_ptr<ClauseArgument> whileSyn;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
     ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
 
 public:
-    WhilePattern(ClauseArgument* whileSyn, std::vector<ClauseArgument*> args);
+    WhilePattern(std::shared_ptr<ClauseArgument> whileSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;
 };

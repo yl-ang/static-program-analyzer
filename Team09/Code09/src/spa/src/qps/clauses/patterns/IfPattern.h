@@ -7,15 +7,15 @@
 
 class IfPattern : public Pattern {
 private:
-    ClauseArgument& ifSyn;
-    std::vector<ClauseArgument*> arguments;
+    std::shared_ptr<ClauseArgument> ifSyn;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
     ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
 
 public:
-    IfPattern(ClauseArgument* ifSyn, std::vector<ClauseArgument*> args);
+    IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;
 };

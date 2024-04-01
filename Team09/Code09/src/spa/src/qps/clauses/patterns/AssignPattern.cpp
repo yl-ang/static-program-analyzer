@@ -1,10 +1,11 @@
 #include "AssignPattern.h"
 
-AssignPattern::AssignPattern(ClauseArgument* assignSyn, std::vector<ClauseArgument*> args)
-    : assignSyn(*assignSyn), arguments(args) {}
+AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
+                             std::vector<std::shared_ptr<ClauseArgument>> args)
+    : assignSyn(assignSyn), arguments(args) {}
 
 ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader) {
-    if (arguments[0]->isSynonym()) {
+    if (firstArg->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else {
         return evaluateNoArgsSyns(reader);
@@ -22,8 +23,8 @@ bool AssignPattern::validateArguments() {
 }
 
 ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
-    Synonym aSyn = dynamic_cast<Synonym&>(assignSyn);
-    Synonym fSyn = dynamic_cast<Synonym&>(*arguments[0]);  // This is 100% variable
+    Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(firstArg);  // This is 100% variable
 
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -70,7 +71,7 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
 }
 
 ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader) {
-    Synonym aSyn = dynamic_cast<Synonym&>(assignSyn);
+    Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::vector<std::string> stmtNumbers = {};
 

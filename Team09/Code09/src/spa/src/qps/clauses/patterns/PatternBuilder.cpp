@@ -1,7 +1,7 @@
 #include "PatternBuilder.h"
 
-std::shared_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType synType, ClauseArgument* syn,
-                                                      std::vector<ClauseArgument*> args) {
+std::shared_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType synType, std::shared_ptr<ClauseArgument> syn,
+                                                      std::vector<std::shared_ptr<ClauseArgument>> args) {
     switch (synType) {
     case DesignEntityType::ASSIGN:
         return std::make_shared<AssignPattern>(syn, args);

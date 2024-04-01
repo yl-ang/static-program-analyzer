@@ -1,6 +1,7 @@
 #include "IfPattern.h"
 
-IfPattern::IfPattern(ClauseArgument* ifSyn, std::vector<ClauseArgument*> args) : ifSyn(*ifSyn), arguments(args) {}
+IfPattern::IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
+    : ifSyn(ifSyn), arguments(args) {}
 
 ClauseResult IfPattern::evaluate(PKBFacadeReader& reader) {
     if (arguments[0]->isSynonym()) {
@@ -23,8 +24,8 @@ bool IfPattern::validateArguments() {
 }
 
 ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
-    Synonym iSyn = dynamic_cast<Synonym&>(ifSyn);
-    Synonym fSyn = dynamic_cast<Synonym&>(*arguments[0]);
+    Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);
 
     std::unordered_set<Stmt> ifStmts = reader.getStatementsByType(StatementType::IF);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -48,7 +49,7 @@ ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
 }
 
 ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
-    Synonym iSyn = dynamic_cast<Synonym&>(ifSyn);
+    Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
 
     std::unordered_set<Stmt> ifStmts = reader.getStatementsByType(StatementType::IF);
 
@@ -64,7 +65,7 @@ ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
 }
 
 ClauseResult IfPattern::evaluateFirstArgWildcard(PKBFacadeReader& reader) {
-    Synonym iSyn = dynamic_cast<Synonym&>(ifSyn);
+    Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
 
     std::unordered_set<Stmt> ifStmts = reader.getStatementsByType(StatementType::IF);
     std::unordered_set<Variable> allVars = reader.getVariables();
