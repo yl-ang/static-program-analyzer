@@ -3,8 +3,8 @@
 #include <queue>
 
 Query::Query(const std::vector<Synonym>& se, const std::vector<SuchThatClause>& stc,
-             const std::vector<PatternClause>& pc)
-    : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
+             const std::vector<PatternClause>& pc, const std::vector<WithClause>& wc)
+    : selectEntities(se), suchThatClauses(stc), patternClauses(pc), withClauses(wc) {}
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (hasNoClauses() && isSelectBoolean()) {

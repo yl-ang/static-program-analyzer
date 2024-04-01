@@ -33,9 +33,19 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
     }
 }
 
+void Validator::validateWithSyntax(const std::string& arguments) {
+    std::vector<std::string> argVector = splitByDelimiter(arguments, "=");
+    if (argVector.size() != 2) {
+        throw QPSSyntaxError();
+    }
+    if (!isAttrCompare(argVector[0]) || !isAttrCompare(argVector[1])) {
+        throw QPSSyntaxError();
+    }
+}
+
 void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
                                 std::vector<SuchThatClause>& suchThatClauses,
-                                std::vector<PatternClause>& patternClauses) {
+                                std::vector<PatternClause>& patternClauses, std::vector<WithClause>& withClauses) {
     bool hasSemanticError = false;
     if (!store->isValidStore()) {
         hasSemanticError = true;
@@ -51,6 +61,11 @@ void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntCo
         }
     }
     for (PatternClause& clause : patternClauses) {
+        if (!clause.validateArguments(store)) {
+            hasSemanticError = true;
+        }
+    }
+    for (WithClause& clause : withClauses) {
         if (!clause.validateArguments(store)) {
             hasSemanticError = true;
         }

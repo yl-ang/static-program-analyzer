@@ -179,9 +179,13 @@ TEST_CASE("PQLParserTester: Parent (1)") {
     std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
 
     // Select checking
     REQUIRE(result_01->getSynonyms().size() == 1);
@@ -239,9 +243,13 @@ TEST_CASE("PQLParserTester: Parent (2)") {
     std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
 
     // Select checking
     REQUIRE(result_01->getSynonyms().size() == 1);
@@ -300,9 +308,13 @@ TEST_CASE("PQLParserTester: Parent (3)") {
     std::vector<PatternClause> result_22 = std::get<2>(parsedClauses_2);
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
 
     // Select checking
     REQUIRE(result_01->getSynonyms().size() == 1);
@@ -369,10 +381,15 @@ TEST_CASE("PQLParserTester: Parent (4)") {
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
     std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
-    Validator::validateClauses(&entities, result_04, result_14, result_24);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+    std::vector<WithClause> result_34 = std::get<3>(parsedClauses_4);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
+    Validator::validateClauses(&entities, result_04, result_14, result_24, result_34);
 
     // Select checking
     REQUIRE(result_01->getSynonyms().size() == 1);
@@ -456,10 +473,15 @@ TEST_CASE("PQLParserTester: Select ... pattern (1)") {
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
     std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
-    Validator::validateClauses(&entities, result_04, result_14, result_24);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+    std::vector<WithClause> result_34 = std::get<3>(parsedClauses_4);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
+    Validator::validateClauses(&entities, result_04, result_14, result_24, result_34);
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
@@ -508,10 +530,15 @@ TEST_CASE("PQLParserTester: Select ... pattern (2)") {
     std::vector<PatternClause> result_23 = std::get<2>(parsedClauses_3);
     std::vector<PatternClause> result_24 = std::get<2>(parsedClauses_4);
 
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
-    Validator::validateClauses(&entities, result_02, result_12, result_22);
-    Validator::validateClauses(&entities, result_03, result_13, result_23);
-    Validator::validateClauses(&entities, result_04, result_14, result_24);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    std::vector<WithClause> result_32 = std::get<3>(parsedClauses_2);
+    std::vector<WithClause> result_33 = std::get<3>(parsedClauses_3);
+    std::vector<WithClause> result_34 = std::get<3>(parsedClauses_4);
+
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
+    Validator::validateClauses(&entities, result_02, result_12, result_22, result_32);
+    Validator::validateClauses(&entities, result_03, result_13, result_23, result_33);
+    Validator::validateClauses(&entities, result_04, result_14, result_24, result_34);
 
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");
     Synonym v1 = Synonym(DesignEntityType::VARIABLE, "v1");
@@ -538,7 +565,8 @@ TEST_CASE("PQLParserTester: Select ... pattern (4)") {
     containerPtr result_01 = std::get<0>(parsedClauses_1);
     std::vector<SuchThatClause> result_11 = std::get<1>(parsedClauses_1);
     std::vector<PatternClause> result_21 = std::get<2>(parsedClauses_1);
-    Validator::validateClauses(&entities, result_01, result_11, result_21);
+    std::vector<WithClause> result_31 = std::get<3>(parsedClauses_1);
+    Validator::validateClauses(&entities, result_01, result_11, result_21, result_31);
 
     Synonym a = Synonym(DesignEntityType::ASSIGN, "a");
     Synonym a1 = Synonym(DesignEntityType::ASSIGN, "a1");

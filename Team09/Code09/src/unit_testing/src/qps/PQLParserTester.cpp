@@ -12,8 +12,9 @@ SynonymStore PQLParserTester::parseQueryEntities(std::vector<std::string> unpars
     return PQLParser::parseQueryEntities(unparsedEntities);
 }
 
-std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>>
-        PQLParserTester::parseClauses(const std::vector<std::string>& clauseList) {
+std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>,
+           std::vector<WithClause>>
+PQLParserTester::parseClauses(const std::vector<std::string>& clauseList) {
     return PQLParser::parseClauses(clauseList);
 }
 
