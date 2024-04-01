@@ -12,6 +12,8 @@ protected:
     ClauseArgument& synonym;
     std::vector<ClauseArgument*> args;
 
+    std::optional<std::shared_ptr<Pattern>> pattern;
+
 public:
     PatternClause(ClauseArgument*, std::vector<ClauseArgument*>);
     bool equals(const QueryClause&) const override;
@@ -20,4 +22,5 @@ public:
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;
     bool validateArguments(SynonymStore* store) override;
+    std::shared_ptr<Pattern> getPattern();
 };

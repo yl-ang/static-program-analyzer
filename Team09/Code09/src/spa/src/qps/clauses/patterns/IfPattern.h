@@ -8,9 +8,7 @@
 class IfPattern : public Pattern {
 private:
     ClauseArgument& ifSyn;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
-    ClauseArgument& thirdArg;
+    std::vector<ClauseArgument*> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
@@ -19,4 +17,5 @@ private:
 public:
     IfPattern(ClauseArgument* ifSyn, std::vector<ClauseArgument*> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

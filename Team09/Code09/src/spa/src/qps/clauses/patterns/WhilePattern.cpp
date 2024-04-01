@@ -1,21 +1,31 @@
 #include "WhilePattern.h"
 
 WhilePattern::WhilePattern(ClauseArgument* whileSyn, std::vector<ClauseArgument*> args)
-    : whileSyn(*whileSyn), firstArg(*args[0]), secondArg(*args[1]) {}
+    : whileSyn(*whileSyn), arguments(args) {}
 
 ClauseResult WhilePattern::evaluate(PKBFacadeReader& reader) {
-    if (firstArg.isSynonym()) {
+    if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
-    } else if (firstArg.isLiteral()) {
+    } else if (arguments[0]->isLiteral()) {
         return evaluateFirstArgLiteral(reader);
     } else {
         return evaluateFirstArgWildcard(reader);
     }
 }
 
+bool WhilePattern::validateArguments() {
+    if (arguments.size() != 2) {
+        return false;
+    }
+    if (!arguments[1]->isWildcard()) {
+        return false;
+    }
+    return true;
+}
+
 ClauseResult WhilePattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     Synonym wSyn = dynamic_cast<Synonym&>(whileSyn);
-    Synonym fSyn = dynamic_cast<Synonym&>(firstArg);
+    Synonym fSyn = dynamic_cast<Synonym&>(*arguments[0]);
 
     std::unordered_set<Stmt> whileStmts = reader.getStatementsByType(StatementType::WHILE);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -46,7 +56,7 @@ ClauseResult WhilePattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
     std::vector<std::string> stmtNumbers = {};
 
     for (Stmt stmt : whileStmts) {
-        if (reader.hasWhilePattern(stmt.stmtNum, firstArg.getValue())) {
+        if (reader.hasWhilePattern(stmt.stmtNum, arguments[0]->getValue())) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
     }

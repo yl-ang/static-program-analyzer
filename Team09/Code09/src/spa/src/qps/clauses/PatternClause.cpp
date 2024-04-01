@@ -3,10 +3,21 @@
 PatternClause::PatternClause(ClauseArgument* syn, std::vector<ClauseArgument*> args) : synonym(*syn), args(args) {}
 
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
-    Synonym& syn = dynamic_cast<Synonym&>(synonym);
-    DesignEntityType synType = syn.getType();
-    std::unique_ptr<Pattern> evaluator = PatternBuilder::buildPattern(synType, &syn, args);
+    std::shared_ptr<Pattern> evaluator = getPattern();
     return evaluator->evaluate(reader);
+}
+
+std::shared_ptr<Pattern> PatternClause::getPattern() {
+    if (!pattern.has_value()) {
+        Synonym& syn = dynamic_cast<Synonym&>(synonym);
+        DesignEntityType synType = syn.getType();
+        if (synType == DesignEntityType::UNKNOWN) {
+            throw Exception("Pattern type not determined yet");
+        }
+        pattern = PatternBuilder::buildPattern(synType, &syn, args);
+    }
+
+    return pattern.value();
 }
 
 bool PatternClause::equals(const QueryClause& other) const {
@@ -76,25 +87,6 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         }
     }
 
-    DesignEntityType synType = syn.getType();
-    switch (synType) {
-    case DesignEntityType::WHILE:
-        if (!(*args[1]).isWildcard()) {
-            throw QPSSyntaxError();
-        }
-        [[fallthrough]];
-    case DesignEntityType::ASSIGN:
-        if (args.size() != 2) {
-            throw QPSSyntaxError();
-        }
-        break;
-    case DesignEntityType::IF:
-        if (args.size() != 3) {
-            throw QPSSyntaxError();
-        }
-        break;
-    default:
-        return false;
-    }
-    return true;
+    std::shared_ptr<Pattern> patternChecker = getPattern();
+    return patternChecker->validateArguments();
 }

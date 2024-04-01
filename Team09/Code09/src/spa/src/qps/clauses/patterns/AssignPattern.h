@@ -9,8 +9,7 @@
 class AssignPattern : public Pattern {
 private:
     ClauseArgument& assignSyn;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
+    std::vector<ClauseArgument*> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateNoArgsSyns(PKBFacadeReader&);
@@ -18,4 +17,5 @@ private:
 public:
     AssignPattern(ClauseArgument* assignSyn, std::vector<ClauseArgument*> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

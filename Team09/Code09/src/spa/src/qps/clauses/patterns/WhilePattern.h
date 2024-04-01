@@ -8,8 +8,7 @@
 class WhilePattern : public Pattern {
 private:
     ClauseArgument& whileSyn;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
+    std::vector<ClauseArgument*> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
@@ -18,4 +17,5 @@ private:
 public:
     WhilePattern(ClauseArgument* whileSyn, std::vector<ClauseArgument*> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };
