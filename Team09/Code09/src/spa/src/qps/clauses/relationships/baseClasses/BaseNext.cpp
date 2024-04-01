@@ -3,25 +3,25 @@
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseEvaluatorUtils.h"
 
-BaseNext::BaseNext(ClauseArgument& currentStmt, ClauseArgument& nextStmt)
+BaseNext::BaseNext(std::shared_ptr<ClauseArgument> currentStmt, std::shared_ptr<ClauseArgument> nextStmt)
     : currentStmt(currentStmt), nextStmt(nextStmt) {}
 
 bool BaseNext::isSimpleResult() const {
-    return !currentStmt.isSynonym() && !nextStmt.isSynonym();
+    return !currentStmt->isSynonym() && !nextStmt->isSynonym();
 }
 
 bool BaseNext::validateArguments() {
-    if (currentStmt.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(currentStmt);
-        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
-            first.getType() == DesignEntityType::PROCEDURE) {
+    if (currentStmt->isSynonym()) {
+        std::shared_ptr<Synonym> first = std::dynamic_pointer_cast<Synonym>(currentStmt);
+        if (first->getType() == DesignEntityType::VARIABLE || first->getType() == DesignEntityType::CONSTANT ||
+            first->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
-    if (nextStmt.isSynonym()) {
-        Synonym second = dynamic_cast<Synonym&>(nextStmt);
-        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
-            second.getType() == DesignEntityType::PROCEDURE) {
+    if (nextStmt->isSynonym()) {
+        std::shared_ptr<Synonym> second = std::dynamic_pointer_cast<Synonym>(nextStmt);
+        if (second->getType() == DesignEntityType::VARIABLE || second->getType() == DesignEntityType::CONSTANT ||
+            second->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
@@ -33,11 +33,11 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
         return {hasNextRelationship(reader)};
     }
 
-    if ((currentStmt.isSynonym() && nextStmt.isWildcard()) || (currentStmt.isWildcard() && nextStmt.isSynonym())) {
+    if ((currentStmt->isSynonym() && nextStmt->isWildcard()) || (currentStmt->isWildcard() && nextStmt->isSynonym())) {
         return evaluateSynonymWildcard(reader);
     }
 
-    if ((currentStmt.isSynonym() && nextStmt.isInteger()) || (currentStmt.isInteger() && nextStmt.isSynonym())) {
+    if ((currentStmt->isSynonym() && nextStmt->isInteger()) || (currentStmt->isInteger() && nextStmt->isSynonym())) {
         return evaluateSynonymInteger(reader);
     }
 
@@ -45,8 +45,8 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    bool currentStmtIsSynonym = currentStmt.isSynonym();
-    Synonym syn = dynamic_cast<Synonym&>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
+    bool currentStmtIsSynonym = currentStmt->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
 
     std::unordered_set<Stmt> allStmts{};
 
@@ -77,11 +77,10 @@ ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    bool currentStmtIsSynonym = currentStmt.isSynonym();
-    Synonym syn = dynamic_cast<Synonym&>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
-    Integer integer = dynamic_cast<Integer&>(currentStmtIsSynonym ? this->nextStmt : this->currentStmt);
+    bool currentStmtIsSynonym = currentStmt->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
+    StmtNum stmtNum = std::stoi(currentStmtIsSynonym ? this->nextStmt->getValue() : this->currentStmt->getValue());
 
-    StmtNum stmtNum = std::stoi(integer.getValue());
     std::unordered_set<StmtNum> synonymStmtNums;
     if (currentStmtIsSynonym) {
         synonymStmtNums = getNextees(reader, stmtNum);
@@ -97,8 +96,8 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym currentSyn = dynamic_cast<Synonym&>(currentStmt);
-    Synonym nextSyn = dynamic_cast<Synonym&>(nextStmt);
+    Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
+    Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
 
     std::vector<Synonym> synonyms{currentSyn, nextSyn};
 

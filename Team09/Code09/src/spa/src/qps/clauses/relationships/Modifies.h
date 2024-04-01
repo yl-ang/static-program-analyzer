@@ -8,8 +8,8 @@
 
 class Modifies : public Relationship {
 private:
-    ClauseArgument& modifier;
-    ClauseArgument& var;
+    std::shared_ptr<ClauseArgument> modifier;
+    std::shared_ptr<ClauseArgument> var;
 
     /**
      * Check if the result is a simple boolean result.
@@ -24,7 +24,7 @@ private:
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
 public:
-    Modifies(ClauseArgument&, ClauseArgument&);
+    Modifies(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

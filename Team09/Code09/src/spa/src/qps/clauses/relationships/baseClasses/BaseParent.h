@@ -6,8 +6,8 @@ using StmtSet = std::unordered_set<StmtNum>;
 
 class BaseParent : public Relationship {
 protected:
-    ClauseArgument& parent;
-    ClauseArgument& child;
+    std::shared_ptr<ClauseArgument> parent;
+    std::shared_ptr<ClauseArgument> child;
 
 private:
     bool isSimpleResult() const;
@@ -21,7 +21,7 @@ private:
     virtual StmtSet getChildren(PKBFacadeReader&, const StmtNum&) = 0;
 
 public:
-    BaseParent(ClauseArgument&, ClauseArgument&);
+    BaseParent(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

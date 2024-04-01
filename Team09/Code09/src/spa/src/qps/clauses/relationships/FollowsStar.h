@@ -9,11 +9,12 @@
 
 class FollowsStar : public BaseFollows {
 public:
-    FollowsStar(ClauseArgument& followee, ClauseArgument& follower) : BaseFollows(followee, follower) {}
+    FollowsStar(std::shared_ptr<ClauseArgument> followee, std::shared_ptr<ClauseArgument> follower)
+        : BaseFollows(followee, follower) {}
 
 private:
     bool hasFollowRelationship(PKBFacadeReader& reader) override {
-        return reader.hasFollowStarRelationship(followee, follower);
+        return reader.hasFollowStarRelationship(*followee, *follower);
     }
 
     StmtSet getFollowers(PKBFacadeReader& reader, const StmtNum& stmtNum) override {

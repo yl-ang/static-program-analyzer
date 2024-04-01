@@ -34,8 +34,8 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
 }
 
 void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntContainer> selectEntities,
-                                std::vector<SuchThatClause>& suchThatClauses,
-                                std::vector<PatternClause>& patternClauses) {
+                                std::vector<std::shared_ptr<SuchThatClause>>& suchThatClauses,
+                                std::vector<std::shared_ptr<PatternClause>>& patternClauses) {
     bool hasSemanticError = false;
     if (!store->isValidStore()) {
         hasSemanticError = true;
@@ -45,13 +45,13 @@ void Validator::validateClauses(SynonymStore* store, std::shared_ptr<SelectEntCo
         hasSemanticError = true;
     }
 
-    for (SuchThatClause& clause : suchThatClauses) {
-        if (!clause.validateArguments(store)) {
+    for (auto& clause : suchThatClauses) {
+        if (!clause->validateArguments(store)) {
             hasSemanticError = true;
         }
     }
-    for (PatternClause& clause : patternClauses) {
-        if (!clause.validateArguments(store)) {
+    for (auto& clause : patternClauses) {
+        if (!clause->validateArguments(store)) {
             hasSemanticError = true;
         }
     }

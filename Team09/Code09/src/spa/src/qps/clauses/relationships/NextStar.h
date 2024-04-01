@@ -9,11 +9,12 @@
 
 class NextStar : public BaseNext {
 public:
-    NextStar(ClauseArgument& currentStmt, ClauseArgument& nextStmt) : BaseNext(currentStmt, nextStmt) {}
+    NextStar(std::shared_ptr<ClauseArgument> currentStmt, std::shared_ptr<ClauseArgument> nextStmt)
+        : BaseNext(currentStmt, nextStmt) {}
 
 private:
     bool hasNextRelationship(PKBFacadeReader& reader) override {
-        return reader.hasNextStarRelationship(currentStmt, nextStmt);
+        return reader.hasNextStarRelationship(*currentStmt, *nextStmt);
     }
 
     StmtSet getNexters(PKBFacadeReader& reader, const StmtNum& nextee) override {

@@ -8,11 +8,11 @@
 
 class Parent : public BaseParent {
 public:
-    Parent(ClauseArgument& parent, ClauseArgument& child) : BaseParent(parent, child) {}
+    Parent(std::shared_ptr<ClauseArgument> parent, std::shared_ptr<ClauseArgument> child) : BaseParent(parent, child) {}
 
 private:
     bool hasParentRelationship(PKBFacadeReader& reader) override {
-        return reader.hasParentRelationship(parent, child);
+        return reader.hasParentRelationship(*parent, *child);
     }
     StmtSet getParents(PKBFacadeReader& reader, const StmtNum& child) override {
         const std::optional parentOpt = reader.getParent(child);

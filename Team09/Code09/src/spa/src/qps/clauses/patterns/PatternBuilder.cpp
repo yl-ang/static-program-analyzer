@@ -1,7 +1,7 @@
 #include "PatternBuilder.h"
 
-std::unique_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType synType, ClauseArgument* syn,
-                                                      std::vector<ClauseArgument*> args) {
+std::unique_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType synType, std::shared_ptr<ClauseArgument> syn,
+                                                      std::vector<std::shared_ptr<ClauseArgument>> args) {
     switch (synType) {
     case DesignEntityType::ASSIGN:
         return std::make_unique<AssignPattern>(syn, args);

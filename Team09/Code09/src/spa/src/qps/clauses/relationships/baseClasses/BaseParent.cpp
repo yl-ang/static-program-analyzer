@@ -2,20 +2,21 @@
 
 #include "qps/clauseArguments/Integer.h"
 
-BaseParent::BaseParent(ClauseArgument& parent, ClauseArgument& child) : parent(parent), child(child) {}
+BaseParent::BaseParent(std::shared_ptr<ClauseArgument> parent, std::shared_ptr<ClauseArgument> child)
+    : parent(parent), child(child) {}
 
 bool BaseParent::validateArguments() {
-    if (parent.isSynonym()) {
-        Synonym first = dynamic_cast<Synonym&>(parent);
-        if (first.getType() == DesignEntityType::VARIABLE || first.getType() == DesignEntityType::CONSTANT ||
-            first.getType() == DesignEntityType::PROCEDURE) {
+    if (parent->isSynonym()) {
+        std::shared_ptr<Synonym> first = std::dynamic_pointer_cast<Synonym>(parent);
+        if (first->getType() == DesignEntityType::VARIABLE || first->getType() == DesignEntityType::CONSTANT ||
+            first->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
-    if (child.isSynonym()) {
-        Synonym second = dynamic_cast<Synonym&>(child);
-        if (second.getType() == DesignEntityType::VARIABLE || second.getType() == DesignEntityType::CONSTANT ||
-            second.getType() == DesignEntityType::PROCEDURE) {
+    if (child->isSynonym()) {
+        std::shared_ptr<Synonym> second = std::dynamic_pointer_cast<Synonym>(child);
+        if (second->getType() == DesignEntityType::VARIABLE || second->getType() == DesignEntityType::CONSTANT ||
+            second->getType() == DesignEntityType::PROCEDURE) {
             return false;
         }
     }
@@ -27,11 +28,11 @@ ClauseResult BaseParent::evaluate(PKBFacadeReader& reader) {
         return {hasParentRelationship(reader)};
     }
 
-    if ((parent.isInteger() && child.isSynonym()) || (parent.isSynonym() && child.isInteger())) {
+    if ((parent->isInteger() && child->isSynonym()) || (parent->isSynonym() && child->isInteger())) {
         return evaluateSynonymInteger(reader);
     }
 
-    if ((parent.isWildcard() && child.isSynonym()) || (parent.isSynonym() && child.isWildcard())) {
+    if ((parent->isWildcard() && child->isSynonym()) || (parent->isSynonym() && child->isWildcard())) {
         return evaluateSynonymWildcard(reader);
     }
 
@@ -39,8 +40,8 @@ ClauseResult BaseParent::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    bool parentIsSynonym = parent.isSynonym();
-    Synonym syn = parentIsSynonym ? dynamic_cast<Synonym&>(parent) : dynamic_cast<Synonym&>(child);
+    bool parentIsSynonym = parent->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
 
     std::unordered_set<Stmt> allStmts{};
     if (syn.getType() == DesignEntityType::STMT) {
@@ -76,11 +77,9 @@ ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    bool parentIsSynonym = parent.isSynonym();
-    Synonym syn = parentIsSynonym ? dynamic_cast<Synonym&>(parent) : dynamic_cast<Synonym&>(child);
-    Integer integer = parentIsSynonym ? dynamic_cast<Integer&>(child) : dynamic_cast<Integer&>(parent);
-
-    StmtNum stmtNum = std::stoi(integer.getValue());
+    bool parentIsSynonym = parent->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
+    StmtNum stmtNum = std::stoi(parentIsSynonym ? child->getValue() : parent->getValue());
 
     std::unordered_set<StmtNum> stmtNums;
     if (parentIsSynonym) {
@@ -108,8 +107,8 @@ ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym parentSyn = dynamic_cast<Synonym&>(parent);
-    Synonym childSyn = dynamic_cast<Synonym&>(child);
+    Synonym parentSyn = *std::dynamic_pointer_cast<Synonym>(parent);
+    Synonym childSyn = *std::dynamic_pointer_cast<Synonym>(child);
 
     std::vector<Synonym> synonyms{parentSyn, childSyn};
     if (parentSyn == childSyn) {
@@ -144,5 +143,5 @@ ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader) {
 }
 
 bool BaseParent::isSimpleResult() const {
-    return !parent.isSynonym() && !child.isSynonym();
+    return !parent->isSynonym() && !child->isSynonym();
 }

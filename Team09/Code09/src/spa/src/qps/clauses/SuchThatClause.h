@@ -7,13 +7,13 @@
 class SuchThatClause : public QueryClause {
 private:
     const RelationshipType type;
-    ClauseArgument& firstArg;
-    ClauseArgument& secondArg;
+    std::shared_ptr<ClauseArgument> firstArg;
+    std::shared_ptr<ClauseArgument> secondArg;
 
     std::optional<std::shared_ptr<Relationship>> relationship;
 
 public:
-    SuchThatClause(const RelationshipType&, ClauseArgument*, ClauseArgument*);
+    SuchThatClause(const RelationshipType&, std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
     bool equals(const QueryClause& other) const override;
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;
