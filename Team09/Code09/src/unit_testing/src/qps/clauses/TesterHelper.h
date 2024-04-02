@@ -125,6 +125,7 @@ public:
 
 class AffectsTester : public SuchThatTester {
 public:
-    AffectsTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    AffectsTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                  std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::AFFECTS) {}
 };

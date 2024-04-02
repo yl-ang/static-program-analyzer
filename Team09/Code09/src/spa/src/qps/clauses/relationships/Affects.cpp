@@ -2,7 +2,7 @@
 
 #include "../ClauseEvaluatorUtils.h"
 
-Affects::Affects(ClauseArgument& affector, ClauseArgument& affected)
+Affects::Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected)
     : affector(affector), affected(affected) {}
 
 bool Affects::validateArguments() {
@@ -12,9 +12,9 @@ bool Affects::validateArguments() {
 /**
  * Various checks below
 */
-bool Affects::checkSynonym(ClauseArgument& clauseArgument) {
-    if (clauseArgument.isSynonym()) {
-        Synonym& s = dynamic_cast<Synonym&>(clauseArgument);
+bool Affects::checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument) {
+    if (clauseArgument->isSynonym()) {
+        Synonym s = *std::dynamic_pointer_cast<Synonym>(clauseArgument);
         DesignEntityType sType = s.getType();
         if (sType == DesignEntityType::VARIABLE || sType == DesignEntityType::PROCEDURE ||
             sType == DesignEntityType::CONSTANT) {
@@ -43,23 +43,23 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
     /**
      * Returns TRUE/FALSE
     */
-    if (affector.isInteger() && affected.isInteger()) {
+    if (affector->isInteger() && affected->isInteger()) {
         return evaluateBothIntegers(reader);
     }
-    if (affector.isWildcard() && affected.isWildcard()) {
+    if (affector->isWildcard() && affected->isWildcard()) {
         return evaluateBothWildcards(reader);
     }
-    if ((affector.isWildcard() && affected.isInteger()) || (affector.isInteger() && affected.isWildcard())) {
+    if ((affector->isWildcard() && affected->isInteger()) || (affector->isInteger() && affected->isWildcard())) {
         return evaluateWildcardInteger(reader);
     }
 
     /**
      * Returns either s1, s2, or both
     */
-    if ((affector.isInteger() && affected.isSynonym()) || (affector.isSynonym() && affected.isInteger())) {
+    if ((affector->isInteger() && affected->isSynonym()) || (affector->isSynonym() && affected->isInteger())) {
         return evaluateSynonymInteger(reader);
     }
-    if ((affector.isWildcard() && affected.isSynonym()) || (affector.isSynonym() && affected.isWildcard())) {
+    if ((affector->isWildcard() && affected->isSynonym()) || (affector->isSynonym() && affected->isWildcard())) {
         return evaluateSynonymWildcard(reader);
     }
 
@@ -304,8 +304,8 @@ void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorS
 */
 
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
-    bool affectorIsInteger = affector.isInteger();
-    Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
+    bool affectorIsInteger = affector->isInteger();
+    Integer integer = affectorIsInteger ? *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
@@ -324,8 +324,8 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
-    Integer affectorInt = dynamic_cast<Integer&>(affector);
-    Integer affectedInt = dynamic_cast<Integer&>(affected);
+    Integer affectorInt = *std::dynamic_pointer_cast<Integer>(affector);
+    Integer affectedInt = *std::dynamic_pointer_cast<Integer>(affected);
 
     StmtNum affectorStmtNum = std::stoi(affectorInt.getValue());
     StmtNum affectedStmtNum = std::stoi(affectedInt.getValue());
@@ -342,8 +342,8 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
-    bool affectorIsSynonym = affector.isSynonym();
-    Synonym syn = affectorIsSynonym ? dynamic_cast<Synonym&>(affector) : dynamic_cast<Synonym&>(affected);
+    bool affectorIsSynonym = affector->isSynonym();
+    Synonym syn = affectorIsSynonym ? *std::dynamic_pointer_cast<Synonym>(affector) : *std::dynamic_pointer_cast<Synonym>(affected);
 
     std::unordered_set<StmtNum> stmtNumValues;
 
@@ -367,9 +367,9 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
-    bool affectorIsInteger = affector.isInteger();
-    Synonym syn = affectorIsInteger ? dynamic_cast<Synonym&>(affected) : dynamic_cast<Synonym&>(affector);
-    Integer integer = affectorIsInteger ? dynamic_cast<Integer&>(affector) : dynamic_cast<Integer&>(affected);
+    bool affectorIsInteger = affector->isInteger();
+    Synonym syn = affectorIsInteger ? *std::dynamic_pointer_cast<Synonym>(affected) : *std::dynamic_pointer_cast<Synonym>(affector);
+    Integer integer = affectorIsInteger ? *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     std::unordered_set<StmtNum> stmtNumValues;
@@ -408,8 +408,8 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
 }
 
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym affectorSyn = dynamic_cast<Synonym&>(affector);
-    Synonym affectedSyn = dynamic_cast<Synonym&>(affected);
+    Synonym affectorSyn = *std::dynamic_pointer_cast<Synonym>(affector);
+    Synonym affectedSyn = *std::dynamic_pointer_cast<Synonym>(affected);
     std::vector<Synonym> headers = {affectorSyn, affectedSyn};
 
     SynonymValues affectorValues;

@@ -40,24 +40,24 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        AffectsTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("1"), new Integer("3")}.testBoolean(true);
-        AffectsTester{pfr, new Integer("1"), new Integer("4")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("4")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("4")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("3")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("4")}.testBoolean(true);
 
-        AffectsTester{pfr, new Integer("4"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
 
-        AffectsTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("3")}.testBoolean(true);
-        AffectsTester{pfr, new Integer("4"), new Integer("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("3")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("4")}.testBoolean(false);
     }
 
     SECTION("Affects(integer, integer) / empty store") {
@@ -69,24 +69,24 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore({});
         pfw.setStatementModifiesStore({});
 
-        AffectsTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("1"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("1"), new Integer("4")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("4")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("4")}.testBoolean(false);
 
-        AffectsTester{pfr, new Integer("4"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
 
-        AffectsTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Integer("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("4")}.testBoolean(false);
     }
 
     SECTION("Affects(wildcard, wildcard)") {
@@ -120,7 +120,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        AffectsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(true);
     }
 
     SECTION("Affects(wildcard, wildcard) / empty store") {
@@ -132,7 +132,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore({});
         pfw.setStatementModifiesStore({});
 
-        AffectsTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 
     SECTION("Affects(integer, wildcard)") {
@@ -166,15 +166,15 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-        AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(true);
-        AffectsTester{pfr, new Integer("4"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Wildcard>()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Wildcard>()}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Wildcard>()}.testBoolean(false);
 
-        AffectsTester{pfr, new Wildcard(), new Integer("4")}.testBoolean(true);
-        AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(true);
-        AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("4")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("3")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("1")}.testBoolean(false);
     }
 
     SECTION("Affects(integer, wildcard) / empty store") {
@@ -187,15 +187,15 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
         pfw.setStatementUsesStore({});
         pfw.setStatementModifiesStore({});
 
-        AffectsTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-        AffectsTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(false);
-        AffectsTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(false);
-        AffectsTester{pfr, new Integer("4"), new Wildcard()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Wildcard>()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Wildcard>()}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Wildcard>()}.testBoolean(false);
 
-        AffectsTester{pfr, new Wildcard(), new Integer("4")}.testBoolean(false);
-        AffectsTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(false);
-        AffectsTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(false);
-        AffectsTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("4")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("3")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("2")}.testBoolean(false);
+        AffectsTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("1")}.testBoolean(false);
     }
 }
 
@@ -235,19 +235,19 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s");
 
         // Select s such that Affects(s, 4)
-        AffectsTester{pfr, stmtSyn, new Integer("4")}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Integer>("4")}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
         // Select s such that Affects(s, 3)
-        AffectsTester{pfr, stmtSyn, new Integer("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Integer>("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "3"}});
         // Select s such that Affects(s, 2)
-        AffectsTester{pfr, stmtSyn, new Integer("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
         // Select s such that Affects(s, 1)
-        AffectsTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that Affects(s, 5), out of bounds
-        AffectsTester{pfr, stmtSyn, new Integer("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("Affects(integer, synonym)") {
@@ -281,19 +281,19 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s");
 
         // Select s such that Affects(4, s)
-        AffectsTester{pfr, new Integer("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, std::make_shared<Integer>("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
         // Select s such that Affects(3, s)
-        AffectsTester{pfr, new Integer("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"4"}});
+        AffectsTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"4", "3"}});
         // Select s such that Affects(2, s)
-        AffectsTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
         // Select s such that Affects(1, s)
-        AffectsTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
+        AffectsTester{pfr, std::make_shared<Integer>("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
 
         // Select s such that Affects(s, 5), out of bounds
-        AffectsTester{pfr, new Integer("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        AffectsTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("Affects(synonym, wildcard)") {
@@ -327,12 +327,12 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s");
 
-        AffectsTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "3"}});
+        AffectsTester{pfr, stmtSyn, std::make_shared<Wildcard>()}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "3"}});
     }
 
-    SECTION("Affects(wildcard, synonym) / empty store") {
+    SECTION("Affects(wildcard, synonym)") {
         std::unordered_set<Variable> variables = {"x", "y"};
 
         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
@@ -363,37 +363,68 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
         pfw.setStatementUsesStore(usesStoreEntries);
         pfw.setStatementModifiesStore(modifiesStoreEntries);
 
-        Synonym* stmtSyn = new Synonym(DesignEntityType::ASSIGN, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s");
 
-        AffectsTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3", "4"}});
+        AffectsTester{pfr, std::make_shared<Wildcard>(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3", "4"}});
     }
 }
 
-// TEST_CASE("SuchThatClause evaluate for affects relationship, both synonym") {
+ TEST_CASE("SuchThatClause evaluate for affects relationship with both synonym") {
+    PKB pkb{};
+    PKBFacadeWriter pfw{pkb};
+    PKBFacadeReader pfr{pkb};
 
-// }
+    SECTION("Affects(synonym, synonym)") {
+        std::unordered_set<Variable> variables = {"x", "y"};
 
-// TEST_CASE("SuchThatClause evaluate for affects relationship with 2 synonyms") {
-//     PKB pkb{};
-//     PKBFacadeWriter pfw{pkb};
-//     PKBFacadeReader pfr{pkb};
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                        Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
 
-//     SECTION("ParentT(Synonym, Synonym)") {
-//         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
-//                                                                    std::pair<int, int>{1, 3},
-//                                                                    std::pair<int, int>{3, 4}};
+        /**
+        * x = 1 -- assign/modifies x
+        * print x -- print/uses x
+        * x = x + 1 -- assign/modifies x/ uses x
+        * y = x + 1 -- assign/uses x
+        */
 
-//         std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
-//                                           Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}, std::pair<int, int>{2, 3},
+                                                                std::pair<int, int>{3, 4}};
 
-//         pfw.setStmts(stmts);
-//         pfw.setParentStore(parentStoreEntries);
-//         Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-//         Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{
+            std::pair<int, std::string>{2, "x"}, std::pair<int, std::string>{3, "x"}, std::pair<int, std::string>{4, "x"}};
 
-//         // Select s1 such that ParentT(s1, s2)
-//         ParentStarTester{pfr, stmtSyn1, stmtSyn2}
-//             .testSynonyms({*stmtSyn1, *stmtSyn2})
-//             .testSynonymValues({{"1", "1", "1", "3"}, {"2", "3", "4", "4"}});
-//     }
-// }
+        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{
+            std::pair<int, std::string>{1, "x"}, std::pair<int, std::string>{3, "x"}, std::pair<int, std::string>{4, "y"}};
+
+        pfw.setVariables(variables);
+        pfw.setStmts(stmts);
+        pfw.setNextStore(nextStoreEntries);
+        pfw.setStatementUsesStore(usesStoreEntries);
+        pfw.setStatementModifiesStore(modifiesStoreEntries);
+
+        std::shared_ptr<Synonym> stmtSyn1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s1");
+        std::shared_ptr<Synonym> stmtSyn2 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s2");
+
+        AffectsTester{pfr, stmtSyn1, stmtSyn2}
+            .testSynonyms({*stmtSyn1, *stmtSyn2})
+            .testSynonymValues({{"1", "3", "3"}, {"3", "3", "4"}});
+    }
+
+    SECTION("Affects(synonym, synonym) / empty store") {
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::PRINT, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+
+        pfw.setVariables({});
+        pfw.setStmts(stmts);
+        pfw.setNextStore({});
+        pfw.setStatementUsesStore({});
+        pfw.setStatementModifiesStore({});
+
+        std::shared_ptr<Synonym> stmtSyn1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s1");
+        std::shared_ptr<Synonym> stmtSyn2 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s2");
+
+        AffectsTester{pfr, stmtSyn1, stmtSyn2}
+            .testSynonyms({*stmtSyn1, *stmtSyn2})
+            .testSynonymValues({{}, {}});
+    }
+ }
