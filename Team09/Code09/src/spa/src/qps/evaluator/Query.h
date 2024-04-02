@@ -8,6 +8,7 @@
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/PatternClause.h"
 #include "qps/clauses/SuchThatClause.h"
+#include "qps/clauses/WithClause.h"
 
 using QueryClausePtr = std::shared_ptr<QueryClause>;
 
@@ -19,13 +20,14 @@ struct ArrangedClauses {
 class Query {
 public:
     Query(const std::vector<Synonym>&, const std::vector<std::shared_ptr<SuchThatClause>>&,
-          const std::vector<std::shared_ptr<PatternClause>>&);
+          const std::vector<std::shared_ptr<PatternClause>>&, const std::vector<std::shared_ptr<WithClause>>&);
     std::vector<std::string> evaluate(PKBFacadeReader&) const;
 
 private:
     std::vector<Synonym> selectEntities;
     std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses;
     std::vector<std::shared_ptr<PatternClause>> patternClauses;
+    std::vector<std::shared_ptr<WithClause>> withClauses;
 
     static bool evaluateAndJoinClauses(const TableManager& tm,
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
@@ -36,7 +38,7 @@ private:
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
     void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
-    void buildAndJoinSelectTable(const TableManager&, const PKBFacadeReader&) const;
+    void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
 

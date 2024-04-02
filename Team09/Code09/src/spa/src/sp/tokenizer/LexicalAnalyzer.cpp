@@ -1,7 +1,7 @@
 #include "LexicalAnalyzer.h"
 
-std::vector<BasicToken*> LexicalAnalyzer::preprocess(std::vector<std::string> strings) {
-    std::vector<BasicToken*> bt;
+std::vector<BasicToken> LexicalAnalyzer::preprocess(std::vector<std::string> strings) {
+    std::vector<BasicToken> bt;
     for (size_t i = 0; i < strings.size(); ++i) {
         std::string current = strings[i];
         std::string prev = (i > 0) ? strings[i - 1] : "";
@@ -11,20 +11,20 @@ std::vector<BasicToken*> LexicalAnalyzer::preprocess(std::vector<std::string> st
     return bt;
 }
 
-BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std::string next) {
+BasicToken LexicalAnalyzer::assignType(std::string curr, std::string prev, std::string next) {
     // Integer
     if (std::all_of(curr.begin(), curr.end(), ::isdigit)) {
         if (!isValidInteger(curr)) {
             throw SyntaxError("Invalid integer!");
         }
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::_INTEGER);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::_INTEGER);
 
         // Symbol
     } else if (std::all_of(curr.begin(), curr.end(), ::ispunct)) {
         if (!isValidSymbol(curr)) {
             throw SyntaxError("Invalid symbol!");
         }
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::SYMBOL);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::SYMBOL);
 
         // Name
     } else if (std::all_of(curr.begin(), curr.end(), ::isalnum)) {
@@ -35,14 +35,14 @@ BasicToken* LexicalAnalyzer::assignType(std::string curr, std::string prev, std:
         if (std::all_of(curr.begin(), curr.end(), ::isalpha)) {
             return disambiguate(curr, prev, next);
         }
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 
     } else {
         throw SyntaxError("Invalid token!");
     }
 }
 
-BasicToken* LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std::string next) {
+BasicToken LexicalAnalyzer::disambiguate(std::string curr, std::string prev, std::string next) {
     bool isKeyword = false;
     if (KEYWORDS.find(curr) != KEYWORDS.end()) {
         // Keyword match, disambiguate by checking neighbours
@@ -68,10 +68,10 @@ BasicToken* LexicalAnalyzer::disambiguate(std::string curr, std::string prev, st
         }
     }
     if (isKeyword) {
-        return new BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
+        return BasicToken(curr, BASIC_TOKEN_TYPE::KEYWORD);
     }
     // Keyword not matched, assign type NAME
-    return new BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
+    return BasicToken(curr, BASIC_TOKEN_TYPE::_NAME);
 }
 
 bool LexicalAnalyzer::isValidInteger(std::string value) {

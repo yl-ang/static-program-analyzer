@@ -6,6 +6,7 @@
 #include "qps/ParserUtils.h"
 #include "qps/QPSRegexes.h"
 #include "qps/clauses/QueryClause.h"
+#include "qps/clauses/WithClause.h"
 #include "qps/evaluator/Query.h"
 #include "qps/exceptions/QPSSemanticError.h"
 #include "qps/exceptions/QPSSyntaxError.h"
@@ -14,6 +15,7 @@
 #include "qps/parser/parsingStrategies/ParsingStrategy.h"
 #include "qps/parser/parsingStrategies/PatternStrategy.h"
 #include "qps/parser/parsingStrategies/SuchThatStrategy.h"
+#include "qps/parser/parsingStrategies/WithStrategy.h"
 
 typedef std::vector<std::string> UnparsedQueries;
 
@@ -22,11 +24,12 @@ protected:
     static std::shared_ptr<SelectEntContainer> parseSelectClause(std::string);
     static std::shared_ptr<SuchThatClause> parseSuchThatClauses(std::string);
     static std::shared_ptr<PatternClause> parsePatternClauses(std::string);
+    static std::shared_ptr<WithClause> parseWithClauses(std::string);
     static std::string getQueryClauses(UnparsedQueries);
     static SynonymStore parseQueryEntities(std::vector<std::string>);
     static void modifyClauseList(std::vector<std::string>&);
     static std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<std::shared_ptr<SuchThatClause>>,
-                      std::vector<std::shared_ptr<PatternClause>>>
+                      std::vector<std::shared_ptr<PatternClause>>, std::vector<std::shared_ptr<WithClause>>>
     parseClauses(const std::vector<std::string>&);
 
 public:

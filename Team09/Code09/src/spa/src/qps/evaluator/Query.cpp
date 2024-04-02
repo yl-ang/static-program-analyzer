@@ -1,10 +1,12 @@
 #include "Query.h"
 
+#include <qps/clauses/SynonymValuesRetriever.h>
+
 #include <queue>
 
 Query::Query(const std::vector<Synonym>& se, const std::vector<std::shared_ptr<SuchThatClause>>& stc,
-             const std::vector<std::shared_ptr<PatternClause>>& pc)
-    : selectEntities(se), suchThatClauses(stc), patternClauses(pc) {}
+             const std::vector<std::shared_ptr<PatternClause>>& pc, const std::vector<std::shared_ptr<WithClause>>& wc)
+    : selectEntities(se), suchThatClauses(stc), patternClauses(pc), withClauses(wc) {}
 
 std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (hasNoClauses() && isSelectBoolean()) {
@@ -127,7 +129,7 @@ bool Query::evaluateAndJoinClauses(const TableManager& tm,
                                    PKBFacadeReader& pkb) {
     for (const std::vector<QueryClausePtr>& connectedClauses : connectedClausesList) {
         for (QueryClausePtr clause : connectedClauses) {
-            ClauseResult res = clause->evaluate(pkb);
+            ClauseResult res = clause->runEvaluation(pkb);
             tm.join(res);
         }
         if (tm.isEmpty()) {
@@ -169,7 +171,7 @@ ArrangedClauses Query::arrangeClauses() const {
 
 bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
     for (auto stc : suchThatClauses) {
-        if (stc->isBooleanResult() && !stc->evaluate(pkb).getBoolean()) {
+        if (stc->isBooleanResult() && !stc->runEvaluation(pkb).getBoolean()) {
             return false;
         }
     }
@@ -202,50 +204,17 @@ bool Query::containsSelectSynonyms(QueryClausePtr clause) const {
     return false;
 }
 
-void Query::buildAndJoinSelectTable(const TableManager& tm, const PKBFacadeReader& pkb) const {
-    if (selectEntities.empty()) {
-        return;
-    }
+void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb) const {
+    std::vector<Synonym> selectEntitiesWithoutAttributes{};
 
-    for (Synonym entity : selectEntities) {
-        ColumnData col{};
-
-        switch (entity.getType()) {
-        case DesignEntityType::VARIABLE:
-            for (std::string var : pkb.getVariables()) {
-                col.push_back(var);
-            }
-            break;
-        case DesignEntityType::CONSTANT:
-            for (std::string con : pkb.getConstants()) {
-                col.push_back(con);
-            }
-            break;
-        case DesignEntityType::PROCEDURE:
-            for (std::string prod : pkb.getProcedures()) {
-                col.push_back(prod);
-            }
-            break;
-        case DesignEntityType::STMT:
-            for (Stmt stmt : pkb.getStmts()) {
-                col.push_back(std::to_string(stmt.stmtNum));
-            }
-            break;
-        case DesignEntityType::READ:
-        case DesignEntityType::ASSIGN:
-        case DesignEntityType::CALL:
-        case DesignEntityType::PRINT:
-        case DesignEntityType::WHILE:
-        case DesignEntityType::IF:
-            for (Stmt stmt : pkb.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[entity.getType()])) {
-                col.push_back(std::to_string(stmt.stmtNum));
-            }
-            break;
+    for (Synonym syn : selectEntities) {
+        if (syn.getAttr().has_value()) {
+            selectEntitiesWithoutAttributes.push_back(Synonym{syn.getType(), syn.getName()});
+        } else {
+            selectEntitiesWithoutAttributes.push_back(syn);
         }
-
-        // We only want synonyms without their attributes attached to them when building the Select table,
-        // because we are storing their synonym values in this table rather than their attributes.
-        Synonym header = entity.getAttr().has_value() ? Synonym{entity.getType(), entity.getName()} : entity;
-        tm.join(ClauseResult{header, col});
     }
+
+    const ClauseResult cr{SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes)};
+    tm.join(cr);
 }
