@@ -2,13 +2,8 @@
 
 #include <PKB/PKBClient/PKBFacadeReader.h>
 
-#include <algorithm>
-#include <set>
-
 #include "ClauseResult.h"
 #include "SynonymValuesRetriever.h"
-
-enum class ClauseType { SELECT, SUCH_THAT, PATTERN };  // Not used
 
 class QueryClause {
 private:

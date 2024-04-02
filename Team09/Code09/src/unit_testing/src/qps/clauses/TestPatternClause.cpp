@@ -16,7 +16,7 @@ bool equalVector(std::vector<std::string> vec1, std::vector<std::string> vec2) {
 
 #define REQUIRE_EQUAL_VECTORS(vec1, vec2) REQUIRE(equalVector(vec1, vec2))
 
-TEST_CASE("Assign Pattern.runEvaluation") {
+TEST_CASE("Assign Pattern evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
@@ -159,7 +159,7 @@ TEST_CASE("Test pattern getSynonyms") {
 }
 // ai-gen end
 
-TEST_CASE("While Pattern.runEvaluation") {
+TEST_CASE("While Pattern evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
@@ -251,7 +251,7 @@ TEST_CASE("While Pattern.runEvaluation") {
     }
 }
 
-TEST_CASE("If Pattern.runEvaluation") {
+TEST_CASE("If Pattern evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
