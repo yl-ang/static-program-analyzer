@@ -147,7 +147,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
                 stmtType == StatementType::CALL) {
                 func(usesVariableOneSet, curModifiesVariables, stmtNum, stmtType);
             }
-            handleCommonAffectedLogic(stmtNum, usesVariableOneSet, stmtType, reader, queue, visited);
+            Affects::handleCommonAffectedLogic(stmtNum, usesVariableOneSet, stmtType, reader, queue, visited);
         }
     }
 }
@@ -235,11 +235,12 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
         }
         StatementType stmtType = stmt.value().type;
 
+        // func(affectorStmtNum, stmtNum, modifiedVariables, stmtType, reader, queue, visited);
         if (stmtType == StatementType::ASSIGN) {
             auto curUsedVariables = reader.getUsesVariablesByStatement(stmtNum);
             func(modifiedVariables, curUsedVariables, stmtNum);
         }
-        handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
+        Affects::handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
     }
 }
 

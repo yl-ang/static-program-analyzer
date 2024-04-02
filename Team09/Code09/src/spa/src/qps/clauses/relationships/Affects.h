@@ -31,16 +31,16 @@ private:
     
     bool checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument);
     bool checkAssign(std::shared_ptr<Synonym> synonym);
-    bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
+    static bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
 
     template <typename Func>
     friend void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader);
-    void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+    static void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
                                     StatementType& stmtType, PKBFacadeReader& reader,
                                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);
     template <typename Func>
     friend void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader);
-    void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+    static void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
                                    StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
                                    std::unordered_set<StmtNum>& visited);
 public:
