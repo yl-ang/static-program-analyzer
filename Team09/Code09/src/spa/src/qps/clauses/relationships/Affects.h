@@ -26,20 +26,22 @@ private:
     void generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     bool isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader);
     bool intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
-    void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                   StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
-                                   std::unordered_set<StmtNum>& visited);
+    
     bool isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& reader);
-    bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
+    
     bool checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument);
     bool checkAssign(std::shared_ptr<Synonym> synonym);
-    void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                    StatementType& stmtType, PKBFacadeReader& reader,
-                                    std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);
+    
 
 public:
     Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected);
-
+    static void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                                   StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                                   std::unordered_set<StmtNum>& visited);
+    static void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                                    StatementType& stmtType, PKBFacadeReader& reader,
+                                    std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    static bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
     bool validateArguments() override;
 };
