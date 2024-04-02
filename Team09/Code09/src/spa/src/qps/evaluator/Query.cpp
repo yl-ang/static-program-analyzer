@@ -73,7 +73,7 @@ ValueTransformer Query::projectSynonymAttributesTransformer(PKBFacadeReader& pkb
 }
 
 bool Query::hasNoClauses() const {
-    return suchThatClauses.empty() && patternClauses.empty();
+    return suchThatClauses.empty() && patternClauses.empty() && withClauses.empty();
 }
 
 bool Query::isSelectBoolean() const {
@@ -132,6 +132,11 @@ ArrangedClauses Query::arrangeClauses() const {
 bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
     for (auto stc : suchThatClauses) {
         if (stc->isBooleanResult() && !stc->runEvaluation(pkb).getBoolean()) {
+            return false;
+        }
+    }
+    for (auto wc : withClauses) {
+        if (wc->isBooleanResult() && !wc->runEvaluation(pkb).getBoolean()) {
             return false;
         }
     }

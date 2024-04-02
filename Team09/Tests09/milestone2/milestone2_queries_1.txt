@@ -1,3 +1,8 @@
+160002 - With / no synonyms / False
+stmt s;
+Select BOOLEAN with 12 = 0
+FALSE
+100
 10001 - Pattern / 1 synonym / Wildcard, Variable
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
 Select a1 pattern a1(_, "y")
