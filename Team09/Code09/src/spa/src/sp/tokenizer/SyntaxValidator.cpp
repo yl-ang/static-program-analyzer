@@ -34,7 +34,9 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
                 // std::cout << "curr token: " << input[index].value << std::endl;
 #endif
 
-                throw SyntaxError("Unexpected Token, no grammar rule can be applied");
+                throw SyntaxError("Unexpected token: \"" + getLexicalEnumString(currToken) +
+                                  "\" while applying grammar rule: \"" + enumToString(std::get<NonTerminal>(stackTop)) +
+                                  "\"");
             }
 #ifdef DEBUG_BUILD
             // std::cout << "top of stack non terminal: " << std::get<NonTerminal>(stackTop) << std::endl;
@@ -67,11 +69,23 @@ bool SyntaxValidator::validateSyntax(std::vector<Token> input) {
             // std::cout << "curr token: " << input[index].value << std::endl;
 #endif
 
-            throw SyntaxError("Unexpected grammar rule");
+            throw SyntaxError("Expected: \"" + getLexicalEnumString(std::get<LEXICAL_TOKEN_TYPE>(stackTop)) +
+                              "\" but got: \"" + getLexicalEnumString(currToken) + "\"");
         }
     }
-    if (!parsingStack.empty() || index != input.size()) {
-        throw SyntaxError(" Unexpected end of input");
+    if (!parsingStack.empty()) {
+        throw SyntaxError("Unexpected end of input while applying grammar rule: \"" +
+                          enumToString(std::get<NonTerminal>(parsingStack.top())) + "\"");
+    }
+    if (index != input.size()) {
+        std::string remainingTokens;
+        for (int i = index; i < input.size(); ++i) {
+            remainingTokens += getLexicalEnumString(input[i].type);
+            if (i < input.size() - 1) {
+                remainingTokens += " ";  // Add space between enum strings
+            }
+        }
+        throw SyntaxError("Remaining tokens with no applicable grammar rule: \"" + remainingTokens + "\"");
     }
 
 #ifdef DEBUG_BUILD
@@ -279,4 +293,43 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
         {{NonTerminal::NT_CONST_VALUE, LEXICAL_TOKEN_TYPE::INTEGER}, {LEXICAL_TOKEN_TYPE::INTEGER}}};
 
     return parsingTable;
+}
+
+std::string SyntaxValidator::enumToString(NonTerminal token) {
+    // Mapping between enum values and their string representations
+    const std::unordered_map<NonTerminal, std::string> tokenStrings = {
+        {NonTerminal::NT_PROGRAM, "program: procedure _program"},
+        {NonTerminal::NT__PROGRAM, "_program: procedure _program | ε"},
+        {NonTerminal::NT_PROCEDURE, "procedure: 'procedure' proc_name '{' stmtLst '}'"},
+        {NonTerminal::NT_STMTLST, "stmtLst: stmt _stmtLst"},
+        {NonTerminal::NT__STMTLST, "_stmtLst: stmt _stmtLst | ε"},
+        {NonTerminal::NT_STMT, "stmt: read | print | while | if | assign  | call"},
+        {NonTerminal::NT_READ, "read: 'read' var_name';'"},
+        {NonTerminal::NT_PRINT, "print: 'print' var_name';'"},
+        {NonTerminal::NT_WHILE, "while: 'while' '(' cond_expr ')' '{' stmtLst '}'"},
+        {NonTerminal::NT_IF, "if: 'if' '(' cond_expr ')' 'then' '{' stmtLst '}' 'else' '{' stmtLst '}'"},
+        {NonTerminal::NT_ASSIGN, "assign: var_name '=' expr ';'"},
+        {NonTerminal::NT_COND_EXPR, "cond_expr: rel_expr  | '!' '(' cond_expr ')'  | '(' cond_expr ')' _cond_expr"},
+        {NonTerminal::NT__COND_EXPR, "_cond_expr: '&&' '(' cond_expr ')' | '||' '(' cond_expr ')'"},
+        {NonTerminal::NT_REL_EXPR, "rel_expr: rel_factor rel_op rel_factor"},
+        {NonTerminal::NT_REL_OP, "rel_op: '>' | '>=' | '<' | '<=' | '==' | '!='"},
+        {NonTerminal::NT_REL_FACTOR, "rel_factor: var_name | const_value | expr"},
+        {NonTerminal::NT_EXPR, "expr: term _expr"},
+        {NonTerminal::NT__EXPR, "_expr: '+' term _expr | '-' term _expr | ε"},
+        {NonTerminal::NT_TERM, "term: factor _term"},
+        {NonTerminal::NT__TERM, "_term: '*' factor _term | '/' factor _term | '%' factor _term | ε"},
+        {NonTerminal::NT_FACTOR, "factor: var_name | const_value | '(' expr ')'"},
+        {NonTerminal::NT_VAR_NAME, "var_name: NAME"},
+        {NonTerminal::NT_PROC_NAME, "proc_name: NAME"},
+        {NonTerminal::NT_CONST_VALUE, "const_value: INTEGER"},
+        {NonTerminal::DUPL, ""},
+        {NonTerminal::NT_CALL, "call: 'call' proc_name ';’"}};
+
+    // Attempt to find the string representation for the given enum value
+    auto it = tokenStrings.find(token);
+    if (it != tokenStrings.end()) {
+        return it->second;
+    } else {
+        return "Unknown token";
+    }
 }

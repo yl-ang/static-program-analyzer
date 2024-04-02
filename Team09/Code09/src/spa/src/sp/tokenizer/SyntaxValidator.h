@@ -9,6 +9,7 @@
 #include <variant>
 #include <vector>
 
+#include "../Utils.h"
 #include "../exceptions/SyntaxError.h"
 #include "Token.h"
 
@@ -83,4 +84,9 @@ public:
      * (Left recursion and left factoring removed)
      */
     ParsingTable initialiseSIMPLEParsingTable();
+
+    /**
+     * @brief Function to convert enum values to strings
+     */
+    std::string enumToString(NonTerminal token);
 };
