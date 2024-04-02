@@ -32,7 +32,7 @@ private:
     bool isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
     bool checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument);
-    bool checkAssign(Synonym& synonym);
+    bool checkAssign(std::shared_ptr<Synonym> synonym);
     void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
                                     StatementType& stmtType, PKBFacadeReader& reader,
                                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);

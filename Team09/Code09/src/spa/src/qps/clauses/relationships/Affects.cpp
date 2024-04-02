@@ -14,8 +14,8 @@ bool Affects::validateArguments() {
 */
 bool Affects::checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument) {
     if (clauseArgument->isSynonym()) {
-        Synonym s = *std::dynamic_pointer_cast<Synonym>(clauseArgument);
-        DesignEntityType sType = s.getType();
+        std::shared_ptr<Synonym> s = std::dynamic_pointer_cast<Synonym>(clauseArgument);
+        DesignEntityType sType = s->getType();
         if (sType == DesignEntityType::VARIABLE || sType == DesignEntityType::PROCEDURE ||
             sType == DesignEntityType::CONSTANT) {
             return false;
@@ -24,8 +24,8 @@ bool Affects::checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument) {
     return true;
 }
 
-bool Affects::checkAssign(Synonym& synonym) {
-    DesignEntityType sType = synonym.getType();
+bool Affects::checkAssign(std::shared_ptr<Synonym> synonym) {
+    DesignEntityType sType = synonym->getType();
     return (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT);
 }
 
@@ -154,13 +154,10 @@ bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& r
                         StatementType stmtType, PKBFacadeReader& reader,
                         std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        if (stmtType == StatementType::ASSIGN) {
+        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ ||
+            stmtType == StatementType::CALL) {
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
-                result = true;
-            }
-        }
-        if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-            if (hasCommonValue(usesVariable, curModifiesVariables)) {
+                result = result || stmtType == StatementType::ASSIGN;
                 return;
             }
         }
@@ -175,13 +172,11 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
                     StatementType& stmtType, PKBFacadeReader& reader,
                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        if (stmtType == StatementType::ASSIGN) {
-            if (hasCommonValue(usesVariable, curModifiesVariables)) {
-                result.insert({stmtNum, affectedStmtNum});
-            }
-        }
         if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
             if (hasCommonValue(usesVariable, curModifiesVariables)) {
+                if (stmtType == StatementType::ASSIGN) {
+                    result.insert({stmtNum, affectedStmtNum});
+                }
                 return;
             }
         }
@@ -305,8 +300,8 @@ void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorS
 
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector->isInteger();
-    Integer integer = *std::dynamic_pointer_cast<Integer>(affectorIsInteger ? affector : affected);
-    StmtNum stmtNum = std::stoi(integer.getValue());
+    std::shared_ptr<ClauseArgument> integer = affectorIsInteger ? affector : affected;
+    StmtNum stmtNum = std::stoi(integer->getValue());
 
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
     if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
@@ -343,7 +338,7 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     bool affectorIsSynonym = affector->isSynonym();
-    Synonym syn = *std::dynamic_pointer_cast<Synonym>(affectorIsSynonym ? affector : affected);
+    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(affectorIsSynonym ? affector : affected);
 
     std::unordered_set<StmtNum> stmtNumValues;
 
@@ -363,23 +358,24 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     for (int stmtNumValue : stmtNumValues) {
         values.push_back(std::to_string(stmtNumValue));
     }
-    return {syn, values};
+
+    return {*syn, values};
 }
 
 ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector->isInteger();
-    Synonym syn = *std::dynamic_pointer_cast<Synonym>(affectorIsInteger ? affected : affector);
-    Integer integer = *std::dynamic_pointer_cast<Integer>(affectorIsInteger ? affector : affected);
-    StmtNum stmtNum = std::stoi(integer.getValue());
+    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(affectorIsInteger ? affected : affector);
+    std::shared_ptr<ClauseArgument> integer = affectorIsInteger ? affector : affected;
+    StmtNum stmtNum = std::stoi(integer->getValue());
 
     std::unordered_set<StmtNum> stmtNumValues;
 
     if (!checkAssign(syn)) {
-        return {syn, {}};
+        return {*syn, {}};
     }
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
     if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
-        return  {syn, {}};
+        return  {*syn, {}};
     }
     AffectsSet resultSet;
     // synonym is affected
@@ -404,13 +400,13 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     for (int stmtNumValue : stmtNumValues) {
         values.push_back(std::to_string(stmtNumValue));
     }
-    return {syn, values};
+    return {*syn, values};
 }
 
 ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym affectorSyn = *std::dynamic_pointer_cast<Synonym>(affector);
-    Synonym affectedSyn = *std::dynamic_pointer_cast<Synonym>(affected);
-    std::vector<Synonym> headers = {affectorSyn, affectedSyn};
+    std::shared_ptr<Synonym> affectorSyn = std::dynamic_pointer_cast<Synonym>(affector);
+    std::shared_ptr<Synonym> affectedSyn = std::dynamic_pointer_cast<Synonym>(affected);
+    std::vector<Synonym> headers = {*affectorSyn, *affectedSyn};
 
     SynonymValues affectorValues;
     SynonymValues affectedValues;
