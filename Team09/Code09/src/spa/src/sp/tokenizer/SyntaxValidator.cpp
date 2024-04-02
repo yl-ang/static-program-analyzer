@@ -297,7 +297,7 @@ SyntaxValidator::ParsingTable SyntaxValidator::initialiseSIMPLEParsingTable() {
 
 std::string SyntaxValidator::enumToString(NonTerminal token) {
     // Mapping between enum values and their string representations
-    static std::unordered_map<NonTerminal, std::string> tokenStrings = {
+    const std::unordered_map<NonTerminal, std::string> tokenStrings = {
         {NonTerminal::NT_PROGRAM, "program: procedure _program"},
         {NonTerminal::NT__PROGRAM, "_program: procedure _program | ε"},
         {NonTerminal::NT_PROCEDURE, "procedure: 'procedure' proc_name '{' stmtLst '}'"},
