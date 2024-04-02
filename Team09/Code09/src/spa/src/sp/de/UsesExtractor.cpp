@@ -48,6 +48,7 @@ void UsesExtractor::visitCall(CallNode* node) {
         extractedUses = usesExtractorHelper->getUses();
         usesExtractorHelper->extractedProcs->insert({calledProc, extractedUses});
         usesExtractorHelper->currentProc = this->currentProc;
+        delete usesExtractorHelper;
 
 #ifdef DEBUG_BUILD
         std::cout << "Caching extracted uses for " << calledProc << std::endl;
@@ -120,6 +121,7 @@ void UsesExtractor::visitWhile(WhileNode* node) {
         uses.insert({userStmtNum, oldPair.second});
         this->procedureUses.insert({currentProc, oldPair.second});
     }
+    delete usesExtractorHelper;
 }
 
 void UsesExtractor::visitIf(IfNode* node) {
@@ -157,6 +159,8 @@ void UsesExtractor::visitIf(IfNode* node) {
         uses.insert({userStmtNum, oldPair.second});
         this->procedureUses.insert({currentProc, oldPair.second});
     }
+    delete thenUsesExtractorHelper;
+    delete elseUsesExtractorHelper;
 }
 
 std::unordered_set<std::pair<StmtNum, Variable>> UsesExtractor::getUses() {
