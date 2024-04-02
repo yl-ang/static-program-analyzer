@@ -75,6 +75,8 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
             currClauseType = QPSConstants::SUCH_THAT;
         } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
             currClauseType = QPSConstants::PATTERN;
+        } else if (std::regex_match(clauseList[i], QPSRegexes::WITH_CLAUSE)) {
+            currClauseType = QPSConstants::WITH;
         } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)) {
             clauseList[i].replace(0, 3, currClauseType);
         } else {

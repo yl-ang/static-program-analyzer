@@ -2,8 +2,15 @@
 
 WithClause::WithClause(std::shared_ptr<ClauseArgument> l, std::shared_ptr<ClauseArgument> r) : lhs(l), rhs(r) {}
 
-ClauseResult WithClause::evaluate(PKBFacadeReader& reader) {
+ClauseResult WithClause::evaluate(PKBFacadeReader& pkb) {
+    if (isBooleanResult()) {
+        return evaluateIntegerEquality();
+    }
     return {{}, {}};
+}
+
+ClauseResult WithClause::evaluateIntegerEquality() const {
+    return lhs->getValue() == rhs->getValue();
 }
 
 bool WithClause::equals(const QueryClause& other) const {
