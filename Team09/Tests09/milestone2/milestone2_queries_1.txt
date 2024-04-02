@@ -4231,10 +4231,10 @@ TRUE
 160004 - With / 1 synonym
 stmt s;
 Select s with s.stmt# = 12
-46, 28, 19, 8, 40, 27
+12
 100
 160005 - With / 2 Synonyms
 stmt s; while w;
 Select s with s.stmt# = w.stmt# 
-46, 28, 19, 8, 40, 27
+38,41,40,45,46
 10000
