@@ -34,6 +34,7 @@ void ModifiesExtractor::visitCall(CallNode* node) {
         dfsVisitHelper(procNode, modifiesExtractorHelper);
         extractedModifies = modifiesExtractorHelper->getModifies();
         this->extractedProcs->insert({calledProc, extractedModifies});
+        delete modifiesExtractorHelper;
     }
 
     // Iterate over each element in the set and update stmtNum value
@@ -76,6 +77,7 @@ void ModifiesExtractor::visitWhile(WhileNode* node) {
         modifies.insert({modifierStmtNum, oldPair.second});
         this->procedureModifies.insert({currentProc, oldPair.second});
     }
+    delete modifiesExtractorHelper;
 }
 
 void ModifiesExtractor::visitIf(IfNode* node) {
@@ -105,6 +107,9 @@ void ModifiesExtractor::visitIf(IfNode* node) {
         modifies.insert({modifierStmtNum, oldPair.second});
         this->procedureModifies.insert({currentProc, oldPair.second});
     }
+
+    delete thenModifiesExtractorHelper;
+    delete elseModifiesExtractorHelper;
 }
 
 std::unordered_set<std::pair<StmtNum, Variable>> ModifiesExtractor::getModifies() {
