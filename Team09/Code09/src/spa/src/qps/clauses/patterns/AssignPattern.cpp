@@ -16,10 +16,6 @@ bool AssignPattern::validateArguments() {
     if (arguments.size() != 2) {
         return false;
     }
-    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(assignSyn);
-    if (syn->getType() != DesignEntityType::ASSIGN) {
-        return false;
-    }
     if (!arguments[1]->isExpressionSpec() && !arguments[1]->isWildcard()) {
         return false;
     }

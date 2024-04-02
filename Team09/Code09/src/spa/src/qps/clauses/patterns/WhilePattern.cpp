@@ -17,10 +17,6 @@ bool WhilePattern::validateArguments() {
     if (arguments.size() != 2) {
         return false;
     }
-    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(whileSyn);
-    if (syn->getType() != DesignEntityType::WHILE) {
-        return false;
-    }
     if (!arguments[1]->isWildcard()) {
         return false;
     }

@@ -9,7 +9,5 @@ std::shared_ptr<Pattern> PatternBuilder::buildPattern(DesignEntityType synType, 
         return std::make_shared<WhilePattern>(syn, args);
     case DesignEntityType::IF:
         return std::make_shared<IfPattern>(syn, args);
-    default:
-        throw QPSSemanticError();
     }
 }

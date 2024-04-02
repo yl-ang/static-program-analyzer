@@ -12,9 +12,6 @@ std::shared_ptr<Pattern> PatternClause::getPattern() {
     if (!pattern.has_value()) {
         std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
         DesignEntityType synType = syn->getType();
-        if (synType == DesignEntityType::UNKNOWN) {
-            throw Exception("Pattern type not determined yet");
-        }
         pattern = PatternBuilder::buildPattern(synType, syn, arguments);
     }
 
@@ -77,7 +74,12 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         return false;
     }
 
-    if ((*arguments[0]).isSynonym()) {
+    if (syn->getType() != DesignEntityType::ASSIGN && syn->getType() != DesignEntityType::WHILE &&
+        syn->getType() != DesignEntityType::IF) {
+        return false;
+    }
+
+    if (arguments[0]->isSynonym()) {
         std::shared_ptr<Synonym> fSyn = std::dynamic_pointer_cast<Synonym>((arguments[0]));
         if (!fSyn->updateType(store)) {
             return false;
