@@ -77,6 +77,26 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
     return result;
 }
 
+// Helper Affected function (2)
+void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
+                                        StatementType& stmtType, PKBFacadeReader& reader,
+                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
+    // if modified, skip rest of loop
+    if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (hasCommonValue(usesVariable, curModifiesVariables)) {
+            return;
+        }
+    }
+
+    auto previousStmtSet = reader.getNextee(stmtNum);
+    for (const auto previousStmt : previousStmtSet) {
+        if (visited.find(previousStmt) == visited.end()) {
+            queue.emplace_back(previousStmt);
+        }
+    }
+}
+
 // Helper Affected template (1)
 template <typename Func>
 void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader) {
@@ -132,26 +152,6 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
     }
 }
 
-// Helper Affected function (2)
-void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
-                                        StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
-    // if modified, skip rest of loop
-    if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        if (hasCommonValue(usesVariable, curModifiesVariables)) {
-            return;
-        }
-    }
-
-    auto previousStmtSet = reader.getNextee(stmtNum);
-    for (const auto previousStmt : previousStmtSet) {
-        if (visited.find(previousStmt) == visited.end()) {
-            queue.emplace_back(previousStmt);
-        }
-    }
-}
-
 // Used for BOOLEAN Affected
 bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     bool result = false;
@@ -176,6 +176,25 @@ void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedS
             return;
         }
     }, affectedStmtNum, reader);
+}
+
+// Helper Affector function (2)
+void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
+                                        StatementType& stmtType, PKBFacadeReader& reader,
+                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
+    // if modified, skip rest of loop
+    if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
+        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
+        if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
+            return;
+        }
+    }
+    auto nextStmtSet = reader.getNexter(stmtNum);
+    for (const auto nextStmt : nextStmtSet) {
+        if (visited.find(nextStmt) == visited.end()) {
+            queue.emplace_back(nextStmt);
+        }
+    }
 }
 
 // Helper Affector template (1)
@@ -222,25 +241,6 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
             func(modifiedVariables, curUsedVariables, stmtNum);
         }
         handleCommonAffectorLogic(stmtNum, modifiedVariables, stmtType, reader, queue, visited);
-    }
-}
-
-// Helper Affector function (2)
-void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                        StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
-    // if modified, skip rest of loop
-    if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
-        auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
-        if (hasCommonValue(modifiedVariables, curModifiesVariables)) {
-            return;
-        }
-    }
-    auto nextStmtSet = reader.getNexter(stmtNum);
-    for (const auto nextStmt : nextStmtSet) {
-        if (visited.find(nextStmt) == visited.end()) {
-            queue.emplace_back(nextStmt);
-        }
     }
 }
 
