@@ -14,7 +14,7 @@ bool WithClause::equals(const QueryClause& other) const {
 }
 
 bool WithClause::isBooleanResult() const {
-    return false;
+    return !lhs->isSynonym() && !rhs->isSynonym();
 }
 
 bool WithClause::containsSynonym(const Synonym& syn) const {
