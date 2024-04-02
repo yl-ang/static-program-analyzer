@@ -9,6 +9,7 @@ private:
 
     ClauseResult evaluateValueEquality() const;
     ClauseResult evaluateOneSynonym(PKBFacadeReader& pkb) const;
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader& pkb) const;
 
 public:
     WithClause(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);

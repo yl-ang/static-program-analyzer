@@ -10,7 +10,7 @@ ClauseResult WithClause::evaluate(PKBFacadeReader& pkb) {
     }
 
     if (lhs->isSynonym() && rhs->isSynonym()) {
-        return {{}, {}};
+        return evaluateBothSynonyms(pkb);
     }
 
     return evaluateOneSynonym(pkb);
@@ -25,18 +25,49 @@ ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb) const {
     auto other = lhs->isSynonym() ? rhs : lhs;
 
     // collect all possbile values of synonym
-    const std::vector<std::vector<std::string>> synonymValues = SynonymValuesRetriever::retrieve(pkb, {syn});
+    std::vector<std::string> synonymValues = SynonymValuesRetriever::retrieve(pkb, syn);
 
     // compare attribute values of synonym values collected with non-synonym argument
     std::vector<std::string> validSynonymValues{};
     for (const auto& synonymValue : synonymValues) {
-        if (AttributeCollector::collect(pkb, syn, synonymValue[0]) == other->getValue()) {
-            validSynonymValues.push_back(synonymValue[0]);
+        if (AttributeCollector::collect(pkb, syn, synonymValue) == other->getValue()) {
+            validSynonymValues.push_back(synonymValue);
         }
     }
 
     // We don't want to retain the attributes since we are returning Synonym results.
     return {syn.getWithoutAttribute(), validSynonymValues};
+}
+
+ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb) const {
+    Synonym lhsSyn = *std::dynamic_pointer_cast<Synonym>(lhs);
+    Synonym rhsSyn = *std::dynamic_pointer_cast<Synonym>(rhs);
+
+    // collect all possbile values of both synonyms
+    std::vector<std::string> lhsValues = SynonymValuesRetriever::retrieve(pkb, lhsSyn);
+    std::vector<std::string> rhsValues = SynonymValuesRetriever::retrieve(pkb, rhsSyn);
+
+    std::unordered_map<std::string, std::vector<std::string>> rhsAttributesMap{};
+    for (std::string rhsValue : rhsValues) {
+        rhsAttributesMap[AttributeCollector::collect(pkb, rhsSyn, rhsValue)].push_back(rhsValue);
+    }
+
+    std::vector<std::string> validLhsValues{};
+    std::vector<std::string> validRhsValues{};
+    for (std::string lhsValue : lhsValues) {
+        auto lhsAttribute = AttributeCollector::collect(pkb, lhsSyn, lhsValue);
+
+        if (rhsAttributesMap.find(lhsAttribute) == rhsAttributesMap.end()) {
+            continue;
+        }
+
+        for (std::string rhsValue : rhsAttributesMap[lhsAttribute]) {
+            validLhsValues.push_back(lhsValue);
+            validRhsValues.push_back(rhsValue);
+        }
+    }
+
+    return {{lhsSyn.getWithoutAttribute(), rhsSyn.getWithoutAttribute()}, {validLhsValues, validRhsValues}};
 }
 
 bool WithClause::equals(const QueryClause& other) const {
