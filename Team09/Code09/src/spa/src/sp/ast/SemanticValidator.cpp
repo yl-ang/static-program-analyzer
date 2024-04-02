@@ -16,6 +16,7 @@ void SemanticValidator::validateSemantics(const std::shared_ptr<ProgramNode> pro
     this->semanticValidatorVisitor = new SemanticValidatorVisitor(procedureNames);
     checkCallingProcedure(programNode);
     checkCyclicCalls();
+    delete this->semanticValidatorVisitor;
 }
 
 void SemanticValidator::checkDuplicateProcedureNames(std::shared_ptr<ProgramNode> programNode) {
