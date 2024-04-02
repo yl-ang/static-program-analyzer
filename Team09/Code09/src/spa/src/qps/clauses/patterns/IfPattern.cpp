@@ -17,6 +17,10 @@ bool IfPattern::validateArguments() {
     if (arguments.size() != 3) {
         return false;
     }
+    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(ifSyn);
+    if (syn->getType() != DesignEntityType::IF) {
+        return false;
+    }
     if (!arguments[1]->isWildcard() || !arguments[2]->isWildcard()) {
         return false;
     }
