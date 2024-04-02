@@ -28,7 +28,7 @@ std::vector<std::shared_ptr<ClauseArgument>> WithStrategy::buildWithParameters(
         } else if (isAttrRef(str)) {
             std::vector<std::string> attrs = splitByDelimiter(str, ".");
             results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, attrs[0],
-                                                        Synonym::stringToAttributeEnum(attrs[0])));
+                                                        Synonym::stringToAttributeEnum(attrs[1])));
         } else {
             throw QPSSyntaxError();
         }

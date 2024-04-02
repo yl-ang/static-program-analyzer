@@ -152,6 +152,12 @@ std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
             nonBooleanClauses.push_back(stc);
         }
     }
+
+    for (auto wc : withClauses) {
+        if (!wc->isBooleanResult()) {
+            nonBooleanClauses.push_back(wc);
+        }
+    }
     return nonBooleanClauses;
 }
 
@@ -169,7 +175,7 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb
 
     for (Synonym syn : selectEntities) {
         if (syn.getAttr().has_value()) {
-            selectEntitiesWithoutAttributes.push_back(Synonym{syn.getType(), syn.getName()});
+            selectEntitiesWithoutAttributes.push_back(syn.getWithoutAttribute());
         } else {
             selectEntitiesWithoutAttributes.push_back(syn);
         }
