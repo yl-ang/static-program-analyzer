@@ -35,17 +35,19 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
     std::shared_ptr<SelectEntContainer> selectEntities = std::get<0>(result);
     std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses = std::get<1>(result);
     std::vector<std::shared_ptr<PatternClause>> patternClauses = std::get<2>(result);
+    std::vector<std::shared_ptr<WithClause>> withClauses = std::get<3>(result);
 
-    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
-    return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
+    Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses, withClauses);
+    return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses, withClauses};
 }
 
 std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<std::shared_ptr<SuchThatClause>>,
-           std::vector<std::shared_ptr<PatternClause>>>
+           std::vector<std::shared_ptr<PatternClause>>, std::vector<std::shared_ptr<WithClause>>>
 PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::shared_ptr<SelectEntContainer> selectEntities;
     std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses;
     std::vector<std::shared_ptr<PatternClause>> patternClauses;
+    std::vector<std::shared_ptr<WithClause>> withClauses;
 
     for (std::string clauseString : clauseList) {
         if (std::regex_match(clauseString, QPSRegexes::SELECT_CLAUSE)) {
@@ -54,11 +56,13 @@ PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
             suchThatClauses.push_back(PQLParser::parseSuchThatClauses(clauseString));
         } else if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
             patternClauses.push_back(PQLParser::parsePatternClauses(clauseString));
+        } else if (std::regex_match(clauseString, QPSRegexes::WITH_CLAUSE)) {
+            withClauses.push_back(PQLParser::parseWithClauses(clauseString));
         } else {
             throw QPSSyntaxError();
         }
     }
-    return std::make_tuple(selectEntities, suchThatClauses, patternClauses);
+    return std::make_tuple(selectEntities, suchThatClauses, patternClauses, withClauses);
 }
 
 void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
@@ -188,5 +192,16 @@ std::shared_ptr<PatternClause> PQLParser::parsePatternClauses(std::string clause
         return ptClause;
     } else {
         throw Exception("Issues with Strategy Pattern for PatternClauses");
+    }
+}
+
+std::shared_ptr<WithClause> PQLParser::parseWithClauses(std::string clauseString) {
+    std::vector<WithClause> result = {};
+    UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<WithStrategy>());
+    std::shared_ptr<QueryClause> qc = unparsedClause.execute();
+    if (std::shared_ptr<WithClause> wtClause = std::dynamic_pointer_cast<WithClause>(qc)) {
+        return wtClause;
+    } else {
+        throw Exception("Issues with Strategy Pattern for WithClauses");
     }
 }

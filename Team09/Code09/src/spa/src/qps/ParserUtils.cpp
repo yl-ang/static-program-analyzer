@@ -98,7 +98,8 @@ std::tuple<std::string, std::string> splitResultAndClause(const std::string& str
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
     std::vector<std::regex> clausePatterns = {QPSRegexes::SELECT_CLAUSE, QPSRegexes::SUCHTHAT_CLAUSE,
-                                              QPSRegexes::PATTERN_CLAUSE, QPSRegexes::AND_CLAUSE};
+                                              QPSRegexes::PATTERN_CLAUSE, QPSRegexes::WITH_CLAUSE,
+                                              QPSRegexes::AND_CLAUSE};
 
     std::vector<size_t> allClausesIndices = {};
     for (const auto& pattern : clausePatterns) {

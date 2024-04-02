@@ -27,14 +27,21 @@ struct QPSRegexes {
     // Such That Clause
     // {>=1 whitespaces}such{>=1 whitespaces}that{>=1 whitespaces}{capturing group}
     // capturing group format -> {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
-    inline static const std::regex SUCHTHAT_CLAUSE = std::regex("\\s*such\\s+that\\s+(\\w+\\*?\\s*\\(.*?\\))\\s*");
+    inline static const std::regex SUCHTHAT_CLAUSE =
+        std::regex("\\s*such\\s+that\\s+(?:not )?(\\w+\\*?\\s*\\(.*?\\))\\s*");
 
     // Pattern Clause
-    inline static const std::regex PATTERN_CLAUSE = std::regex("\\s*pattern\\s+(\\w+\\s*\\(.*?\\))\\s*");
+    inline static const std::regex PATTERN_CLAUSE = std::regex("\\s*pattern\\s+(?:not )?(\\w+\\s*\\(.*?\\))\\s*");
+
+    // With Clause
+    inline static const std::regex WITH_CLAUSE = std::regex(
+        "\\s*with\\ (?:not )?(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*");
 
     // And Clause
     // and{letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
-    inline static const std::regex AND_CLAUSE = std::regex("\\s*and\\s+(\\w+\\*?)\\s*\\((.*?)\\)\\s*");
+    inline static const std::regex AND_CLAUSE = std::regex(
+        "\\s*and\\s+(?:not\\s+)?((\\w+\\*?)\\s*\\((.*?)\\)|(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?"
+        "|\"\\w+\"|\\w+))\\s*");
 
     // {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
     inline static const std::regex SUCHTHAT_ARGS = std::regex("\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*");

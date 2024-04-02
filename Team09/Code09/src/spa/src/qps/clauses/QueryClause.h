@@ -4,7 +4,7 @@
 
 #include "ClauseResult.h"
 
-enum class ClauseType { SELECT, SUCH_THAT, PATTERN };
+enum class ClauseType { SELECT, SUCH_THAT, PATTERN };  // Not used
 
 class QueryClause {
 public:
