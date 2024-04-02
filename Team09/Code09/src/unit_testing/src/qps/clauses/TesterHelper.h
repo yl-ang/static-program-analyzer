@@ -12,11 +12,12 @@ private:  // NOLINT
 
 public:  // NOLINT
     SuchThatTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                   std::shared_ptr<ClauseArgument> secondArg, RelationshipType rsType)
-        : pkb{pkb},
-          firstArg{firstArg},
-          secondArg{secondArg},
-          result{std::make_shared<SuchThatClause>(rsType, firstArg, secondArg)->evaluate(pkb)} {}
+                   std::shared_ptr<ClauseArgument> secondArg, RelationshipType rsType, bool isNegation = false)
+        : pkb{pkb}, firstArg{firstArg}, secondArg{secondArg}, result{false} {
+        auto stc = std::make_shared<SuchThatClause>(rsType, firstArg, secondArg);
+        stc->setNegation(isNegation);
+        result = stc->runEvaluation(pkb);
+    }
 
     void testBoolean(bool expected) {
         REQUIRE(result.isBoolean());
@@ -72,53 +73,55 @@ public:  // NOLINT
 class FollowsTester : public SuchThatTester {
 public:
     FollowsTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                  std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS) {}
+                  std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS, isNegation) {}
 };
 
 class FollowsStarTester : public SuchThatTester {
 public:
     FollowsStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                      std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS_STAR) {}
+                      std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS_STAR, isNegation) {}
 };
 
 class ParentTester : public SuchThatTester {
 public:
     ParentTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                 std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT) {}
+                 std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT, isNegation) {}
 };
 
 class ParentStarTester : public SuchThatTester {
 public:
     ParentStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                     std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT_STAR) {}
+                     std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT_STAR, isNegation) {}
 };
 
 class UsesTester : public SuchThatTester {
 public:
-    UsesTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::USES) {}
+    UsesTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg,
+               bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::USES, isNegation) {}
 };
 
 class ModifiesTester : public SuchThatTester {
 public:
     ModifiesTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                   std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::MODIFIES) {}
+                   std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::MODIFIES, isNegation) {}
 };
 
 class NextTester : public SuchThatTester {
 public:
-    NextTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT) {}
+    NextTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg,
+               bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT, isNegation) {}
 };
 
 class NextStarTester : public SuchThatTester {
 public:
     NextStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
-                   std::shared_ptr<ClauseArgument> secondArg)
-        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT_STAR) {}
+                   std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT_STAR, isNegation) {}
 };

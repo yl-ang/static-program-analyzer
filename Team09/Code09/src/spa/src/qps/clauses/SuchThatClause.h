@@ -12,10 +12,12 @@ private:
 
     std::optional<std::shared_ptr<Relationship>> relationship;
 
+protected:
+    ClauseResult evaluate(PKBFacadeReader&) override;
+
 public:
     SuchThatClause(const RelationshipType&, std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
     bool equals(const QueryClause& other) const override;
-    ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;

@@ -10,4 +10,5 @@ public:
     static std::vector<std::string> filterStatementsByType(PKBFacadeReader&, DesignEntityType,
                                                            std::unordered_set<StmtNum>);
     static bool isIdentLiteral(const std::string& str);
+    static std::vector<std::vector<std::string>> transpose(std::vector<std::vector<std::string>>);
 };

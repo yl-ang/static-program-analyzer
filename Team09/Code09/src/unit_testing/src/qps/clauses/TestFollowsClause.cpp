@@ -16,6 +16,11 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with no synonyms") {
         FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
         FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
         FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
+
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2"), true}.testBoolean(false);
+        FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1"), true}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1"), true}.testBoolean(true);
+        FollowsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2"), true}.testBoolean(true);
     }
 
     SECTION("Follows(Integer, Integer) / empty store") {
@@ -144,5 +149,10 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 2 synonyms") {
         FollowsTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
             .testSynonymValues({{"1", "2", "3"}, {"2", "3", "4"}});
+
+        FollowsTester{pfr, stmtSyn1, stmtSyn2, true}
+            .testSynonyms({*stmtSyn1, *stmtSyn2})
+            .testSynonymValues({{"1", "1", "1", "2", "2", "2", "3", "3", "3", "4", "4", "4", "4"},
+                                {"1", "3", "4", "1", "2", "4", "1", "2", "3", "1", "2", "3", "4"}});
     }
 }

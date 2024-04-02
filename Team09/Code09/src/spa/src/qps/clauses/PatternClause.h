@@ -12,10 +12,11 @@ protected:
     std::shared_ptr<ClauseArgument> synonym;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
+    ClauseResult evaluate(PKBFacadeReader&) override;
+
 public:
     PatternClause(std::shared_ptr<ClauseArgument>, std::vector<std::shared_ptr<ClauseArgument>>);
     bool equals(const QueryClause&) const override;
-    ClauseResult evaluate(PKBFacadeReader&) override;
     bool isBooleanResult() const override;
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;
