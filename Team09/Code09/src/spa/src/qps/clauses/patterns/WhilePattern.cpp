@@ -1,12 +1,12 @@
 #include "WhilePattern.h"
 
-WhilePattern::WhilePattern(ClauseArgument* whileSyn, std::vector<ClauseArgument*> args)
-    : whileSyn(*whileSyn), firstArg(*args[0]), secondArg(*args[1]) {}
+WhilePattern::WhilePattern(std::shared_ptr<ClauseArgument> whileSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
+    : whileSyn(whileSyn), firstArg(args[0]), secondArg(args[1]) {}
 
 ClauseResult WhilePattern::evaluate(PKBFacadeReader& reader) {
-    if (firstArg.isSynonym()) {
+    if (firstArg->isSynonym()) {
         return evaluateFirstArgSyn(reader);
-    } else if (firstArg.isLiteral()) {
+    } else if (firstArg->isLiteral()) {
         return evaluateFirstArgLiteral(reader);
     } else {
         return evaluateFirstArgWildcard(reader);
@@ -14,8 +14,8 @@ ClauseResult WhilePattern::evaluate(PKBFacadeReader& reader) {
 }
 
 ClauseResult WhilePattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
-    Synonym wSyn = dynamic_cast<Synonym&>(whileSyn);
-    Synonym fSyn = dynamic_cast<Synonym&>(firstArg);
+    Synonym wSyn = *std::dynamic_pointer_cast<Synonym>(whileSyn);
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(firstArg);
 
     std::unordered_set<Stmt> whileStmts = reader.getStatementsByType(StatementType::WHILE);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -39,14 +39,14 @@ ClauseResult WhilePattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
 }
 
 ClauseResult WhilePattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
-    Synonym wSyn = dynamic_cast<Synonym&>(whileSyn);
+    Synonym wSyn = *std::dynamic_pointer_cast<Synonym>(whileSyn);
 
     std::unordered_set<Stmt> whileStmts = reader.getStatementsByType(StatementType::WHILE);
 
     std::vector<std::string> stmtNumbers = {};
 
     for (Stmt stmt : whileStmts) {
-        if (reader.hasWhilePattern(stmt.stmtNum, firstArg.getValue())) {
+        if (reader.hasWhilePattern(stmt.stmtNum, firstArg->getValue())) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
     }
@@ -55,7 +55,7 @@ ClauseResult WhilePattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
 }
 
 ClauseResult WhilePattern::evaluateFirstArgWildcard(PKBFacadeReader& reader) {
-    Synonym wSyn = dynamic_cast<Synonym&>(whileSyn);
+    Synonym wSyn = *std::dynamic_pointer_cast<Synonym>(whileSyn);
 
     std::unordered_set<Stmt> whileStmts = reader.getStatementsByType(StatementType::WHILE);
     std::unordered_set<Variable> allVars = reader.getVariables();

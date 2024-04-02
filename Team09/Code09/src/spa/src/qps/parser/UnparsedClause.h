@@ -6,7 +6,6 @@
 #include "../clauses/QueryClause.h"
 #include "parsingStrategies/ParsingStrategy.h"
 #include "parsingStrategies/PatternStrategy.h"
-#include "parsingStrategies/StrategyUtils.h"
 #include "parsingStrategies/SuchThatStrategy.h"
 
 class UnparsedClause {
@@ -16,5 +15,5 @@ private:
 
 public:
     UnparsedClause(std::string str, std::unique_ptr<ParsingStrategy>&& strategy);
-    std::unique_ptr<QueryClause> execute();
+    std::shared_ptr<QueryClause> execute();
 };

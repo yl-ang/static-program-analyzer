@@ -32,6 +32,7 @@ class RelationshipBuilder {
 public:
     static RelationshipType determineRelationshipType(const std::string& type);
 
-    static std::unique_ptr<Relationship> createRelationship(RelationshipType type, ClauseArgument& firstArg,
-                                                            ClauseArgument& secondArg);
+    static std::shared_ptr<Relationship> createRelationship(RelationshipType type,
+                                                            std::shared_ptr<ClauseArgument> firstArg,
+                                                            std::shared_ptr<ClauseArgument> secondArg);
 };

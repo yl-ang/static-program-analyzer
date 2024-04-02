@@ -18,21 +18,24 @@ struct ArrangedClauses {
 
 class Query {
 public:
-    Query(const std::vector<Synonym>&, const std::vector<SuchThatClause>&, const std::vector<PatternClause>&);
+    Query(const std::vector<Synonym>&, const std::vector<std::shared_ptr<SuchThatClause>>&,
+          const std::vector<std::shared_ptr<PatternClause>>&);
     std::vector<std::string> evaluate(PKBFacadeReader&) const;
 
 private:
     std::vector<Synonym> selectEntities;
-    std::vector<SuchThatClause> suchThatClauses;
-    std::vector<PatternClause> patternClauses;
+    std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses;
+    std::vector<std::shared_ptr<PatternClause>> patternClauses;
 
     static bool evaluateAndJoinClauses(const TableManager& tm,
                                        const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
                                        PKBFacadeReader& pkb);
     static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
+    static Synonym headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym);
 
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
+    void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
     void buildAndJoinSelectTable(const TableManager&, const PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;

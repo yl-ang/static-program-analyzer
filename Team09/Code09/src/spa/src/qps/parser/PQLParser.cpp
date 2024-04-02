@@ -1,6 +1,5 @@
 #include "PQLParser.h"
 
-#include <iostream>
 // Checked with lecturer, this is acceptable format for PQL:
 // Select v1 such that Parent(v1,v2) pattern a(v1,v2)
 // can >=0 spaces at existing spaces, and between commas and in front of brackets
@@ -34,18 +33,19 @@ Query PQLParser::parse(UnparsedQueries unparsedQueries) {
 
     auto result = parseClauses(clauseList);
     std::shared_ptr<SelectEntContainer> selectEntities = std::get<0>(result);
-    std::vector<SuchThatClause> suchThatClauses = std::get<1>(result);
-    std::vector<PatternClause> patternClauses = std::get<2>(result);
+    std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses = std::get<1>(result);
+    std::vector<std::shared_ptr<PatternClause>> patternClauses = std::get<2>(result);
 
     Validator::validateClauses(&entities, selectEntities, suchThatClauses, patternClauses);
     return Query{selectEntities->getSynonyms(), suchThatClauses, patternClauses};
 }
 
-std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<SuchThatClause>, std::vector<PatternClause>>
+std::tuple<std::shared_ptr<SelectEntContainer>, std::vector<std::shared_ptr<SuchThatClause>>,
+           std::vector<std::shared_ptr<PatternClause>>>
 PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::shared_ptr<SelectEntContainer> selectEntities;
-    std::vector<SuchThatClause> suchThatClauses;
-    std::vector<PatternClause> patternClauses;
+    std::vector<std::shared_ptr<SuchThatClause>> suchThatClauses;
+    std::vector<std::shared_ptr<PatternClause>> patternClauses;
 
     for (std::string clauseString : clauseList) {
         if (std::regex_match(clauseString, QPSRegexes::SELECT_CLAUSE)) {
@@ -162,7 +162,7 @@ std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string cla
     throw QPSSyntaxError();
 }
 
-SuchThatClause PQLParser::parseSuchThatClauses(std::string clauseString) {
+std::shared_ptr<SuchThatClause> PQLParser::parseSuchThatClauses(std::string clauseString) {
     std::vector<SuchThatClause> result = {};  // if there is none
 
     // replaced only the below line for strategy pattern refactor
@@ -170,25 +170,21 @@ SuchThatClause PQLParser::parseSuchThatClauses(std::string clauseString) {
     // UnparsedClause(std::vector<Synonym> entities,
     // std::string str, std::unique_ptr<ParsingStrategy> &&strategy);
     UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<SuchThatStrategy>());
-    std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-    SuchThatClause* stPtr = dynamic_cast<SuchThatClause*>(qc.get());
-    if (stPtr) {
-        SuchThatClause stClause = std::move(*stPtr);
+    std::shared_ptr<QueryClause> qc = unparsedClause.execute();
+    if (std::shared_ptr<SuchThatClause> stClause = std::dynamic_pointer_cast<SuchThatClause>(qc)) {
         return stClause;
     } else {
         throw Exception("Issues with Strategy Pattern for SuchThatClauses");
     }
 }
 
-PatternClause PQLParser::parsePatternClauses(std::string clauseString) {
+std::shared_ptr<PatternClause> PQLParser::parsePatternClauses(std::string clauseString) {
     std::vector<PatternClause> result = {};  // if there is none
     // replaced only the below line for strategy pattern refactor
     // PatternClause st = toPatternClause(entities, clauseString);
     UnparsedClause unparsedClause = UnparsedClause(clauseString, std::make_unique<PatternStrategy>());
-    std::unique_ptr<QueryClause> qc = unparsedClause.execute();
-    PatternClause* ptPtr = dynamic_cast<PatternClause*>(qc.get());
-    if (ptPtr) {
-        PatternClause ptClause = std::move(*ptPtr);
+    std::shared_ptr<QueryClause> qc = unparsedClause.execute();
+    if (std::shared_ptr<PatternClause> ptClause = std::dynamic_pointer_cast<PatternClause>(qc)) {
         return ptClause;
     } else {
         throw Exception("Issues with Strategy Pattern for PatternClauses");

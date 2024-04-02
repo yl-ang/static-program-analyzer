@@ -11,8 +11,8 @@ using AffectsSet = std::unordered_set<std::pair<StmtNum, StmtNum>>;
 
 class Affects : public Relationship {
 private:
-    ClauseArgument& affector;
-    ClauseArgument& affected;
+    std::shared_ptr<ClauseArgument> affector;
+    std::shared_ptr<ClauseArgument> affected;
 
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateBothIntegers(PKBFacadeReader&);
@@ -38,7 +38,8 @@ private:
                                     std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);
 
 public:
-    Affects(ClauseArgument& affector, ClauseArgument& affected);
+    Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected)
+        : affector(affector), affected(affected) {}
 
     ClauseResult evaluate(PKBFacadeReader&) override;
     bool validateArguments() override;

@@ -6,16 +6,17 @@
 class SuchThatTester {
 private:  // NOLINT
     PKBFacadeReader pkb;
-    ClauseArgument* firstArg;
-    ClauseArgument* secondArg;
+    std::shared_ptr<ClauseArgument> firstArg;
+    std::shared_ptr<ClauseArgument> secondArg;
     ClauseResult result;
 
 public:  // NOLINT
-    SuchThatTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg, RelationshipType rsType)
+    SuchThatTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                   std::shared_ptr<ClauseArgument> secondArg, RelationshipType rsType)
         : pkb{pkb},
           firstArg{firstArg},
           secondArg{secondArg},
-          result{SuchThatClause(rsType, firstArg, secondArg).evaluate(pkb)} {}
+          result{std::make_shared<SuchThatClause>(rsType, firstArg, secondArg)->evaluate(pkb)} {}
 
     void testBoolean(bool expected) {
         REQUIRE(result.isBoolean());
@@ -70,49 +71,55 @@ public:  // NOLINT
 
 class FollowsTester : public SuchThatTester {
 public:
-    FollowsTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    FollowsTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                  std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS) {}
 };
 
 class FollowsStarTester : public SuchThatTester {
 public:
-    FollowsStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    FollowsStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                      std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::FOLLOWS_STAR) {}
 };
 
 class ParentTester : public SuchThatTester {
 public:
-    ParentTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    ParentTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                 std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT) {}
 };
 
 class ParentStarTester : public SuchThatTester {
 public:
-    ParentStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    ParentStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                     std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::PARENT_STAR) {}
 };
 
 class UsesTester : public SuchThatTester {
 public:
-    UsesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    UsesTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::USES) {}
 };
 
 class ModifiesTester : public SuchThatTester {
 public:
-    ModifiesTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    ModifiesTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                   std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::MODIFIES) {}
 };
 
 class NextTester : public SuchThatTester {
 public:
-    NextTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    NextTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg, std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT) {}
 };
 
 class NextStarTester : public SuchThatTester {
 public:
-    NextStarTester(PKBFacadeReader pkb, ClauseArgument* firstArg, ClauseArgument* secondArg)
+    NextStarTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                   std::shared_ptr<ClauseArgument> secondArg)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT_STAR) {}
 };
 

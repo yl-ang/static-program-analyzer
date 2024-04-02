@@ -2,33 +2,28 @@
 
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "Relationship.h"
+#include "baseClasses/BaseFollows.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseResult.h"
 
-class Follows : public Relationship {
-private:
-    ClauseArgument& followee;
-    ClauseArgument& follower;
-
-    /**
-     * Check if the result is a simple boolean result.
-     * It is a simple boolean result if both arguments are not synonyms.
-     * @return true if the result is a simple boolean result, false otherwise.
-     */
-    bool isSimpleResult() const;
-
-    /**
-     * Evaluate clause which has 1 synonym and 1 integer.
-     * @return true if the result is a boolean result, false otherwise.
-     */
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
-
+class Follows : public BaseFollows {
 public:
-    Follows(ClauseArgument&, ClauseArgument&);
+    Follows(std::shared_ptr<ClauseArgument> followee, std::shared_ptr<ClauseArgument> follower)
+        : BaseFollows(followee, follower) {}
 
-    ClauseResult evaluate(PKBFacadeReader&) override;
-    bool validateArguments() override;
+private:
+    bool hasFollowRelationship(PKBFacadeReader& reader) override {
+        return reader.hasFollowRelationship(*followee, *follower);
+    }
+
+    StmtSet getFollowers(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        std::optional stmtOpt = reader.getFollower(stmtNum);
+        return stmtOpt.has_value() ? StmtSet{stmtOpt.value()} : StmtSet{};
+    }
+
+    StmtSet getFollowees(PKBFacadeReader& reader, const StmtNum& stmtNum) override {
+        std::optional stmtOpt = reader.getFollowee(stmtNum);
+        return stmtOpt.has_value() ? StmtSet{stmtOpt.value()} : StmtSet{};
+    }
 };

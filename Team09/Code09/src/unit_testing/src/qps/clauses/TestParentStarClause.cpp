@@ -13,53 +13,53 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with no synonyms") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        ParentStarTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(true);
-        ParentStarTester{pfr, new Integer("1"), new Integer("3")}.testBoolean(true);
-        ParentStarTester{pfr, new Integer("2"), new Integer("3")}.testBoolean(true);
-        ParentStarTester{pfr, new Integer("2"), new Integer("1")}.testBoolean(false);
-        ParentStarTester{pfr, new Integer("1"), new Integer("1")}.testBoolean(false);
-        ParentStarTester{pfr, new Integer("2"), new Integer("2")}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("3")}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("3")}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
     }
 
     SECTION("ParentT(Integer, Integer) / empty store") {
         pfw.setParentStore({});
-        ParentStarTester{pfr, new Integer("1"), new Integer("2")}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(false);
     }
 
     SECTION("ParentT(Integer, Wildcard)") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        ParentStarTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(true);
-        ParentStarTester{pfr, new Integer("2"), new Wildcard()}.testBoolean(true);
-        ParentStarTester{pfr, new Integer("3"), new Wildcard()}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Wildcard>()}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 
     SECTION("ParentT(Integer, Wildcard) / empty store") {
         pfw.setParentStore({});
-        ParentStarTester{pfr, new Integer("1"), new Wildcard()}.testBoolean(false);
-        ParentStarTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 
     SECTION("ParentT(Wildcard, Integer)") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        ParentStarTester{pfr, new Wildcard(), new Integer("3")}.testBoolean(true);
-        ParentStarTester{pfr, new Wildcard(), new Integer("2")}.testBoolean(true);
-        ParentStarTester{pfr, new Wildcard(), new Integer("1")}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("3")}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("2")}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Integer>("1")}.testBoolean(false);
     }
 
     SECTION("ParentT(Wildcard, Wildcard)") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        ParentStarTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(true);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(true);
     }
 
     SECTION("ParentT(Wildcard, Wildcard) / empty store") {
         pfw.setParentStore({});
-        ParentStarTester{pfr, new Wildcard(), new Wildcard()}.testBoolean(false);
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), std::make_shared<Wildcard>()}.testBoolean(false);
     }
 }
 
@@ -72,34 +72,42 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that ParentT(s, 2)
-        ParentStarTester{pfr, stmtSyn, new Integer("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("2")}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"1"}});
         // Select s such that ParentT(s, 3)
-        ParentStarTester{pfr, stmtSyn, new Integer("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "2"}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("3")}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"1", "2"}});
         // Select s such that ParentT(s, 1)
-        ParentStarTester{pfr, stmtSyn, new Integer("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that ParentT(s, 5), out of bounds
-        ParentStarTester{pfr, stmtSyn, new Integer("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("ParentT(Integer, Synonym)") {
         std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that ParentT(1, s)
-        ParentStarTester{pfr, new Integer("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2", "3"}});
+        ParentStarTester{pfr, std::make_shared<Integer>("1"), stmtSyn}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"2", "3"}});
         // Select s such that ParentT(2, s)
-        ParentStarTester{pfr, new Integer("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
+        ParentStarTester{pfr, std::make_shared<Integer>("2"), stmtSyn}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"3"}});
         // Select s such that ParentT(3, s)
-        ParentStarTester{pfr, new Integer("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
 
         // Select s such that ParentT(5, s), out of bounds
-        ParentStarTester{pfr, new Integer("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
     }
 
     SECTION("ParentT(Synonym, Wildcard)") {
@@ -111,10 +119,12 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
 
         pfw.setStmts(stmts);
         pfw.setParentStore(parentStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that ParentT(s, _)
-        ParentStarTester{pfr, stmtSyn, new Wildcard()}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "2"}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Wildcard>()}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"1", "2"}});
     }
 
     SECTION("ParentT(Wildcard, Synonym)") {
@@ -126,10 +136,12 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
 
         pfw.setStmts(stmts);
         pfw.setParentStore(parentStoreEntries);
-        Synonym* stmtSyn = new Synonym(DesignEntityType::STMT, "s");
+        std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
         // Select s such that ParentT(_, s)
-        ParentStarTester{pfr, new Wildcard(), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2", "3"}});
+        ParentStarTester{pfr, std::make_shared<Wildcard>(), stmtSyn}
+            .testSynonyms({*stmtSyn})
+            .testSynonymValues({{"2", "3"}});
     }
 }
 
@@ -147,8 +159,8 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 2 synonyms") {
 
         pfw.setStmts(stmts);
         pfw.setParentStore(parentStoreEntries);
-        Synonym* stmtSyn1 = new Synonym(DesignEntityType::STMT, "s1");
-        Synonym* stmtSyn2 = new Synonym(DesignEntityType::STMT, "s2");
+        std::shared_ptr<Synonym> stmtSyn1 = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+        std::shared_ptr<Synonym> stmtSyn2 = std::make_shared<Synonym>(DesignEntityType::STMT, "s2");
 
         // Select s1 such that ParentT(s1, s2)
         ParentStarTester{pfr, stmtSyn1, stmtSyn2}

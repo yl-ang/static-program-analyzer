@@ -17,7 +17,7 @@ public:
     void join(const Table& result) const;
     void join(const ClauseResult& result) const;
     void joinAll(const std::vector<Table>& tables) const;
-    void projectAttributes(const ValueTransformer& attributeProjector) const;
+    void projectAttributes(const std::vector<Synonym>&, const HeaderMatcher&, const ValueTransformer&) const;
     std::vector<std::string> extractResults(const std::vector<Synonym>& synonyms) const;
 
 private:

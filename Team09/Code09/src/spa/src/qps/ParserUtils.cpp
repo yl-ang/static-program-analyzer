@@ -59,16 +59,6 @@ std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& 
     }
 }
 
-std::vector<std::string> stringToWordList(const std::string& string) {
-    std::vector<std::string> wordList;
-    std::stringstream ss(string);
-    std::string word;
-    while (ss >> word) {
-        wordList.push_back(word);
-    }
-    return wordList;
-}
-
 std::string trim(const std::string& str) {
     size_t start = str.find_first_not_of(QPSConstants::WHITESPACES);
     std::string trimmedString;
@@ -131,26 +121,6 @@ std::vector<std::string> getAllClauses(const std::string& str) {
     clause = str.substr(allClausesIndices.at(allClausesIndices.size() - 1));
     clauses.push_back(trim(clause));
     return clauses;
-}
-
-std::vector<size_t> getClauseIndices(const std::string& str, const std::string& clause) {
-    size_t offset = 0;
-    size_t clauseIndex = str.find(clause, offset);
-
-    // no such clause found
-    if (clauseIndex == std::string::npos) {
-        return {};
-    }
-
-    std::vector<size_t> clausePositionList = {};
-    while (clauseIndex != std::string::npos) {
-        clausePositionList.push_back(clauseIndex);
-
-        offset = clauseIndex + 1;
-        clauseIndex = str.find(clause, offset);
-    }
-
-    return clausePositionList;
 }
 
 std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& regexPattern) {

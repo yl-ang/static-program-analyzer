@@ -18,18 +18,6 @@ std::unordered_set<Procedure> PKBFacadeReader::getProcedures() const {
     return pkbReference->procedureStore->getAllEntities();
 }
 
-bool PKBFacadeReader::containsVariable(const Variable &variable) const {
-    return pkbReference->variableStore->hasEntity(variable);
-}
-
-bool PKBFacadeReader::containsConstant(const Constant &constant) const {
-    return pkbReference->constantStore->hasEntity(constant);
-}
-
-bool PKBFacadeReader::containsProcedure(const Procedure &procedure) const {
-    return pkbReference->procedureStore->hasEntity(procedure);
-}
-
 std::unordered_set<Stmt> PKBFacadeReader::getStmts() const {
     return pkbReference->stmtStore->getStatements();
 }
@@ -152,14 +140,6 @@ std::unordered_set<Procedure> PKBFacadeReader::getUsesProceduresByVariable(const
 
 bool PKBFacadeReader::hasProcedureVariableUseRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
     return pkbReference->usesStore->hasProcedureVariableUseRelationship(arg1, arg2);
-}
-
-bool PKBFacadeReader::hasPattern(StmtNum stmtNum, std::string lhs, std::string rhs) {
-    return pkbReference->patternStore->hasPattern(stmtNum, lhs, rhs);
-}
-
-bool PKBFacadeReader::hasPattern(StmtNum stmtNum, ClauseArgument &arg1, ClauseArgument &arg2) {
-    return pkbReference->patternStore->hasPattern(stmtNum, arg1, arg2);
 }
 
 std::unordered_set<StmtNum> PKBFacadeReader::getNexter(StmtNum nextee) {

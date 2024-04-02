@@ -133,16 +133,10 @@ std::vector<std::string> TableManager::extractResults(const std::vector<Synonym>
     return results;
 }
 
-void TableManager::projectAttributes(const ValueTransformer& attributeProjector) const {
-    std::vector<Synonym> synonymsWithAttributes{};
-
-    for (Synonym syn : this->result.getHeaders()) {
-        if (syn.getAttr().has_value()) {
-            synonymsWithAttributes.push_back(syn);
-        }
-    }
-
-    this->result.transformColumn(synonymsWithAttributes, attributeProjector);
+void TableManager::projectAttributes(const std::vector<Synonym>& synonymsWithAttributes,
+                                     const HeaderMatcher& headerMatcher,
+                                     const ValueTransformer& attributeProjector) const {
+    this->result.projectNewColumn(synonymsWithAttributes, headerMatcher, attributeProjector);
 }
 
 std::string TableManager::buildTuple(const std::vector<Synonym>& synonyms, const Row& row) {

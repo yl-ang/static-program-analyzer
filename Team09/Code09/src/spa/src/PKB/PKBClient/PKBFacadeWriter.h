@@ -33,10 +33,6 @@ public:
     void setStatementUsesStore(const std::unordered_set<std::pair<StmtNum, Variable>> &usesStatementPairs) const;
     void setProcedureUsesStore(const std::unordered_set<std::pair<Procedure, Variable>> &usesProcedurePairs) const;
 
-    // Setter for PatternStore
-    void setPatternStore(
-        const std::unordered_set<std::pair<StmtNum, std::pair<std::string, std::string>>> &patterns) const;
-
     // Setter for NextStore
     void setNextStore(const std::unordered_set<std::pair<StmtNum, StmtNum>> &nextPairs) const;
 
