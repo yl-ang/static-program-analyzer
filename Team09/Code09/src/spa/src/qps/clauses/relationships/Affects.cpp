@@ -305,7 +305,8 @@ void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorS
 
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector->isInteger();
-    Integer integer = affectorIsInteger ? *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
+    Integer integer = affectorIsInteger ?
+        *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
@@ -343,7 +344,8 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     bool affectorIsSynonym = affector->isSynonym();
-    Synonym syn = affectorIsSynonym ? *std::dynamic_pointer_cast<Synonym>(affector) : *std::dynamic_pointer_cast<Synonym>(affected);
+    Synonym syn = affectorIsSynonym ?
+        *std::dynamic_pointer_cast<Synonym>(affector) : *std::dynamic_pointer_cast<Synonym>(affected);
 
     std::unordered_set<StmtNum> stmtNumValues;
 
@@ -368,8 +370,10 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
 
 ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector->isInteger();
-    Synonym syn = affectorIsInteger ? *std::dynamic_pointer_cast<Synonym>(affected) : *std::dynamic_pointer_cast<Synonym>(affector);
-    Integer integer = affectorIsInteger ? *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
+    Synonym syn = affectorIsInteger ?
+        *std::dynamic_pointer_cast<Synonym>(affected) : *std::dynamic_pointer_cast<Synonym>(affector);
+    Integer integer = affectorIsInteger ?
+        *std::dynamic_pointer_cast<Integer>(affector) : *std::dynamic_pointer_cast<Integer>(affected);
     StmtNum stmtNum = std::stoi(integer.getValue());
 
     std::unordered_set<StmtNum> stmtNumValues;
