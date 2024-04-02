@@ -1454,7 +1454,6 @@ TEST_CASE("Select with 1 such-that clause") {
     }
 };
 
-/*
 TEST_CASE("Multi") {
     PKB pkb{};
     PKBFacadeReader pfr{buildPKBNew(pkb)};
@@ -1574,4 +1573,3 @@ TEST_CASE("Multi") {
         }
     }
 }
-*/

@@ -38,9 +38,9 @@ private:
     ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
     void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
-    void buildAndJoinSelectTable(const TableManager&, const PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
     std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
+    void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&) const;
 
     // Getters and checkers
     bool hasNoClauses() const;
