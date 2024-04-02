@@ -34,7 +34,7 @@ public:
      * Procedure definitions, else keywords on a line and close brackets are assigned
      * statement number -1.
      */
-    std::vector<Token> assignTokens(std::vector<BasicToken*> input);
+    std::vector<Token> assignTokens(std::vector<BasicToken> input);
     Token assignKeyword(BasicToken* bt);
     Token assignSymbol(BasicToken* bt);
 };

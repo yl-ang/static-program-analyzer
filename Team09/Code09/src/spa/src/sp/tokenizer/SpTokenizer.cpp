@@ -1,23 +1,23 @@
 #include "SpTokenizer.h"
 
 std::vector<Token> SpTokenizer::tokenize(std::vector<std::string> input) {
-    std::vector<BasicToken*> basicTokens = lexicalAnalyzer.preprocess(input);
+    std::vector<BasicToken> basicTokens = lexicalAnalyzer.preprocess(input);
     std::vector<Token> tokens = assignTokens(basicTokens);
     syntaxValidator.validateSyntax(tokens);
     return tokens;
 }
 
 std::vector<Token> SpTokenizer::tokenizeForPattern(std::vector<std::string> input) {
-    std::vector<BasicToken*> basicTokens = lexicalAnalyzer.preprocess(input);
+    std::vector<BasicToken> basicTokens = lexicalAnalyzer.preprocess(input);
     std::vector<Token> tokens = assignTokens(basicTokens);
     return tokens;
 }
 
-std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken*> input) {
+std::vector<Token> SpTokenizer::assignTokens(std::vector<BasicToken> input) {
     std::vector<Token> tokens;
     for (size_t i = 0; i < input.size(); i++) {
-        BasicToken* curr = input[i];
-        BasicToken* next = (i + 1 < input.size()) ? input[i + 1] : nullptr;
+        BasicToken* curr = &input[i];
+        BasicToken* next = (i + 1 < input.size()) ? &input[i + 1] : nullptr;
         switch (curr->type) {
         case BASIC_TOKEN_TYPE::_INTEGER:
             tokens.push_back(Token(LEXICAL_TOKEN_TYPE::INTEGER, curr->value, stmtNumCounter));
