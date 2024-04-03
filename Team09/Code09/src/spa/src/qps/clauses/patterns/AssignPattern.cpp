@@ -2,19 +2,29 @@
 
 AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
                              std::vector<std::shared_ptr<ClauseArgument>> args)
-    : assignSyn(assignSyn), firstArg(args[0]), secondArg(args[1]) {}
+    : assignSyn(assignSyn), arguments(args) {}
 
 ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader) {
-    if (firstArg->isSynonym()) {
+    if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else {
         return evaluateNoArgsSyns(reader);
     }
 }
 
+bool AssignPattern::validateArguments() {
+    if (arguments.size() != 2) {
+        return false;
+    }
+    if (!arguments[1]->isExpressionSpec() && !arguments[1]->isWildcard()) {
+        return false;
+    }
+    return true;
+}
+
 ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
-    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(firstArg);  // This is 100% variable
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);  // This is 100% variable
 
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -22,9 +32,9 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     std::vector<std::string> stmtNumbers = {};
     std::vector<std::string> synValues = {};
 
-    std::string secondString = secondArg->getValue();
+    std::string secondString = arguments[1]->getValue();
     bool isPartial = false;
-    if (secondArg->isExpressionSpec()) {
+    if (arguments[1]->isExpressionSpec()) {
         if (isPartialExpression(secondString)) {
             secondString = removeCharsFrom(secondString, QPSConstants::WILDCARD);
             isPartial = true;
@@ -65,17 +75,17 @@ ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader) {
     std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
     std::vector<std::string> stmtNumbers = {};
 
-    if (firstArg->isWildcard() && secondArg->isWildcard()) {
+    if (arguments[0]->isWildcard() && arguments[1]->isWildcard()) {
         for (Stmt stmt : assignStmts) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
         return {aSyn, stmtNumbers};
     }
 
-    std::string firstString = firstArg->getValue();
-    std::string secondString = secondArg->getValue();
+    std::string firstString = arguments[0]->getValue();
+    std::string secondString = arguments[1]->getValue();
     bool isPartial = false;
-    if (secondArg->isExpressionSpec()) {
+    if (arguments[1]->isExpressionSpec()) {
         if (isPartialExpression(secondString)) {
             secondString = removeCharsFrom(secondString, QPSConstants::WILDCARD);
             isPartial = true;

@@ -4,10 +4,18 @@ PatternClause::PatternClause(std::shared_ptr<ClauseArgument> syn, std::vector<st
     : synonym(syn), arguments(args) {}
 
 ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
-    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
-    DesignEntityType synType = syn->getType();
-    std::unique_ptr<Pattern> evaluator = PatternBuilder::buildPattern(synType, syn, arguments);
+    std::shared_ptr<Pattern> evaluator = getPattern();
     return evaluator->evaluate(reader);
+}
+
+std::shared_ptr<Pattern> PatternClause::getPattern() {
+    if (!pattern.has_value()) {
+        std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(synonym);
+        DesignEntityType synType = syn->getType();
+        pattern = PatternBuilder::buildPattern(synType, syn, arguments);
+    }
+
+    return pattern.value();
 }
 
 bool PatternClause::equals(const QueryClause& other) const {
@@ -66,7 +74,12 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         return false;
     }
 
-    if ((*arguments[0]).isSynonym()) {
+    if (syn->getType() != DesignEntityType::ASSIGN && syn->getType() != DesignEntityType::WHILE &&
+        syn->getType() != DesignEntityType::IF) {
+        return false;
+    }
+
+    if (arguments[0]->isSynonym()) {
         std::shared_ptr<Synonym> fSyn = std::dynamic_pointer_cast<Synonym>((arguments[0]));
         if (!fSyn->updateType(store)) {
             return false;
@@ -77,25 +90,6 @@ bool PatternClause::validateArguments(SynonymStore* store) {
         }
     }
 
-    DesignEntityType synType = syn->getType();
-    switch (synType) {
-    case DesignEntityType::WHILE:
-        if (!(*arguments[1]).isWildcard()) {
-            throw QPSSyntaxError();
-        }
-        [[fallthrough]];
-    case DesignEntityType::ASSIGN:
-        if (arguments.size() != 2) {
-            throw QPSSyntaxError();
-        }
-        break;
-    case DesignEntityType::IF:
-        if (arguments.size() != 3) {
-            throw QPSSyntaxError();
-        }
-        break;
-    default:
-        return false;
-    }
-    return true;
+    std::shared_ptr<Pattern> patternChecker = getPattern();
+    return patternChecker->validateArguments();
 }

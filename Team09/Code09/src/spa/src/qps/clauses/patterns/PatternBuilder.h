@@ -8,6 +8,6 @@
 
 class PatternBuilder {
 public:
-    static std::unique_ptr<Pattern> buildPattern(DesignEntityType, std::shared_ptr<ClauseArgument>,
+    static std::shared_ptr<Pattern> buildPattern(DesignEntityType, std::shared_ptr<ClauseArgument>,
                                                  std::vector<std::shared_ptr<ClauseArgument>>);
 };

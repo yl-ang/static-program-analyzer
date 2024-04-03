@@ -1,21 +1,31 @@
 #include "IfPattern.h"
 
 IfPattern::IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
-    : ifSyn(ifSyn), firstArg(args[0]), secondArg(args[1]), thirdArg(args[2]) {}
+    : ifSyn(ifSyn), arguments(args) {}
 
 ClauseResult IfPattern::evaluate(PKBFacadeReader& reader) {
-    if (firstArg->isSynonym()) {
+    if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
-    } else if (firstArg->isLiteral()) {
+    } else if (arguments[0]->isLiteral()) {
         return evaluateFirstArgLiteral(reader);
     } else {
         return evaluateFirstArgWildcard(reader);
     }
 }
 
+bool IfPattern::validateArguments() {
+    if (arguments.size() != 3) {
+        return false;
+    }
+    if (!arguments[1]->isWildcard() || !arguments[2]->isWildcard()) {
+        return false;
+    }
+    return true;
+}
+
 ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
-    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(firstArg);
+    Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);
 
     std::unordered_set<Stmt> ifStmts = reader.getStatementsByType(StatementType::IF);
     std::unordered_set<Variable> allVars = reader.getVariables();
@@ -46,7 +56,7 @@ ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader) {
     std::vector<std::string> stmtNumbers = {};
 
     for (Stmt stmt : ifStmts) {
-        if (reader.hasIfPattern(stmt.stmtNum, firstArg->getValue())) {
+        if (reader.hasIfPattern(stmt.stmtNum, arguments[0]->getValue())) {
             stmtNumbers.push_back(std::to_string(stmt.stmtNum));
         }
     }

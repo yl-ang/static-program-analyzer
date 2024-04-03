@@ -8,9 +8,7 @@
 class IfPattern : public Pattern {
 private:
     std::shared_ptr<ClauseArgument> ifSyn;
-    std::shared_ptr<ClauseArgument> firstArg;
-    std::shared_ptr<ClauseArgument> secondArg;
-    std::shared_ptr<ClauseArgument> thirdArg;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
@@ -19,4 +17,5 @@ private:
 public:
     IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

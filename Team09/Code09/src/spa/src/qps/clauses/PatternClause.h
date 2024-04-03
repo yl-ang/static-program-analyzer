@@ -12,7 +12,8 @@ protected:
     std::shared_ptr<ClauseArgument> synonym;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
-    ClauseResult evaluate(PKBFacadeReader&) override;
+    std::optional<std::shared_ptr<Pattern>> pattern;
+    ClauseResult evaluate(PKBFacadeReader&);
 
 public:
     PatternClause(std::shared_ptr<ClauseArgument>, std::vector<std::shared_ptr<ClauseArgument>>);
@@ -21,4 +22,5 @@ public:
     bool containsSynonym(const Synonym&) const override;
     std::vector<Synonym> getSynonyms() const override;
     bool validateArguments(SynonymStore* store) override;
+    std::shared_ptr<Pattern> getPattern();
 };

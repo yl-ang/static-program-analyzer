@@ -9,8 +9,7 @@
 class AssignPattern : public Pattern {
 private:
     std::shared_ptr<ClauseArgument> assignSyn;
-    std::shared_ptr<ClauseArgument> firstArg;
-    std::shared_ptr<ClauseArgument> secondArg;
+    std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
     ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
     ClauseResult evaluateNoArgsSyns(PKBFacadeReader&);
@@ -18,4 +17,5 @@ private:
 public:
     AssignPattern(std::shared_ptr<ClauseArgument> assignSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
     ClauseResult evaluate(PKBFacadeReader&) override;
+    bool validateArguments() override;
 };

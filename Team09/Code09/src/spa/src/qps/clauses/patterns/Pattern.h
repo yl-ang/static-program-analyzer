@@ -8,4 +8,5 @@
 struct Pattern {
     Pattern() = default;
     virtual ClauseResult evaluate(PKBFacadeReader&) = 0;
+    virtual bool validateArguments() = 0;
 };
