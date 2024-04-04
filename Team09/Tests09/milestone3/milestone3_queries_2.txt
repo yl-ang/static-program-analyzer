@@ -1,455 +1,455 @@
-1 - Modifies: variables modified by 28
-variable v;
-Select v such that Modifies(28, v)
-b
-5000
-2 - Uses: read that uses r
-read r;
-Select r such that Uses(r, "r")
-none
-5000
-3 - Uses: if that uses k
-if ifs;
-Select ifs such that Uses(ifs, "k")
-none
-5000
-4 - Modifies: print that modifies p
-print pn;
-Select pn such that Modifies(pn, "p")
-none
-5000
-5 - Uses: while that uses
-while w;
-Select w such that Uses(w, _)
-26
-5000
-6 - Uses: while that uses i
-while w;
-Select w such that Uses(w, "i")
-none
-5000
-7 - Uses: if that uses o
-if ifs;
-Select ifs such that Uses(ifs, "o")
-none
-5000
-8 - Modifies: variables modified by print
-variable v; print pn;
-Select v such that Modifies(pn, v)
-none
-5000
-9 - Uses: print that uses
-print pn;
-Select pn such that Uses(pn, _)
-37, 39, 36, 41, 34
-5000
-10 - Uses: statement that uses w matching pattern, select v
-stmt s; assign a; variable v;
-Select v such that Uses(s, v) pattern a(v, _"w"_)
-none
-5000
-11 - Uses: if that uses
-if ifs;
-Select ifs such that Uses(ifs, _)
-33
-5000
-12 - Uses: print that uses p
-print pn;
-Select pn such that Uses(pn, "p")
-none
-5000
-13 - Modifies: print that modifies
-print pn;
-Select pn such that Modifies(pn, _)
-none
-5000
-14 - Modifies: statement that modifies v matching pattern, select v
-stmt s; assign a; variable v;
-Select v such that Modifies(s, v) pattern a(v, _"v"_)
-none
-5000
-15 - Modifies: print that modifies t
-print pn;
-Select pn such that Modifies(pn, "t")
-none
-5000
-16 - Modifies: variables modified by read
-variable v; read r;
-Select v such that Modifies(r, v)
-z, y, d, x, b, e, k, v, i, a, t
-5000
-17 - Uses: assign that uses d
-assign a;
-Select a such that Uses(a, "d")
-25, 24, 23, 20, 18, 17, 16, 22, 21, 9, 14, 15, 13, 12, 11, 6, 10, 4, 8, 7
-5000
-18 - Modifies: while that modifies e
+1 - Modifies: while that modifies e
 while w;
 Select w such that Modifies(w, "e")
 26
 5000
-19 - Uses: if that uses l
+2 - Uses: read that uses i
+read r;
+Select r such that Uses(r, "i")
+none
+5000
+3 - Uses: while that uses g
+while w;
+Select w such that Uses(w, "g")
+none
+5000
+4 - Uses: if that uses l
 if ifs;
 Select ifs such that Uses(ifs, "l")
 none
 5000
-20 - Modifies: assign that modifies c
-assign a;
-Select a such that Modifies(a, "c")
-2
+5 - Modifies: statement that modifies k
+stmt s;
+Select s such that Modifies(s, "k")
+31, 26, 10
 5000
-21 - Uses: while that uses w
-while w;
-Select w such that Uses(w, "w")
-26
-5000
-22 - Modifies: read that modifies i
+6 - Uses: read that uses
 read r;
-Select r such that Modifies(r, "i")
-32
-5000
-23 - Uses: variables used by read
-variable v; read r;
-Select v such that Uses(r, v)
+Select r such that Uses(r, _)
 none
 5000
-24 - Modifies: if that modifies n
-if ifs;
-Select ifs such that Modifies(ifs, "n")
-none
-5000
-25 - Modifies: assign that modifies e
-assign a;
-Select a such that Modifies(a, "e")
-4
-5000
-26 - Modifies: variables modified by assign
-variable v; assign a;
-Select v such that Modifies(a, v)
-z, x, j, w, i, c, r, k, v, l, p, o, h, u, b, y, t, n, q, d, e, f, s, m, g
-5000
-27 - Modifies: assign that modifies d
-assign a;
-Select a such that Modifies(a, "d")
-3
-5000
-28 - Modifies: variables modified by if
-variable v; if ifs;
-Select v such that Modifies(ifs, v)
-v, t
-5000
-29 - Uses: print that uses q
+7 - Uses: print that uses r
 print pn;
-Select pn such that Uses(pn, "q")
+Select pn such that Uses(pn, "r")
 none
 5000
-30 - Uses: while that uses h
-while w;
-Select w such that Uses(w, "h")
-none
+8 - Modifies: variables modified by while
+variable v; while w;
+Select v such that Modifies(w, v)
+z, y, d, x, b, e, k, v, i, a, t
 5000
-31 - Modifies: while that modifies t
-while w;
-Select w such that Modifies(w, "t")
-26
-5000
-32 - Modifies: statement that modifies k matching pattern, select s
-stmt s; assign a; variable v;
-Select s such that Modifies(s, v) pattern a(v, _"k"_)
-45, 40, 43, 25, 21, 24, 26, 12, 23, 46, 44, 15, 42, 38, 22, 14, 18, 20, 11, 19, 35, 17, 33, 13, 16
-5000
-33 - Modifies: while that modifies w
-while w;
-Select w such that Modifies(w, "w")
-none
-5000
-34 - Modifies: variables modified by 1
-variable v;
-Select v such that Modifies(1, v)
-b
-5000
-35 - Modifies: assign that modifies b
+9 - Modifies: assign that modifies b
 assign a;
 Select a such that Modifies(a, "b")
 1
 5000
-36 - Uses: assign that uses a
+10 - Modifies: if that modifies o
+if ifs;
+Select ifs such that Modifies(ifs, "o")
+none
+5000
+11 - Modifies: variables modified by print
+variable v; print pn;
+Select v such that Modifies(pn, v)
+none
+5000
+12 - Uses: variables uses by if
+variable v; if ifs;
+Select v such that Uses(ifs, v)
+u, p, s, r, w, q
+5000
+13 - Uses: variables used by read
+variable v; read r;
+Select v such that Uses(r, v)
+none
+5000
+14 - Uses: assign that uses a
 assign a;
 Select a such that Uses(a, "a")
 25, 24, 23, 20, 17, 22, 21, 9, 14, 15, 13, 12, 16, 11, 6, 10, 8, 4
 5000
-37 - Uses: statement that uses k
-stmt s;
-Select s such that Uses(s, "k")
-25, 24, 23, 22, 14, 21, 18, 20, 11, 19, 17, 13, 12, 15, 16
+15 - Modifies: variables modified by read
+variable v; read r;
+Select v such that Modifies(r, v)
+z, y, d, x, b, e, k, v, i, a, t
 5000
-38 - Modifies: statement that modifies a (randomly pick 5)
+16 - Uses: print that uses u
+print pn;
+Select pn such that Uses(pn, "u")
+37, 41
+5000
+17 - Modifies: if that modifies k
+if ifs;
+Select ifs such that Modifies(ifs, "k")
+none
+5000
+18 - Uses: statement that uses b
 stmt s;
-Select s such that Modifies(s, "a")
-27, 26
+Select s such that Uses(s, "b")
+25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 26, 7, 12, 13, 10, 8, 4, 3
+5000
+19 - Modifies: assign that modifies c
+assign a;
+Select a such that Modifies(a, "c")
+2
+5000
+20 - Modifies: if that modifies m
+if ifs;
+Select ifs such that Modifies(ifs, "m")
+none
+5000
+21 - Uses: statement that uses u
+stmt s;
+Select s such that Uses(s, "u")
+37, 41, 33, 26, 22, 24, 25, 23, 21
+5000
+22 - Uses: read that uses y
+read r;
+Select r such that Uses(r, "y")
+none
+5000
+23 - Modifies: print that modifies
+print pn;
+Select pn such that Modifies(pn, _)
+none
+5000
+24 - Modifies: variables modified by statement
+variable v; stmt s;
+Select v such that Modifies(s, v)
+z, x, j, w, i, a, c, r, k, v, l, p, o, h, u, b, y, t, n, q, d, e, f, s, m, g
+5000
+25 - Uses: statement that uses a
+stmt s;
+Select s such that Uses(s, "a")
+25, 24, 26, 23, 20, 17, 22, 21, 9, 14, 15, 13, 12, 16, 11, 6, 10, 8, 4
+5000
+26 - Uses: print that uses p
+print pn;
+Select pn such that Uses(pn, "p")
+none
+5000
+27 - Modifies: if that modifies l
+if ifs;
+Select ifs such that Modifies(ifs, "l")
+none
+5000
+28 - Modifies: read that modifies x
+read r;
+Select r such that Modifies(r, "x")
+46, 43
+5000
+29 - Modifies: if that modifies
+if ifs;
+Select ifs such that Modifies(ifs, _)
+33
+5000
+30 - Uses: variables used by print
+variable v; print pn;
+Select v such that Uses(pn, v)
+u, w
+5000
+31 - Modifies: read that modifies y
+read r;
+Select r such that Modifies(r, "y")
+44
+5000
+32 - Uses: print that uses q
+print pn;
+Select pn such that Uses(pn, "q")
+none
+5000
+33 - Uses: assign that uses e
+assign a;
+Select a such that Uses(a, "e")
+25, 24, 23, 18, 17, 16, 22, 21, 9, 14, 19, 11, 6, 5, 7, 10, 4, 15, 12, 3
+5000
+34 - Modifies: print that modifies p
+print pn;
+Select pn such that Modifies(pn, "p")
+none
+5000
+35 - Modifies: print that modifies s
+print pn;
+Select pn such that Modifies(pn, "s")
+none
+5000
+36 - Modifies: while that modifies
+while w;
+Select w such that Modifies(w, _)
+26
+5000
+37 - Modifies: statement that modifies k matching pattern, select s
+stmt s; assign a; variable v;
+Select s such that Modifies(s, v) pattern a(v, _"k"_)
+45, 40, 43, 25, 21, 24, 26, 12, 23, 46, 44, 15, 42, 38, 22, 14, 18, 20, 11, 19, 35, 17, 33, 13, 16
+5000
+38 - Modifies: assign that modifies e
+assign a;
+Select a such that Modifies(a, "e")
+4
 5000
 39 - Modifies: print that modifies q
 print pn;
 Select pn such that Modifies(pn, "q )
 SyntaxError
 5000
-40 - Modifies: statement that modifies
-stmt s;
-Select s such that Modifies(s, _)
-45, 46, 44, 40, 35, 43, 33, 32, 31, 30, 29, 26, 12, 23, 20, 14, 18, 17, 16, 38, 42, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 28, 25, 6, 7, 5, 8, 27, 4
-5000
-41 - Uses: read that uses
-read r;
-Select r such that Uses(r, _)
-none
-5000
-42 - Modifies: if that modifies m
-if ifs;
-Select ifs such that Modifies(ifs, "m")
-none
-5000
-43 - Uses: assign that uses c
-assign a;
-Select a such that Uses(a, "c")
-25, 24, 23, 20, 18, 13, 10, 8, 19, 11, 22, 21, 9, 6, 1, 5, 7, 15, 3
-5000
-44 - Uses: assign that uses b
-assign a;
-Select a such that Uses(a, "b")
-25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 7, 12, 13, 10, 8, 4, 3
-5000
-45 - Modifies: print that modifies r
-print pn;
-Select pn such that Modifies(pn, "r")
-none
-5000
-46 - Modifies: while that modifies
-while w;
-Select w such that Modifies(w, _)
-26
-5000
-47 - Modifies: read that modifies r
-read r;
-Select r such that Modifies(r, "r")
-none
-5000
-48 - Uses: variables uses by if
-variable v; if ifs;
-Select v such that Uses(ifs, v)
-u, p, s, r, w, q
-5000
-49 - Uses: variables used by statement
-variable v; stmt s;
-Select v such that Uses(s, v)
-u, p, o, phi, chi, k, tau, sigma, j, rho, w, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
-5000
-50 - Modifies: read that modifies
-read r;
-Select r such that Modifies(r, _)
-46, 45, 40, 43, 35, 29, 31, 44, 38, 32, 30, 42, 27, 28
-5000
-51 - Uses: statement that uses u
-stmt s;
-Select s such that Uses(s, "u")
-37, 41, 33, 26, 22, 24, 25, 23, 21
-5000
-52 - Modifies: statement that modifies v
-stmt s;
-Select s such that Modifies(s, "v")
-35, 26, 38, 33, 21
-5000
-53 - Uses: if that uses n
-if ifs;
-Select ifs such that Uses(ifs, "n")
-none
-5000
-54 - Uses: variables used by while
-variable v; while w;
-Select v such that Uses(w, v)
-p, w, d, a, b, s, u, c, r, q
-5000
-55 - Uses: while that uses e
-while w;
-Select w such that Uses(w, "e")
-none
-5000
-56 - Modifies: if that modifies l
-if ifs;
-Select ifs such that Modifies(ifs, "l")
-none
-5000
-57 - Modifies: variables modified by while
-variable v; while w;
-Select v such that Modifies(w, v)
-z, y, d, x, b, e, k, v, i, a, t
-5000
-58 - Modifies: if that modifies o
-if ifs;
-Select ifs such that Modifies(ifs, "o")
-none
-5000
-59 - Uses: if that uses m
-if ifs;
-Select ifs such that Uses(ifs, "m")
-none
-5000
-60 - Uses: variables used by print
-variable v; print pn;
-Select v such that Uses(pn, v)
-u, w
-5000
-61 - Uses: print that uses r
-print pn;
-Select pn such that Uses(pn, "r")
-none
-5000
-62 - Modifies: assign that modifies a
-assign a;
-Select a such that Modifies(a, "a")
-none
-5000
-63 - Uses: while that uses g
-while w;
-Select w such that Uses(w, "g")
-none
-5000
-64 - Uses: print that uses s
-print pn;
-Select pn such that Uses(pn, "s")
-none
-5000
-65 - Modifies: assign that modifies
-assign a;
-Select a such that Modifies(a, _)
-12, 23, 20, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
-5000
-66 - Uses: statement that uses a
-stmt s;
-Select s such that Uses(s, "a")
-25, 24, 26, 23, 20, 17, 22, 21, 9, 14, 15, 13, 12, 16, 11, 6, 10, 8, 4
-5000
-67 - Modifies: print that modifies s
-print pn;
-Select pn such that Modifies(pn, "s")
-none
-5000
-68 - Uses: read that uses z
-read r;
-Select r such that Uses(r, "z")
-none
-5000
-69 - Modifies: read that modifies x
-read r;
-Select r such that Modifies(r, "x")
-46, 43
-5000
-70 - Modifies: read that modifies z
-read r;
-Select r such that Modifies(r, "z")
-45, 42
-5000
-71 - Uses: statement that uses
-stmt s;
-Select s such that Uses(s, _)
-37, 41, 33, 34, 26, 12, 23, 20, 39, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 36, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
-5000
-72 - Uses: statement that uses s
-stmt s;
-Select s such that Uses(s, "s")
-25, 23, 33, 20, 19, 24, 22, 21, 26, 18
-5000
-73 - Uses: statement that uses b
-stmt s;
-Select s such that Uses(s, "b")
-25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 26, 7, 12, 13, 10, 8, 4, 3
-5000
-74 - Modifies: read that modifies y
-read r;
-Select r such that Modifies(r, "y")
-44
-5000
-75 - Modifies: while that modifies j
-while w;
-Select w such that Modifies(w, "j")
-none
-5000
-76 - Uses: statement that uses k matching pattern, select s
-stmt s; assign a; variable v;
-Select s such that Uses(s, v) pattern a(v, _"k"_)
-37, 25, 36, 1, 21, 24, 12, 23, 20, 39, 14, 18, 22, 15, 2, 34, 33, 13, 17, 41, 16, 19, 11, 5, 26, 7
-5000
-77 - Uses: read that uses y
-read r;
-Select r such that Uses(r, "y")
-none
-5000
-78 - Uses: read that uses x
-read r;
-Select r such that Uses(r, "x")
-none
-5000
-79 - Uses: assign that uses
-assign a;
-Select a such that Uses(a, _)
-12, 23, 20, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
-5000
-80 - Modifies: statement that modifies b
-stmt s;
-Select s such that Modifies(s, "b")
-28, 26, 1
-5000
-81 - Uses: assign that uses e
-assign a;
-Select a such that Uses(a, "e")
-25, 24, 23, 18, 17, 16, 22, 21, 9, 14, 19, 11, 6, 5, 7, 10, 4, 15, 12, 3
-5000
-82 - Modifies: statement that modifies s
-stmt s;
-Select s such that Modifies(s, "s")
-18
-5000
-83 - Uses: read that uses i
-read r;
-Select r such that Uses(r, "i")
-none
-5000
-84 - Modifies: variables modified by statement
-variable v; stmt s;
-Select v such that Modifies(s, v)
-z, x, j, w, i, a, c, r, k, v, l, p, o, h, u, b, y, t, n, q, d, e, f, s, m, g
-5000
-85 - Modifies: if that modifies
-if ifs;
-Select ifs such that Modifies(ifs, _)
-33
-5000
-86 - Uses: print that uses u
-print pn;
-Select pn such that Uses(pn, "u")
-37, 41
-5000
-87 - Modifies: while that modifies i
+40 - Modifies: while that modifies i
 while w;
 Select w such that Modifies(w, "i")
 26
 5000
-88 - Modifies: if that modifies k
-if ifs;
-Select ifs such that Modifies(ifs, "k")
+41 - Uses: statement that uses k
+stmt s;
+Select s such that Uses(s, "k")
+25, 24, 23, 22, 14, 21, 18, 20, 11, 19, 17, 13, 12, 15, 16
+5000
+42 - Uses: statement that uses
+stmt s;
+Select s such that Uses(s, _)
+37, 41, 33, 34, 26, 12, 23, 20, 39, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 36, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
+5000
+43 - Modifies: assign that modifies d
+assign a;
+Select a such that Modifies(a, "d")
+3
+5000
+44 - Uses: print that uses s
+print pn;
+Select pn such that Uses(pn, "s")
 none
 5000
-89 - Uses: variables used by assign
+45 - Modifies: variables modified by 28
+variable v;
+Select v such that Modifies(28, v)
+b
+5000
+46 - Uses: variables used by assign
 variable v; assign a;
 Select v such that Uses(a, v)
 u, p, o, phi, chi, k, tau, sigma, j, rho, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
 5000
-90 - Modifies: statement that modifies k
-stmt s;
-Select s such that Modifies(s, "k")
-31, 26, 10
+47 - Uses: while that uses
+while w;
+Select w such that Uses(w, _)
+26
 5000
-91 - Modifies: variables modified by 32
+48 - Uses: assign that uses c
+assign a;
+Select a such that Uses(a, "c")
+25, 24, 23, 20, 18, 13, 10, 8, 19, 11, 22, 21, 9, 6, 1, 5, 7, 15, 3
+5000
+49 - Modifies: read that modifies z
+read r;
+Select r such that Modifies(r, "z")
+45, 42
+5000
+50 - Modifies: while that modifies j
+while w;
+Select w such that Modifies(w, "j")
+none
+5000
+51 - Uses: if that uses
+if ifs;
+Select ifs such that Uses(ifs, _)
+33
+5000
+52 - Uses: if that uses n
+if ifs;
+Select ifs such that Uses(ifs, "n")
+none
+5000
+53 - Modifies: read that modifies
+read r;
+Select r such that Modifies(r, _)
+46, 45, 40, 43, 35, 29, 31, 44, 38, 32, 30, 42, 27, 28
+5000
+54 - Uses: statement that uses k matching pattern, select s
+stmt s; assign a; variable v;
+Select s such that Uses(s, v) pattern a(v, _"k"_)
+37, 25, 36, 1, 21, 24, 12, 23, 20, 39, 14, 18, 22, 15, 2, 34, 33, 13, 17, 41, 16, 19, 11, 5, 26, 7
+5000
+55 - Uses: if that uses m
+if ifs;
+Select ifs such that Uses(ifs, "m")
+none
+5000
+56 - Uses: variables used by statement
+variable v; stmt s;
+Select v such that Uses(s, v)
+u, p, o, phi, chi, k, tau, sigma, j, rho, w, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
+5000
+57 - Uses: while that uses h
+while w;
+Select w such that Uses(w, "h")
+none
+5000
+58 - Uses: assign that uses d
+assign a;
+Select a such that Uses(a, "d")
+25, 24, 23, 20, 18, 17, 16, 22, 21, 9, 14, 15, 13, 12, 11, 6, 10, 4, 8, 7
+5000
+59 - Uses: if that uses k
+if ifs;
+Select ifs such that Uses(ifs, "k")
+none
+5000
+60 - Modifies: statement that modifies v
+stmt s;
+Select s such that Modifies(s, "v")
+35, 26, 38, 33, 21
+5000
+61 - Uses: print that uses
+print pn;
+Select pn such that Uses(pn, _)
+37, 39, 36, 41, 34
+5000
+62 - Modifies: read that modifies i
+read r;
+Select r such that Modifies(r, "i")
+32
+5000
+63 - Uses: while that uses e
+while w;
+Select w such that Uses(w, "e")
+none
+5000
+64 - Modifies: print that modifies r
+print pn;
+Select pn such that Modifies(pn, "r")
+none
+5000
+65 - Uses: assign that uses b
+assign a;
+Select a such that Uses(a, "b")
+25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 7, 12, 13, 10, 8, 4, 3
+5000
+66 - Uses: statement that uses s
+stmt s;
+Select s such that Uses(s, "s")
+25, 23, 33, 20, 19, 24, 22, 21, 26, 18
+5000
+67 - Modifies: statement that modifies b
+stmt s;
+Select s such that Modifies(s, "b")
+28, 26, 1
+5000
+68 - Modifies: statement that modifies v matching pattern, select v
+stmt s; assign a; variable v;
+Select v such that Modifies(s, v) pattern a(v, _"v"_)
+none
+5000
+69 - Modifies: print that modifies t
+print pn;
+Select pn such that Modifies(pn, "t")
+none
+5000
+70 - Uses: read that uses z
+read r;
+Select r such that Uses(r, "z")
+none
+5000
+71 - Uses: variables used by while
+variable v; while w;
+Select v such that Uses(w, v)
+p, w, d, a, b, s, u, c, r, q
+5000
+72 - Uses: if that uses o
+if ifs;
+Select ifs such that Uses(ifs, "o")
+none
+5000
+73 - Uses: statement that uses w matching pattern, select v
+stmt s; assign a; variable v;
+Select v such that Uses(s, v) pattern a(v, _"w"_)
+none
+5000
+74 - Modifies: while that modifies t
+while w;
+Select w such that Modifies(w, "t")
+26
+5000
+75 - Modifies: if that modifies n
+if ifs;
+Select ifs such that Modifies(ifs, "n")
+none
+5000
+76 - Modifies: while that modifies w
+while w;
+Select w such that Modifies(w, "w")
+none
+5000
+77 - Modifies: assign that modifies a
+assign a;
+Select a such that Modifies(a, "a")
+none
+5000
+78 - Uses: while that uses w
+while w;
+Select w such that Uses(w, "w")
+26
+5000
+79 - Uses: read that uses x
+read r;
+Select r such that Uses(r, "x")
+none
+5000
+80 - Uses: assign that uses
+assign a;
+Select a such that Uses(a, _)
+12, 23, 20, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
+5000
+81 - Modifies: statement that modifies a (randomly pick 5)
+stmt s;
+Select s such that Modifies(s, "a")
+27, 26
+5000
+82 - Modifies: variables modified by 1
+variable v;
+Select v such that Modifies(1, v)
+b
+5000
+83 - Modifies: variables modified by 32
 variable v;
 Select v such that Modifies(32, v)
 i
+5000
+84 - Uses: read that uses r
+read r;
+Select r such that Uses(r, "r")
+none
+5000
+85 - Modifies: variables modified by if
+variable v; if ifs;
+Select v such that Modifies(ifs, v)
+v, t
+5000
+86 - Modifies: read that modifies r
+read r;
+Select r such that Modifies(r, "r")
+none
+5000
+87 - Modifies: statement that modifies
+stmt s;
+Select s such that Modifies(s, _)
+45, 46, 44, 40, 35, 43, 33, 32, 31, 30, 29, 26, 12, 23, 20, 14, 18, 17, 16, 38, 42, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 28, 25, 6, 7, 5, 8, 27, 4
+5000
+88 - Uses: while that uses i
+while w;
+Select w such that Uses(w, "i")
+none
+5000
+89 - Modifies: variables modified by assign
+variable v; assign a;
+Select v such that Modifies(a, v)
+z, x, j, w, i, c, r, k, v, l, p, o, h, u, b, y, t, n, q, d, e, f, s, m, g
+5000
+90 - Modifies: assign that modifies
+assign a;
+Select a such that Modifies(a, _)
+12, 23, 20, 14, 18, 17, 16, 10, 2, 15, 13, 19, 3, 11, 22, 24, 1, 21, 9, 25, 6, 7, 5, 8, 4
+5000
+91 - Modifies: statement that modifies s
+stmt s;
+Select s such that Modifies(s, "s")
+18
 5000

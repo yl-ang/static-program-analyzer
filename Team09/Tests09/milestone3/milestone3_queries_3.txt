@@ -1,0 +1,655 @@
+1 - Parent: while with if child
+while w; if ifs;
+Select w such that Parent(w, ifs)
+9, 4
+5000
+2 - Follows*: Print followed by while
+print pn; while w;
+Select pn such that Follows*(pn, w)
+49, 7
+5000
+3 - Follows*: While followed by read
+while w; read r;
+Select w such that Follows*(w, r)
+none
+5000
+4 - Parent*: While with assign children
+while w; assign a;
+Select w such that Parent*(w, a)
+51, 50, 9, 4
+5000
+5 - Follows: If followed by if
+if ifs, ifs2;
+Select ifs such that Follows(ifs, ifs2)
+none
+5000
+6 - Follows*: Read followed by statement
+read r; while w;
+Select r such that Follows*(r, w)
+6
+5000
+7 - Follows: Assign followed by print
+assign a; print pn;
+Select a such that Follows(a, pn)
+none
+5000
+8 - Follows: Assign followed by read
+assign a; read r;
+Select a such that Follows(a, r)
+none
+5000
+9 - Follows: While followed by while
+while w, w2;
+Select w such that Follows(w, w2)
+none
+5000
+10 - Parent: if with if child
+if ifs; if ifschild;
+Select ifs such that Parent(ifs, ifschild)
+42, 5
+5000
+11 - Follows*: If followed by if
+if ifs, ifs2;
+Select ifs such that Follows*(ifs, ifs2)
+none
+5000
+12 - Parent: if with read child
+if ifs; read r;
+Select ifs such that Parent(ifs, r)
+42, 12, 5
+5000
+13 - Follows: If followed by statement
+if ifs;
+Select ifs such that Follows(ifs, _)
+12, 5
+5000
+14 - Follows: If followed by print
+if ifs; print pn;
+Select ifs such that Follows(ifs, pn)
+5
+5000
+15 - Follows: Statement followed by statement
+stmt s;
+Select s such that Follows(_, s)
+56, 50, 54, 53, 49, 44, 45, 40, 37, 35, 55, 34, 33, 32, 31, 30, 29, 36, 21, 24, 12, 23, 20, 39, 14, 18, 17, 28, 16, 4, 27, 19, 3, 11, 22, 42, 38, 15, 2, 9, 8, 26, 7
+5000
+16 - Follows: While followed by read
+while w; read r;
+Select w such that Follows(w, r)
+none
+5000
+17 - Follows: Print followed by while
+print pn; while w;
+Select pn such that Follows(pn, w)
+49
+5000
+18 - Parent*: Statements with read children
+stmt s; read r;
+Select s such that Parent*(s, r)
+51, 50, 42, 9, 4, 12, 5
+5000
+19 - Follows*: Assign followed by if
+assign a; if ifs;
+Select a such that Follows*(a, ifs)
+41
+5000
+20 - Follows*: While followed by statement
+while w;
+Select w such that Follows*(w, _)
+51, 9
+5000
+21 - Parent: while with read child
+while w; read r;
+Select w such that Parent(w, r)
+51, 9
+5000
+22 - Follows*: Read followed by print
+read r; print pn;
+Select r such that Follows*(r, pn)
+43, 10, 52, 6
+5000
+23 - Parent: while with while child
+while w; while wchild;
+Select w such that Parent(w, wchild)
+50, 4
+5000
+24 - Follows*: Statements followed by read
+stmt s; read r;
+Select s such that Follows*(s, r)
+43, 44, 14, 22, 21, 18, 20, 19, 16, 23, 13, 17, 15
+5000
+25 - Parent: if with while child
+if ifs; while w;
+Select ifs such that Parent(ifs, w)
+5
+5000
+26 - Follows: If followed by while
+if ifs; while w;
+Select ifs such that Follows(ifs, w)
+none
+5000
+27 - Follows: Print followed by print
+print pn, pn2;
+Select pn such that Follows(pn, pn2)
+34, 32, 30, 25, 29, 33, 28, 27, 35, 31, 26
+5000
+28 - Parent: assign with read child
+assign a; read r;
+Select a such that Parent(a, r)
+none
+5000
+29 - Follows*: Statement follow statement
+stmt s;
+Select s such that Follows*(s, _)
+53, 49, 44, 43, 41, 35, 55, 34, 33, 32, 31, 30, 29, 27, 12, 23, 20, 51, 39, 14, 18, 17, 16, 19, 3, 11, 38, 15, 2, 10, 13, 8, 28, 25, 6, 22, 52, 1, 21, 9, 5, 26, 7
+5000
+30 - Parent*: While with read children
+while w; read r;
+Select w such that Parent*(w, r)
+51, 50, 9, 4
+5000
+31 - Parent: print with while child
+print pn; while w;
+Select pn such that Parent(pn, w)
+none
+5000
+32 - Follows*: Read followed by if
+read r; if ifs;
+Select r such that Follows*(r, ifs)
+10
+5000
+33 - Follows: While followed by print
+while w; print pn;
+Select w such that Follows(w, pn)
+none
+5000
+34 - Follows*: Statements followed by while
+stmt s; while w;
+Select s such that Follows*(s, w)
+8, 6, 49, 7, 5, 3, 2, 1
+5000
+35 - Follows: Statements followed by read
+stmt s; read r;
+Select s such that Follows(s, r)
+44, 14, 22, 21, 18, 20, 19, 16, 23, 13, 17, 15
+5000
+36 - Follows*: Statements followed by assign
+stmt s; assign a;
+Select s such that Follows*(s, a)
+53, 51, 55, 52, 2, 9, 39, 38, 10, 8, 12, 11, 6, 1, 7
+5000
+37 - Follows: Read followed by if
+read r; if ifs;
+Select r such that Follows(r, ifs)
+none
+5000
+38 - Follows*: Assign followed by while
+assign a; while w;
+Select a such that Follows*(a, w)
+1, 3, 2, 8
+5000
+39 - Follows: Assign followed by while
+assign a; while w;
+Select a such that Follows(a, w)
+3, 8
+5000
+40 - Parent: read with while child
+read r; while w;
+Select r such that Parent(r, w)
+none
+5000
+41 - Follows*: Statements followed by print
+stmt s; print pn;
+Select s such that Follows*(s, pn)
+35, 34, 52, 31, 29, 28, 27, 26, 32, 33, 30, 25, 43, 10, 6, 5
+5000
+42 - Parent: if with print child
+if ifs; print pn;
+Select ifs such that Parent(ifs, pn)
+42, 46, 12, 5
+5000
+43 - Parent: while with while parent
+while w; while wparent;
+Select w such that Parent(wparent, w)
+51, 50
+5000
+44 - Parent: statements with read child
+stmt s; read r;
+Select s such that Parent(s, r)
+51, 42, 9, 12, 5
+5000
+45 - Follows*: Print followed by statement
+print pn; stmt s;
+Select pn such that Follows*(pn, s)
+44, 35, 34, 32, 49, 26, 7, 33, 30, 25, 31, 29, 28, 53, 11, 27
+5000
+46 - Follows: Statements followed by if
+stmt s; if ifs;
+Select s such that Follows(s, ifs)
+41, 11
+5000
+47 - Parent*: If with if children
+if ifs, ifs2;
+Select ifs such that Parent*(ifs, ifs2)
+42, 5
+5000
+48 - Follows*: While followed by if
+while w; if ifs;
+Select w such that Follows*(w, ifs)
+none
+5000
+49 - Follows: Print followed by read
+print pn; read r;
+Select pn such that Follows(pn, r)
+44
+5000
+50 - Follows*: Assign followed by print
+assign a; print pn;
+Select a such that Follows*(a, pn)
+none
+5000
+51 - Parent: statements with if child
+stmt s; if ifs;
+Select s such that Parent(s, ifs)
+42, 9, 4, 5
+5000
+52 - Parent: print with if child
+print pn; if ifs;
+Select pn such that Parent(pn, ifs)
+none
+5000
+53 - Parent*: Statements with children
+stmt s;
+Select s such that Parent*(s, _)
+51, 50, 46, 42, 9, 4, 12, 5
+5000
+54 - Follows: Print followed by assign
+print pn; assign a;
+Select pn such that Follows(pn, a)
+7, 53
+5000
+55 - Parent: read with statement child
+read r;
+Select r such that Parent(r, _)
+none
+5000
+56 - Parent*: While with print children
+while w; print pn;
+Select w such that Parent*(w, pn)
+51, 50, 9, 4
+5000
+57 - Parent: while with statements child
+while w;
+Select w such that Parent(w, _)
+51, 50, 9, 4
+5000
+58 - Follows*: Print followed by read
+print pn; read r;
+Select pn such that Follows*(pn, r)
+44
+5000
+59 - Parent: statements with assign child matching pattern
+stmt s; assign a;
+Select s such that Parent(s, a) pattern a(_, _"y"_)
+51, 50, 9, 5
+5000
+60 - Parent: read with print child
+read r; print pn;
+Select r such that Parent(r, pn)
+none
+5000
+61 - Parent: if with if parent
+if ifs; if ifsparent;
+Select ifs such that Parent(ifsparent, ifs)
+42, 46
+5000
+62 - Parent: statements with child
+stmt s;
+Select s such that Parent(s, _)
+51, 50, 46, 42, 9, 4, 12, 5
+5000
+63 - Parent*: If with print children
+if ifs; print pn;
+Select ifs such that Parent*(ifs, pn)
+42, 46, 12, 5
+5000
+64 - Follows*: Assign followed by assign
+assign a, a2;
+Select a such that Follows*(a, a2)
+2, 1, 8, 38, 55, 39
+5000
+65 - Parent: print with statement child
+print pn;
+Select pn such that Parent(pn, _)
+none
+5000
+66 - Follows: Read followed by statement
+read r;
+Select r such that Follows(r, _)
+23, 21, 14, 22, 19, 52, 43, 10, 13, 16, 6, 17, 15, 20, 18
+5000
+67 - Follows*: Read followed by read
+read r, r2;
+Select r such that Follows*(r, r2)
+43, 14, 22, 21, 18, 20, 19, 16, 23, 13, 17, 15
+5000
+68 - Follows*: Statements followed by if
+stmt s; if ifs;
+Select s such that Follows*(s, ifs)
+11, 41, 10
+5000
+69 - Follows: Print followed by if
+print pn; if ifs;
+Select pn such that Follows(pn, ifs)
+11
+5000
+70 - Parent*: If with assign children
+if ifs; assign a;
+Select ifs such that Parent*(ifs, a)
+42, 46, 5
+5000
+71 - Follows*: While followed by print
+while w; print pn;
+Select w such that Follows*(w, pn)
+none
+5000
+72 - Parent: print with print child
+print pn; print pnchild;
+Select pn such that Parent(pn, pnchild)
+none
+5000
+73 - Parent*: Statements with print children
+stmt s; print pn;
+Select s such that Parent*(s, pn)
+51, 50, 46, 42, 9, 4, 12, 5
+5000
+74 - Follows: Assign followed by assign
+assign a, a2;
+Select a such that Follows(a, a2)
+55, 2, 39, 1, 38
+5000
+75 - Parent: while with assign child
+while w; assign r;
+Select w such that Parent(w, r)
+51, 50, 9
+5000
+76 - Parent*: If with read children
+if ifs; read r;
+Select ifs such that Parent*(ifs, r)
+42, 12, 5
+5000
+77 - Parent*: Statements with parent
+stmt s;
+Select s such that Parent*(_, s)
+56, 53, 51, 54, 49, 11, 48, 15, 40, 46, 44, 5, 39, 29, 43, 55, 45, 26, 41, 37, 17, 35, 47, 34, 22, 36, 33, 32, 31, 50, 30, 10, 28, 27, 21, 6, 25, 52, 24, 12, 23, 20, 14, 18, 16, 42, 38, 13, 8, 9, 19, 7
+5000
+78 - Follows: Read followed by read
+read r, r2;
+Select r such that Follows(r, r2)
+21, 20, 22, 19, 16, 23, 13, 17, 15, 18, 14
+5000
+79 - Follows*: If followed by print
+if ifs; print pn;
+Select ifs such that Follows*(ifs, pn)
+5
+5000
+80 - Follows*: If followed by assign
+if ifs; assign a;
+Select ifs such that Follows*(ifs, a)
+12
+5000
+81 - Parent: assign with assign child
+assign a; assign achild;
+Select a such that Parent(a, achild)
+none
+5000
+82 - Parent: print with assign child
+print pn; assign a;
+Select pn such that Parent(pn, a)
+none
+5000
+83 - Parent: assign with while child
+assign a; while w;
+Select a such that Parent(a, w)
+none
+5000
+84 - Follows: While followed by statement
+while w;
+Select w such that Follows(w, _)
+51, 9
+5000
+85 - Parent: if with assign child
+if ifs; assign a;
+Select ifs such that Parent(ifs, a)
+46, 5
+5000
+86 - Follows: Statements followed by assign
+stmt s; assign a;
+Select s such that Follows(s, a)
+51, 53, 55, 39, 38, 9, 12, 1, 2, 7
+5000
+87 - Follows*: While followed by while
+while w, w2;
+Select w such that Follows*(w, w2)
+none
+5000
+88 - Follows: Statements followed by while
+stmt s; while w;
+Select s such that Follows(s, w)
+49, 8, 3
+5000
+89 - Parent*: If with while children
+if ifs; while w;
+Select ifs such that Parent*(ifs, w)
+5
+5000
+90 - Parent: assign with print child
+assign a; print pn;
+Select a such that Parent(a, pn)
+none
+5000
+91 - Follows: Read followed by print
+read r; print pn;
+Select r such that Follows(r, pn)
+43, 10, 52, 6
+5000
+92 - Follows*: If followed by read
+if ifs; read r;
+Select ifs such that Follows*(ifs, r)
+none
+5000
+93 - Follows: Read followed by assign
+read r; assign a;
+Select r such that Follows(r, a)
+none
+5000
+94 - Parent: statements with parent
+stmt s;
+Select s such that Parent(_, s)
+56, 53, 51, 54, 49, 11, 48, 15, 40, 46, 44, 5, 39, 29, 43, 55, 45, 26, 41, 37, 17, 35, 47, 34, 22, 36, 33, 32, 31, 50, 30, 10, 28, 27, 21, 6, 25, 52, 24, 12, 23, 20, 14, 18, 16, 42, 38, 13, 8, 9, 19, 7
+5000
+95 - Parent*: Statements with if children
+stmt s; if ifs;
+Select s such that Parent*(s, ifs)
+42, 9, 4, 5
+5000
+96 - Parent*: Statements with while children
+stmt s; while w;
+Select s such that Parent*(s, w)
+50, 4, 5
+5000
+97 - Follows: If followed by assign
+if ifs; assign a;
+Select ifs such that Follows(ifs, a)
+12
+5000
+98 - Follows*: If followed by while
+if ifs; while w;
+Select ifs such that Follows*(ifs, w)
+5
+5000
+99 - Follows: Statements followed by print
+stmt s; print pn;
+Select s such that Follows(s, pn)
+35, 34, 52, 31, 29, 28, 27, 26, 32, 33, 30, 25, 43, 10, 6, 5
+5000
+100 - Parent: statements with print child
+stmt s; print pn;
+Select s such that Parent(s, pn)
+51, 46, 42, 9, 4, 12, 5
+5000
+101 - Follows*: Print followed by if
+print pn; if ifs;
+Select pn such that Follows*(pn, ifs)
+11
+5000
+102 - Parent: assign with statement child
+assign a;
+Select a such that Parent(a, _)
+none
+5000
+103 - Follows*: While followed by assign
+while w; assign a;
+Select w such that Follows*(w, a)
+51, 9
+5000
+104 - Follows: Assign followed by statement
+assign a;
+Select a such that Follows(a, _)
+3, 8, 38, 1, 2, 41, 55, 39
+5000
+105 - Follows: Print followed by statement
+print pn;
+Select pn such that Follows(pn, _)
+44, 35, 34, 32, 49, 26, 7, 33, 30, 25, 31, 29, 28, 53, 11, 27
+5000
+106 - Parent: read with assign child
+read r; assign a;
+Select r such that Parent(r, a)
+none
+5000
+107 - Parent: read with read child
+read r; read rchild;
+Select r such that Parent(r, rchild)
+none
+5000
+108 - Parent*: Assign with statement children
+assign a; stmt s;
+Select a such that Parent*(a, s)
+none
+5000
+109 - Follows*: Read followed by assign
+read r; assign a;
+Select r such that Follows*(r, a)
+10, 52, 6
+5000
+110 - Parent: statements with while child
+stmt s; while w;
+Select s such that Parent(s, w)
+50, 4, 5
+5000
+111 - Parent*: While with while children
+while w, w2;
+Select w such that Parent*(w, w2)
+50, 4
+5000
+112 - Parent*: Print with statement children
+print pn;
+Select pn such that Parent*(pn, _)
+none
+5000
+113 - Follows*: Print followed by print
+print pn, pn2;
+Select pn such that Follows*(pn, pn2)
+34, 32, 30, 25, 29, 33, 28, 27, 35, 31, 26
+5000
+114 - Parent: print with read child
+print pn; read r;
+Select pn such that Parent(pn, r)
+none
+5000
+115 - Parent*: While with if children
+while w; if ifs;
+Select w such that Parent*(w, ifs)
+9, 4
+5000
+116 - Parent: read with if child
+read r; if ifs;
+Select r such that Parent(r, ifs)
+none
+5000
+117 - Follows*: Assign followed by read
+assign a; read r;
+Select a such that Follows*(a, r)
+none
+5000
+118 - Follows: If followed by read
+if ifs; read r;
+Select ifs such that Follows(ifs, r)
+none
+5000
+119 - Follows: While followed by if
+while w; if ifs;
+Select w such that Follows(w, ifs)
+none
+5000
+120 - Follows: Statement follow statement
+stmt s;
+Select s such that Follows(s, _)
+53, 49, 44, 43, 41, 35, 55, 34, 33, 32, 31, 30, 29, 27, 12, 23, 20, 51, 39, 14, 18, 17, 16, 19, 3, 11, 38, 15, 2, 10, 13, 8, 28, 25, 6, 22, 52, 1, 21, 9, 5, 26, 7
+5000
+121 - Follows: Read followed by while
+read r; while w;
+Select r such that Follows(r, w)
+none
+5000
+122 - Parent*: Statements with assign children
+stmt s; assign a;
+Select s such that Parent*(s, a)
+51, 50, 46, 42, 9, 4, 5
+5000
+123 - Parent: statements with assign child
+stmt s; assign a;
+Select s such that Parent(s, a)
+51, 50, 46, 9, 5
+5000
+124 - Parent*: Read with statement children
+read r;
+Select r such that Parent*(r, _)
+none
+5000
+125 - Follows: While followed by assign
+while w; assign a;
+Select w such that Follows(w, a)
+51, 9
+5000
+126 - Parent: while with print child
+while w; print pn;
+Select w such that Parent(w, pn)
+51, 9, 4
+5000
+127 - Follows*: Statement followed by statement
+stmt s;
+Select s such that Follows*(_, s)
+56, 50, 54, 53, 49, 44, 45, 40, 37, 35, 55, 34, 33, 32, 31, 30, 29, 36, 21, 24, 12, 23, 20, 39, 14, 18, 17, 28, 16, 4, 27, 19, 3, 11, 22, 42, 38, 15, 2, 9, 8, 26, 7
+5000
+128 - Parent: if with statement child
+if ifs;
+Select ifs such that Parent(ifs, _)
+42, 46, 12, 5
+5000
+129 - Parent: assign with if child
+assign a; if ifs;
+Select a such that Parent(a, ifs)
+none
+5000
+130 - Follows*: Print followed by assign
+print pn; assign a;
+Select pn such that Follows*(pn, a)
+7, 53, 11
+5000
+131 - Follows: Assign followed by if
+assign a; if ifs;
+Select a such that Follows(a, ifs)
+41
+5000
