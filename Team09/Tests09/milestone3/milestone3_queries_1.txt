@@ -36,7 +36,7 @@ Select a pattern a(_, _"6"_)
 8 - var, wildcard
 assign a;
 Select a pattern a("x", _)
-1, 4
+4, 1
 5000
 9 - var, wildcard
 assign a;
@@ -46,12 +46,12 @@ Select a pattern a("z", _)
 10 - var, wildcard
 assign a;
 Select a pattern a("x102ga", _)
-17, 18, 9, 11
+18, 17, 9, 11
 5000
 11 - var, wildcard
 assign a;
 Select a pattern a("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _)
-3, 6, 8
+6, 8, 3
 5000
 12 - var, wildcard
 assign a;
@@ -91,12 +91,12 @@ Select x pattern x("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _"6"_)
 19 - var, var
 assign x;
 Select x pattern x("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
-6, 8
+8, 6
 5000
 20 - var, var
 assign x;
 Select x pattern x("y0", _"y0"_)
-7, 12, 16
+16, 12, 7
 5000
 21 - var, var
 assign x;
@@ -131,7 +131,7 @@ Select a pattern a("z", _"x102ga"_)
 27 - wildcard, var
 assign a;
 Select a pattern a(_, _"3"_)
-11, 12, 13, 16, 17, 3, 4, 6, 7, 8, 1, 9
+4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
 5000
 28 - wildcard, var
 assign a;
@@ -146,7 +146,7 @@ Select a pattern a(_, _"6"_)
 30 - wildcard, var
 assign a;
 Select a pattern a(_, _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
-4, 6, 7, 8
+4, 8, 7, 6
 5000
 31 - wildcard, var
 assign a;
@@ -161,12 +161,12 @@ Select a pattern a(_, _"7"_)
 33 - wildcard, var
 assign a;
 Select a pattern a(_, _"2"_)
-11, 12, 13, 16, 17, 3, 4, 6, 7, 8, 1, 9
+4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
 5000
 34 - wildcard, var
 assign a;
 Select a pattern a(_, _"y0"_)
-7, 12, 16
+16, 12, 7
 5000
 35 - wildcard, var
 assign a;
@@ -186,12 +186,12 @@ none
 38 - wildcard, var
 assign a;
 Select a pattern a(_, _"x102ga"_)
-11, 12, 13, 16,17,18
+18, 12, 17, 11, 16, 13
 5000
 39 - wildcard, var
 assign a;
 Select a pattern a(_, _"x"_)
-11, 13, 17,18
+18, 17, 13, 11
 5000
 40 - wildcard, var
 assign a;
@@ -201,7 +201,7 @@ none
 41 - wildcard, wildcard
 assign a;
 Select a pattern a(_, _)
-1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 16,17,18
+18, 4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
 5000
 42 - invalid LHS
 assign a;
