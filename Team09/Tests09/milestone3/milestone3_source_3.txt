@@ -1,0 +1,81 @@
+procedure nesting {
+    z = xVariableWithAVeryLongName + y;
+
+    y = xVariableWithAVeryLongName;
+    xVariableWithAVeryLongName = 0;
+
+
+    while ((xVariableWithAVeryLongName <= 0) && (y >= 0)) {
+        if ((xVariableWithAVeryLongName == 0) || (y == 0)) then {
+            read xVariableWithAVeryLongName;
+            print y;
+            z = xVariableWithAVeryLongName + y;
+
+            while (((xVariableWithAVeryLongName == 0) && (y == 0)) || (z == 0)) {
+                read xVariableWithAVeryLongName;
+                print y;
+                  if (z == 0) then {
+                    read xVariableWithAVeryLongName;
+                    read y;
+                    read z;
+                                        read xVariableWithAVeryLongName;
+                    read y;
+                    read z;
+                     read xVariableWithAVeryLongName;
+                    read y;
+                    read z;                    read xVariableWithAVeryLongName;
+                    read y;
+                    read z;
+                } else {
+                    print z;
+                    print z;
+                    print y;
+                                        print z;
+                    print z;
+                    print y;                    print z;
+                    print z;
+                    print y;                    print z;
+                    print z;
+                    print y;
+                }
+                z = xVariableWithAVeryLongName + y;
+
+
+            }
+            y = z - xVariableWithAVeryLongName;
+            y = z - xVariableWithAVeryLongName;
+
+            y = z - xVariableWithAVeryLongName;
+        } else {
+            xVariableWithAVeryLongName = 100 * y + z;
+
+            if (y == 0) then {
+                read xVariableWithAVeryLongName;
+                print y;
+                read z;
+            } else {
+                if (xVariableWithAVeryLongName == 0) then {
+                  print xVariableWithAVeryLongName;
+
+                } else {
+                  xVariableWithAVeryLongName = xVariableWithAVeryLongName;
+                }
+            }
+        }
+
+        print z;
+
+        while ((z != 0) || (y < 0)) {
+            while (xVariableWithAVeryLongName == y) {
+                read xVariableWithAVeryLongName;
+                print y;
+                z = 100 * z - 200 * y;
+            }
+
+                            z = 100 * z - 200 * y;
+
+                z = 100 * z - 200 * y;
+
+        }
+    }
+}
