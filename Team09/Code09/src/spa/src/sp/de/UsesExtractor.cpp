@@ -71,74 +71,6 @@ void UsesExtractor::visitPrint(PrintNode* node) {
     this->procedureUses.insert({currentProc, usedVariable});
 }
 
-// void UsesExtractor::visitWhile(WhileNode* node) {
-//     #ifdef DEBUG_BUILD
-//         std::cout << "Visiting While" << std::endl;
-//     #endif
-//     int userStmtNum = node->statementNumber;
-//     std::vector<std::string> usedVariablesInCond = node->whileCondition->getVars();
-//     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
-//         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
-//         this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
-//     }
-
-//     // Extract uses relationships from usesExtractorHelper and append to usesExtractor
-//     // Each uses relationship will have the userStmtNum of the nested statement
-//     // So we simply replace the userStmtNum from the extracted uses relationship
-//     // with the current WhileNode stmtNum
-
-//     UsesExtractor* usesExtractorHelper = new UsesExtractor(this->procs, this->extractedProcs);
-//     usesExtractorHelper->currentProc = this->currentProc;
-//     dfsVisitHelper(node->whileStmtList, usesExtractorHelper);
-//     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses = usesExtractorHelper->getUses();
-
-//     // Iterate over each element in the set and update stmtNum value
-//     for (auto it = extractedUses.begin(); it != extractedUses.end();) {
-//         auto oldPair = *it;
-//         it = extractedUses.erase(it);
-
-//         // Create a new pair with the updated stmtNum value and insert it
-//         uses.insert({userStmtNum, oldPair.second});
-//         this->procedureUses.insert({currentProc, oldPair.second});
-//     }
-//     delete usesExtractorHelper;
-
-//     // Stack for iterative traversal
-//     std::stack<WhileNode*> whileStack;
-//     std::unordered_set<WhileNode*> visitedNodes;
-
-//     whileStack.push(node);
-
-//     while (!whileStack.empty()) {
-//         WhileNode* currentNode = whileStack.top();
-//         whileStack.pop();
-
-//         // Check if already visited
-//         if (visitedNodes.find(currentNode) != visitedNodes.end()) {
-//             continue;
-//         }
-
-//         // Process variables used in the body
-//         for (const auto& stmt : currentNode->getStmtLstNode()->children) {
-//             std::vector<std::string> usedVariablesInStmt = stmt->getVars();
-//             for (const auto& variable : usedVariablesInStmt) {
-//                 this->uses.insert({currentNode->statementNumber, variable});
-//                 this->procedureUses.insert({currentProc, variable});
-//             }
-
-//             // Check for nested while nodes and push them onto the stack
-//             if (stmt->getType() == "while") {
-//                 WhileNode* nestedWhile = dynamic_cast<WhileNode*>(stmt);
-//                 whileStack.push(nestedWhile);
-//             }
-//         }
-
-//         // Mark node as visited
-//         visitedNodes.insert(currentNode);
-//     }
-
-// }
-
 void UsesExtractor::visitWhile(WhileNode* node) {
 #ifdef DEBUG_BUILD
     std::cout << "Visiting While" << std::endl;
@@ -149,7 +81,6 @@ void UsesExtractor::visitWhile(WhileNode* node) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
         this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
     }
-
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses;
 
 #ifdef DEBUG_BUILD
@@ -195,38 +126,6 @@ void UsesExtractor::visitIf(IfNode* node) {
         this->uses.insert({userStmtNum, usedVariablesInCond[i]});
         this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
     }
-    // UsesExtractor* thenUsesExtractorHelper = new UsesExtractor(
-    //     this->procs, this->extractedProcs, this->extractedWhiles);
-    // thenUsesExtractorHelper->currentProc = this->currentProc;
-    // UsesExtractor* elseUsesExtractorHelper = new UsesExtractor(
-    //     this->procs, this->extractedProcs, this->extractedWhiles);
-    // elseUsesExtractorHelper->currentProc = this->currentProc;
-    // dfsVisitHelper(node->thenStmtList, thenUsesExtractorHelper);
-    // dfsVisitHelper(node->elseStmtList, elseUsesExtractorHelper);
-
-    // std::unordered_set<std::pair<StmtNum, Variable>> extractedThenUses = thenUsesExtractorHelper->getUses();
-    // std::unordered_set<std::pair<StmtNum, Variable>> extractedElseUses = elseUsesExtractorHelper->getUses();
-
-    // // Iterate over each element in the set and update stmtNum value
-    // for (auto it = extractedThenUses.begin(); it != extractedThenUses.end();) {
-    //     auto oldPair = *it;
-    //     it = extractedThenUses.erase(it);
-
-    //     // Create a new pair with the updated stmtNum value and insert it
-    //     uses.insert({userStmtNum, oldPair.second});
-    //     this->procedureUses.insert({currentProc, oldPair.second});
-    // }
-
-    // for (auto it = extractedElseUses.begin(); it != extractedElseUses.end();) {
-    //     auto oldPair = *it;
-    //     it = extractedElseUses.erase(it);
-
-    //     // Create a new pair with the updated stmtNum value and insert it
-    //     uses.insert({userStmtNum, oldPair.second});
-    //     this->procedureUses.insert({currentProc, oldPair.second});
-    // }
-    // delete thenUsesExtractorHelper;
-    // delete elseUsesExtractorHelper;
 
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses;
 
@@ -240,7 +139,6 @@ void UsesExtractor::visitIf(IfNode* node) {
 #ifdef DEBUG_BUILD
         std::cout << "no if cached" << std::endl;
 #endif
-
         UsesExtractor* thenUsesExtractorHelper =
             new UsesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
         thenUsesExtractorHelper->currentProc = this->currentProc;
