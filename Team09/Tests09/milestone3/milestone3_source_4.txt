@@ -1,4 +1,4 @@
-  procedure TwoNesting {
+  procedure nestedProcedureWithSuperLongName {
     print ALPHAalphaAlpha;
     read BetaBETABata;
     call CommaCommaGiveMeAComa;

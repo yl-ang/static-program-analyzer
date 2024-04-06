@@ -1,51 +1,51 @@
-1 - Parent*: if with assign child
-if if; assign assignmentStatement;
-Select if such that Parent*(if, assignmentStatement)
-42, 46, 5
-5000
-2 - Parent*: while with while child
+1 - Parent*: while with while child
 while whilestatements; while wchild;
 Select whilestatements such that Parent*(whilestatements, wchild)
 50, 4
 5000
-3 - Parent*: print with while child
-print printStatement; while whilestatements;
-Select printStatement such that Parent*(printStatement, whilestatements)
+2 - Parent: Read with statement children
+read readStatement;
+Select readStatement such that Parent(readStatement, _)
 none
 5000
-4 - Parent*: statements with print child
-stmt statement; print printStatement;
-Select statement such that Parent*(statement, printStatement)
-51, 50, 46, 42, 9, 4, 12, 5
+3 - Parent*: statements with while child
+stmt statement; while whilestatements;
+Select statement such that Parent*(statement, whilestatements)
+50, 4, 5
 5000
-5 - Parent: While with while children
-while whilestatements, w2;
-Select whilestatements such that Parent(whilestatements, w2)
-50, 4
-5000
-6 - Parent: Statements with children
-stmt statement;
-Select statement such that Parent(statement, _)
-51, 50, 46, 42, 9, 4, 12, 5
-5000
-7 - Parent: Statements with read children
+4 - Parent: Statements with read children
 stmt statement; read readStatement;
 Select statement such that Parent(statement, readStatement)
 51, 42, 9, 12, 5
 5000
-8 - Parent: If with print children
-if if; print printStatement;
-Select if such that Parent(if, printStatement)
-42, 46, 12, 5
+5 - Parent: While with print children
+while whilestatements; print printStatement;
+Select whilestatements such that Parent(whilestatements, printStatement)
+51, 9, 4
 5000
-9 - Parent: Statements with assign children
-stmt statement; assign assignmentStatement;
-Select statement such that Parent(statement, assignmentStatement)
-51, 50, 46, 9, 5
+6 - Parent*: read with if child
+read readStatement; if if;
+Select readStatement such that Parent*(readStatement, if)
+none
 5000
-10 - Parent*: assign with statement child
-assign assignmentStatement;
-Select assignmentStatement such that Parent*(assignmentStatement, _)
+7 - Parent*: statements with child
+stmt statement;
+Select statement such that Parent*(statement, _)
+51, 50, 46, 42, 9, 4, 12, 5
+5000
+8 - Parent*: assign with while child
+assign assignmentStatement; while whilestatements;
+Select assignmentStatement such that Parent*(assignmentStatement, whilestatements)
+none
+5000
+9 - Parent: If with read children
+if if; read readStatement;
+Select if such that Parent(if, readStatement)
+42, 12, 5
+5000
+10 - Parent*: assign with read child
+assign assignmentStatement; read readStatement;
+Select assignmentStatement such that Parent*(assignmentStatement, readStatement)
 none
 5000
 11 - Parent: If with assign children
@@ -53,243 +53,243 @@ if if; assign assignmentStatement;
 Select if such that Parent(if, assignmentStatement)
 46, 5
 5000
-12 - Parent*: while with if child
-while whilestatements; if if;
-Select whilestatements such that Parent*(whilestatements, if)
-9, 4
-5000
-13 - Parent*: statements with child
-stmt statement;
-Select statement such that Parent*(statement, _)
-51, 50, 46, 42, 9, 4, 12, 5
-5000
-14 - Parent*: assign with while child
-assign assignmentStatement; while whilestatements;
-Select assignmentStatement such that Parent*(assignmentStatement, whilestatements)
+12 - Parent*: read with statement child
+read readStatement;
+Select readStatement such that Parent*(readStatement, _)
 none
 5000
-15 - Parent*: print with assign child
-print printStatement; assign assignmentStatement;
-Select printStatement such that Parent*(printStatement, assignmentStatement)
-none
-5000
-16 - Parent*: statements with while child
-stmt statement; while whilestatements;
-Select statement such that Parent*(statement, whilestatements)
-50, 4, 5
-5000
-17 - Parent*: if with print child
-if if; print printStatement;
-Select if such that Parent*(if, printStatement)
-42, 46, 12, 5
-5000
-18 - Follows: Statements followed by if
+13 - Parent*: statements with if child
 stmt statement; if if;
-Select statement such that Follows(statement, if)
-41, 11
+Select statement such that Parent*(statement, if)
+42, 9, 4, 5
 5000
-19 - Parent: Statements with if children
+14 - Parent: Statements with if children
 stmt statement; if if;
 Select statement such that Parent(statement, if)
 42, 9, 4, 5
 5000
-20 - Parent: Assign with statement children
-assign assignmentStatement; stmt statement;
-Select assignmentStatement such that Parent(assignmentStatement, statement)
+15 - Parent*: while with while parent
+while whilestatements; while wparent;
+Select whilestatements such that Parent*(wparent, whilestatements)
+51, 50, 9
+5000
+16 - Follows: Statements followed by if
+stmt statement; if if;
+Select statement such that Follows(statement, if)
+41, 11
+5000
+17 - Parent*: while with print child
+while whilestatements; print printStatement;
+Select whilestatements such that Parent*(whilestatements, printStatement)
+51, 50, 9, 4
+5000
+18 - Parent*: If with if children
+if if, if2;
+Select if such that Parent*(if, if2)
+42, 5
+5000
+19 - Parent*: if with if parent
+if if; if ifparent;
+Select if such that Parent*(ifparent, if)
+42, 46
+5000
+20 - Parent: While with while children
+while whilestatements, w2;
+Select whilestatements such that Parent(whilestatements, w2)
+50, 4
+5000
+21 - Parent*: assign with assign child
+assign assignmentStatement; assign achild;
+Select assignmentStatement such that Parent*(assignmentStatement, achild)
 none
 5000
-21 - Parent: Statements with while children
-stmt statement; while whilestatements;
-Select statement such that Parent(statement, whilestatements)
-50, 4, 5
-5000
-22 - Parent*: read with print child
-read readStatement; print printStatement;
-Select readStatement such that Parent*(readStatement, printStatement)
-none
-5000
-23 - Parent: If with while children
-if if; while whilestatements;
-Select if such that Parent(if, whilestatements)
-5
-5000
-24 - Parent: While with read children
-while whilestatements; read readStatement;
-Select whilestatements such that Parent(whilestatements, readStatement)
-51, 9
-5000
-25 - Parent*: if with statement child
-if if;
-Select if such that Parent*(if, _)
-42, 46, 12, 5
-5000
-26 - Parent: While with assign children
+22 - Parent: While with assign children
 while whilestatements; assign assignmentStatement;
 Select whilestatements such that Parent(whilestatements, assignmentStatement)
 51, 50, 9
 5000
-27 - Parent*: if with if child
-if if; if ifchild;
-Select if such that Parent*(if, ifchild)
-42, 5
+23 - Parent*: if with print child
+if if; print printStatement;
+Select if such that Parent*(if, printStatement)
+42, 46, 12, 5
 5000
-28 - Parent*: while with assign child
+24 - Parent*: read with read child
+read readStatement; read rchild;
+Select readStatement such that Parent*(readStatement, rchild)
+none
+5000
+25 - Parent*: read with print child
+read readStatement; print printStatement;
+Select readStatement such that Parent*(readStatement, printStatement)
+none
+5000
+26 - Parent*: assign with if child
+assign assignmentStatement; if if;
+Select assignmentStatement such that Parent*(assignmentStatement, if)
+none
+5000
+27 - Parent*: while with assign child
 while whilestatements; assign readStatement;
 Select whilestatements such that Parent*(whilestatements, readStatement)
 51, 50, 9, 4
 5000
-29 - Parent*: assign with read child
-assign assignmentStatement; read readStatement;
-Select assignmentStatement such that Parent*(assignmentStatement, readStatement)
+28 - Parent*: print with read child
+print printStatement; read readStatement;
+Select printStatement such that Parent*(printStatement, readStatement)
 none
 5000
-30 - Parent: Read with statement children
-read readStatement;
-Select readStatement such that Parent(readStatement, _)
+29 - Parent*: print with if child
+print printStatement; if if;
+Select printStatement such that Parent*(printStatement, if)
 none
 5000
-31 - Parent*: print with statement child
-print printStatement;
-Select printStatement such that Parent*(printStatement, _)
+30 - Parent*: assign with statement child
+assign assignmentStatement;
+Select assignmentStatement such that Parent*(assignmentStatement, _)
 none
 5000
-32 - Parent: While with if children
-while whilestatements; if if;
-Select whilestatements such that Parent(whilestatements, if)
-9, 4
+31 - Follows*: Read followed by while
+read readStatement; while whilestatements;
+Select readStatement such that Follows*(readStatement, whilestatements)
+6
 5000
-33 - Parent*: assign with if child
-assign assignmentStatement; if if;
-Select assignmentStatement such that Parent*(assignmentStatement, if)
+32 - Parent*: read with while child
+read readStatement; while whilestatements;
+Select readStatement such that Parent*(readStatement, whilestatements)
 none
+5000
+33 - Parent: Statements with print children
+stmt statement; print printStatement;
+Select statement such that Parent(statement, printStatement)
+51, 46, 42, 9, 4, 12, 5
 5000
 34 - Follows*: Assign followed by statement
 assign assignmentStatement;
 Select assignmentStatement such that Follows*(assignmentStatement, _)
 3, 8, 38, 1, 2, 41, 55, 39
 5000
-35 - Parent*: print with if child
-print printStatement; if if;
-Select printStatement such that Parent*(printStatement, if)
+35 - Parent: Assign with statement children
+assign assignmentStatement; stmt statement;
+Select assignmentStatement such that Parent(assignmentStatement, statement)
 none
 5000
-36 - Parent*: read with if child
-read readStatement; if if;
-Select readStatement such that Parent*(readStatement, if)
-none
+36 - Parent*: if with if child
+if if; if ifchild;
+Select if such that Parent*(if, ifchild)
+42, 5
 5000
-37 - Parent*: assign with assign child
-assign assignmentStatement; assign achild;
-Select assignmentStatement such that Parent*(assignmentStatement, achild)
-none
+37 - Parent: While with read children
+while whilestatements; read readStatement;
+Select whilestatements such that Parent(whilestatements, readStatement)
+51, 9
 5000
-38 - Parent*: statements with if child
-stmt statement; if if;
-Select statement such that Parent*(statement, if)
-42, 9, 4, 5
+38 - Parent: While with if children
+while whilestatements; if if;
+Select whilestatements such that Parent(whilestatements, if)
+9, 4
 5000
 39 - Parent*: while with read child
 while whilestatements; read readStatement;
 Select whilestatements such that Parent*(whilestatements, readStatement)
 51, 50, 9, 4
 5000
-40 - Parent*: read with statement child
-read readStatement;
-Select readStatement such that Parent*(readStatement, _)
-none
-5000
-41 - Parent*: print with read child
-print printStatement; read readStatement;
-Select printStatement such that Parent*(printStatement, readStatement)
-none
-5000
-42 - Parent*: read with read child
-read readStatement; read rchild;
-Select readStatement such that Parent*(readStatement, rchild)
-none
-5000
-43 - Parent*: if with while child
-if if; while whilestatements;
-Select if such that Parent*(if, whilestatements)
-5
-5000
-44 - Parent*: print with print child
-print printStatement; print printStatementchild;
-Select printStatement such that Parent*(printStatement, printStatementchild)
-none
-5000
-45 - Parent*: statements with read child
-stmt statement; read readStatement;
-Select statement such that Parent*(statement, readStatement)
-51, 50, 42, 9, 4, 12, 5
-5000
-46 - Parent: If with read children
-if if; read readStatement;
-Select if such that Parent(if, readStatement)
-42, 12, 5
-5000
-47 - Parent*: if with if parent
-if if; if ifparent;
-Select if such that Parent*(ifparent, if)
-42, 46
-5000
-48 - Parent*: read with while child
-read readStatement; while whilestatements;
-Select readStatement such that Parent*(readStatement, whilestatements)
-none
-5000
-49 - Parent*: while with statements child
+40 - Parent*: while with statements child
 while whilestatements;
 Select whilestatements such that Parent*(whilestatements, _)
 51, 50, 9, 4
 5000
-50 - Parent*: while with print child
-while whilestatements; print printStatement;
-Select whilestatements such that Parent*(whilestatements, printStatement)
-51, 50, 9, 4
+41 - Parent*: if with statement child
+if if;
+Select if such that Parent*(if, _)
+42, 46, 12, 5
 5000
-51 - Parent*: while with while parent
-while whilestatements; while wparent;
-Select whilestatements such that Parent*(wparent, whilestatements)
-51, 50, 9
+42 - Parent*: print with statement child
+print printStatement;
+Select printStatement such that Parent*(printStatement, _)
+none
 5000
-52 - Parent*: if with read child
-if if; read readStatement;
-Select if such that Parent*(if, readStatement)
-42, 12, 5
+43 - Parent*: if with assign child
+if if; assign assignmentStatement;
+Select if such that Parent*(if, assignmentStatement)
+42, 46, 5
 5000
-53 - Parent: Statements with print children
+44 - Parent: If with while children
+if if; while whilestatements;
+Select if such that Parent(if, whilestatements)
+5
+5000
+45 - Parent*: statements with print child
 stmt statement; print printStatement;
-Select statement such that Parent(statement, printStatement)
-51, 46, 42, 9, 4, 12, 5
+Select statement such that Parent*(statement, printStatement)
+51, 50, 46, 42, 9, 4, 12, 5
 5000
-54 - Parent*: If with if children
-if if, if2;
-Select if such that Parent*(if, if2)
-42, 5
-5000
-55 - Follows*: If followed by statement
+46 - Follows*: If followed by statement
 if if;
 Select if such that Follows*(if, _)
 12, 5
 5000
-56 - Parent*: read with assign child
-read readStatement; assign assignmentStatement;
-Select readStatement such that Parent*(readStatement, assignmentStatement)
-none
-5000
-57 - Follows*: Read followed by while
-read readStatement; while whilestatements;
-Select readStatement such that Follows*(readStatement, whilestatements)
-6
-5000
-58 - Parent: Print with statement children
+47 - Parent: Print with statement children
 print printStatement;
 Select printStatement such that Parent(printStatement, _)
 none
 5000
-59 - Parent: While with print children
-while whilestatements; print printStatement;
-Select whilestatements such that Parent(whilestatements, printStatement)
-51, 9, 4
+48 - Parent: Statements with children
+stmt statement;
+Select statement such that Parent(statement, _)
+51, 50, 46, 42, 9, 4, 12, 5
+5000
+49 - Parent*: print with print child
+print printStatement; print printStatementchild;
+Select printStatement such that Parent*(printStatement, printStatementchild)
+none
+5000
+50 - Parent*: if with read child
+if if; read readStatement;
+Select if such that Parent*(if, readStatement)
+42, 12, 5
+5000
+51 - Parent*: print with assign child
+print printStatement; assign assignmentStatement;
+Select printStatement such that Parent*(printStatement, assignmentStatement)
+none
+5000
+52 - Parent*: print with while child
+print printStatement; while whilestatements;
+Select printStatement such that Parent*(printStatement, whilestatements)
+none
+5000
+53 - Parent*: statements with read child
+stmt statement; read readStatement;
+Select statement such that Parent*(statement, readStatement)
+51, 50, 42, 9, 4, 12, 5
+5000
+54 - Parent: If with print children
+if if; print printStatement;
+Select if such that Parent(if, printStatement)
+42, 46, 12, 5
+5000
+55 - Parent: Statements with while children
+stmt statement; while whilestatements;
+Select statement such that Parent(statement, whilestatements)
+50, 4, 5
+5000
+56 - Parent*: if with while child
+if if; while whilestatements;
+Select if such that Parent*(if, whilestatements)
+5
+5000
+57 - Parent*: read with assign child
+read readStatement; assign assignmentStatement;
+Select readStatement such that Parent*(readStatement, assignmentStatement)
+none
+5000
+58 - Parent: Statements with assign children
+stmt statement; assign assignmentStatement;
+Select statement such that Parent(statement, assignmentStatement)
+51, 50, 46, 9, 5
+5000
+59 - Parent*: while with if child
+while whilestatements; if if;
+Select whilestatements such that Parent*(whilestatements, if)
+9, 4
 5000
