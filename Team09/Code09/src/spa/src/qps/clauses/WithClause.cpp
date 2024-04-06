@@ -109,16 +109,12 @@ WithType WithClause::determineWithType(std::shared_ptr<ClauseArgument> compAttr)
     std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(compAttr);
     SynonymAttributeType attrType = syn->getAttr().value();
 
-    switch (attrType) {
-    case SynonymAttributeType::PROCNAME:
-    case SynonymAttributeType::VARNAME:
-        return WithType::NAME;
-    case SynonymAttributeType::VALUE:
-    case SynonymAttributeType::STMTNUM:
-        return WithType::INTEGER;
-    default:
-        throw QPSSemanticError();
+    auto it = SYNONYM_ATTRIBUTE_TYPE_TO_WITH_TYPE_MAP.find(attrType);
+    if (it != SYNONYM_ATTRIBUTE_TYPE_TO_WITH_TYPE_MAP.end()) {
+        return it->second;
     }
+
+    throw QPSSemanticError();
 }
 
 bool WithClause::validateArguments(SynonymStore* store) {

@@ -4,6 +4,13 @@
 
 enum class WithType { INTEGER, NAME };
 
+static std::unordered_map<SynonymAttributeType, WithType> SYNONYM_ATTRIBUTE_TYPE_TO_WITH_TYPE_MAP = {
+    {SynonymAttributeType::PROCNAME, WithType::NAME},
+    {SynonymAttributeType::VARNAME, WithType::NAME},
+    {SynonymAttributeType::VALUE, WithType::INTEGER},
+    {SynonymAttributeType::STMTNUM, WithType::INTEGER},
+    {SynonymAttributeType::NONE, WithType::INTEGER}};
+
 class WithClause : public QueryClause {
 private:
     std::shared_ptr<ClauseArgument> lhs;
