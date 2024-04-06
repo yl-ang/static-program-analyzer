@@ -1,150 +1,150 @@
-1 - Uses: assign that uses beta
-assign a;
-Select a such that Uses(a, "beta")
-11, 22, 17, 1
-5000
-2 - Uses: assign that uses gamma
-assign a;
-Select a such that Uses(a, "gamma")
-22, 17, 11, 2
-5000
-3 - Modifies: read that uses b
-read read;
-Select a such that Modifies(read, "b")
-SemanticError
-5000
-4 - Uses: assign that uses alpha
-assign a;
-Select a such that Uses(a, "alpha")
-16, 22, 1
-5000
-5 - Uses: read that uses variables
-variable v; read if;
-Select v such that Uses(if, v)
+1 - Uses: print that uses q
+print printStatement;
+Select printStatement such that Uses(printStatement, "q")
 none
 5000
-6 - Modifies: read that modifies
-read r;
-Select r such that Modifies(r, _)
-46, 45, 40, 43, 35, 29, 31, 44, 38, 32, 30, 42, 27, 28
-5000
-7 - Uses: assign that uses b
-assign a;
-Select a such that Uses(a, "b")
-25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 7, 12, 13, 10, 8, 4, 3
-5000
-8 - Modifies: read that uses a
-read read;
-Select a such that Modifies(read, "a")
-SemanticError
-5000
-9 - Uses: read that uses a
-variable v; read if;
-Select v such that Uses(if, "a")
-none
-5000
-10 - Modifies: read that uses v
-read read;
-Select a such that Modifies(read, "v")
-SemanticError
-5000
-11 - Uses: print that uses u
-print pn;
-Select pn such that Uses(pn, "u")
-37, 41
-5000
-12 - Uses: print that uses s
-print pn;
-Select pn such that Uses(pn, "s")
-none
-5000
-13 - Modifies: read that uses w
-read read;
-Select a such that Modifies(read, "w")
-SemanticError
-5000
-14 - Modifies: assign that uses c
-assign a;
-Select a such that Modifies(a, "c")
-2
-5000
-15 - Modifies: assign that uses beta
-assign a;
-Select a such that Modifies(a, "beta")
-none
-5000
-16 - Uses: assign that uses c
-assign a;
-Select a such that Uses(a, "c")
+2 - Uses: assign that uses c
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "c")
 25, 24, 23, 20, 18, 13, 10, 8, 19, 11, 22, 21, 9, 6, 1, 5, 7, 15, 3
 5000
-17 - Modifies: read that uses x
+3 - Uses: read that uses  assignmentStatement
+variable variableName; read if;
+Select variableName such that Uses(if, " assignmentStatement")
+none
+5000
+4 - Modifies: assign that uses c
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "c")
+2
+5000
+5 - Modifies: read that uses w
 read read;
-Select a such that Modifies(read, "x")
+Select  assignmentStatement such that Modifies(read, "w")
 SemanticError
 5000
-18 - Uses: print that uses r
-print pn;
-Select pn such that Uses(pn, "r")
-none
+6 - Modifies: read that modifies
+read readstatement;
+Select  readstatement such that Modifies( readstatement, _)
+46, 45, 40, 43, 35, 29, 31, 44, 38, 32, 30, 42, 27, 28
 5000
-19 - Uses: variables used by if
-variable v; if while;
-Select v such that Uses(while, v)
+7 - Modifies: read that uses variableName
+read read;
+Select  assignmentStatement such that Modifies(read, "variableName")
+SemanticError
+5000
+8 - Uses: assign that uses beta
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "beta")
+11, 22, 17, 1
+5000
+9 - Uses: assign that uses alpha
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "alpha")
+16, 22, 1
+5000
+10 - Uses: variables used by if
+variable variableName; if while;
+Select variableName such that Uses(while, variableName)
 u, p, s, r, w, q
 5000
-20 - Modifies: variables modified by read
-variable v; read r;
-Select v such that Modifies(r, v)
-z, y, d, x, b, e, k, v, i, a, t
-5000
-21 - Modifies: assign that uses alpha
-assign a;
-Select a such that Modifies(a, "alpha")
+11 - Uses: print that uses  readstatement
+print printStatement;
+Select printStatement such that Uses(printStatement, " readstatement")
 none
 5000
-22 - Uses: variables used by print
-variable v; print pn;
-Select v such that Uses(pn, v)
-u, w
+12 - Uses: read that uses variables
+variable variableName; read if;
+Select variableName such that Uses(if, variableName)
+none
 5000
-23 - Uses: statement num that uses a
-variable v; read if;
-Select v such that Uses(11, "a")
-z, y, x, u, upsilon, sigma, p, o, phi, chi, k, tau, j, rho, w, i, omicron, m, nu, d, mu, a, b, eta, c, theta, s, r, omega, e, v, l, lambda, kappa, beta, g, epsilon, delta, pi, psi, gamma, iota, f, alpha, zeta, xi, h, n, q, t
-5000
-24 - Uses: variables used by assign
-variable v; assign a;
-Select v such that Uses(a, v)
-u, p, o, phi, chi, k, tau, sigma, j, rho, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
-5000
-25 - Modifies: assign that uses b
-assign a;
-Select a such that Modifies(a, "b")
+13 - Modifies: assign that uses b
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "b")
 1
 5000
+14 - Modifies: assign that uses alpha
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "alpha")
+none
+5000
+15 - Uses: statement num that uses  assignmentStatement
+variable variableName; read if;
+Select variableName such that Uses(15, " assignmentStatement")
+none
+5000
+16 - Uses: print that uses p
+print printStatement;
+Select printStatement such that Uses(printStatement, "p")
+none
+5000
+17 - Uses: assign that uses b
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "b")
+25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 7, 12, 13, 10, 8, 4, 3
+5000
+18 - Modifies: read that uses b
+read read;
+Select  assignmentStatement such that Modifies(read, "b")
+SemanticError
+5000
+19 - Uses: print that uses s
+print printStatement;
+Select printStatement such that Uses(printStatement, "s")
+none
+5000
+20 - Uses: assign that uses gamma
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "gamma")
+22, 17, 11, 2
+5000
+21 - Modifies: read that uses x
+read read;
+Select  assignmentStatement such that Modifies(read, "x")
+SemanticError
+5000
+22 - Modifies: read that uses  assignmentStatement
+read read;
+Select  assignmentStatement such that Modifies(read, " assignmentStatement")
+SemanticError
+5000
+23 - Modifies: assign that uses beta
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "beta")
+none
+5000
+24 - Uses: assign that uses  assignmentStatement
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, " assignmentStatement")
+none
+5000
+25 - Modifies: variables modified by read
+variable variableName; read readstatement;
+Select variableName such that Modifies( readstatement, variableName)
+z, y, d, x, b, e, k, v, i, a, t
+5000
 26 - Uses: print that uses
-print pn;
-Select pn such that Uses(pn, _)
+print printStatement;
+Select printStatement such that Uses(printStatement, _)
 37, 39, 36, 41, 34
 5000
-27 - Uses: print that uses p
-print pn;
-Select pn such that Uses(pn, "p")
-none
+27 - Uses: variables used by print
+variable variableName; print printStatement;
+Select variableName such that Uses(printStatement, variableName)
+u, w
 5000
-28 - Uses: assign that uses a
-assign a;
-Select a such that Uses(a, "a")
-25, 24, 23, 20, 17, 22, 21, 9, 14, 15, 13, 12, 16, 11, 6, 10, 8, 4
+28 - Uses: variables used by assign
+variable variableName; assign assignmentStatement;
+Select variableName such that Uses( assignmentStatement, variableName)
+u, p, o, phi, chi, k, tau, sigma, j, rho, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
 5000
-29 - Uses: variables used by while
-variable v; while if;
-Select v such that Uses(if, v)
+29 - Uses: print that uses u
+print printStatement;
+Select printStatement such that Uses(printStatement, "u")
+37, 41
+5000
+30 - Uses: variables used by while
+variable variableName; while if;
+Select variableName such that Uses(if, variableName)
 p, w, d, a, b, s, u, c, r, q
-5000
-30 - Uses: print that uses q
-print pn;
-Select pn such that Uses(pn, "q")
-none
 5000

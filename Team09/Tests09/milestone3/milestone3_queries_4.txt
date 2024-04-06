@@ -1,620 +1,175 @@
-1 - Modifies // second layer, procedure, in if cont stmt (else) (stmt)
+1 - Follows* : if condition followed by statement after
 procedure p;
-Select p such that Modifies("TwoNesting", "elseA")
+Select p such that Follows*(12, 21)
 none
 5000
-2 - Follows // first layer (while cont stmt -> stmt)
-procedure p;
-Select p such that Follows(49, 85)
-none
-5000
-3 - Uses // second layer, in if then if then cont stmt (stmt)
-procedure p;
-Select p such that Uses(5, "ifIfB")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-4 - FollowsStar // second layer, in while cont stmt (stmt -> while cont stmt -> if cont stmt)
-procedure p;
-Select p such that Follows*(73, 78)
-none
-5000
-5 - FollowsStar // second layer, in if cont stmt (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(8, 20)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-6 - Uses // third layer, procedure, in if if cont stmt (else) (stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "ifElseC")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-7 - Follows
-procedure p; while w; if ifs;
-Select p such that Follows(ifs, w)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-8 - FollowsStar // second layer, in while cont stmt (stmt -> stmt -> stmt)
-procedure p;
-Select p such that Follows*(50, 52)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-9 - ParentStar // second layer, in if cont stmt (if cont stmt (else) -> stmt)
-procedure p;
-Select p such that Parent*(5, 16)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-10 - Modifies // third layer, procedure, in if if cont stmt (else) (stmt)
-procedure p;
-Select p such that Modifies("TwoNesting", "ifElseA")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-11 - FollowsStar // second layer, in if cont stmt (if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(10, 21)
-none
-5000
-12 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt (inside))
-procedure p;
-Select p such that Parent(5, 25)
-none
-5000
-13 - Modifies // second layer, in if then if else cont stmt (stmt)
-procedure p;
-Select p such that Modifies(5, "ifElseA")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-14 - FollowsStar // second layer, in if cont stmt (if cont stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(32, 35)
-none
-5000
-15 - Uses // second layer, procedure, in if cont stmt (else) (stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "elseC")
-none
-5000
-16 - Modifies // second layer, in while while cont stmt (stmt)
-procedure p;
-Select p such that Modifies(49, "whileWhileA")
-none
-5000
-17 - Parent // third layer, in while while cont stmt (stmt)
-procedure p;
-Select p such that Parent(54, 57)
-none
-5000
-18 - FollowsStar // second layer, in while cont stmt (while cont stmt -> if cont stmt)
-procedure p;
-Select p such that Follows*(76, 78)
-none
-5000
-19 - Follows // first layer (if cont stmt -> stmt)
-procedure p;
-Select p such that Follows(5, 45)
-none
-5000
-20 - FollowsStar // second layer, in if cont stmt (stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(21, 29)
-none
-5000
-21 - ParentStar
-procedure p; while w1; while w2;
-Select p such that Parent*(w1, w2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-22 - Uses // second layer, in while while cont stmt (stmt)
-procedure p;
-Select p such that Uses(49, "whileWhileC")
-none
-5000
-23 - Follows // first layer (stmt -> while cont stmt)
-procedure p;
-Select p such that Follows(48, 49)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-24 - Uses // second layer, procedure, in if cont stmt (then) (stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "ifB")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-25 - Follows // second layer, in while cont stmt (if cont stmt -> stmt)
+2 - Follows : statement in while
 procedure p;
 Select p such that Follows(63, 72)
 none
 5000
-26 - Modifies // third layer, procedure, in if while cont stmt (stmt)
+3 - Follows* : second layer, in while cont stmt (stmt -> stmt -> stmt)
 procedure p;
-Select p such that Modifies("TwoNesting", "ifWhileA")
+Select p such that Follows*(50, 52)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+4 - ParentStar
+procedure p; if ifThenElseConditional; while whileCondtion;
+Select p such that Parent*(ifThenElseConditional, whileCondtion)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+5 - Uses : statement in nested whiles
+procedure p;
+Select p such that Uses(31, "whileWhileC")
 none
 5000
-27 - Parent // third layer, in if while cont stmt (stmt)
+6 - Follows* : if then while
+procedure p;
+Select p such that Follows*(12, 31)
+none
+5000
+7 - Modifies : if condition in proc followed by statement after
+procedure p;
+Select p such that Modifies("nestedProcedureWithSuperLongName", "ifElseA")
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+8 - Follows* : while followed by statement in proc
+procedure p;
+Select p such that Follows*(31, 70)
+none
+5000
+9 - ParentStar: parent of whiles
+procedure p; while w1; while w2;
+Select p such that Parent*(w1, w2)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+10 - Parent :  statement in while nested if
 procedure p;
 Select p such that Parent(23, 25)
 none
 5000
-28 - ParentStar
-procedure p; if ifs; while w;
-Select p such that Parent*(ifs, w)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-29 - Follows // first layer (stmt -> if cont stmt)
+11 - Follows : child statement in if
 procedure p;
-Select p such that Follows(4, 5)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-30 - FollowsStar // first layer (if cont stmt -> stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(5, 49)
+Select p such that Follows(12, 25)
 none
 5000
-31 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt (inside then))
+12 - Modifies : statement in while nested if
 procedure p;
-Select p such that Parent(49, 65)
+Select p such that Modifies("nestedProcedureWithSuperLongName", "ifWhileA")
 none
 5000
-32 - FollowsStar // second layer, in if cont stmt (stmt -> if cont stmt)
+13 - Modifies : nested whiles
 procedure p;
-Select p such that Follows*(7, 10)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
+Select p such that Modifies(31, "whileWhileA")
+none
+5000
+14 - Follows : if conditional then statement
+procedure p;
+Select p such that Follows(12, 45)
+none
+5000
+15 - Modifies : nested if
+procedure p;
+Select p such that Modifies(12, "ifIfA")
+none
+5000
+16 - Modifies : procedure, in if
+procedure p;
+Select p such that Modifies("nestedProcedureWithSuperLongName", "elsaFromFrozenIsAlsoElseA")
+none
+5000
+17 - Follows : while in if
+procedure p;
+Select p such that Follows(75, 95)
+none
+5000
+18 - Follows* : while in if
+procedure p;
+Select p such that Follows*(32, 35)
+none
+5000
+19 - Follows* : while then if
+procedure p;
+Select p such that Follows*(86, 95)
+none
+5000
+20 - Uses : statement in if
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "ifB")
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+21 - Follows : statement then if
+procedure p;
+Select p such that Follows(4, 12)
+none
+5000
+22 - Modifies : nested ifThenElseConditional
+procedure p;
+Select p such that Modifies(12, "ifElseA")
+none
+5000
+23 - ParentStar : if condition followed by statement after
+procedure p;
+Select p such that Parent*(12, 16)
+none
+5000
+24 - Follows : statement followed by while
+procedure p;
+Select p such that Follows(48, 31)
+none
+5000
+25 - Uses : nested if uses
+procedure p;
+Select p such that Uses(12, "ifIfifififififiifB")
+none
+5000
+26 - Uses : if statement
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "elseC")
+none
+5000
+27 - Parent : statements in while
+procedure p;
+Select p such that Parent(31, 65)
+none
+5000
+28 - Follows* : statement then if
+procedure p;
+Select p such that Follows*(7, 12)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+29 - Parent :
+procedure p;
+Select p such that Parent(12, 12)
+none
+5000
+30 - Uses : procedure in if
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "ifElseCSoundslikeifelsiewhoiselsie")
+none
+5000
+31 - Parent : while in if
+procedure p;
+Select p such that Parent(12, 25)
+none
+5000
+32 - Follows* : then block contains while
+procedure p;
+Select p such that Follows*(21, 29)
+none
 5000
 33 - Follows
-procedure p; while w; if ifs;
-Select p such that Follows(w, ifs)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
+procedure p; while whileCondtion; if ifThenElseConditional;
+Select p such that Follows(whileCondtion, ifThenElseConditional)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
 5000
-34 - Parent // second layer, in if cont stmt (stmt -> if cont stmt)
+34 - Parent : nested whiles
 procedure p;
-Select p such that Parent(5, 10)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-35 - Modifies // second layer, in if then if then cont stmt (stmt)
-procedure p;
-Select p such that Modifies(5, "ifIfA")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-36 - Follows // second layer, in if cont stmt (while cont stmt -> stmt)
-procedure p;
-Select p such that Follows(23, 28)
+Select p such that Parent(60, 70)
 none
 5000
-37 - FollowsStar // second layer, in if cont stmt (stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(19, 23)
-none
-5000
-38 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt)
-procedure p;
-Select p such that Parent(49, 63)
-none
-5000
-39 - Parent // third layer, in if if cont stmt (stmt (inside else))
-procedure p;
-Select p such that Parent(10, 17)
-none
-5000
-40 - FollowsStar
-procedure p; while w1; while w2;
-Select p such that Follows*(w1, w2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-41 - FollowsStar // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(8, 31)
-none
-5000
-42 - FollowsStar // second layer, in while cont stmt (stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(73, 76)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-43 - Parent // second layer, in while cont stmt (stmt)
-procedure p;
-Select p such that Parent(5, 8)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-44 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Parent(49, 74)
-none
-5000
-45 - ParentStar // second layer, in while cont stmt (while -> stmt)
-procedure p;
-Select p such that Parent*(49, 56)
-none
-5000
-46 - Parent // second layer, in if cont stmt (stmt -> if cont stmt (inside else))
-procedure p;
-Select p such that Parent(5, 16)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-47 - ParentStar // second layer, in while cont stmt (if cont stmt (else) -> stmt)
-procedure p;
-Select p such that Parent*(49, 70)
-none
-5000
-48 - Modifies // second layer, in while if else cont stmt (stmt)
-procedure p;
-Select p such that Modifies(49, "whileElseA")
-none
-5000
-49 - FollowsStar // second layer, in if cont stmt (if cont stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(32, 38)
-none
-5000
-50 - Parent
-procedure p; while w; if ifs;
-Select p such that Parent(w, ifs)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-51 - Uses // third layer, procedure, in if if cont stmt (then) (stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "ifIfB")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-52 - FollowsStar // second layer, in while cont stmt (stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(50, 60)
-none
-5000
-53 - Parent
-procedure p; if ifs; while w;
-Select p such that Parent(ifs, w)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-54 - Parent // second layer, in if cont stmt (stmt -> if cont stmt (inside then))
-procedure p;
-Select p such that Parent(5, 11)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-55 - Follows // second layer, in if cont stmt (if cont stmt -> stmt)
-procedure p;
-Select p such that Follows(10, 19)
-none
-5000
-56 - Follows // second layer, in if cont stmt (if cont stmt -> while cont stmt)
-procedure p;
-Select p such that Follows(32, 35)
-none
-5000
-57 - FollowsStar
-procedure p; while w; if ifs;
-Select p such that Follows*(w, ifs)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-58 - Uses // check TwoNesting all
-variable v;
-Select v such that Uses("TwoNesting", v)
-C3, B3, whileElseContainerStmt, whileIfContainerStmt, whileC3, whileElseC, whileElseA, whileIfB, whileIfA, ifC, whileElseB, d, whileWhileC, whileB, whileB3, C2, B2, Atimes2ISStill2lah, ifElseB, elseA, ifC4, ifB4, D, ifWhileA, whileA2, whileB2, ifWhileContainerStmt, ifElseContainerStmt, x, ifIfContainerStmt, ifIfC, ifElseC, ifB, ifIfB, whileC2, whileWhileContainerStmt, whileWhileA, A4, whileC4, ifA, ifC3, whileA4, whileA, whileC, A3, CommaCommaGiveMeAComa, BetaBETABata, ifB2, whileA3, ifC2, ALPHAalphaAlpha, whileB4, whileIfC, whileWhileB, ifB3
-5000
-59 - Uses // second layer, in if then while cont stmt (stmt)
-procedure p;
-Select p such that Uses(5, "ifWhileB")
-none
-5000
-60 - FollowsStar // second layer, in while cont stmt (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(62, 74)
-none
-5000
-61 - Parent // second layer, in while cont stmt (stmt -> while cont stmt)
-procedure p;
-Select p such that Parent(49, 52)
-none
-5000
-62 - Parent // second layer, in if cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt -> stmt -> while cont stmt -> if cont stmt)
-procedure p;
-Select p such that Parent(49, 78)
-none
-5000
-63 - Parent // third layer, in while if cont stmt (stmt (inside then))
-procedure p;
-Select p such that Parent(63, 67)
-none
-5000
-64 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt)
-procedure p;
-Select p such that Parent(5, 23)
-none
-5000
-65 - Modifies // second layer, in if then while cont stmt (stmt)
-procedure p;
-Select p such that Modifies(5, "ifWhileA")
-none
-5000
-66 - FollowsStar
-procedure p; if ifs1; if ifs2;
-Select p such that Follows*(ifs1, ifs2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-67 - FollowsStar // second layer, in if cont stmt (while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(23, 30)
-none
-5000
-68 - FollowsStar // first layer (stmt -> stmt -> stmt)
-procedure p;
-Select p such that Follows*(1, 4)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-69 - Parent // first layer (stmt -> while cont stmt)
-procedure p;
-Select p such that Parent(5, 49)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-70 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt -> stmt -> while cont stmt)
-procedure p;
-Select p such that Parent(49, 76)
-none
-5000
-71 - Parent
-procedure p; if ifs1; if ifs2;
-Select p such that Parent(ifs1, ifs2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-72 - Parent // second layer, in else cont stmt (else (inside))
-procedure p;
-Select p such that Parent(5, 42)
-none
-5000
-73 - FollowsStar // second layer, in while cont stmt (while cont stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(76, 84)
-none
-5000
-74 - Follows // second layer, in while cont stmt (while cont stmt -> stmt)
-procedure p;
-Select p such that Follows(54, 59)
-none
-5000
-75 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt (inside else))
-procedure p;
-Select p such that Parent(49, 70)
-none
-5000
-76 - FollowsStar // first layer (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(2, 46)
-none
-5000
-77 - FollowsStar // first layer (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(3, 88)
-none
-5000
-78 - FollowsStar // second layer, in if cont stmt (stmt -> stmt -> stmt)
-procedure p;
-Select p such that Follows*(7, 9)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-79 - Parent // third layer, in if if cont stmt (stmt (inside then))
-procedure p;
-Select p such that Parent(10, 13)
-none
-5000
-80 - ParentStar
-procedure p; if ifs1; if ifs2;
-Select p such that Parent*(ifs1, ifs2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-81 - Modifies // check TwoNesting all
-variable v;
-Select v such that Modifies("TwoNesting", v)
-whileIfB, whileIfA, whileB, whileB3, ifA4, ifA2, whileB2, whileWhileA, ifA, whileA2, BetaBETABata, B2, ifA3, ifB, ifIfB, ifElseA, A4, whileA4, whileA, A3, whileElseA, CommaCommaGiveMeAComa, B3, Atimes2ISStill2lah, ALPHAalphaAlpha, whileA3, whileB4, ifIfA
-5000
-82 - Uses // first layer, procedure (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "C2")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-83 - Parent
-procedure p; while w1; while w2;
-Select p such that Parent(w1, w2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-84 - FollowsStar // second layer, in while cont stmt (while cont stmt -> stmt -> if cont stmt)
-procedure p;
-Select p such that Follows*(54, 63)
-none
-5000
-85 - FollowsStar // second layer, in while cont stmt (while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(54, 62)
-none
-5000
-86 - ParentStar // second layer, in if cont stmt (if cont stmt (then) > stmt)
-procedure p;
-Select p such that Parent*(5, 13)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-87 - ParentStar // second layer, in while cont stmt (if cont stmt (then) -> stmt)
-procedure p;
-Select p such that Parent*(49, 65)
-none
-5000
-88 - Parent // second layer, in while cont stmt (stmt -> while cont stmt (inside))
-procedure p;
-Select p such that Parent(49, 56)
-none
-5000
-89 - Follows // second layer, in while cont stmt (stmt -> if cont stmt)
-procedure p;
-Select p such that Follows(62, 63)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-90 - Follows // second layer, in while cont stmt (while cont stmt -> if cont stmt)
-procedure p;
-Select p such that Follows(76, 78)
-none
-5000
-91 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt -> if cont stmt)
-procedure p;
-Select p such that Parent(5, 32)
-none
-5000
-92 - Parent // third layer, in while if cont stmt (stmt (inside else))
-procedure p;
-Select p such that Parent(63, 70)
-none
-5000
-93 - Follows // second layer, in if cont stmt (stmt -> while cont stmt)
-procedure p;
-Select p such that Follows(22, 23)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-94 - Follows // first layer (stmt -> stmt)
-procedure p;
-Select p such that Follows(1, 2)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-95 - FollowsStar // first layer (stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(46, 87)
-none
-5000
-96 - Parent // second layer, in if cont stmt (stmt)
-procedure p;
-Select p such that Parent(5, 8)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-97 - Parent // second layer, in if cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt -> stmt -> while cont stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Parent(49, 82)
-none
-5000
-98 - FollowsStar // second layer, in while cont stmt (stmt -> while cont stmt -> stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(51, 74)
-none
-5000
-99 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt -> if cont stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Parent(5, 39)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-100 - Follows // second layer, in while cont stmt (stmt -> while cont stmt)
-procedure p;
-Select p such that Follows(53, 54)
-none
-5000
-101 - Follows // second layer, in if cont stmt (stmt -> stmt)
-procedure p;
-Select p such that Follows(7, 8)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-102 - Uses // second layer, in if then if else cont stmt (stmt)
-procedure p;
-Select p such that Uses(5, "ifElseC")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-103 - Follows // second layer, in if cont stmt (stmt -> if cont stmt)
-procedure p;
-Select p such that Follows(9, 10)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-104 - Parent // first layer (stmt)
-procedure p;
-Select p such that Parent(5, 46)
-none
-5000
-105 - Modifies // second layer, procedure, in if cont stmt (then) (stmt)
-procedure p;
-Select p such that Modifies("TwoNesting", "ifA")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-106 - Uses // third layer, procedure, in if while cont stmt (stmt)
-procedure p;
-Select p such that Uses("TwoNesting", "ifWhileC")
-none
-5000
-107 - FollowsStar // second layer, in while cont stmt (stmt -> if cont stmt)
-procedure p;
-Select p such that Follows*(60, 63)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-108 - FollowsStar
-procedure p; if ifs; while w;
-Select p such that Follows*(ifs, w)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-109 - Uses // second layer, in while if else cont stmt (stmt)
-procedure p;
-Select p such that Uses(49, "whileElseB")
-none
-5000
-110 - Uses // second layer, in while if then cont stmt (stmt)
-procedure p;
-Select p such that Uses(49, "whileIfC")
-none
-5000
-111 - Modifies // second layer, in while if then cont stmt (stmt)
-procedure p;
-Select p such that Modifies(49, "whileIfA")
-none
-5000
-112 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt -> if cont stmt -> while cont stmt)
-procedure p;
-Select p such that Parent(5, 35)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-113 - FollowsStar // second layer, in if cont stmt (stmt -> if cont stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(30, 35)
-none
-5000
-114 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Parent(5, 19)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-115 - Parent // second layer, in while cont stmt (stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Parent(49, 62)
-none
-5000
-116 - FollowsStar // second layer, in while cont stmt (if cont stmt -> stmt)
-procedure p;
-Select p such that Follows*(63, 74)
-none
-5000
-117 - FollowsStar // second layer, in if cont stmt (if cont stmt -> stmt -> while cont stmt)
-procedure p;
-Select p such that Follows*(10, 23)
-none
-5000
-118 - Modifies // first layer, procedure (stmt -> if cont stmt -> stmt)
-procedure p;
-Select p such that Modifies("TwoNesting", "A2")
-none
-5000
-119 - Follows // second layer, in while cont stmt (stmt -> stmt)
-procedure p;
-Select p such that Follows(52, 53)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-120 - Parent // second layer, in if cont stmt (stmt -> if cont stmt -> stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Parent(5, 29)
-none
-5000
-121 - Modifies // third layer, procedure, in if if cont stmt (then) (stmt)
-procedure p;
-Select p such that Modifies("TwoNesting", "ifIfA")
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-122 - Parent // first layer (stmt -> while cont stmt -> stmt)
-procedure p;
-Select p such that Parent(5, 87)
-none
-5000
-123 - ParentStar // second layer, in if cont stmt (while -> stmt)
-procedure p;
-Select p such that Parent*(5, 26)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
-5000
-124 - ParentStar
-procedure p; while w; if ifs;
-Select p such that Parent*(w, ifs)
-whileC4, whileC3, C3, whileElseC, whileC2, whileC, ifWhileC, elseC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, whileIfC, C2, TwoNesting
+35 - Follows : prcoedure with whiles
+procedure p; while whileCondtion; if ifThenElseConditional;
+Select p such that Follows(ifThenElseConditional, whileCondtion)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
 5000
