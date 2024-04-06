@@ -229,7 +229,7 @@ bool isAttrName(const std::string& attrName) {
 }
 
 bool isNotRelation(const std::string& notRelation) {
-    return std::regex_search(notRelation, std::regex("^" + QPSConstants::NOT));
+    return std::regex_search(notRelation, std::regex(QPSConstants::NOT));
 }
 
 bool containsSuchThatClause(const std::string& selectStatement) {

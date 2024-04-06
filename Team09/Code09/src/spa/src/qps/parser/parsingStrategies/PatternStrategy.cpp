@@ -2,6 +2,9 @@
 
 std::shared_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     std::string removedPattern = trim(str.substr(QPSConstants::PATTERN.size()));
+
+    bool hasNot = isNotRelation(removedPattern);
+
     std::string assignSynonym;
     std::string parameters;
     std::tie(assignSynonym, parameters) = substringUntilDelimiter(removedPattern, "(");
@@ -9,7 +12,7 @@ std::shared_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
         throw QPSSyntaxError();
     }
     parameters.pop_back();
-    assignSynonym = trim(assignSynonym);
+    assignSynonym = hasNot ? trim(assignSynonym.substr(QPSConstants::NOT.size())) : trim(assignSynonym);
     parameters = trim(parameters);
 
     std::vector<std::string> parameterStringsToParse{assignSynonym};
@@ -20,6 +23,10 @@ std::shared_ptr<QueryClause> PatternStrategy::execute(std::string str) const {
     std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildPatternParameters(parameterStringsToParse)};
     std::shared_ptr<PatternClause> patternClause =
         std::make_shared<PatternClause>(entityVector[0], std::vector(entityVector.begin() + 1, entityVector.end()));
+    if (hasNot) {
+        patternClause->setNegation(true);
+    }
+
     return patternClause;
 }
 
