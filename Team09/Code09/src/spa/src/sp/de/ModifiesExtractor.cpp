@@ -25,12 +25,13 @@ void ModifiesExtractor::visitCall(CallNode* node) {
         extractedModifies = extractedProcs->at(calledProc);
     } else {
         // Extract modifies relationships from modifiesExtractorHelper and append to ModifiesExtractor
-        // Each modifies relationship will have the userStmtNum of the nested statement
-        // So we simply replace the userStmtNum from the extracted modifies relationship
+        // Each modifies relationship will have the modifierStmtNum of the nested statement
+        // So we simply replace the modifierStmtNum from the extracted modifies relationship
         // with the current CallNode stmtNum
 
         ProcedureNode* procNode = this->procs.at(calledProc);
-        ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor(this->procs, this->extractedProcs);
+        ModifiesExtractor* modifiesExtractorHelper =
+            new ModifiesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
         dfsVisitHelper(procNode, modifiesExtractorHelper);
         extractedModifies = modifiesExtractorHelper->getModifies();
         this->extractedProcs->insert({calledProc, extractedModifies});
@@ -64,9 +65,23 @@ void ModifiesExtractor::visitAssign(AssignmentNode* node) {
 
 void ModifiesExtractor::visitWhile(WhileNode* node) {
     int modifierStmtNum = node->statementNumber;
-    ModifiesExtractor* modifiesExtractorHelper = new ModifiesExtractor(this->procs, this->extractedProcs);
-    dfsVisitHelper(node->whileStmtList, modifiesExtractorHelper);
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies = modifiesExtractorHelper->getModifies();
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies;
+
+    // if this while statement has been extracted before
+    if (extractedWhiles != nullptr && this->extractedWhiles->find(node) != this->extractedWhiles->end()) {
+        extractedModifies = this->extractedWhiles->at(node);
+
+    } else {
+        ModifiesExtractor* modifiesExtractorHelper =
+            new ModifiesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
+        modifiesExtractorHelper->currentProc = this->currentProc;
+        dfsVisitHelper(node->whileStmtList, modifiesExtractorHelper);
+        extractedModifies = modifiesExtractorHelper->getModifies();
+        modifiesExtractorHelper->extractedWhiles->insert({node, extractedModifies});
+
+        this->extractedWhiles->insert({node, extractedModifies});
+        delete modifiesExtractorHelper;
+    }
 
     // Iterate over each element in the set and update stmtNum value
     for (auto it = extractedModifies.begin(); it != extractedModifies.end();) {
@@ -74,42 +89,51 @@ void ModifiesExtractor::visitWhile(WhileNode* node) {
         it = extractedModifies.erase(it);
 
         // Create a new pair with the updated stmtNum value and insert it
-        modifies.insert({modifierStmtNum, oldPair.second});
+        this->modifies.insert({modifierStmtNum, oldPair.second});
         this->procedureModifies.insert({currentProc, oldPair.second});
     }
-    delete modifiesExtractorHelper;
 }
 
 void ModifiesExtractor::visitIf(IfNode* node) {
     int modifierStmtNum = node->statementNumber;
-    ModifiesExtractor* thenModifiesExtractorHelper = new ModifiesExtractor(this->procs, this->extractedProcs);
-    ModifiesExtractor* elseModifiesExtractorHelper = new ModifiesExtractor(this->procs, this->extractedProcs);
-    dfsVisitHelper(node->thenStmtList, thenModifiesExtractorHelper);
-    dfsVisitHelper(node->elseStmtList, elseModifiesExtractorHelper);
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedThenModifies = thenModifiesExtractorHelper->getModifies();
-    std::unordered_set<std::pair<StmtNum, Variable>> extractedElseModifies = elseModifiesExtractorHelper->getModifies();
+    std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies;
 
+    // if this if statement has been extracted before
+    if (extractedIfs != nullptr && this->extractedIfs->find(node) != this->extractedIfs->end()) {
+        extractedModifies = this->extractedIfs->at(node);
+    } else {
+        ModifiesExtractor* thenModifiesExtractorHelper =
+            new ModifiesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
+        thenModifiesExtractorHelper->currentProc = this->currentProc;
+        dfsVisitHelper(node->thenStmtList, thenModifiesExtractorHelper);
+        for (const auto& elem : thenModifiesExtractorHelper->getModifies()) {
+            extractedModifies.insert(elem);
+        }
+
+        ModifiesExtractor* elseModifiesExtractorHelper =
+            new ModifiesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
+        elseModifiesExtractorHelper->currentProc = this->currentProc;
+        dfsVisitHelper(node->elseStmtList, elseModifiesExtractorHelper);
+        for (const auto& elem : elseModifiesExtractorHelper->getModifies()) {
+            extractedModifies.insert(elem);
+        }
+
+        thenModifiesExtractorHelper->extractedIfs->insert({node, extractedModifies});
+        elseModifiesExtractorHelper->extractedIfs->insert({node, extractedModifies});
+
+        this->extractedIfs->insert({node, extractedModifies});
+        delete thenModifiesExtractorHelper;
+        delete elseModifiesExtractorHelper;
+    }
     // Iterate over each element in the set and update stmtNum value
-    for (auto it = extractedThenModifies.begin(); it != extractedThenModifies.end();) {
+    for (auto it = extractedModifies.begin(); it != extractedModifies.end();) {
         auto oldPair = *it;
-        it = extractedThenModifies.erase(it);
+        it = extractedModifies.erase(it);
 
         // Create a new pair with the updated stmtNum value and insert it
-        modifies.insert({modifierStmtNum, oldPair.second});
+        this->modifies.insert({modifierStmtNum, oldPair.second});
         this->procedureModifies.insert({currentProc, oldPair.second});
     }
-
-    for (auto it = extractedElseModifies.begin(); it != extractedElseModifies.end();) {
-        auto oldPair = *it;
-        it = extractedElseModifies.erase(it);
-
-        // Create a new pair with the updated stmtNum value and insert it
-        modifies.insert({modifierStmtNum, oldPair.second});
-        this->procedureModifies.insert({currentProc, oldPair.second});
-    }
-
-    delete thenModifiesExtractorHelper;
-    delete elseModifiesExtractorHelper;
 }
 
 std::unordered_set<std::pair<StmtNum, Variable>> ModifiesExtractor::getModifies() {
