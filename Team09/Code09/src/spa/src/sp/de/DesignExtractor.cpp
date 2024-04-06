@@ -2,6 +2,7 @@
 
 #include <sp/ast/AstNode.h>
 
+#include <unordered_map>
 #include <vector>
 
 void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
@@ -35,16 +36,23 @@ void DesignExtractor::writePKB(PKBFacadeWriter* writer) {
 void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     this->procedureTracker = new ProcedureTracker();
     dfsVisit(root, procedureTracker);
-#ifdef DEBUG_BUILD
-    std::cout << "done adding procs" << std::endl;
-#endif
     this->entityExtractor = new EntityExtractor();
     this->followsExtractor = new FollowsExtractor();
     this->parentExtractor = new ParentExtractor();
+
+    std::unordered_map<WhileNode*, std::unordered_set<std::pair<StmtNum, Variable>>> extractedUsesWhiles = {};
+    std::unordered_map<IfNode*, std::unordered_set<std::pair<StmtNum, Variable>>> extractedUsesIfs = {};
+    std::unordered_map<WhileNode*, std::unordered_set<std::pair<StmtNum, Variable>>> extractedModifiesWhiles = {};
+    std::unordered_map<IfNode*, std::unordered_set<std::pair<StmtNum, Variable>>> extractedModifiesIfs = {};
+
     this->usesExtractor =
-        new UsesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedUsesProcs);
+        new UsesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedUsesProcs,
+                          &extractedUsesWhiles, &extractedUsesIfs);
+
     this->modifiesExtractor =
-        new ModifiesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedModifiesProcs);
+        new ModifiesExtractor(procedureTracker->getProcedures(), &this->procedureTracker->extractedModifiesProcs,
+                              &extractedModifiesWhiles, &extractedModifiesIfs);
+
     this->patternExtractor = new PatternExtractor();
     this->nextExtractor = new NextExtractor();
     this->callsExtractor = new CallsExtractor();
@@ -55,7 +63,7 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
 #ifdef DEBUG_BUILD
-        std::cout << "visited" << std::endl;
+        std::cout << "Visited" << std::endl;
 #endif
     }
 

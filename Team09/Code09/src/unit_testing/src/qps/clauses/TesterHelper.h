@@ -125,3 +125,10 @@ public:
                    std::shared_ptr<ClauseArgument> secondArg, bool isNegation = false)
         : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::NEXT_STAR, isNegation) {}
 };
+
+class AffectsTester : public SuchThatTester {
+public:
+    AffectsTester(PKBFacadeReader pkb, std::shared_ptr<ClauseArgument> firstArg,
+                  std::shared_ptr<ClauseArgument> secondArg)
+        : SuchThatTester(pkb, firstArg, secondArg, RelationshipType::AFFECTS) {}
+};

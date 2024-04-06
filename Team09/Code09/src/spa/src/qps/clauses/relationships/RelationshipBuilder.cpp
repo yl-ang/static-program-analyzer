@@ -34,7 +34,7 @@ std::shared_ptr<Relationship> RelationshipBuilder::createRelationship(Relationsh
     case (RelationshipType::CALLS_STAR):
         return std::make_shared<CallsStar>(firstArg, secondArg);
     case (RelationshipType::AFFECTS):
-        return std::make_shared<Next>(firstArg, secondArg);
+        return std::make_shared<Affects>(firstArg, secondArg);
     }
     throw Exception("Cannot create relationship");
 }
