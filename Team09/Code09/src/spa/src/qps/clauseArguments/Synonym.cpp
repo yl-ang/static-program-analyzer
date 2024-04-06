@@ -109,6 +109,10 @@ bool Synonym::updateType(SynonymStore* store) {
     return validateAttribute() && type != DesignEntityType::UNKNOWN;
 }
 
+Synonym Synonym::getWithoutAttribute() const {
+    return Synonym{getType(), getName()};
+}
+
 std::string Synonym::entityTypeToString(DesignEntityType type) {
     switch (type) {
     case DesignEntityType::STMT:

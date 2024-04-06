@@ -13,6 +13,10 @@ std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, st
     return joinedResults;
 }
 
+RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym) {
+    return getSynonymValues(pkb, synonym);
+}
+
 ClauseResult SynonymValuesRetriever::retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms) {
     std::vector<RowValues> rows = retrieve(pkb, synonyms);
     std::vector<SynonymValues> columns = ClauseEvaluatorUtils::transpose(rows);

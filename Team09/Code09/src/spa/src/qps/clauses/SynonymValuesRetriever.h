@@ -8,6 +8,7 @@ using RowValues = std::vector<std::string>;
 
 class SynonymValuesRetriever {
 public:
+    static RowValues retrieve(PKBFacadeReader& pkb, Synonym synonym);
     static std::vector<RowValues> retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms);
     static ClauseResult retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms);
 
