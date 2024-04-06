@@ -2,10 +2,14 @@
 
 #include "QueryClause.h"
 
+enum class WithType { INTEGER, NAME };
+
 class WithClause : public QueryClause {
 private:
     std::shared_ptr<ClauseArgument> lhs;
     std::shared_ptr<ClauseArgument> rhs;
+
+    WithType determineWithType(std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluateValueEquality() const;
     ClauseResult evaluateOneSynonym(PKBFacadeReader& pkb) const;

@@ -97,6 +97,30 @@ std::vector<Synonym> WithClause::getSynonyms() const {
     return synonyms;
 }
 
+WithType WithClause::determineWithType(std::shared_ptr<ClauseArgument> compAttr) {
+    if (compAttr->isLiteral()) {
+        return WithType::NAME;
+    }
+
+    if (compAttr->isInteger()) {
+        return WithType::INTEGER;
+    }
+
+    std::shared_ptr<Synonym> syn = std::dynamic_pointer_cast<Synonym>(compAttr);
+    SynonymAttributeType attrType = syn->getAttr().value();
+
+    switch (attrType) {
+    case SynonymAttributeType::PROCNAME:
+    case SynonymAttributeType::VARNAME:
+        return WithType::NAME;
+    case SynonymAttributeType::VALUE:
+    case SynonymAttributeType::STMTNUM:
+        return WithType::INTEGER;
+    default:
+        throw QPSSemanticError();
+    }
+}
+
 bool WithClause::validateArguments(SynonymStore* store) {
     if (lhs->isSynonym()) {
         std::shared_ptr<Synonym> lSyn = std::dynamic_pointer_cast<Synonym>(lhs);
@@ -110,5 +134,9 @@ bool WithClause::validateArguments(SynonymStore* store) {
             return false;
         }
     }
-    return true;
+
+    WithType lType = determineWithType(lhs);
+    WithType rType = determineWithType(rhs);
+
+    return lType == rType;
 }
