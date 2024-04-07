@@ -108,9 +108,6 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
         std::unordered_set<StmtNum> visited;
         std::vector<StmtNum> queue;
 
-        // Place the statement itself inside queue
-        // queue.emplace_back(affectedStmtNum);
-
         // get the immendiate set of next of affectedStmtNum
         auto startingSet = reader.getNextee(affectedStmtNum);
         /**
@@ -203,9 +200,6 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
     // keep track of visited
     std::unordered_set<StmtNum> visited;
     std::vector<StmtNum> queue;
-
-    // Place the statement itself inside queue
-    // queue.emplace_back(affectorStmtNum);
 
     // get the immediate set of next of affectorStmtNum
     auto startingSet = reader.getNexter(affectorStmtNum);
