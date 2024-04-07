@@ -109,7 +109,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
         std::vector<StmtNum> queue;
 
         // Place the statement itself inside queue
-        queue.emplace_back(affectedStmtNum);
+        // queue.emplace_back(affectedStmtNum);
 
         // get the immendiate set of next of affectedStmtNum
         auto startingSet = reader.getNextee(affectedStmtNum);
@@ -205,7 +205,7 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
     std::vector<StmtNum> queue;
 
     // Place the statement itself inside queue
-    queue.emplace_back(affectorStmtNum);
+    // queue.emplace_back(affectorStmtNum);
 
     // get the immediate set of next of affectorStmtNum
     auto startingSet = reader.getNexter(affectorStmtNum);
@@ -401,8 +401,16 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     }
     AffectsSet resultSet = generateAffectsRelation(reader);
     for (std::pair<StmtNum, StmtNum> result: resultSet) {
-        affectorValues.push_back(std::to_string(result.first));
-        affectedValues.push_back(std::to_string(result.second));
+        // account for if affectorSyn is same syn as affectedSyn
+        if (*affectorSyn == *affectedSyn) {
+            if (result.first == result.second) {
+                affectorValues.push_back(std::to_string(result.first));
+                affectedValues.push_back(std::to_string(result.second));
+            }
+        } else {
+            affectorValues.push_back(std::to_string(result.first));
+            affectedValues.push_back(std::to_string(result.second));
+        }
     }
 
     std::vector<SynonymValues> values = {affectorValues, affectedValues};
