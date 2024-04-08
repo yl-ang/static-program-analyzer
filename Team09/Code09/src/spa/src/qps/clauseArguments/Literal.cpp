@@ -1,5 +1,7 @@
 #include "Literal.h"
 
+#include "qps/QPSConstants.h"
+
 Literal::Literal(const std::string& v) : value(v) {}
 
 std::string Literal::getValue() const {
@@ -11,7 +13,7 @@ bool Literal::isLiteral() const {
 }
 
 std::string Literal::getClauseType() const {
-    return "Literal";
+    return QPSConstants::LITERAL_CLAUSE_TYPE;
 }
 
 bool Literal::operator==(const ClauseArgument& other) const {
