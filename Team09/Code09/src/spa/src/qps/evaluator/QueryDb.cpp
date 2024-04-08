@@ -7,10 +7,14 @@ void QueryDb::insert(std::vector<std::shared_ptr<QueryClause>> clauses) {
     entries.reserve(clauses.size());
 
     for (std::shared_ptr<QueryClause> clause : clauses) {
-        ID thisId = id_index;
-        ++id_index;
+        ID thisId = id_index++;
 
         QueryDbEntry newEntry{thisId, clause};
+
+        if (clauseCache.find(newEntry) != clauseCache.end()) {
+            continue;
+        }
+        clauseCache.insert(newEntry);
         entries.push_back(newEntry);
         idToEntryMap[thisId] = newEntry;
 
