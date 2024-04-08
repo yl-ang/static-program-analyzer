@@ -112,7 +112,7 @@ Table TableManager::getTable() const {
 
 Table TableManager::clauseResultToTable(const ClauseResult& result) {
     if (result.isBoolean()) {
-        throw QPSTableManagerException();
+        throw QPSTableManagerError();
     }
     return Table{result.getSynonyms(), result.getAllSynonymValues()};
 }
