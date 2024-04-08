@@ -16,13 +16,11 @@ public:
           elseStmtList(elseStmtList),
           statementNumber(lineNumber) {}
 
-    void accept(AstVisitor* visitor) override;
+    void accept(AstVisitor* visitor) override {
+        visitor->visitIf(this);
+    }
     int statementNumber;
     std::shared_ptr<ExpressionNode> ifCondition;
     std::shared_ptr<StatementListNode> thenStmtList;
     std::shared_ptr<StatementListNode> elseStmtList;
-
-    std::shared_ptr<ExpressionNode> getCond();
-    std::shared_ptr<StatementListNode> getThenStmtLstNode();
-    std::shared_ptr<StatementListNode> getElseStmtLstNode();
 };

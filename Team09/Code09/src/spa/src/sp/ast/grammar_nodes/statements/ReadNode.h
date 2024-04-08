@@ -12,8 +12,9 @@ public:
           variable(variable),
           statementNumber(statementNumber) {}
 
-    void accept(AstVisitor* visitor) override;
+    void accept(AstVisitor* visitor) override {
+        visitor->visitRead(this);
+    }
     std::shared_ptr<VariableNode> variable;
     int statementNumber;
-    std::string getVar();
 };

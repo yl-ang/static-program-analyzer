@@ -19,7 +19,7 @@ void ProcedureTracker::visitCall(CallNode* node) {}
 void ProcedureTracker::visitStmtLst(StatementListNode* node) {}
 
 void ProcedureTracker::visitProcedure(ProcedureNode* node) {
-    std::string procName = node->getValue();
+    std::string procName = node->name;
     this->procedures.insert({procName, node});
 #ifdef DEBUG_BUILD
     std::cout << "I'm adding procedure: " << procName << std::endl;

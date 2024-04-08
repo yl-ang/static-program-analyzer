@@ -18,18 +18,6 @@ public:
             int stmtNumber = -1)
         : value(value), type(type), children(children), stmtNumber(stmtNumber) {}
 
-    std::string getType() const {
-        return type;
-    }
-
-    std::string getValue() const {
-        return value;
-    }
-
-    int getStmtNumber() const {
-        return stmtNumber;
-    }
-
     const std::vector<std::shared_ptr<ASTNode>>& getChildren() const {
         return children;
     }
@@ -38,8 +26,8 @@ public:
 
     friend bool operator==(const ASTNode& lhs, const ASTNode& rhs) {
         // Compare the easy to compare members
-        if (lhs.getValue() != rhs.getValue() || lhs.getType() != rhs.getType() ||
-            lhs.children.size() != rhs.children.size() || lhs.getStmtNumber() != rhs.getStmtNumber()) {
+        if (lhs.value != rhs.value || lhs.type != rhs.type || lhs.children.size() != rhs.children.size() ||
+            lhs.stmtNumber != rhs.stmtNumber) {
             return false;
         }
 
