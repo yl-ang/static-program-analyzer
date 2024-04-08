@@ -1,5 +1,7 @@
 #include "Integer.h"
 
+#include "qps/QPSConstants.h"
+
 Integer::Integer(const std::string& v) : value(v) {}
 
 std::string Integer::getValue() const {
@@ -11,7 +13,7 @@ bool Integer::isInteger() const {
 }
 
 std::string Integer::getClauseType() const {
-    return "Integer";
+    return QPSConstants::INTEGER_CLAUSE_TYPE;
 }
 
 bool Integer::operator==(const ClauseArgument& other) const {
