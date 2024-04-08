@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 #include "PKB/PKBClient/PKBFacadeReader.h"
+#include "QueryDb.h"
 #include "Table.h"
 #include "TableManager.h"
 #include "qps/clauseArguments/Synonym.h"
@@ -29,22 +30,17 @@ private:
     std::vector<std::shared_ptr<PatternClause>> patternClauses;
     std::vector<std::shared_ptr<WithClause>> withClauses;
 
-    static bool evaluateAndJoinClauses(const TableManager& tm,
-                                       const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
-                                       PKBFacadeReader& pkb);
+    static void evaluateAndJoinClauses(const TableManager& tm, QueryDb&, PKBFacadeReader& pkb);
     static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
     static Synonym headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym);
 
-    ArrangedClauses arrangeClauses() const;
     bool evaluateBooleanClauses(PKBFacadeReader&) const;
     void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
     void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
-    std::vector<std::vector<QueryClausePtr>> splitIntoConnectedSynonyms() const;
 
     // Getters and checkers
     bool hasNoClauses() const;
     bool isSelectBoolean() const;
     std::vector<std::string> getEmptyResult() const;
-    bool containsSelectSynonyms(QueryClausePtr) const;
 };
