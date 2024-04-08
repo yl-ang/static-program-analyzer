@@ -45,7 +45,7 @@ void QueryDb::loadClausesWithEntities(std::vector<Synonym> synonyms) {
     }
 }
 
-bool QueryDb::loadConnectedClauses() {
+bool QueryDb::loadNewGroup() {
     bool loadSuccessful = false;
     for (const auto& pair : synonymToClauseListMap) {
         if (evaluatedSynonyms.find(pair.first) != evaluatedSynonyms.end() || pair.second.empty()) {

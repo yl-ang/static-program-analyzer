@@ -16,8 +16,6 @@ static Synonym createConstant(const std::string& name) {
 }
 
 TEST_CASE("Query Db") {
-    QueryDb db{};
-
     auto arg_c = std::make_shared<Synonym>(createVariable("c"));
     auto arg_x = std::make_shared<Synonym>(createVariable("x"));
 
@@ -32,7 +30,7 @@ TEST_CASE("Query Db") {
     std::shared_ptr<QueryClause> clause_unconnected =
         std::make_shared<SuchThatClause>(RelationshipType::FOLLOWS, arg_a, const_1);
 
-    db.insert({clause_c_x, clause_c, clause_unconnected});
+    QueryDb db{{clause_c_x, clause_c, clause_unconnected}};
 
     db.loadClausesWithEntities({*arg_c, *arg_x});
     auto firstPop = db.next();
@@ -42,7 +40,7 @@ TEST_CASE("Query Db") {
     auto thirdPop = db.next();
     REQUIRE_FALSE(thirdPop.has_value());
 
-    db.loadRemainingClauses();
+    db.loadNewGroup();
     REQUIRE(db.next().has_value());
     REQUIRE_FALSE(db.next().has_value());
 }

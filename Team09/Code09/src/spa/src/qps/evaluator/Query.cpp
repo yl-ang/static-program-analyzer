@@ -31,7 +31,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return getEmptyResult();
     }
 
-    while (db.loadConnectedClauses()) {
+    while (db.loadNewGroup()) {
         const TableManager nonConnectedTableManager{};
         if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
             return getEmptyResult();
