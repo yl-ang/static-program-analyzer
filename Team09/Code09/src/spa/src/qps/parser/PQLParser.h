@@ -9,6 +9,7 @@
 #include "qps/clauses/WithClause.h"
 #include "qps/evaluator/Query.h"
 #include "qps/exceptions/QPSSemanticError.h"
+#include "qps/exceptions/QPSStrategyPatternError.h"
 #include "qps/exceptions/QPSSyntaxError.h"
 #include "qps/parser/SelectEntContainer.h"
 #include "qps/parser/SynonymStore.h"
