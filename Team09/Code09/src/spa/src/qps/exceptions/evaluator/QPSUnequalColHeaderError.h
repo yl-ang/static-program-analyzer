@@ -4,5 +4,5 @@ const std::string UNEQUAL_COLS_AND_HEADERS_ERR_MSG = "Number of columns and head
 
 class QPSUnequalColHeaderError : public Exception {
 public:
-    QPSUnequalColHeaderError();
+    QPSUnequalColHeaderError() : Exception(UNEQUAL_COLS_AND_HEADERS_ERR_MSG) {}
 };

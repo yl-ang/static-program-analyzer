@@ -5,5 +5,5 @@ const std::string NON_EXISTENT_SYNONYM_ACCESS_ERR_MSG = "Attempting to access at
 
 class QPSNonSynonymAccessError : public Exception {
 public:
-    QPSNonSynonymAccessError();
+    QPSNonSynonymAccessError() : Exception(NON_EXISTENT_SYNONYM_ACCESS_ERR_MSG);
 };

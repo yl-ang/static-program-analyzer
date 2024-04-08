@@ -6,5 +6,5 @@ const std::string UNEQUAL_ROWS_IN_COLS_ERR_MSG = "Number of rows in columns are 
 
 class QPSUnequalRowColError : public Exception {
 public:
-    QPSUnequalRowColError();
+    QPSUnequalRowColError() : Exception(UNEQUAL_ROWS_IN_COLS_ERR_MSG) {}
 };
