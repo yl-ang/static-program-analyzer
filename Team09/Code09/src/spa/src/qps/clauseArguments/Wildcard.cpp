@@ -7,7 +7,7 @@ bool Wildcard::isWildcard() const {
 }
 
 std::string Wildcard::getValue() const {
-    return QPSConstants::WILDCARD_VALUE;
+    return QPSConstants::WILDCARD;
 }
 
 std::string Wildcard::getClauseType() const {

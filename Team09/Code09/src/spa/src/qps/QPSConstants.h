@@ -66,6 +66,5 @@ struct QPSConstants {
     inline static const std::string EXPR_SPEC_CLAUSE_TYPE = "ExpressionSpec";
     inline static const std::string INTEGER_CLAUSE_TYPE = "Integer";
     inline static const std::string LITERAL_CLAUSE_TYPE = "Literal";
-    inline static const std::string WILDCARD_VALUE = "_";
     inline static const std::string WILDCARD_CLAUSE_TYPE = "Wildcard";
 };
