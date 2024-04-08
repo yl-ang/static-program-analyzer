@@ -8,5 +8,5 @@ const std::string STRATEGY_PATTERN_ERR_MSG_BASE = "Issues with Strategy Pattern 
 
 class QPSStrategyPatternError : public Exception {
 public:
-    QPSStrategyPatternError(std::string errorClause);
+    QPSStrategyPatternError(std::string errorClause) : Exception(STRATEGY_PATTERN_ERR_MSG_BASE + errorClause) {}
 };
