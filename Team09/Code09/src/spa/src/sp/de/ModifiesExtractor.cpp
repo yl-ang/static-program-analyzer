@@ -17,7 +17,7 @@ void ModifiesExtractor::visitProcedure(ProcedureNode* node) {
 
 void ModifiesExtractor::visitCall(CallNode* node) {
     int modifierStmtNum = node->statementNumber;
-    std::string calledProc = node->getCalledProcedure();
+    std::string calledProc = node->procedureName;
     std::unordered_set<std::pair<StmtNum, Variable>> extractedModifies;
 
     // if the called proc has been extracted before

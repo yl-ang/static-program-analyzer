@@ -15,6 +15,8 @@ class ExpressionNode : public ASTNode {
 private:
     std::vector<std::string> variables;
     std::vector<std::string> constants;
+    void findVariables(const std::vector<std::shared_ptr<ASTNode>>& children);
+    void findConstants(const std::vector<std::shared_ptr<ASTNode>>& children);
 
 public:
     // generic case
@@ -45,7 +47,4 @@ public:
 
     std::vector<std::string> getVars();
     std::vector<std::string> getConsts();
-
-    void findVariables(const std::vector<std::shared_ptr<ASTNode>>& children);
-    void findConstants(const std::vector<std::shared_ptr<ASTNode>>& children);
 };

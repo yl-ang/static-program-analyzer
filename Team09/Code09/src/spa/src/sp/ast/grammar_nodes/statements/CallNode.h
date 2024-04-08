@@ -9,8 +9,8 @@ public:
     explicit CallNode(std::string procedureName, int statementNumber)
         : StatementNode(procedureName, "call", statementNumber, {}), procedureName(procedureName) {}
 
-    void accept(AstVisitor* visitor) override;
+    void accept(AstVisitor* visitor) override {
+        visitor->visitCall(this);
+    }
     std::string procedureName;
-
-    std::string getCalledProcedure();
 };

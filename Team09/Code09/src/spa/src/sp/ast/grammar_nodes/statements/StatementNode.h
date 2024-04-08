@@ -9,6 +9,7 @@ class StatementNode : public ASTNode {
 public:
     StatementNode(std::string value, std::string type, int statementNumber,
                   std::vector<std::shared_ptr<ASTNode>> children)
-        : ASTNode(value, type, children, statementNumber), statementNumber(statementNumber) {}
+        : ASTNode(value, type, children, statementNumber), statementNumber(statementNumber), type(type) {}
     int statementNumber;
+    std::string type;
 };

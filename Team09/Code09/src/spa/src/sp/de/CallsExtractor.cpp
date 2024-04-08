@@ -20,8 +20,8 @@ void CallsExtractor::visitProcedure(ProcedureNode* node) {
 }
 
 void CallsExtractor::visitCall(CallNode* node) {
-    this->calls.insert({this->currentProc, node->getCalledProcedure()});
-    this->callStmts.insert({node->getCalledProcedure(), node->getStmtNumber()});
+    this->calls.insert({this->currentProc, node->procedureName});
+    this->callStmts.insert({node->procedureName, node->statementNumber});
 }
 
 std::unordered_set<std::pair<Procedure, Procedure>> CallsExtractor::getCalls() {

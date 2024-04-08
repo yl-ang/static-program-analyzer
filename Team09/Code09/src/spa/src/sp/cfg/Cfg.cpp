@@ -21,7 +21,7 @@ void CFG::buildStatementListCFG(std::shared_ptr<StatementListNode> statementList
         int currentStatementNumber = currentNode->statementNumber;
         int nextStatementNumber = i + 1 == statementLists.size() ? 0 : statementLists[i + 1]->statementNumber;
 
-        if (currentNode->getType() == "if") {
+        if (currentNode->type == "if") {
             std::shared_ptr<IfNode> ifNode = std::dynamic_pointer_cast<IfNode>(currentNode);
             std::shared_ptr<StatementListNode> thenNode = ifNode->thenStmtList;
             std::shared_ptr<StatementListNode> elseNode = ifNode->elseStmtList;
@@ -32,7 +32,7 @@ void CFG::buildStatementListCFG(std::shared_ptr<StatementListNode> statementList
             // we are in a loop block
             buildStatementListCFG(thenNode, nextStatementNumber == 0 ? loopLineStart : nextStatementNumber);
             buildStatementListCFG(elseNode, nextStatementNumber == 0 ? loopLineStart : nextStatementNumber);
-        } else if (currentNode->getType() == "while") {
+        } else if (currentNode->type == "while") {
             std::shared_ptr<WhileNode> whileNode = std::dynamic_pointer_cast<WhileNode>(currentNode);
             // put the next first statement number of the while block into cfg map
             insertIntoCFGMap(currentStatementNumber, whileNode->whileStmtList->firstChildStatementNumber());

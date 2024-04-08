@@ -14,7 +14,7 @@ public:
     std::shared_ptr<StatementListNode> statements;
     std::string name;
 
-    void accept(AstVisitor* visitor) override;
-
-    std::shared_ptr<StatementListNode> getStmtLstNode();
+    void accept(AstVisitor* visitor) override {
+        visitor->visitProcedure(this);
+    }
 };
