@@ -2,9 +2,13 @@
 
 ID QueryDb::id_index = 0;
 
-void QueryDb::insert(std::vector<std::shared_ptr<QueryClause>> clauses) {
+QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
     std::vector<QueryDbEntry> entries{};
     entries.reserve(clauses.size());
+    adjList.reserve(clauses.size());
+    clauseCache.reserve(clauses.size());
+    synonymToClauseListMap.reserve(clauses.size());
+    idToEntryMap.reserve(clauses.size());
 
     for (std::shared_ptr<QueryClause> clause : clauses) {
         ID thisId = id_index++;
@@ -41,9 +45,10 @@ void QueryDb::loadClausesWithEntities(std::vector<Synonym> synonyms) {
     }
 }
 
-void QueryDb::loadRemainingClauses() {
+bool QueryDb::loadConnectedClauses() {
+    bool loadSuccessful = false;
     for (const auto& pair : synonymToClauseListMap) {
-        if (evaluatedSynonyms.find(pair.first) != evaluatedSynonyms.end()) {
+        if (evaluatedSynonyms.find(pair.first) != evaluatedSynonyms.end() || pair.second.empty()) {
             // already evaluated
             continue;
         }
@@ -51,7 +56,10 @@ void QueryDb::loadRemainingClauses() {
         for (ID id : pair.second) {
             queue.push(id);
         }
+        loadSuccessful = true;
+        break;
     }
+    return loadSuccessful;
 }
 
 OptionalQueryClause QueryDb::next() {

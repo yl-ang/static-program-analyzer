@@ -59,13 +59,11 @@ class QueryDb {
 
     void setTraversed(ID id);
     void addNeighboursToQueue(ID id);
-    bool isCachedClause(const QueryDbEntry& entry);
 
 public:
-    QueryDb() = default;
+    QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses);
 
-    void insert(std::vector<std::shared_ptr<QueryClause>> clauses);
     void loadClausesWithEntities(std::vector<Synonym> synonyms);
-    void loadRemainingClauses();
+    bool loadConnectedClauses();
     OptionalQueryClause next();
 };

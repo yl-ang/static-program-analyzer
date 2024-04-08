@@ -25,18 +25,17 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return getEmptyResult();
     }
 
-    QueryDb db{};
-    db.insert(this->getNonBooleanClauses());
-
+    QueryDb db{getNonBooleanClauses()};
     db.loadClausesWithEntities(this->selectEntities);
     if (evaluateAndJoinClauses(tableManager, db, pkb); tableManager.isEmpty()) {
         return getEmptyResult();
     }
 
-    db.loadRemainingClauses();
-    const TableManager nonConnectedTableManager{};
-    if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
-        return getEmptyResult();
+    while (db.loadConnectedClauses()) {
+        const TableManager nonConnectedTableManager{};
+        if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
+            return getEmptyResult();
+        }
     }
 
     if (isSelectBoolean()) {
