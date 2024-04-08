@@ -9,6 +9,7 @@
 #include "qps/clauses/PatternClause.h"
 #include "qps/clauses/SuchThatClause.h"
 #include "qps/clauses/WithClause.h"
+#include "qps/exceptions/evaluator/QPSNonSynonymAccessError.h"
 
 using QueryClausePtr = std::shared_ptr<QueryClause>;
 

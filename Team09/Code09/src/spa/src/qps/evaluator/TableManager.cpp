@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "qps/exceptions/evaluator/QPSTableManagerError.h"
+
 void TableManager::join(const ClauseResult& cr) const {
     this->join(clauseResultToTable(cr));
 }
@@ -110,7 +112,7 @@ Table TableManager::getTable() const {
 
 Table TableManager::clauseResultToTable(const ClauseResult& result) {
     if (result.isBoolean()) {
-        throw Exception(CONVERTING_BOOLEAN_RESULT_TO_TABLE_EXCEPTION);
+        throw QPSTableManagerException();
     }
     return Table{result.getSynonyms(), result.getAllSynonymValues()};
 }

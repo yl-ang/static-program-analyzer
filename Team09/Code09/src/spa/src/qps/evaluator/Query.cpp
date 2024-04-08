@@ -61,7 +61,7 @@ Synonym Query::headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSy
     });
 
     if (it == synonyms.end()) {
-        throw Exception("Attempting to access attribute of non-existent synonym");
+        throw QPSNonSynonymAccessError();
     }
     return *it;
 }
