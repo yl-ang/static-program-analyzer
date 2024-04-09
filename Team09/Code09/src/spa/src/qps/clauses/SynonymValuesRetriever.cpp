@@ -1,5 +1,7 @@
 #include "SynonymValuesRetriever.h"
 
+#include "qps/clauseArguments/Synonym.h"
+
 std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms) {
     std::vector<RowValues> unjoinedSets{};
 
@@ -83,6 +85,8 @@ std::vector<std::string> SynonymValuesRetriever::getSynonymValues(PKBFacadeReade
             col.push_back(std::to_string(stmt.stmtNum));
         }
         break;
+    case DesignEntityType::UNKNOWN:
+        throw QPSUnknownDETypeError();
     }
 
     return col;
