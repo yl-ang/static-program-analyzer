@@ -122,6 +122,8 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     }
 
     SECTION("ParentStar relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 32));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 48));
         REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 18));
         REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 23));
         REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 38));
@@ -222,5 +224,42 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasPartialPattern(2, "a1", "abc"));
         REQUIRE(pkbFacadeReader.hasPartialPattern(5, "a4", "q + w"));
         REQUIRE_FALSE(pkbFacadeReader.hasPartialPattern(5, "a4", "w+a"));
+    }
+
+    SECTION("If Pattern stored correctly") {
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "a33"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "abc"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "xyz"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "c"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "a9"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "a25"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "while"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "a25"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(23, "if"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(26, "read"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(30, "read"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "a33"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "abc"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "xyz"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "c"));
+        REQUIRE_FALSE(pkbFacadeReader.hasIfPattern(34, "cc"));
+        REQUIRE_FALSE(pkbFacadeReader.hasIfPattern(34, "xyz1"));
+    }
+
+    SECTION("While Pattern stored correctly") {
+        REQUIRE(pkbFacadeReader.hasWhilePattern(38, "a16"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(38, "b1"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "t"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "h"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "m"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "r"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "x"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "z"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "a"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "c"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "y"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "b"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "g"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "o"));
     }
 }
