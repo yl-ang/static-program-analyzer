@@ -176,6 +176,9 @@ bool Query::containsSelectSynonyms(QueryClausePtr clause) const {
 }
 
 void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb) const {
+    if (isSelectBoolean())
+        return;
+
     std::vector<Synonym> selectEntitiesWithoutAttributes{};
 
     for (Synonym syn : selectEntities) {
