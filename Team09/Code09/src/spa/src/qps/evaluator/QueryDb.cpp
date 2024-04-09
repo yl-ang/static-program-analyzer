@@ -1,25 +1,23 @@
 #include "QueryDb.h"
 
-ID QueryDb::id_index = 0;
-
 QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
-    std::vector<QueryDbEntry> entries{};
-    entries.reserve(clauses.size());
     adjList.reserve(clauses.size());
-    clauseCache.reserve(clauses.size());
     synonymToClauseListMap.reserve(clauses.size());
     idToEntryMap.reserve(clauses.size());
 
-    for (std::shared_ptr<QueryClause> clause : clauses) {
-        ID thisId = id_index++;
+    ID idIndex = 0;
+
+    ClauseCache entries{};
+    entries.reserve(clauses.size());
+    for (const std::shared_ptr<QueryClause>& clause : clauses) {
+        ID thisId = idIndex++;
 
         QueryDbEntry newEntry{thisId, clause};
 
-        if (clauseCache.find(newEntry) != clauseCache.end()) {
+        if (entries.find(newEntry) != entries.end()) {
             continue;
         }
-        clauseCache.insert(newEntry);
-        entries.push_back(newEntry);
+        entries.insert(newEntry);
         idToEntryMap[thisId] = newEntry;
 
         for (const Synonym& synonym : clause->getSynonyms()) {
@@ -29,6 +27,8 @@ QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
 
     for (const QueryDbEntry& entry : entries) {
         for (Synonym syn : entry.clause->getSynonyms()) {
+            synonymsToEvaluate.insert(syn.getName());
+
             for (ID id : synonymToClauseListMap[syn.getName()]) {
                 adjList[entry.id].insert(id);
                 adjList[id].insert(entry.id);
@@ -46,20 +46,18 @@ void QueryDb::loadClausesWithEntities(std::vector<Synonym> synonyms) {
 }
 
 bool QueryDb::loadNewGroup() {
-    bool loadSuccessful = false;
-    for (const auto& pair : synonymToClauseListMap) {
-        if (evaluatedSynonyms.find(pair.first) != evaluatedSynonyms.end() || pair.second.empty()) {
-            // already evaluated
+    for (const SynonymName& synName : synonymsToEvaluate) {
+        auto clauseIds = synonymToClauseListMap[synName];
+        if (clauseIds.empty()) {
             continue;
         }
 
-        for (ID id : pair.second) {
+        for (ID id : clauseIds) {
             queue.push(id);
         }
-        loadSuccessful = true;
-        break;
+        return true;
     }
-    return loadSuccessful;
+    return false;
 }
 
 OptionalQueryClause QueryDb::next() {
@@ -85,7 +83,7 @@ OptionalQueryClause QueryDb::next() {
 void QueryDb::setTraversed(ID id) {
     seen.insert(id);
     for (Synonym syn : idToEntryMap[id].clause->getSynonyms()) {
-        evaluatedSynonyms.insert(syn.getName());
+        synonymsToEvaluate.erase(syn.getName());
     }
 }
 
@@ -93,4 +91,6 @@ void QueryDb::addNeighboursToQueue(ID id) {
     for (ID connectedId : adjList[id]) {
         queue.push(connectedId);
     }
+    // Prevent adding clauses multiple times into the evaluate queue.
+    adjList[id].clear();
 }
