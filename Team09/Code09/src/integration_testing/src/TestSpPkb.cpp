@@ -103,7 +103,25 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     }
 
     SECTION("FollowsStar relationship stored correctly") {
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 1));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 2));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 3));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 4));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 5));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 6));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 7));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 8));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 9));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 10));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 11));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 12));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 13));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 14));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 15));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 16));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 17));
         REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 18));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 19));
         REQUIRE(pkbFacadeReader.hasFollowStarRelationship(19, 22));
         REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 19));
         REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(19, 38));
