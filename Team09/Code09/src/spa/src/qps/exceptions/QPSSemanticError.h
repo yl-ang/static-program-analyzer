@@ -2,7 +2,7 @@
 
 #include "Exception.h"
 
-const std::string SEMANTIC_ERR_MSG = "Semantic Error";
+const std::string SEMANTIC_ERR_MSG = "SemanticError";
 
 class QPSSemanticError : public Exception {
 public:

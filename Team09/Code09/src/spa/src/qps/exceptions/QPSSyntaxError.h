@@ -2,7 +2,7 @@
 
 #include "Exception.h"
 
-const std::string SYNTAX_ERR_MSG = "Syntax Error";
+const std::string SYNTAX_ERR_MSG = "SyntaxError";
 
 class QPSSyntaxError : public Exception {
 public:
