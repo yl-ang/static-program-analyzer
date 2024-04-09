@@ -1,0 +1,30 @@
+1 - With: int, constant.value
+constant const;
+Select BOOLEAN with 1234 = const.value
+TRUE
+5000
+2 - With: int, stmt.stmt#
+read r;
+Select BOOLEAN with 3 = r.stmt#
+TRUE
+5000
+3 - With: int, call.stmt#
+call c;
+Select BOOLEAN with 8 = c.stmt#
+TRUE
+5000
+4 - With: int, while.stmt#
+while w;
+Select BOOLEAN with 10 = w.stmt#
+TRUE
+5000
+5 - With: procedure Name: TRUE
+procedure p;
+Select BOOLEAN with p.procName = "PROC3"
+TRUE
+5000
+6 - With: procedure Name: FALSE
+procedure p;
+Select BOOLEAN with p.procName = "INVALIDPROC"
+TRUE
+5000
