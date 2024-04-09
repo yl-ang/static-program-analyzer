@@ -298,6 +298,8 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasWhilePattern(41, "c"));
         REQUIRE(pkbFacadeReader.hasWhilePattern(41, "y"));
         REQUIRE(pkbFacadeReader.hasWhilePattern(41, "b"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(40, "a"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(40, "b"));
         REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "g"));
         REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "o"));
     }
