@@ -48,3 +48,53 @@ stmt s; assign a;
 Select s with s.stmt# = a.stmt#
 1, 19, 13, 2, 6, 7, 14, 5, 15, 16, 18, 24
 5000
+11 - With: comparing variable name with if stmt number (SemanticError)
+variable v; if ifs;
+Select v with v.varName = ifs.stmt#
+SemanticError
+5000
+12 - With: comparing procedure name with assignment stmt number (SemanticError)
+procedure proc; assign a;
+Select proc with proc.procName = a.stmt#
+SemanticError
+5000
+13 - With: comparing procedure name with while stmt number (SemanticError)
+procedure proc; while w;
+Select proc with proc.procName = w.stmt#
+SemanticError
+5000
+14 - With: comparing integer with procedure name (SemanticError)
+procedure proc;
+Select proc with 1 = proc.procName
+SemanticError
+5000
+15 - With: comparing variable name with print stmt number (SemanticError)
+variable var; print p;
+Select var with var.varName = p.stmt#
+SemanticError
+5000
+16 - With: compare and get all if statements using with
+stmt s; if ifs;
+Select s with s.stmt# = ifs.stmt#
+10, 23
+5000
+17 - With: compare and get all call statements using with
+stmt s; call c;
+Select s with s.stmt# = c.stmt#
+13, 22, 30
+5000
+18 - With: compare and get constants that equal stmt numbers using with
+stmt s; constant c;
+Select s with s.stmt# = c.value
+1, 2, 3, 10
+5000
+19 - With: tuple and with for same variable name pairs
+variable v, v1;
+Select <v, v1> with v.varName = v1.varName
+x x, x1 x1, x2 x2, x3 x3, x4 x4, x5 x5, x6 x6, x7 x7, x8 x8, x9 x9, x10 x10, x11 x11, x13 x13, x14 x14, x15 x15, x16 x16, x17 x17, x18 x18, x19 x19, x20 x20, x22 x22, x23 x23, x24 x24, x25 x25, x26 x26, x27 x27, x28 x28, x30 x30, x31 x31, x32 x32 
+5000
+20 - With: get all procedure names using with
+procedure p, p1;
+Select p with p.procName = p1.procName
+procedure1, procedure2, procedure3, procedure4
+5000
