@@ -180,7 +180,7 @@ std::shared_ptr<SuchThatClause> PQLParser::parseSuchThatClauses(std::string clau
     if (std::shared_ptr<SuchThatClause> stClause = std::dynamic_pointer_cast<SuchThatClause>(qc)) {
         return stClause;
     } else {
-        throw Exception("Issues with Strategy Pattern for SuchThatClauses");
+        throw QPSStrategyPatternError("SuchThatClauses");
     }
 }
 
@@ -193,7 +193,7 @@ std::shared_ptr<PatternClause> PQLParser::parsePatternClauses(std::string clause
     if (std::shared_ptr<PatternClause> ptClause = std::dynamic_pointer_cast<PatternClause>(qc)) {
         return ptClause;
     } else {
-        throw Exception("Issues with Strategy Pattern for PatternClauses");
+        throw QPSStrategyPatternError("PatternClauses");
     }
 }
 
@@ -204,6 +204,6 @@ std::shared_ptr<WithClause> PQLParser::parseWithClauses(std::string clauseString
     if (std::shared_ptr<WithClause> wtClause = std::dynamic_pointer_cast<WithClause>(qc)) {
         return wtClause;
     } else {
-        throw Exception("Issues with Strategy Pattern for WithClauses");
+        throw QPSStrategyPatternError("WithClauses");
     }
 }

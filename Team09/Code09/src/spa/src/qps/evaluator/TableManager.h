@@ -6,9 +6,6 @@
 
 class TableManager {
 public:
-    inline static std::string CONVERTING_BOOLEAN_RESULT_TO_TABLE_EXCEPTION =
-        "Illegal attempt at converting boolean clause result to table.";
-
     TableManager() = default;
     TableManager(const Table& table) : result{table} {}
 
