@@ -25,13 +25,17 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return getEmptyResult();
     }
 
-    ArrangedClauses ac = arrangeClauses();
-    if (evaluateAndJoinClauses(tableManager, ac.selectConnectedClauses, pkb); tableManager.isEmpty()) {
+    QueryDb db{getNonBooleanClauses()};
+    db.loadClausesWithEntities(this->selectEntities);
+    if (evaluateAndJoinClauses(tableManager, db, pkb); tableManager.isEmpty()) {
         return getEmptyResult();
     }
 
-    if (evaluateAndJoinClauses(tableManager, ac.nonSelectConnectedClauses, pkb); tableManager.isEmpty()) {
-        return getEmptyResult();
+    while (db.loadNewGroup()) {
+        const TableManager nonConnectedTableManager{};
+        if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
+            return getEmptyResult();
+        }
     }
 
     if (isSelectBoolean()) {
@@ -84,49 +88,13 @@ std::vector<std::string> Query::getEmptyResult() const {
     return this->isSelectBoolean() ? std::vector{QPSConstants::FALSE_STRING} : std::vector<std::string>{};
 }
 
-bool Query::evaluateAndJoinClauses(const TableManager& tm,
-                                   const std::vector<std::vector<QueryClausePtr>>& connectedClausesList,
-                                   PKBFacadeReader& pkb) {
-    for (const std::vector<QueryClausePtr>& connectedClauses : connectedClausesList) {
-        for (QueryClausePtr clause : connectedClauses) {
-            ClauseResult res = clause->runEvaluation(pkb);
-            tm.join(res);
-        }
-        if (tm.isEmpty()) {
-            // If the table is empty, we can stop evaluating the clauses
-            return false;
-        }
+void Query::evaluateAndJoinClauses(const TableManager& tm, QueryDb& db, PKBFacadeReader& pkb) {
+    OptionalQueryClause next = db.next();
+    while (next.has_value() && !tm.isEmpty()) {
+        ClauseResult res = next->get()->runEvaluation(pkb);
+        tm.join(res);
+        next = db.next();
     }
-    return true;
-}
-
-// TODO(Ezekiel): Write the actual algorithm to split into connected synonyms for optimization.
-std::vector<std::vector<QueryClausePtr>> Query::splitIntoConnectedSynonyms() const {
-    std::vector<std::vector<QueryClausePtr>> res{};
-    for (QueryClausePtr c : getNonBooleanClauses()) {
-        std::vector<QueryClausePtr> connectedClauses{c};
-        res.push_back(connectedClauses);
-    }
-    return res;
-}
-
-ArrangedClauses Query::arrangeClauses() const {
-    std::vector<std::vector<QueryClausePtr>> selectConnectedClauses{};
-    std::vector<std::vector<QueryClausePtr>> nonSelectConnectedClauses{};
-
-    for (std::vector<QueryClausePtr> connectedClauses : splitIntoConnectedSynonyms()) {
-        bool hasSelectSynoyms = false;
-        for (QueryClausePtr clause : connectedClauses) {
-            if (containsSelectSynonyms(clause)) {
-                hasSelectSynoyms = true;
-                break;
-            }
-        }
-        hasSelectSynoyms ? selectConnectedClauses.push_back(connectedClauses)
-                         : nonSelectConnectedClauses.push_back(connectedClauses);
-    }
-
-    return ArrangedClauses{selectConnectedClauses, nonSelectConnectedClauses};
 }
 
 bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
@@ -164,15 +132,6 @@ std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
         }
     }
     return nonBooleanClauses;
-}
-
-bool Query::containsSelectSynonyms(QueryClausePtr clause) const {
-    for (Synonym selectSyn : selectEntities) {
-        if (clause->containsSynonym(selectSyn)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb) const {
