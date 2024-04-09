@@ -37,7 +37,7 @@ jobs:
         shell: bash
         run: |
           cd Team09/Code09/build/src/unit_testing/Release
-          ./unit_testing.exe
+          ./unit_testing.exe --benchmark-no-analysis
 
       - name: Integration Testing
         shell: bash
@@ -91,7 +91,7 @@ jobs:
 
       - name: Run Unit Tests
         working-directory: ${{runner.workspace}}/build
-        run: ./src/unit_testing/unit_testing
+        run: ./src/unit_testing/unit_testing --benchmark-no-analysis
 
       # - name: Integration Testing
       #   working-directory: ${{runner.workspace}}/build

@@ -15,11 +15,10 @@ public:
           statementNumber(statementNumber),
           whileStmtList(whileStmtList) {}
 
-    void accept(AstVisitor* visitor) override;
+    void accept(AstVisitor* visitor) override {
+        visitor->visitWhile(this);
+    }
     std::shared_ptr<ExpressionNode> whileCondition;
     std::shared_ptr<StatementListNode> whileStmtList;
     int statementNumber;
-
-    std::shared_ptr<ExpressionNode> getCond();
-    std::shared_ptr<StatementListNode> getStmtLstNode();
 };

@@ -37,11 +37,6 @@ bool isEntRef(const std::string& str) {
     return isSynonym(str) || isWildcard(str) || isQuotedIdent(str);
 }
 
-bool isRelRef(const std::string& str) {
-    std::string pattern = "^(" + QPSConstants::REL_REF_REGEX + ")$";
-    return std::regex_search(str, std::regex(pattern));
-}
-
 bool isExpressionSpec(const std::string& str) {
     if (isWildcard(str)) {
         return true;
@@ -169,10 +164,6 @@ bool isDeclarationStatement(const std::string& str) {
     return std::regex_search(str, std::regex(pattern));
 }
 
-bool isResultClause(const std::string& str) {
-    return isBoolean(str) || isTuple(str);
-}
-
 bool isBoolean(const std::string& str) {
     return trim(str) == QPSConstants::BOOLEAN;
 }
@@ -200,10 +191,6 @@ bool isElem(const std::string& str) {
     return isSynonym(str) || isAttrRef(str);
 }
 
-bool isAttrCond(const std::string& attrCond) {
-    return isAttrCompare(attrCond);
-}
-
 bool isAttrCompare(const std::string& attrComp) {
     std::vector<std::string> expressions = splitByDelimiter(attrComp, "=");
     if (expressions.size() != 2) {
@@ -229,21 +216,5 @@ bool isAttrName(const std::string& attrName) {
 }
 
 bool isNotRelation(const std::string& notRelation) {
-    return std::regex_search(notRelation, std::regex("^" + QPSConstants::NOT));
-}
-
-bool containsSuchThatClause(const std::string& selectStatement) {
-    return std::regex_search(selectStatement, std::regex(QPSConstants::SUCH_THAT));
-}
-
-bool containsPatternClause(const std::string& patternStatement) {
-    return std::regex_search(patternStatement, std::regex(QPSConstants::PATTERN));
-}
-
-bool containsAndClause(const std::string& andStatement) {
-    return std::regex_search(andStatement, std::regex(QPSConstants::AND));
-}
-
-bool containsWithClause(const std::string& withStatement) {
-    return std::regex_search(withStatement, std::regex(QPSConstants::WITH));
+    return std::regex_search(notRelation, std::regex(QPSConstants::NOT));
 }

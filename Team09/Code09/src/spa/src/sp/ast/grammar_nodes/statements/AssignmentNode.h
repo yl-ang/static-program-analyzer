@@ -20,8 +20,7 @@ public:
     std::shared_ptr<ExpressionNode> expression;
     int statementNumber;
 
-    void accept(AstVisitor* visitor) override;
-
-    std::shared_ptr<ExpressionNode> getExpr();
-    std::string getVar();
+    void accept(AstVisitor* visitor) override {
+        visitor->visitAssign(this);
+    }
 };

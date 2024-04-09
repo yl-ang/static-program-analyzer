@@ -56,4 +56,5 @@ public:
 
     // Checks that the other Synonym has the same type and value, regardless of attribute.
     bool equalSynonymValue(const Synonym& other) const;
+    Synonym getWithoutAttribute() const;
 };

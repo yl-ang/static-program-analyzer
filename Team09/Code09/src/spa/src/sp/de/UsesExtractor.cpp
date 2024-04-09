@@ -20,7 +20,7 @@ void UsesExtractor::visitProcedure(ProcedureNode* node) {
 
 void UsesExtractor::visitCall(CallNode* node) {
     int userStmtNum = node->statementNumber;
-    std::string calledProc = node->getCalledProcedure();
+    std::string calledProc = node->procedureName;
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses;
 
     // if the called proc has been extracted before

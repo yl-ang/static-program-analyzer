@@ -17,7 +17,5 @@ std::vector<std::string> splitByDelimiter(const std::string& str, const std::str
 std::tuple<std::string, std::string> substringUntilDelimiter(const std::string& str, const std::string& delimiter);
 std::string trim(const std::string& str);
 
-std::tuple<std::string, std::string> splitResultAndClause(const std::string& str);
-std::vector<std::string> extractReturnResults(const std::string& str);
 std::vector<std::string> getAllClauses(const std::string& str);
 std::vector<size_t> getClauseIndices(const std::string& str, const std::regex& pattern);

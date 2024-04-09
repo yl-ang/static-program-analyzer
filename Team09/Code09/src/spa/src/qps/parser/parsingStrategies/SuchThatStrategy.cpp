@@ -6,6 +6,7 @@ std::shared_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
         if (argMatch.suffix().matched) {
             throw QPSSyntaxError();
         }
+        std::string suchThatNot = argMatch.prefix();
         std::string type = argMatch[1];
         std::string parameters = argMatch[2];
 
@@ -14,6 +15,10 @@ std::shared_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
         std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildSTParameters(parameterStringsToParse)};
         std::shared_ptr<SuchThatClause> suchThatClause = std::make_shared<SuchThatClause>(
             RelationshipBuilder::determineRelationshipType(type), entityVector[0], entityVector[1]);
+
+        if (isNotRelation(suchThatNot)) {
+            suchThatClause->setNegation(true);
+        }
 
         return suchThatClause;
     } else {

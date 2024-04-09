@@ -1,3 +1,8 @@
+160002 - With / no synonyms / False
+stmt s;
+Select BOOLEAN with 12 = 0
+FALSE
+100
 10001 - Pattern / 1 synonym / Wildcard, Variable
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2;
 Select a1 pattern a1(_, "y")
@@ -4212,4 +4217,29 @@ SemanticError
 stmt s1, s2; assign a1, a2; read r1, r2; print pn1, pn2; call c1, c2; while w1, w2; if i1, i2; procedure p1, p2; variable v1, v2;
 Select v1 such that Uses(v1, p1)
 SemanticError
+10000
+160001 - With / no synonyms
+stmt s;
+Select BOOLEAN with 12 = 12
+TRUE
+100
+160002 - With / no synonyms / False
+stmt s;
+Select BOOLEAN with 12 = 0
+FALSE
+100
+160003 - With / no synonyms / VarNames
+stmt s;
+Select BOOLEAN with "test" = "test"
+TRUE
+100
+160004 - With / 1 synonym
+stmt s;
+Select s with s.stmt# = 12
+12
+100
+160005 - With / 2 Synonyms
+stmt s; while w;
+Select s with s.stmt# = w.stmt# 
+38, 40, 41, 45, 46
 10000

@@ -174,36 +174,6 @@ TEST_CASE("isFactor") {
     }
 }
 
-TEST_CASE("isResultClause") {
-    SECTION("boolean_true") {
-        REQUIRE(isResultClause("BOOLEAN"));
-    }
-
-    SECTION("elem_true") {
-        REQUIRE(isResultClause("var"));
-    }
-
-    SECTION("tuple_true") {
-        REQUIRE(isResultClause("<var>"));
-    }
-
-    SECTION("tuple with multiple elem_true") {
-        REQUIRE(isResultClause("<var, x, y>"));
-    }
-
-    SECTION("integer_false") {
-        REQUIRE_FALSE(isResultClause("10"));
-    }
-
-    SECTION("tuple with boolean_true") {
-        REQUIRE(isResultClause("<BOOLEAN>"));
-    }
-
-    SECTION("tuple missing angular bracket_false") {
-        REQUIRE_FALSE(isResultClause("var>"));
-    }
-}
-
 TEST_CASE("isTuple") {
     SECTION("elem_true") {
         REQUIRE(isTuple("var"));

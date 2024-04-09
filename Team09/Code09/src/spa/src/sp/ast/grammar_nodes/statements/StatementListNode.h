@@ -13,7 +13,9 @@ public:
           children(children) {}
 
     std::vector<std::shared_ptr<StatementNode>> children;
-    void accept(AstVisitor* visitor) override;
+    void accept(AstVisitor* visitor) override {
+        visitor->visitStmtLst(this);
+    }
 
     std::vector<int> getStmtsStmtNum();
     int firstChildStatementNumber();

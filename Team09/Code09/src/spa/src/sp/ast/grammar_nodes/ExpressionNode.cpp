@@ -8,12 +8,16 @@ void ExpressionNode::accept(AstVisitor* visitor) {
 }
 
 std::vector<std::string> ExpressionNode::getVars() {
-    findVariables(this->getChildren());
+    if (variables.size() == 0) {
+        findVariables(this->getChildren());
+    }
     return variables;
 }
 
 std::vector<std::string> ExpressionNode::getConsts() {
-    findConstants(this->getChildren());
+    if (constants.size() == 0) {
+        findConstants(this->getChildren());
+    }
     return constants;
 }
 
@@ -21,13 +25,13 @@ std::vector<std::string> ExpressionNode::getConsts() {
 void ExpressionNode::findVariables(const std::vector<std::shared_ptr<ASTNode>>& children) {
     if (children.size() == 0) {
         if (auto variableNodePtr = dynamic_cast<VariableNode*>(this)) {
-            variables.push_back(variableNodePtr->getValue());
+            variables.push_back(variableNodePtr->value);
         }
     }
     for (auto& child : children) {
         // Use dynamic_cast to check if the child node is of type VariableNode
         if (auto variableNodePtr = dynamic_cast<VariableNode*>(child.get())) {
-            variables.push_back(variableNodePtr->getValue());
+            variables.push_back(variableNodePtr->value);
         }
         // Recursively traverse child nodes
         findVariables(child->getChildren());
@@ -38,13 +42,13 @@ void ExpressionNode::findVariables(const std::vector<std::shared_ptr<ASTNode>>& 
 void ExpressionNode::findConstants(const std::vector<std::shared_ptr<ASTNode>>& children) {
     if (children.size() == 0) {
         if (auto constantNodePtr = dynamic_cast<ConstantNode*>(this)) {
-            constants.push_back(constantNodePtr->getValue());
+            constants.push_back(constantNodePtr->value);
         }
     }
     for (auto& child : children) {
         // Use dynamic_cast to check if the child node is of type ConstantNode
         if (auto constantNodePtr = dynamic_cast<ConstantNode*>(child.get())) {
-            constants.push_back(constantNodePtr->getValue());
+            constants.push_back(constantNodePtr->value);
         }
         // Recursively traverse child nodes
         findConstants(child->getChildren());

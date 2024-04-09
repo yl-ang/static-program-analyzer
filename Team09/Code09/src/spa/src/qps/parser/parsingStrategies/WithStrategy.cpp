@@ -1,14 +1,20 @@
 #include "WithStrategy.h"
 
 std::shared_ptr<QueryClause> WithStrategy::execute(std::string str) const {
-    std::string prefix;
-    std::string mainClause;
-    std::tie(prefix, mainClause) = substringUntilDelimiter(str, QPSConstants::SPACE);
+    std::string removedWith = trim(str.substr(QPSConstants::WITH.size()));
+
+    bool hasNot = isNotRelation(removedWith);
+
+    std::string mainClause = hasNot ? trim(removedWith.substr(QPSConstants::NOT.size())) : removedWith;
 
     Validator::validateWithSyntax(mainClause);
     std::vector<std::string> parameterStringsToParse = splitByDelimiter(mainClause, "=");
     std::vector<std::shared_ptr<ClauseArgument>> entityVector{buildWithParameters(parameterStringsToParse)};
     std::shared_ptr<WithClause> withClause{std::make_shared<WithClause>(entityVector[0], entityVector[1])};
+
+    if (hasNot) {
+        withClause->setNegation(true);
+    }
 
     return withClause;
 }
@@ -28,7 +34,7 @@ std::vector<std::shared_ptr<ClauseArgument>> WithStrategy::buildWithParameters(
         } else if (isAttrRef(str)) {
             std::vector<std::string> attrs = splitByDelimiter(str, ".");
             results.push_back(std::make_shared<Synonym>(DesignEntityType::UNKNOWN, attrs[0],
-                                                        Synonym::stringToAttributeEnum(attrs[0])));
+                                                        Synonym::stringToAttributeEnum(attrs[1])));
         } else {
             throw QPSSyntaxError();
         }

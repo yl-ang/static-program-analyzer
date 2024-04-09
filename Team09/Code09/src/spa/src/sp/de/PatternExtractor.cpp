@@ -25,9 +25,9 @@ void PatternExtractor::visitProcedure(ProcedureNode* node) {}
 void PatternExtractor::visitRead(ReadNode* node) {}
 void PatternExtractor::visitVariable(VariableNode* node) {
     if (this->isInIfCondition) {
-        this->variablesInIfConditionExpr.insert({node->getStmtNumber(), node->value});
+        this->variablesInIfConditionExpr.insert({node->statementNumber, node->value});
     } else if (this->isInWhileCondition) {
-        this->variablesInWhileConditionExpr.insert({node->getStmtNumber(), node->value});
+        this->variablesInWhileConditionExpr.insert({node->statementNumber, node->value});
     }
 }
 void PatternExtractor::visitConstant(ConstantNode* node) {}

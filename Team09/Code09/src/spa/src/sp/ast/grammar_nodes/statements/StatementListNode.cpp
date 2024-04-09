@@ -1,9 +1,6 @@
 #include "StatementListNode.h"
 
 #include "StatementNode.h"
-void StatementListNode::accept(AstVisitor* visitor) {
-    visitor->visitStmtLst(this);
-}
 
 std::vector<int> StatementListNode::getStmtsStmtNum() {
     std::vector<int> stmtNums;

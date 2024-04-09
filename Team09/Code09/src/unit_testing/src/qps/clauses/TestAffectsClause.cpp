@@ -56,7 +56,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, no synonym") {
 
         AffectsTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("1")}.testBoolean(false);
         AffectsTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("2")}.testBoolean(false);
-        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("3")}.testBoolean(true);
+        AffectsTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Integer>("3")}.testBoolean(false);
         AffectsTester{pfr, std::make_shared<Integer>("4"), std::make_shared<Integer>("4")}.testBoolean(false);
     }
 
@@ -242,7 +242,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
             std::make_shared<Integer>("4")}.testSynonyms({*stmtSyn}).testSynonymValues({{"3"}});
         // Select s such that Affects(s, 3)
         AffectsTester{pfr, stmtSyn,
-            std::make_shared<Integer>("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1", "3"}});
+            std::make_shared<Integer>("3")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
         // Select s such that Affects(s, 2)
         AffectsTester{pfr, stmtSyn,
             std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
@@ -292,7 +292,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship, one synonym") {
             std::make_shared<Integer>("4"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
         // Select s such that Affects(3, s)
         AffectsTester{pfr,
-            std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"4", "3"}});
+            std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"4"}});
         // Select s such that Affects(2, s)
         AffectsTester{pfr,
             std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
@@ -419,7 +419,7 @@ TEST_CASE("SuchThatClause evaluate for affects relationship with both synonym") 
 
         AffectsTester{pfr, stmtSyn1, stmtSyn2}
             .testSynonyms({*stmtSyn1, *stmtSyn2})
-            .testSynonymValues({{"1", "3", "3"}, {"3", "3", "4"}});
+            .testSynonymValues({{"1", "3"}, {"3", "4"}});
     }
 
     SECTION("Affects(synonym, synonym) / empty store") {

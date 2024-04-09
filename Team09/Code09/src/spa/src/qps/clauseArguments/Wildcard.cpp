@@ -1,15 +1,17 @@
 #include "Wildcard.h"
 
+#include "qps/QPSConstants.h"
+
 bool Wildcard::isWildcard() const {
     return true;
 }
 
 std::string Wildcard::getValue() const {
-    return "_";
+    return QPSConstants::WILDCARD;
 }
 
 std::string Wildcard::getClauseType() const {
-    return "Wildcard";
+    return QPSConstants::WILDCARD_CLAUSE_TYPE;
 }
 
 bool Wildcard::operator==(const ClauseArgument& other) const {

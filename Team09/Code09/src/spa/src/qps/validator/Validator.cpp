@@ -34,11 +34,7 @@ void Validator::validateSuchThatSyntax(const std::string& relType, const std::st
 }
 
 void Validator::validateWithSyntax(const std::string& arguments) {
-    std::vector<std::string> argVector = splitByDelimiter(arguments, "=");
-    if (argVector.size() != 2) {
-        throw QPSSyntaxError();
-    }
-    if (!isAttrCompare(argVector[0]) || !isAttrCompare(argVector[1])) {
+    if (!isAttrCompare(arguments)) {
         throw QPSSyntaxError();
     }
 }

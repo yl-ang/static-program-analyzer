@@ -1,5 +1,7 @@
 #include "ExpressionSpec.h"
 
+#include "qps/QPSConstants.h"
+
 ExpressionSpec::ExpressionSpec(const std::string& v) : value(v) {}
 
 std::string ExpressionSpec::getValue() const {
@@ -11,7 +13,7 @@ bool ExpressionSpec::isExpressionSpec() const {
 }
 
 std::string ExpressionSpec::getClauseType() const {
-    return "ExpressionSpec";
+    return QPSConstants::EXPR_SPEC_CLAUSE_TYPE;
 }
 
 bool ExpressionSpec::operator==(const ClauseArgument& other) const {
