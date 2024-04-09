@@ -102,6 +102,14 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasFollowRelationship(41, 45));
     }
 
+    SECTION("FollowsStar relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 18));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(19, 22));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 19));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(19, 38));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(38, 49));
+    }
+
     SECTION("Parent relationship stored correctly") {
         REQUIRE(pkbFacadeReader.hasParentRelationship(19, 20));
         REQUIRE(pkbFacadeReader.hasParentRelationship(22, 23));
@@ -111,6 +119,12 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasParentRelationship(38, 39));
         REQUIRE(pkbFacadeReader.hasParentRelationship(40, 41));
         REQUIRE(pkbFacadeReader.hasParentRelationship(40, 45));
+    }
+
+    SECTION("ParentStar relationship stored correctly") {
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 18));
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 23));
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 38));
     }
 
     SECTION("Uses relationship stored correctly - statements") {
@@ -175,6 +189,14 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         auto whileProc = Literal("while");
         REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, main));
         REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, whileProc));
+    }
+
+    SECTION("CallStar relationship stored correctly") {
+        auto ifProc = Literal("if");
+        auto main = Literal("main");
+        auto whileProc = Literal("while");
+        REQUIRE(pkbFacadeReader.hasCallStarRelationship(ifProc, main));
+        REQUIRE(pkbFacadeReader.hasCallStarRelationship(ifProc, whileProc));
     }
 
     SECTION("Next relationship stored correctly") {
