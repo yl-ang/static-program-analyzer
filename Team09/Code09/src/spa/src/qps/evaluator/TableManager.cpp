@@ -25,12 +25,22 @@ void TableManager::join(const Table& other) const {
     const std::vector newHeaders{mergeHeaders(other)};
     const std::vector<Synonym> commonHeaders{getCommonHeaders(other)};
 
+    std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
+    commonValueStringToRowMap.reserve(this->result.getRows().size());
+    for (Row row : this->result.getRows()) {
+        std::string commonValueString{buildTuple(commonHeaders, row)};
+        commonValueStringToRowMap[commonValueString].push_back(row);
+    }
+
     std::vector<Row> newRows{};
-    for (const Row& row : this->result.getRows()) {
-        for (const Row& otherRow : other.getRows()) {
-            if (areJoinableRows(row, otherRow, commonHeaders)) {
-                Row newRow{combineRows(row, otherRow, other.getHeaders())};
-                newRows.push_back(newRow);
+    newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
+    for (const Row& row : other.getRows()) {
+        std::string commonValueString{buildTuple(commonHeaders, row)};
+        if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
+            for (Row& otherRow : it->second) {
+                Row newRow{row};
+                combineRows(newRow, otherRow);
+                newRows.push_back(std::move(newRow));
             }
         }
     }
@@ -60,13 +70,10 @@ bool TableManager::areJoinableRows(const Row& row, const Row& otherRow, const st
     });
 }
 
-Row TableManager::combineRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& otherHeaders) {
-    Row newRow{row};
-    for (Synonym header : otherHeaders) {
-        SynonymValue headerValue = header.getValue();
-        newRow[headerValue] = otherRow.at(headerValue);
+void TableManager::combineRows(Row& targetRow, const Row& sourceRow) {
+    for (const auto& pair : sourceRow) {
+        targetRow[pair.first] = pair.second;
     }
-    return newRow;
 }
 
 // TODO(Ezekiel): Refactor this

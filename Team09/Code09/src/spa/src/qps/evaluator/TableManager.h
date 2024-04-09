@@ -23,7 +23,7 @@ public:
 private:
     static Table clauseResultToTable(const ClauseResult& res);
     static std::string buildTuple(const std::vector<Synonym>& synonyms, const Row& row);
-    static Row combineRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& otherHeaders);
+    static void combineRows(Row& row, const Row& otherRow);
     static bool areJoinableRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& commonHeaders);
 
     mutable Table result{};

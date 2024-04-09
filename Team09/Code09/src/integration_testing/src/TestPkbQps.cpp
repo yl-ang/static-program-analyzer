@@ -1451,6 +1451,12 @@ TEST_CASE("Select with 1 such-that clause") {
             QPSResult expected = {allFollowees};
             REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
         }
+
+        SECTION("Follows(Synonym, Wildcard)") {
+            QPSResult result = qps.processQueries("stmt s, s1, s2; Select s such that Next*(s, s1) and Next*(s1, s2)");
+            QPSResult expected = {};
+            REQUIRE_EQUAL_VECTOR_CONTENTS(result, expected);
+        }
     }
 };
 

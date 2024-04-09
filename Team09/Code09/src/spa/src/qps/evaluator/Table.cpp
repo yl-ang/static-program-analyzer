@@ -71,6 +71,23 @@ std::vector<Synonym> Table::getHeaders() const {
     return headers;
 }
 
+std::vector<Row> Table::getColumns(const std::vector<Synonym>& synonyms) const {
+    std::vector<Row> allRows{};
+    for (Row row : getRows()) {
+        Row subsetRow{};
+        subsetRow.reserve(synonyms.size());
+
+        for (const auto& columnKey : synonyms) {
+            if (auto it = row.find(columnKey.getValue()); it != row.end()) {
+                subsetRow[columnKey.getValue()] = it->second;
+            }
+        }
+
+        allRows.push_back(subsetRow);
+    }
+    return allRows;
+}
+
 void Table::projectNewColumn(std::vector<Synonym> newHeaders, const HeaderMatcher& matchTargetHeader,
                              const ValueTransformer& valueTransform) {
     for (const Synonym& newHeader : newHeaders) {
