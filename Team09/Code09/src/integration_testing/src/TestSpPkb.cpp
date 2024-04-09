@@ -122,7 +122,28 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
     }
 
     SECTION("ParentStar relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 24));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 25));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 26));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 27));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 28));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 29));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 30));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 31));
         REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 32));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 33));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 34));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 35));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 36));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 37));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 41));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 42));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 43));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 44));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 45));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 46));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 47));
         REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 48));
         REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 18));
         REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 23));
