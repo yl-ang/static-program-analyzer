@@ -21,9 +21,6 @@ void ProcedureTracker::visitStmtLst(StatementListNode* node) {}
 void ProcedureTracker::visitProcedure(ProcedureNode* node) {
     std::string procName = node->name;
     this->procedures.insert({procName, node});
-#ifdef DEBUG_BUILD
-    std::cout << "I'm adding procedure: " << procName << std::endl;
-#endif
 }
 
 std::unordered_map<std::string, ProcedureNode*> ProcedureTracker::getProcedures() {

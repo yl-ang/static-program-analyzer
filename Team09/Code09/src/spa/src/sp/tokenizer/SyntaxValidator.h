@@ -15,32 +15,32 @@
 
 // Define non-terminals, no need to define terminals since LEXICAL_TOKEN_TYPES are terminals
 enum NonTerminal {
-    NT_PROGRAM,  // 0
-    NT__PROGRAM,
-    NT_PROCEDURE,    // 1
-    NT_STMTLST,      // 2
-    NT__STMTLST,     // 3
-    NT_STMT,         //  4
-    NT_READ,         // 5
-    NT_PRINT,        // 6
-    NT_WHILE,        // 7
-    NT_IF,           // 8
-    NT_ASSIGN,       // 9
-    NT_COND_EXPR,    // 10
-    NT__COND_EXPR,   // 11
-    NT_REL_EXPR,     // 12
-    NT_REL_OP,       // 13
-    NT_REL_FACTOR,   // 14
-    NT_EXPR,         // 15
-    NT__EXPR,        // 16
-    NT_TERM,         // 17
-    NT__TERM,        // 18
-    NT_FACTOR,       // 19
-    NT_VAR_NAME,     // 20
-    NT_PROC_NAME,    // 21
-    NT_CONST_VALUE,  // 22
-    DUPL,            // 23
-    NT_CALL          // 24
+    NT_PROGRAM,      // 0
+    NT__PROGRAM,     // 1
+    NT_PROCEDURE,    // 2
+    NT_STMTLST,      // 3
+    NT__STMTLST,     // 4
+    NT_STMT,         // 5
+    NT_READ,         // 6
+    NT_PRINT,        // 7
+    NT_WHILE,        // 8
+    NT_IF,           // 9
+    NT_ASSIGN,       // 10
+    NT_COND_EXPR,    // 11
+    NT__COND_EXPR,   // 12
+    NT_REL_EXPR,     // 13
+    NT_REL_OP,       // 14
+    NT_REL_FACTOR,   // 15
+    NT_EXPR,         // 16
+    NT__EXPR,        // 17
+    NT_TERM,         // 18
+    NT__TERM,        // 19
+    NT_FACTOR,       // 20
+    NT_VAR_NAME,     // 21
+    NT_PROC_NAME,    // 22
+    NT_CONST_VALUE,  // 23
+    DUPL,            // 24
+    NT_CALL          // 25
 };
 
 /**
@@ -49,7 +49,10 @@ enum NonTerminal {
  * Technique works can be found at https://en.wikipedia.org/wiki/LL_parser
  */
 class SyntaxValidator {
-public:
+private:
+    using Symbol = std::variant<NonTerminal, LEXICAL_TOKEN_TYPE>;
+    using SymbolPair = std::pair<NonTerminal, LEXICAL_TOKEN_TYPE>;
+
     // Define custom hash function for std::pair<NonTerminal, LEXICAL_TOKEN_TYPE>
     struct PairHash {
         template <typename T1, typename T2>
@@ -60,14 +63,7 @@ public:
         }
     };
 
-    using Symbol = std::variant<NonTerminal, LEXICAL_TOKEN_TYPE>;
-    using SymbolPair = std::pair<NonTerminal, LEXICAL_TOKEN_TYPE>;
     using ParsingTable = std::unordered_map<SymbolPair, std::vector<Symbol>, PairHash>;
-
-    /**
-     * @brief Parse input expression using LL(1) parsing technique
-     */
-    bool validateSyntax(std::vector<Token> input);
 
     /**
      * @brief Special case for COND_EXPR grammar rule. (Hacky fix)
@@ -89,4 +85,10 @@ public:
      * @brief Function to convert enum values to strings
      */
     std::string enumToString(NonTerminal token);
+
+public:
+    /**
+     * @brief Parse input expression using LL(1) parsing technique
+     */
+    bool validateSyntax(std::vector<Token> input);
 };

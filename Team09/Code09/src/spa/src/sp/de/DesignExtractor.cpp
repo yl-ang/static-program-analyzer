@@ -62,15 +62,7 @@ void DesignExtractor::extract(const std::shared_ptr<ProgramNode> root) {
 
     for (auto& visitor : visitors) {
         dfsVisit(root, visitor);
-#ifdef DEBUG_BUILD
-        std::cout << "Visited" << std::endl;
-#endif
     }
-
-#ifdef DEBUG_BUILD
-    std::cout << "Completed Visiting" << std::endl;
-#endif
-
     for (auto procedure : root->children) {
         this->nextExtractor->buildCFG(procedure);
     }

@@ -8,7 +8,6 @@
 #include "AstVisitor.h"
 
 class AbstractionExtractor : public AstVisitor {
-private:
 public:
     AbstractionExtractor() {}
 
