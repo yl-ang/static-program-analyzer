@@ -220,7 +220,7 @@ Select i.stmt# pattern not i("VAR6", _, _)
 5000
 45 - Not, Pattern, If, Wildcard
 if i;
-Select ifs pattern not i(_, _, _)
+Select i pattern not i(_, _, _)
 none
 5000
 46 - Not, Pattern, While
