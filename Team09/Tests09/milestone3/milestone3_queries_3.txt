@@ -91,7 +91,7 @@ Select if such that Parent*(if, if2)
 19 - Parent*: if with if parent
 if if; if ifparent;
 Select if such that Parent*(ifparent, if)
-42, 46
+12, 42, 46
 5000
 20 - Parent: While with while children
 while whilestatements, w2;
