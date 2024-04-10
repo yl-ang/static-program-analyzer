@@ -151,6 +151,10 @@ std::string TableManager::buildTuple(const std::vector<Synonym>& synonyms, const
         resultTuple.append(entry);
         resultTuple.append(" ");
     }
-    resultTuple.erase(resultTuple.size() - 1);  // remove trailing whitespace
+
+    if (resultTuple.length() > 0) {
+        resultTuple.erase(resultTuple.size() - 1);  // remove trailing whitespace
+    }
+
     return resultTuple;
 }
