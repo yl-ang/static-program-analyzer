@@ -28,7 +28,7 @@ private:
      * other table.
      */
     bool isSentinel = false;
-    mutable std::vector<Synonym> headers;
+    std::vector<Synonym> headers;
     std::vector<Row> rows;
 
     /**
