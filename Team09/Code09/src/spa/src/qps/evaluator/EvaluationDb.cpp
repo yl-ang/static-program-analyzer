@@ -8,7 +8,8 @@ std::unordered_set<StmtNum> EvaluationDb::getStmts(const Synonym& syn) {
 
     if (tableManager->hasHeader(syn)) {
         std::unordered_set<StmtNum> stmtNums{};
-        for (std::string value : tableManager->getColumn(syn)) {
+        stmtNums.reserve(tableManager->getColumn(syn).size());
+        for (const std::string& value : tableManager->getColumn(syn)) {
             stmtNums.insert(std::stoi(value));
         }
         return stmtNums;

@@ -29,6 +29,10 @@ bool BaseNext::validateArguments() {
 }
 
 ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
+    return {false};
+}
+
+ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isSimpleResult()) {
         return {hasNextRelationship(reader)};
     }
@@ -41,7 +45,7 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
         return evaluateSynonymInteger(reader);
     }
 
-    return evaluateBothSynonyms(reader);
+    return evaluateBothSynonyms(reader, evalDb);
 }
 
 ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
@@ -95,7 +99,7 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
     return {syn, ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)};
 }
 
-ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
     Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
 
@@ -103,32 +107,50 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     SynonymValues currentSynValues{}, nextSynValues{};
 
-    const std::unordered_set<Stmt>& allStmts =
-        currentSyn.getType() != DesignEntityType::STMT
-            ? reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[currentSyn.getType()])
-            : reader.getStmts();
+    const std::unordered_set existingCurrentSynStmtNums{evalDb->getStmts(currentSyn)};
+    const std::unordered_set existingNexterStmtNums{evalDb->getStmts(nextSyn)};
 
-    for (const Stmt& currStmt : allStmts) {
-        std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt.stmtNum);
-        if (nexters.empty()) {
-            continue;
-        }
+    currentSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
+    nextSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
 
-        if (currentSyn == nextSyn) {
-            if (nexters.find(currStmt.stmtNum) != nexters.end()) {
-                currentSynValues.push_back(std::to_string(currStmt.stmtNum));
-                nextSynValues.push_back(std::to_string(currStmt.stmtNum));
+    for (const StmtNum& currStmt : existingCurrentSynStmtNums) {
+        for (const StmtNum& nextStmt : existingNexterStmtNums) {
+            if (currentSyn == nextSyn) {
+                if (currStmt == nextStmt) {
+                    currentSynValues.push_back(std::to_string(currStmt));
+                    nextSynValues.push_back(std::to_string(nextStmt));
+                }
+                continue;
             }
 
-            continue;
+            if (hasNextRelationship(reader, currStmt, nextStmt)) {
+                currentSynValues.push_back(std::to_string(currStmt));
+                nextSynValues.push_back(std::to_string(nextStmt));
+            }
         }
-        std::vector nexterStmts = ClauseEvaluatorUtils::filterStatementsByType(reader, nextSyn.getType(), nexters);
 
-        nextSynValues.reserve(nextSynValues.size() + nexterStmts.size());
-        nextSynValues.insert(nextSynValues.end(), nexterStmts.begin(), nexterStmts.end());
+        /*
+                std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt);
+                if (nexters.empty()) {
+                    continue;
+                }
 
-        currentSynValues.reserve(currentSynValues.size() + nexterStmts.size());
-        currentSynValues.insert(currentSynValues.end(), nexterStmts.size(), std::to_string(currStmt.stmtNum));
+                if (currentSyn == nextSyn) {
+                    if (nexters.find(currStmt) != nexters.end()) {
+                        currentSynValues.push_back(std::to_string(currStmt));
+                        nextSynValues.push_back(std::to_string(currStmt));
+                    }
+
+                    continue;
+                }
+
+                for (const StmtNum& nexter : nexters) {
+                    if (auto it = existingNexterStmtNums.find(nexter); it != existingNexterStmtNums.end()) {
+                        currentSynValues.push_back(std::to_string(currStmt));
+                        nextSynValues.push_back(std::to_string(nexter));
+                    }
+                }
+                */
     }
 
     std::vector<SynonymValues> synonymValues{currentSynValues, nextSynValues};

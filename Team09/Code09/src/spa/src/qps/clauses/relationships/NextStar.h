@@ -17,6 +17,10 @@ private:
         return reader.hasNextStarRelationship(*currentStmt, *nextStmt);
     }
 
+    bool hasNextRelationship(PKBFacadeReader& reader, const StmtNum& curr, const StmtNum& next) override {
+        return reader.hasNextStarRelationship(curr, next);
+    }
+
     StmtSet getNexters(PKBFacadeReader& reader, const StmtNum& nextee) override {
         return reader.getNexterStar(nextee);
     }
