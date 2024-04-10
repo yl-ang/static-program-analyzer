@@ -13,11 +13,22 @@ class SpTokenizer {
 private:
     LexicalAnalyzer lexicalAnalyzer;
     SyntaxValidator syntaxValidator;
+
     // Statement number counter that increments with every statement
     int stmtNumCounter = 0;
     const int NO_STMT_NUM = -1;
+
     // Countdown for tokens that should not be given a statement number
     int noStmtNumCounter = 0;
+
+    /**
+     * @brief Assign specific token types and statement numbers to each token.
+     * Procedure definitions, else keywords on a line and close brackets are assigned
+     * statement number -1.
+     */
+    std::vector<Token> assignTokens(std::vector<BasicToken> input);
+    Token assignKeyword(BasicToken* bt);
+    Token assignSymbol(BasicToken* bt);
 
 public:
     /**
@@ -29,12 +40,4 @@ public:
      * @brief Tokenizes for pattern
      */
     std::vector<Token> tokenizeForPattern(std::vector<std::string> input);
-    /**
-     * @brief Assign specific token types and statement numbers to each token.
-     * Procedure definitions, else keywords on a line and close brackets are assigned
-     * statement number -1.
-     */
-    std::vector<Token> assignTokens(std::vector<BasicToken> input);
-    Token assignKeyword(BasicToken* bt);
-    Token assignSymbol(BasicToken* bt);
 };
