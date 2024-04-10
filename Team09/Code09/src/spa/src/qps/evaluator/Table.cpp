@@ -3,18 +3,20 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
+
 Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : headers(headers) {
     if (columns.empty()) {
         return;
     }
 
     if (headers.size() != columns.size()) {
-        throw "Number of columns and headers are not equal.";
+        throw QPSUnequalColHeaderError();
     }
 
     for (size_t i = 0; i < columns.size(); i++) {
         if (columns[i].size() != columns[0].size()) {
-            throw "Number of rows in columns are not equal.";
+            throw QPSUnequalRowColError();
         }
     }
 
@@ -32,7 +34,7 @@ Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : he
 Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(headers), rows(rows) {
     for (const Row& row : rows) {
         if (row.size() != headers.size()) {
-            throw "Number of columns and headers are not equal.";
+            throw QPSUnequalColHeaderError();
         }
     }
 }

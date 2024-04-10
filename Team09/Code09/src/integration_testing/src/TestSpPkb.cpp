@@ -102,6 +102,32 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasFollowRelationship(41, 45));
     }
 
+    SECTION("FollowsStar relationship stored correctly") {
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 1));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 2));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 3));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 4));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 5));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 6));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 7));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 8));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 9));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 10));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 11));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 12));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 13));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 14));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 15));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 16));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 17));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(1, 18));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 19));
+        REQUIRE(pkbFacadeReader.hasFollowStarRelationship(19, 22));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(1, 19));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(19, 38));
+        REQUIRE_FALSE(pkbFacadeReader.hasFollowStarRelationship(38, 49));
+    }
+
     SECTION("Parent relationship stored correctly") {
         REQUIRE(pkbFacadeReader.hasParentRelationship(19, 20));
         REQUIRE(pkbFacadeReader.hasParentRelationship(22, 23));
@@ -111,6 +137,35 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasParentRelationship(38, 39));
         REQUIRE(pkbFacadeReader.hasParentRelationship(40, 41));
         REQUIRE(pkbFacadeReader.hasParentRelationship(40, 45));
+    }
+
+    SECTION("ParentStar relationship stored correctly") {
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 23));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 24));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 25));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 26));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 27));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 28));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 29));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 30));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 31));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 32));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 33));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 34));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 35));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 36));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(22, 37));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 41));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 42));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 43));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 44));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 45));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 46));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 47));
+        REQUIRE(pkbFacadeReader.hasParentStarRelationship(40, 48));
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 18));
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 23));
+        REQUIRE_FALSE(pkbFacadeReader.hasParentStarRelationship(1, 38));
     }
 
     SECTION("Uses relationship stored correctly - statements") {
@@ -177,6 +232,14 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasCallRelationship(ifProc, whileProc));
     }
 
+    SECTION("CallStar relationship stored correctly") {
+        auto ifProc = Literal("if");
+        auto main = Literal("main");
+        auto whileProc = Literal("while");
+        REQUIRE(pkbFacadeReader.hasCallStarRelationship(ifProc, main));
+        REQUIRE(pkbFacadeReader.hasCallStarRelationship(ifProc, whileProc));
+    }
+
     SECTION("Next relationship stored correctly") {
         REQUIRE_FALSE(pkbFacadeReader.hasNextRelationship(18, 19));
         REQUIRE(pkbFacadeReader.hasNextRelationship(19, 20));
@@ -200,5 +263,44 @@ TEST_CASE("SP-PKB: Design Abstractions stored correctly") {
         REQUIRE(pkbFacadeReader.hasPartialPattern(2, "a1", "abc"));
         REQUIRE(pkbFacadeReader.hasPartialPattern(5, "a4", "q + w"));
         REQUIRE_FALSE(pkbFacadeReader.hasPartialPattern(5, "a4", "w+a"));
+    }
+
+    SECTION("If Pattern stored correctly") {
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "a33"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "abc"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "xyz"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "c"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(19, "a9"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "a25"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "while"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(22, "a25"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(23, "if"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(26, "read"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(30, "read"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "a33"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "abc"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "xyz"));
+        REQUIRE(pkbFacadeReader.hasIfPattern(34, "c"));
+        REQUIRE_FALSE(pkbFacadeReader.hasIfPattern(34, "cc"));
+        REQUIRE_FALSE(pkbFacadeReader.hasIfPattern(34, "xyz1"));
+    }
+
+    SECTION("While Pattern stored correctly") {
+        REQUIRE(pkbFacadeReader.hasWhilePattern(38, "a16"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(38, "b1"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "t"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "h"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "m"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "r"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "x"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "z"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "a"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "c"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "y"));
+        REQUIRE(pkbFacadeReader.hasWhilePattern(41, "b"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(40, "a"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(40, "b"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "g"));
+        REQUIRE_FALSE(pkbFacadeReader.hasWhilePattern(41, "o"));
     }
 }

@@ -7,6 +7,8 @@
 
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
+#include "qps/exceptions/evaluator/QPSUnequalColHeaderError.h"
+#include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
 using SynonymValue = std::string;
 using ColumnData = std::vector<std::string>;
