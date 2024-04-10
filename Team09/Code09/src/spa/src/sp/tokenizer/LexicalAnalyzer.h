@@ -15,11 +15,24 @@
  *
  */
 class LexicalAnalyzer {
-public:
-    std::vector<BasicToken> preprocess(std::vector<std::string> strings);
-    static BasicToken assignType(std::string curr, std::string prev, std::string next);
-    static BasicToken disambiguate(std::string curr, std::string prev, std::string next);
+private:
     static bool isValidInteger(std::string value);
     static bool isValidName(std::string value);
     static bool isValidSymbol(std::string value);
+
+public:
+    /**
+     * @brief Driver for the lexical analyzer.
+     */
+    std::vector<BasicToken> preprocess(std::vector<std::string> strings);
+
+    /**
+     * @brief Assigns intermediate types to tokens (symbol / name/ integer/ keyword).
+     */
+    static BasicToken assignType(std::string curr, std::string prev, std::string next);
+
+    /**
+     * @brief Disambiguates between names and keywords.
+     */
+    static BasicToken disambiguate(std::string curr, std::string prev, std::string next);
 };
