@@ -6,6 +6,7 @@
 #include "PKB/Utils/DataTypes.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
+#include "qps/evaluator/EvaluationDb.h"
 
 enum class RelationshipType {
     FOLLOWS,
@@ -31,5 +32,8 @@ class Relationship {
 public:
     virtual ~Relationship(){};
     virtual ClauseResult evaluate(PKBFacadeReader& reader) = 0;
+    virtual ClauseResult evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+        return evaluate(reader);
+    }
     virtual bool validateArguments() = 0;
 };

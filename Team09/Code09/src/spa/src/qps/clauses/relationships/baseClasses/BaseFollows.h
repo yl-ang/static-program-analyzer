@@ -12,7 +12,7 @@ protected:
 private:
     bool isSimpleResult() const;
 
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&);
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
 
@@ -24,5 +24,6 @@ public:
     BaseFollows(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
     bool validateArguments() override;
 };
