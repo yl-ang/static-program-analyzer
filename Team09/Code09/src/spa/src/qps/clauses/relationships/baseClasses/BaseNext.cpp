@@ -114,43 +114,26 @@ ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader, const std::
     nextSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
 
     for (const StmtNum& currStmt : existingCurrentSynStmtNums) {
-        for (const StmtNum& nextStmt : existingNexterStmtNums) {
-            if (currentSyn == nextSyn) {
-                if (currStmt == nextStmt) {
-                    currentSynValues.push_back(std::to_string(currStmt));
-                    nextSynValues.push_back(std::to_string(nextStmt));
-                }
-                continue;
-            }
-
-            if (hasNextRelationship(reader, currStmt, nextStmt)) {
-                currentSynValues.push_back(std::to_string(currStmt));
-                nextSynValues.push_back(std::to_string(nextStmt));
-            }
+        std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt);
+        if (nexters.empty()) {
+            continue;
         }
 
-        /*
-                std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt);
-                if (nexters.empty()) {
-                    continue;
-                }
+        if (currentSyn == nextSyn) {
+            if (nexters.find(currStmt) != nexters.end() &&
+                existingNexterStmtNums.find(currStmt) != existingNexterStmtNums.end()) {
+                currentSynValues.push_back(std::to_string(currStmt));
+                nextSynValues.push_back(std::to_string(currStmt));
+            }
+            continue;
+        }
 
-                if (currentSyn == nextSyn) {
-                    if (nexters.find(currStmt) != nexters.end()) {
-                        currentSynValues.push_back(std::to_string(currStmt));
-                        nextSynValues.push_back(std::to_string(currStmt));
-                    }
-
-                    continue;
-                }
-
-                for (const StmtNum& nexter : nexters) {
-                    if (auto it = existingNexterStmtNums.find(nexter); it != existingNexterStmtNums.end()) {
-                        currentSynValues.push_back(std::to_string(currStmt));
-                        nextSynValues.push_back(std::to_string(nexter));
-                    }
-                }
-                */
+        for (const StmtNum& nexter : nexters) {
+            if (existingNexterStmtNums.find(nexter) != existingNexterStmtNums.end()) {
+                currentSynValues.push_back(std::to_string(currStmt));
+                nextSynValues.push_back(std::to_string(nexter));
+            }
+        }
     }
 
     std::vector<SynonymValues> synonymValues{currentSynValues, nextSynValues};

@@ -167,7 +167,7 @@ std::unordered_set<StmtNum> PKBFacadeReader::getNexteeStar(StmtNum nexter) {
 }
 
 bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
-    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+    return pkbReference->nextStore->hasNextStarRelationship(s1, s2);
 }
 
 bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
