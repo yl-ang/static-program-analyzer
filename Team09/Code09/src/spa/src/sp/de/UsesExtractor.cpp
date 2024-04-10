@@ -12,9 +12,6 @@ void UsesExtractor::visitVariable(VariableNode* node) {}
 void UsesExtractor::visitConstant(ConstantNode* node) {}
 
 void UsesExtractor::visitProcedure(ProcedureNode* node) {
-#ifdef DEBUG_BUILD
-    std::cout << "Visiting Procedure " << node->name << std::endl;
-#endif
     this->currentProc = node->name;
 }
 
@@ -72,9 +69,6 @@ void UsesExtractor::visitPrint(PrintNode* node) {
 }
 
 void UsesExtractor::visitWhile(WhileNode* node) {
-#ifdef DEBUG_BUILD
-    std::cout << "Visiting While" << std::endl;
-#endif
     int userStmtNum = node->statementNumber;
     std::vector<std::string> usedVariablesInCond = node->whileCondition->getVars();
     for (int i = 0; i < usedVariablesInCond.size(); ++i) {
@@ -82,21 +76,10 @@ void UsesExtractor::visitWhile(WhileNode* node) {
         this->procedureUses.insert({currentProc, usedVariablesInCond[i]});
     }
     std::unordered_set<std::pair<StmtNum, Variable>> extractedUses;
-
-#ifdef DEBUG_BUILD
-    std::cout << "trying to access while cache" << std::endl;
-#endif
     // if this while statement has been extracted before
     if (extractedWhiles != nullptr && this->extractedWhiles->find(node) != this->extractedWhiles->end()) {
         extractedUses = this->extractedWhiles->at(node);
-#ifdef DEBUG_BUILD
-        std::cout << "accessing while cache" << std::endl;
-#endif
     } else {
-#ifdef DEBUG_BUILD
-        std::cout << "no while cached" << std::endl;
-#endif
-
         UsesExtractor* usesExtractorHelper =
             new UsesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
         usesExtractorHelper->currentProc = this->currentProc;
@@ -132,13 +115,7 @@ void UsesExtractor::visitIf(IfNode* node) {
     // if this if statement has been extracted before
     if (extractedIfs != nullptr && this->extractedIfs->find(node) != this->extractedIfs->end()) {
         extractedUses = this->extractedIfs->at(node);
-#ifdef DEBUG_BUILD
-        std::cout << "accessing if cache" << std::endl;
-#endif
     } else {
-#ifdef DEBUG_BUILD
-        std::cout << "no if cached" << std::endl;
-#endif
         UsesExtractor* thenUsesExtractorHelper =
             new UsesExtractor(this->procs, this->extractedProcs, this->extractedWhiles, this->extractedIfs);
         thenUsesExtractorHelper->currentProc = this->currentProc;
