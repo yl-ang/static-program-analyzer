@@ -21,12 +21,6 @@ private:
     // Countdown for tokens that should not be given a statement number
     int noStmtNumCounter = 0;
 
-    /**
-     * @brief Assign specific token types and statement numbers to each token.
-     * Procedure definitions, else keywords on a line and close brackets are assigned
-     * statement number -1.
-     */
-    std::vector<Token> assignTokens(std::vector<BasicToken> input);
     Token assignKeyword(BasicToken* bt);
     Token assignSymbol(BasicToken* bt);
 
@@ -40,4 +34,11 @@ public:
      * @brief Tokenizes for pattern
      */
     std::vector<Token> tokenizeForPattern(std::vector<std::string> input);
+
+    /**
+     * @brief Assign specific token types and statement numbers to each token.
+     * Procedure definitions, else keywords on a line and close brackets are assigned
+     * statement number -1.
+     */
+    std::vector<Token> assignTokens(std::vector<BasicToken> input);
 };
