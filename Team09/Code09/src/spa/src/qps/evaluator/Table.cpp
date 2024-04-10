@@ -1,7 +1,6 @@
 #include "Table.h"
 
 #include <algorithm>
-#include <unordered_set>
 
 #include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
@@ -123,4 +122,14 @@ bool Table::operator==(const Table& other) const {
     }
 
     return true;
+}
+
+std::unordered_set<SynonymValue> Table::getColumn(const Synonym& synonym) const {
+    std::unordered_set<SynonymValue> result{};
+
+    for (Row row : getRows()) {
+        result.insert(row.at(synonym.getValue()));
+    }
+
+    return result;
 }

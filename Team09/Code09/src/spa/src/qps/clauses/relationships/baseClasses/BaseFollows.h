@@ -13,8 +13,8 @@ private:
     bool isSimpleResult() const;
 
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&);
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
+    ClauseResult evaluateSynonymInteger(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
 
     virtual bool hasFollowRelationship(PKBFacadeReader&) = 0;
     virtual StmtSet getFollowers(PKBFacadeReader&, const StmtNum&) = 0;

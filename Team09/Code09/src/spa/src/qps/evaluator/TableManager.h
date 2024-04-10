@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_set>
+
 #include "Table.h"
 #include "qps/clauses/ClauseResult.h"
 #include "qps/exceptions/Exception.h"
@@ -17,6 +19,8 @@ public:
     void joinAll(const std::vector<Table>& tables) const;
     void projectAttributes(const std::vector<Synonym>&, const HeaderMatcher&, const ValueTransformer&) const;
     std::vector<std::string> extractResults(const std::vector<Synonym>& synonyms) const;
+    bool hasHeader(const Synonym& synonym) const;
+    std::unordered_set<std::string> getColumn(const Synonym& synonym) const;
 
 private:
     static Table clauseResultToTable(const ClauseResult& res);

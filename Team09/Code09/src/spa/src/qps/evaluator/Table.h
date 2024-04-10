@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "qps/clauseArguments/Synonym.h"
@@ -95,6 +96,8 @@ public:
      * \param transformer The transformer function
      */
     void projectNewColumn(std::vector<Synonym>, const HeaderMatcher&, const ValueTransformer&);
+
+    std::unordered_set<SynonymValue> getColumn(const Synonym& synonym) const;
 
     bool isSentinelTable() const;
     bool operator==(const Table&) const;

@@ -6,9 +6,12 @@ std::unordered_set<StmtNum> EvaluationDb::getStmts(const Synonym& syn) {
     // Check if in cache
     SynonymName value = syn.getValue();
 
-    auto it = stmtNumCache.find(value);
-    if (it != stmtNumCache.end()) {
-        return it->second;
+    if (tableManager->hasHeader(syn)) {
+        std::unordered_set<StmtNum> stmtNums{};
+        for (std::string value : tableManager->getColumn(syn)) {
+            stmtNums.insert(std::stoi(value));
+        }
+        return stmtNums;
     }
 
     // If not, then retrieve all

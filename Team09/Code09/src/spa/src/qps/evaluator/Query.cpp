@@ -11,15 +11,14 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (hasNoClauses() && isSelectBoolean()) {
         return {QPSConstants::TRUE_STRING};
     }
-
+    const TableManager tableManager{};
+    const std::shared_ptr sharedTableManager{std::make_shared<TableManager>(tableManager)};
     const std::shared_ptr sharedPkb{std::make_shared<PKBFacadeReader>(pkb)};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{sharedPkb})};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{sharedPkb, sharedTableManager})};
 
     if (!evaluateBooleanClauses(pkb, evalDb)) {
         return getEmptyResult();
     }
-
-    const TableManager tableManager{};
 
     if (!getNonBooleanClauses().empty()) {
         QueryDb queryDb{getNonBooleanClauses()};
