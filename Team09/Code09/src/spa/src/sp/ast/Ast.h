@@ -27,7 +27,7 @@ const std::unordered_set<LEXICAL_TOKEN_TYPE> RelationalOperators = {
 class AST {
     SemanticValidator semanticValidator;
 
-public:
+private:
     std::shared_ptr<VariableNode> buildVarNameAST(Token token);
     std::shared_ptr<ConstantNode> buildIntAST(Token token);
     std::shared_ptr<ExpressionNode> buildExprFromFactorAST(std::queue<Token>& tokens);
@@ -40,18 +40,20 @@ public:
     std::shared_ptr<ExpressionNode> buildRelationalExpressionAST(std::queue<Token>& tokens);
     std::shared_ptr<ExpressionNode> buildSubExpressionAST(std::queue<Token>& tokens,
                                                           std::shared_ptr<ExpressionNode> node);
-    std::shared_ptr<ExpressionNode> buildExpressionAST(std::queue<Token>& tokens);
     std::shared_ptr<AssignmentNode> buildAssignmentAST(std::queue<Token>& tokens);
     std::shared_ptr<PrintNode> buildPrintAST(std::queue<Token>& tokens);
     std::shared_ptr<ReadNode> buildReadAST(std::queue<Token>& tokens);
     std::shared_ptr<StatementNode> buildStatementAST(std::queue<Token>& tokens);
     std::shared_ptr<StatementListNode> buildStatementListAST(std::queue<Token>& tokens);
     std::shared_ptr<ProcedureNode> buildProcedureAST(std::queue<Token>& tokens);
-    std::shared_ptr<ProgramNode> buildAST(std::vector<Token> tokens);
     std::shared_ptr<ExpressionNode> buildConditionalExpressionAST(std::queue<Token>& tokens);
     std::shared_ptr<ExpressionNode> buildBinaryConditionalExpressionAST(std::queue<Token>& tokens);
     std::shared_ptr<ExpressionNode> handleBracketedCondExpr(std::queue<Token>& tokens);
     std::shared_ptr<WhileNode> buildWhileAST(std::queue<Token>& tokens);
     std::shared_ptr<IfNode> buildIfAST(std::queue<Token>& tokens);
     std::shared_ptr<CallNode> buildCallAST(std::queue<Token>& tokens);
+
+public:
+    std::shared_ptr<ProgramNode> buildAST(std::vector<Token> tokens);
+    std::shared_ptr<ExpressionNode> buildExpressionAST(std::queue<Token>& tokens);
 };
