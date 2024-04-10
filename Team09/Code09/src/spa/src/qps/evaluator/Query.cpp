@@ -3,8 +3,6 @@
 #include <qps/clauses/SynonymValuesRetriever.h>
 #include <qps/clauses/with/AttributeCollector.h>
 
-#include <queue>
-
 Query::Query(const std::vector<Synonym>& se, const std::vector<std::shared_ptr<SuchThatClause>>& stc,
              const std::vector<std::shared_ptr<PatternClause>>& pc, const std::vector<std::shared_ptr<WithClause>>& wc)
     : selectEntities(se), suchThatClauses(stc), patternClauses(pc), withClauses(wc) {}
@@ -20,22 +18,24 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
 
     const TableManager tableManager{};
 
+    if (!getNonBooleanClauses().empty()) {
+        QueryDb db{getNonBooleanClauses()};
+        db.loadClausesWithEntities(this->selectEntities);
+        if (evaluateAndJoinClauses(tableManager, db, pkb); tableManager.isEmpty()) {
+            return getEmptyResult();
+        }
+
+        while (db.loadNewGroup()) {
+            const TableManager nonConnectedTableManager{};
+            if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
+                return getEmptyResult();
+            }
+        }
+    }
+
     if (buildAndJoinSelectTable(tableManager, pkb); tableManager.isEmpty()) {
         // There are no results to select at all. Return empty result.
         return getEmptyResult();
-    }
-
-    QueryDb db{getNonBooleanClauses()};
-    db.loadClausesWithEntities(this->selectEntities);
-    if (evaluateAndJoinClauses(tableManager, db, pkb); tableManager.isEmpty()) {
-        return getEmptyResult();
-    }
-
-    while (db.loadNewGroup()) {
-        const TableManager nonConnectedTableManager{};
-        if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
-            return getEmptyResult();
-        }
     }
 
     if (isSelectBoolean()) {
@@ -140,14 +140,17 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb
 
     std::vector<Synonym> selectEntitiesWithoutAttributes{};
 
-    for (Synonym syn : selectEntities) {
-        if (syn.getAttr().has_value()) {
-            selectEntitiesWithoutAttributes.push_back(syn.getWithoutAttribute());
-        } else {
-            selectEntitiesWithoutAttributes.push_back(syn);
+    for (const Synonym& syn : selectEntities) {
+        const Synonym synWithoutAttribute = syn.getAttr().has_value() ? syn.getWithoutAttribute() : syn;
+
+        // We only 'top-up' synonyms whose values that are not currently in the table.
+        if (!tm.containsHeader(synWithoutAttribute)) {
+            selectEntitiesWithoutAttributes.push_back(synWithoutAttribute);
         }
     }
 
-    const ClauseResult cr{SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes)};
-    tm.join(cr);
+    if (!selectEntitiesWithoutAttributes.empty()) {
+        const ClauseResult cr{SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes)};
+        tm.join(cr);
+    }
 }

@@ -13,6 +13,7 @@ public:
     TableManager(Table table) : result{std::move(table)} {}
 
     bool isEmpty() const;
+    bool containsHeader(const Synonym& header) const;
     Table getTable() const;
     void join(const Table& result) const;
     void join(const ClauseResult& result) const;

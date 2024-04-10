@@ -120,6 +120,10 @@ bool TableManager::isEmpty() const {
     return this->result.isEmpty();
 }
 
+bool TableManager::containsHeader(const Synonym& header) const {
+    return this->result.containsHeader(header);
+}
+
 std::vector<std::string> TableManager::extractResults(const std::vector<Synonym>& synonyms) const {
     if (this->isEmpty() || synonyms.empty() || !this->result.headersIsSupersetOf(synonyms)) {
         return {};
