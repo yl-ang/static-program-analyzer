@@ -111,7 +111,7 @@ PROC1, PROC2, PROC3, PROC4, PROC5
 23  - Not, Call*: p is procedure that does have have call* relationship with PROC5
 procedure p;
 Select p such that not Calls* (p, "PROC5")
-PROC1, PROC2, PROC3, PROC4, PROC5
+PROC2, PROC5
 5000
 24  - Not, Call*: p is procedure that does have have call* relationship with PROC2
 procedure p;
