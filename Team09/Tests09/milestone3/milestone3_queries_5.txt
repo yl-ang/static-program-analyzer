@@ -208,3 +208,18 @@ TRUE
 Select BOOLEAN such that not Parent*(_, _)
 FALSE
 5000
+43 - Not, Pattern, If, Variable
+if i; variable var;
+Select <i, var> pattern not i(var, _, _) with i.stmt# = 5
+none
+5000
+44 - Not, Pattern, If
+if i;
+Select i.stmt# pattern not i("VAR6", _, _)
+11, 12, 17
+5000
+45 - Not, Pattern, If, Wildcard
+if i;
+Select ifs pattern not i(_, _, _)
+none
+5000
