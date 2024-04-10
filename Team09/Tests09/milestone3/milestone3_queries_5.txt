@@ -223,3 +223,13 @@ if i;
 Select ifs pattern not i(_, _, _)
 none
 5000
+46 - Not, Pattern, While
+while w;
+Select w.stmt# pattern not w("VAR6", _)
+10
+5000
+47 - Not, Pattern, While, Wildcard
+while w;
+Select w pattern not w(_, _)
+none
+5000
