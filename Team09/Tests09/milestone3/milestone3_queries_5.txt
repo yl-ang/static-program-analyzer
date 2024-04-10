@@ -233,3 +233,23 @@ while w;
 Select w pattern not w(_, _)
 none
 5000
+48 - Not, Assign Pattern, expr, wildcard
+assign a;
+Select a.stmt# pattern not a("VAR3", _)
+1, 13, 2, 19, 7, 6, 14, 5, 15, 16, 24
+5000
+49 - Not, Assign Pattern, wildcard, expr
+assign a;
+Select a.stmt# pattern not a(_, "VAR2")
+1, 13, 2, 19, 7, 6, 14, 5, 15, 16, 18, 24
+5000
+50 - Not, Assign Pattern, partial + wildcard, expr
+assign a;
+Select a.stmt# pattern not a(_, _"VAR2"_)
+1, 13, 2, 7, 6, 14, 5, 15, 16, 24
+5000
+51 - Not, Assign Pattern, wildcard, wildcard
+assign a;
+Select a.stmt# pattern not a(_, _)
+none
+5000
