@@ -10,7 +10,7 @@ public:
         "Illegal attempt at converting boolean clause result to table.";
 
     TableManager() = default;
-    TableManager(const Table& table) : result{table} {}
+    TableManager(Table table) : result{std::move(table)} {}
 
     bool isEmpty() const;
     Table getTable() const;
@@ -23,8 +23,7 @@ public:
 private:
     static Table clauseResultToTable(const ClauseResult& res);
     static std::string buildTuple(const std::vector<Synonym>& synonyms, const Row& row);
-    static void combineRows(Row& row, const Row& otherRow);
-    static bool areJoinableRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& commonHeaders);
+    static void combineRows(Row&, const Row&);
 
     mutable Table result{};
 
@@ -32,4 +31,6 @@ private:
     void joinSentinelTable(const Table& other) const;
     std::vector<Synonym> mergeHeaders(const Table& other) const;
     std::vector<Synonym> getCommonHeaders(const Table& other) const;
+    std::unordered_map<std::string, std::vector<Row>> getCommonValueStringToRowMap(
+        const std::vector<Synonym>& commonHeaders) const;
 };

@@ -96,10 +96,4 @@ public:
 
     bool isSentinelTable() const;
     bool operator==(const Table&) const;
-
-    std::vector<Row> getColumns(const std::vector<Synonym>& synonyms) const;
-
-    void setHeaders(std::vector<Synonym> newHeaders) const {
-        this->headers = newHeaders;
-    }
 };

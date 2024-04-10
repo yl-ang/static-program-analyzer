@@ -23,24 +23,19 @@ void TableManager::join(const Table& other) const {
     }
 
     const std::vector newHeaders{mergeHeaders(other)};
-    const std::vector<Synonym> commonHeaders{getCommonHeaders(other)};
-
-    std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
-    commonValueStringToRowMap.reserve(this->result.getRows().size());
-    for (Row row : this->result.getRows()) {
-        std::string commonValueString{buildTuple(commonHeaders, row)};
-        commonValueStringToRowMap[commonValueString].push_back(row);
-    }
+    const std::vector commonHeaders{getCommonHeaders(other)};
+    const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders)};
 
     std::vector<Row> newRows{};
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
-    for (const Row& row : other.getRows()) {
+    for (Row& row : other.getRows()) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
+
         if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
-            for (Row& otherRow : it->second) {
+            for (const Row& otherRow : it->second) {
                 Row newRow{row};
                 combineRows(newRow, otherRow);
-                newRows.push_back(std::move(newRow));
+                newRows.push_back(newRow);
             }
         }
     }
@@ -60,14 +55,15 @@ void TableManager::joinEmptyTable(const Table& other) const {
     this->result = Table{newHeaders, emptyRows};
 }
 
-bool TableManager::areJoinableRows(const Row& row, const Row& otherRow, const std::vector<Synonym>& commonHeaders) {
-    if (commonHeaders.empty()) {
-        return true;
+std::unordered_map<std::string, std::vector<Row>> TableManager::getCommonValueStringToRowMap(
+    const std::vector<Synonym>& commonHeaders) const {
+    std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
+    commonValueStringToRowMap.reserve(this->result.getRows().size());
+    for (Row row : this->result.getRows()) {
+        std::string commonValueString{buildTuple(commonHeaders, row)};
+        commonValueStringToRowMap[commonValueString].push_back(std::move(row));
     }
-
-    return std::all_of(commonHeaders.begin(), commonHeaders.end(), [&row, &otherRow](const Synonym& header) {
-        return row.at(header.getValue()) == otherRow.at(header.getValue());
-    });
+    return commonValueStringToRowMap;
 }
 
 void TableManager::combineRows(Row& targetRow, const Row& sourceRow) {
@@ -76,21 +72,19 @@ void TableManager::combineRows(Row& targetRow, const Row& sourceRow) {
     }
 }
 
-// TODO(Ezekiel): Refactor this
 std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     std::vector<Synonym> commonHeaders{};
     std::unordered_set<SynonymValue> seen{};
 
     for (Synonym header : this->result.getHeaders()) {
         if (seen.find(header.getValue()) == seen.end() && other.containsHeader(header)) {
-            commonHeaders.push_back(header);
             seen.insert(header.getValue());
+            commonHeaders.push_back(header);
         }
     }
     return commonHeaders;
 }
 
-// TODO(Ezekiel): Refactor this
 std::vector<Synonym> TableManager::mergeHeaders(const Table& other) const {
     std::vector<Synonym> newHeaders{};
     std::unordered_set<SynonymValue> seen{};
@@ -132,11 +126,13 @@ std::vector<std::string> TableManager::extractResults(const std::vector<Synonym>
     }
 
     std::unordered_set<std::string> uniqueTuples{};
+    uniqueTuples.reserve(this->result.getRows().size());
     for (const Row& row : this->result.getRows()) {
         uniqueTuples.insert(buildTuple(synonyms, row));
     }
 
-    std::vector<std::string> results{uniqueTuples.begin(), uniqueTuples.end()};
+    std::vector<std::string> results{std::make_move_iterator(uniqueTuples.begin()),
+                                     std::make_move_iterator(uniqueTuples.end())};
     return results;
 }
 
@@ -148,10 +144,12 @@ void TableManager::projectAttributes(const std::vector<Synonym>& synonymsWithAtt
 
 std::string TableManager::buildTuple(const std::vector<Synonym>& synonyms, const Row& row) {
     std::string resultTuple{};
+
     for (const Synonym& synonym : synonyms) {
         SynonymValue synonymVal = synonym.getValue();
         RowEntry entry = row.at(synonymVal);
-        resultTuple += entry + " ";
+        resultTuple.append(entry);
+        resultTuple.append(" ");
     }
     resultTuple.erase(resultTuple.size() - 1);  // remove trailing whitespace
     return resultTuple;
