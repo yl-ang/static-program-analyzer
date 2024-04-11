@@ -26,63 +26,28 @@ std::queue<Token> makeTokenQueue(std::vector<Token> tokens) {
     return queue;
 }
 
-TEST_CASE("AST Build Tests") {
+TEST_CASE("AST BuildExpression Tests") {
     AST ast;
-
-    SECTION("Build const factor ast correctly") {
+    SECTION("Build single integer expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0)};
         ConstantNode expectedNode = ConstantNode("1", 0);
 
         auto queue = makeTokenQueue(inputTokenArray);
 
-        auto result = ast.buildFactorAST(queue);
+        auto result = ast.buildExpressionAST(queue);
         REQUIRE(expectedNode == *(result.get()));
     }
 
-    SECTION("Build variable factor ast correctly") {
+    SECTION("Build single variable expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0)};
         VariableNode expectedNode = VariableNode("a", 0);
         auto queue = makeTokenQueue(inputTokenArray);
 
-        auto result = ast.buildFactorAST(queue);
+        auto result = ast.buildExpressionAST(queue);
         REQUIRE(expectedNode == *(result.get()));
     }
 
-    SECTION("Build assignment to const ast correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-        };
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
-        std::shared_ptr<ConstantNode> integerNode = std::make_shared<ConstantNode>("1", 0);
-
-        auto expectedNode = AssignmentNode(nameNode, integerNode, 0);
-
-        auto result = ast.buildAssignmentAST(queue);
-        REQUIRE(expectedNode == *(result.get()));
-    }
-
-    SECTION("Build assignment to var ast correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0), Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0), Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1)};
-
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildAssignmentAST(queue);  // Do this first
-
-        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
-        std::shared_ptr<VariableNode> integerNode = std::make_shared<VariableNode>("b", 0);
-
-        AssignmentNode expectedNode = AssignmentNode(nameNode, integerNode, 0);
-
-        REQUIRE(expectedNode == *(result.get()));  // Now this should work
-    }
-
-    SECTION("Build adding two terms correctly") {
+    SECTION("Building adding 2 vars expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
                                               Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
                                               Token(LEXICAL_TOKEN_TYPE::NAME, "c", 0)};
@@ -96,7 +61,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build adding multiple terms correctly") {
+    SECTION("Building adding 3 vars expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
@@ -114,13 +79,13 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode2 == *(result.get()));
     }
 
-    SECTION("Build multiplying two terms correctly") {
+    SECTION("Building multiplying 2 vars expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
                                               Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
                                               Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0)};
 
         auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildTermAST(queue);  // Do this first
+        auto result = ast.buildExpressionAST(queue);  // Do this first
         std::shared_ptr<VariableNode> xtNode = std::make_shared<VariableNode>("x", 0);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
@@ -129,7 +94,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(mulNode == *(result.get()));
     }
 
-    SECTION("Build add then mul correctly") {
+    SECTION("Build 'a + b * c' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
@@ -148,7 +113,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build mul then add correctly") {
+    SECTION("Build 'a * b + c' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
@@ -167,124 +132,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build assignment procedure") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 1),
-            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 1),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 1),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
-        };
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildProcedureAST(queue);
-        auto xNode = std::make_shared<VariableNode>("x", 1);
-        auto yNode = std::make_shared<VariableNode>("y", 1);
-
-        std::vector<std::shared_ptr<StatementNode>> children1 = {};
-
-        auto equalNode = std::make_shared<AssignmentNode>(xNode, yNode, 1);
-
-        children1.push_back(equalNode);
-        auto stmtList = std::make_shared<StatementListNode>(children1);
-
-        auto procedure = ProcedureNode("a", stmtList);
-
-        REQUIRE(procedure == *(result.get()));
-    }
-
-    SECTION("Build read statement ast correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::READ, "read", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
-        };
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildReadAST(queue);
-
-        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
-
-        auto expectedNode = ReadNode(aNode, 0);
-
-        REQUIRE(expectedNode == *(result.get()));
-    }
-    SECTION("Build read procedure correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
-            Token(LEXICAL_TOKEN_TYPE::READ, "read", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
-        };
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildProcedureAST(queue);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-
-        std::vector<std::shared_ptr<StatementNode>> children1 = {};
-
-        auto readNode = std::make_shared<ReadNode>(yNode, 0);
-
-        children1.push_back(readNode);
-        auto stmtList = std::make_shared<StatementListNode>(children1);
-
-        auto procedure = ProcedureNode("a", stmtList);
-
-        REQUIRE(procedure == *(result.get()));
-    }
-
-    SECTION("Build print statement ast correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::PRINT, "print", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-        };
-
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildPrintAST(queue);
-
-        std::shared_ptr<VariableNode> aNode = std::make_shared<VariableNode>("a", 0);
-
-        auto expectedNode = PrintNode(aNode, 0);
-
-        REQUIRE(expectedNode == *(result.get()));
-    }
-    SECTION("Build print procedure correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
-            Token(LEXICAL_TOKEN_TYPE::PRINT, "print", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
-        };
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildProcedureAST(queue);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-
-        std::vector<std::shared_ptr<StatementNode>> children1 = {};
-
-        auto printNode = std::make_shared<PrintNode>(yNode, 0);
-
-        children1.push_back(printNode);
-        auto stmtList = std::make_shared<StatementListNode>(children1);
-
-        auto procedure = ProcedureNode("a", stmtList);
-
-        REQUIRE(procedure == *(result.get()));
-    }
-
-    SECTION("Build parenthesised expressions ast correctly") {
+    SECTION("Build '(a + b)' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
             Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "c", 0),
@@ -292,7 +140,7 @@ TEST_CASE("AST Build Tests") {
         };
 
         auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildFactorAST(queue);  // Do this first
+        auto result = ast.buildExpressionAST(queue);  // Do this first
         std::shared_ptr<VariableNode> constNode = std::make_shared<VariableNode>("b", 0);
         std::shared_ptr<VariableNode> const2Node = std::make_shared<VariableNode>("c", 0);
 
@@ -301,7 +149,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build parenthesised expressions with multiple parenthesis ast correctly") {
+    SECTION("Build '((a + b))' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
@@ -311,7 +159,7 @@ TEST_CASE("AST Build Tests") {
         };
 
         auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildFactorAST(queue);  // Do this first
+        auto result = ast.buildExpressionAST(queue);  // Do this first
         std::shared_ptr<VariableNode> constNode = std::make_shared<VariableNode>("b", 0);
         std::shared_ptr<VariableNode> const2Node = std::make_shared<VariableNode>("c", 0);
 
@@ -320,37 +168,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build parenthesised mul then add correctly") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
-        };
-
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildFactorAST(queue);  // Do this first
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
-
-        std::vector<std::shared_ptr<ExpressionNode>> children = {};
-        std::vector<std::shared_ptr<ExpressionNode>> children1 = {};
-
-        children.push_back(xNode);
-        children.push_back(yNode);
-
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
-        children1.push_back(mulNode);
-
-        children1.push_back(zNode);
-
-        auto addNode = ExpressionNode(ADD, mulNode, zNode, 0);
-
-        REQUIRE(addNode == *(result.get()));
-    }
-
-    SECTION("Build multiple parenthesised mul then add correctly") {
+    SECTION("Build '(((a * b + c)))' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
@@ -361,7 +179,7 @@ TEST_CASE("AST Build Tests") {
         };
 
         auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildFactorAST(queue);  // Do this first
+        auto result = ast.buildExpressionAST(queue);  // Do this first
         std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
         std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
@@ -373,31 +191,31 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode == *(result.get()));
     }
 
-    SECTION("Build parenthesised const factor ast correctly") {
+    SECTION("Build '(1)' style expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
                                               Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
                                               Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
         auto queue = makeTokenQueue(inputTokenArray);
 
-        auto result = ast.buildFactorAST(queue);
+        auto result = ast.buildExpressionAST(queue);
         ConstantNode expectedNode = ConstantNode("1", 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
-    SECTION("Build parenthesised variable factor ast correctly") {
+    SECTION("Build '(a)' style expr correctly") {
         std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
                                               Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
                                               Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
         auto queue = makeTokenQueue(inputTokenArray);
 
-        auto result = ast.buildFactorAST(queue);
+        auto result = ast.buildExpressionAST(queue);
 
         VariableNode expectedNode = VariableNode("a", 0);
 
         REQUIRE(expectedNode == *(result.get()));
     }
 
-    SECTION("Build parenthesis first then var ast correctly") {
+    SECTION("Build '(a + b) * c' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
@@ -420,7 +238,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(mulNode == *(result.get()));
     }
 
-    SECTION("Build var first then parenthesis ast correctly") {
+    SECTION("Build 'a * (b + c)' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),         Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0), Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
@@ -439,7 +257,7 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(mulNode == *(result.get()));
     }
 
-    SECTION("Build var first then parenthesis then var ast correctly") {
+    SECTION("Build 'a * (b + c) + d' style expr correctly") {
         std::vector<Token> inputTokenArray = {
             Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),          Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
@@ -464,307 +282,252 @@ TEST_CASE("AST Build Tests") {
         REQUIRE(addNode2 == *(result.get()));
     }
 
-    SECTION("Build rel_factors correctly for var") {
+    SECTION("Build '(a * b + c)' style expr correctly") {
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
         };
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildRelationalFactorAST(queue);
-        VariableNode aNode = VariableNode("a", 0);
-
-        REQUIRE(aNode == *(result.get()));
-    }
-
-    SECTION("Build rel_factors correctly for const") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
-        };
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildRelationalFactorAST(queue);
-        ConstantNode oneNode = ConstantNode("1", 0);
-
-        REQUIRE(oneNode == *(result.get()));
-    }
-    SECTION("Build rel_factors correctly for expr") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0)};
 
         auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildRelationalFactorAST(queue);  // Do this first
+        auto result = ast.buildExpressionAST(queue);  // Do this first
         std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
         std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, yNode, zNode, 0);
+        std::vector<std::shared_ptr<ExpressionNode>> children = {};
+        std::vector<std::shared_ptr<ExpressionNode>> children1 = {};
 
-        auto addNode = ExpressionNode(ADD, xNode, mulNode, 0);
+        children.push_back(xNode);
+        children.push_back(yNode);
+
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
+        children1.push_back(mulNode);
+
+        children1.push_back(zNode);
+
+        auto addNode = ExpressionNode(ADD, mulNode, zNode, 0);
 
         REQUIRE(addNode == *(result.get()));
     }
+}
 
-    SECTION("Build relational expression with var and const") {
+TEST_CASE("AST Build Tests") {
+    AST ast;
+
+    SECTION("Build assignment to const ast correctly") {
+        /*
+       procedure a {
+        a = 1;
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
-            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
             Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
 
-        auto queue = makeTokenQueue(inputTokenArray);
+        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<ConstantNode> integerNode = std::make_shared<ConstantNode>("1", 0);
 
-        auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
-        auto oneNode = std::make_shared<ConstantNode>("1", 0);
+        auto expectedNode = std::make_shared<AssignmentNode>(nameNode, integerNode, 0);
+        std::vector<std::shared_ptr<StatementNode>> children1{expectedNode};
 
-        auto lessThan = ExpressionNode(LESS_THAN, zNode, oneNode, 0);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
 
-        REQUIRE(lessThan == *(result.get()));
+        auto procedure = std::make_shared<ProcedureNode>("a", stmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+        auto result = ast.buildAST(inputTokenArray);
+
+        REQUIRE(ProgNode == *(result.get()));
     }
-    SECTION("Build relational expression with var and var") {
+
+    SECTION("Build assignment to var ast correctly") {
+        /*
+       procedure a {
+       a = b;
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
-            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+
+        auto result = ast.buildAST(inputTokenArray);
+
+        std::shared_ptr<VariableNode> nameNode = std::make_shared<VariableNode>("a", 0);
+        std::shared_ptr<VariableNode> integerNode = std::make_shared<VariableNode>("b", 0);
+
+        auto expectedNode = std::make_shared<AssignmentNode>(nameNode, integerNode, 0);
+        std::vector<std::shared_ptr<StatementNode>> children1{expectedNode};
+
+        auto stmtList = std::make_shared<StatementListNode>(children1);
+        auto procedure = std::make_shared<ProcedureNode>("a", stmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build read procedure correctly") {
+        /*
+       procedure a {
+       read y;
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::READ, "read", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
 
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildRelationalExpressionAST(queue);
-        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        auto result = ast.buildAST(inputTokenArray);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::vector<std::shared_ptr<ExpressionNode>> children = {};
 
-        auto lessThan = ExpressionNode(LESS_THAN, zNode, yNode, 0);
+        std::vector<std::shared_ptr<StatementNode>> children1 = {};
 
-        REQUIRE(lessThan == *(result.get()));
+        auto readNode = std::make_shared<ReadNode>(yNode, 0);
+
+        children1.push_back(readNode);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", stmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        REQUIRE(ProgNode == *(result.get()));
     }
 
-    SECTION("Build relational expression with const and var") {
-        std::vector<Token> inputTokenArray = {Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
-                                              Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-                                              Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0)};
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildRelationalExpressionAST(queue);
-        auto zNode = std::make_shared<VariableNode>("z", 0);
-        auto oneNode = std::make_shared<ConstantNode>("1", 0);
-
-        auto lessThan = ExpressionNode(LESS_THAN, oneNode, zNode, 0);
-
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build relational expression with const and const") {
+    SECTION("Build print procedure correctly") {
+        /*
+       procedure a {
+       rpint y;
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
-            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::INTEGER, "2", 0),
-        };
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildRelationalExpressionAST(queue);
-        auto twoNode = std::make_shared<ConstantNode>("2", 0);
-        auto oneNode = std::make_shared<ConstantNode>("1", 0);
-
-        auto lessThan = ExpressionNode(LESS_THAN, oneNode, twoNode, 0);
-
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build relational expression with var and expr") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::PRINT, "print", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
         };
 
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        auto result = ast.buildAST(inputTokenArray);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
 
-        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode, yNode, 0);
+        std::vector<std::shared_ptr<StatementNode>> children1 = {};
 
-        auto lessThan = ExpressionNode(LESS_THAN, zNode, addNode, 0);
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildRelationalExpressionAST(queue);
-        REQUIRE(lessThan == *(result.get()));
+        auto printNode = std::make_shared<PrintNode>(yNode, 0);
+
+        children1.push_back(printNode);
+        auto stmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", stmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        REQUIRE(ProgNode == *(result.get()));
     }
 
-    SECTION("Build relational expression with expressions") {
+    SECTION("Build call statement ast correctly") {
+        /*
+       procedure a {
+       call b;
+       }
+       procedure b {
+       print y;
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0), Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::CALL, "call", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::PRINT, "print", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
 
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        auto callNode = std::make_shared<CallNode>("b", 0);
 
-        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
+        std::vector<std::shared_ptr<StatementNode>> children1{callNode};
 
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
 
-        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildRelationalExpressionAST(queue);
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build relational expression with parenthesised exprs") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-        };
-
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
-
-        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
-
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
-
-        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildRelationalExpressionAST(queue);
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build conditional expr to bracketed rel_expr") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-        };
-
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
-
-        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
-
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
-
-        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildConditionalExpressionAST(queue);
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build conditional expr to non bracketed rel_expr") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),           Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),          Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-        };
-
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
-
-        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
-
-        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
-
-        auto lessThan = ExpressionNode(LESS_THAN, mulNode, addNode, 0);
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildConditionalExpressionAST(queue);
-        REQUIRE(lessThan == *(result.get()));
-    }
-
-    SECTION("Build not conditional expression") {
-        std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::NOT, "!", 0),          Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),         Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
-            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
-
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        auto procedure1 = std::make_shared<ProcedureNode>("a", procStmtList);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
 
-        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
+        std::vector<std::shared_ptr<StatementNode>> children2 = {};
 
-        auto notNode = ExpressionNode(NOT, lessThan, 0);
+        auto printNode = std::make_shared<PrintNode>(yNode, 0);
 
-        auto queue = makeTokenQueue(inputTokenArray);
+        children2.push_back(printNode);
+        auto stmtList = std::make_shared<StatementListNode>(children2);
 
-        auto result = ast.buildConditionalExpressionAST(queue);
-        REQUIRE(notNode == *(result.get()));
+        auto procedure2 = std::make_shared<ProcedureNode>("b", stmtList);
+
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure1, procedure2};
+
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
     }
 
-    SECTION("Build binary conditional expression") {
+    SECTION("Build while with condition of the form '!((a == b) && (a != b))'") {
+        /*
+       procedure a {
+       while (!((x == y) && (x != y))) {
+       x = y;
+       }
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),     Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0), Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
-            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
-            Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),  Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
-            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0)};
-        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
-        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
-        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
-
-        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
-
-        auto moreThan = std::make_shared<ExpressionNode>(GREATER_THAN, xNode1, yNode1, 0);
-
-        auto andandNode = ExpressionNode(ANDAND, lessThan, moreThan, 0);
-
-        auto queue = makeTokenQueue(inputTokenArray);
-
-        auto result = ast.buildConditionalExpressionAST(queue);
-        REQUIRE(andandNode == *(result.get()));
-    }
-
-    SECTION("While loop test statement") {
-        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
             Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::NOT, "!", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
-
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::EQUAL_CHECK, "==", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::NOT_EQUAL_CHECK, "!=", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
-
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
@@ -772,6 +535,7 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
             Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
         std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
@@ -792,30 +556,44 @@ TEST_CASE("AST Build Tests") {
 
         auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
 
-        auto expected = WhileNode(notNode, stmtList, 0);
+        auto whileNode = std::make_shared<WhileNode>(notNode, stmtList, 0);
 
-        auto queue = makeTokenQueue(inputTokenArray);
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
 
-        auto result = ast.buildWhileAST(queue);
-        REQUIRE(expected == *(result.get()));
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
     }
 
-    SECTION("Build if-then-else statement") {
+    SECTION("Build if with condition of the form '(x < y) && (x > y)'") {
+        /*
+       procedure a {
+       if ((x < y) && (x > y)) then {
+       x = y;
+       } else {a = b;}
+       }
+        */
         std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
             Token(LEXICAL_TOKEN_TYPE::IF, "if", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::ANDAND, "&&", 0),
             Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
             Token(LEXICAL_TOKEN_TYPE::GREATER_THAN, ">", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
-
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
             Token(LEXICAL_TOKEN_TYPE::THEN, "then", 0),
@@ -832,6 +610,7 @@ TEST_CASE("AST Build Tests") {
             Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
             Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
             Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
         std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
         std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
@@ -858,25 +637,467 @@ TEST_CASE("AST Build Tests") {
         children7.push_back(assign1);
         auto stmtList2 = std::make_shared<StatementListNode>(children7);
 
-        auto expected = IfNode(andandNode, stmtList, stmtList2, 0);
+        auto ifNode = std::make_shared<IfNode>(andandNode, stmtList, stmtList2, 0);
 
-        auto queue = makeTokenQueue(inputTokenArray);
+        std::vector<std::shared_ptr<StatementNode>> children1{ifNode};
 
-        auto result = ast.buildIfAST(queue);
-        REQUIRE(expected == *(result.get()));
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
     }
 
-    SECTION("Build call statement ast correctly") {
+    SECTION("Build while with condition of the form 'z < 1'") {
+        /*
+       procedure a {
+       while (z < 1) {
+       x = y;
+       }
+       }
+        */
         std::vector<Token> inputTokenArray = {
-            Token(LEXICAL_TOKEN_TYPE::CALL, "call", 0),
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
             Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
-            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
         };
-        auto queue = makeTokenQueue(inputTokenArray);
-        auto result = ast.buildCallAST(queue);
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
 
-        auto expectedNode = CallNode("a", 0);
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, zNode, oneNode, 0);
 
-        REQUIRE(expectedNode == *(result.get()));
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form 'z < y'") {
+        /*
+       procedure a {
+       while (z < y) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, zNode, yNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form '1 < z'") {
+        /*
+       procedure a {
+       while (1 < z) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, oneNode, zNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form '1 < 2'") {
+        /*
+       procedure a {
+       while (1 < 2) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "1", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::INTEGER, "2", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
+        auto twoNode = std::make_shared<ConstantNode>("2", 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, oneNode, twoNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form 'z < x + y'") {
+        /*
+       procedure a {
+       while (z < x + y) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "z", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+        std::shared_ptr<VariableNode> zNode = std::make_shared<VariableNode>("z", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode1 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode1 = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+        auto oneNode = std::make_shared<ConstantNode>("1", 0);
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode1, yNode, 0);
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, zNode, addNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form 'x * y < x + y'") {
+        /*
+       procedure a {
+       while (x * y <  x + y) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
+
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, mulNode, addNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form '(x * y) < x + y'") {
+        /*
+       procedure a {
+       while ((x * y <  x + y)) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::MUL, "*", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::ADD, "+", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+
+        auto addNode = std::make_shared<ExpressionNode>(ADD, xNode2, yNode2, 0);
+
+        auto mulNode = std::make_shared<ExpressionNode>(MUL, xNode, yNode, 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, mulNode, addNode, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(lessThan, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
+    }
+
+    SECTION("Build while with condition of the form '!(x < y)'") {
+        /*
+       procedure a {
+       while (!(x < y)) {
+       x = y;
+       }
+       }
+        */
+        std::vector<Token> inputTokenArray = {
+            Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::WHILE, "while", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NOT, "!", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::LESS_THAN, "<", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_BRACKET, ")", 0),
+            Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "x", 0),
+            Token(LEXICAL_TOKEN_TYPE::EQUAL, "=", 0),
+            Token(LEXICAL_TOKEN_TYPE::NAME, "y", 0),
+            Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+            Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
+        };
+        std::shared_ptr<VariableNode> xNode = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode = std::make_shared<VariableNode>("y", 0);
+        std::shared_ptr<VariableNode> xNode2 = std::make_shared<VariableNode>("x", 0);
+        std::shared_ptr<VariableNode> yNode2 = std::make_shared<VariableNode>("y", 0);
+
+        auto lessThan = std::make_shared<ExpressionNode>(LESS_THAN, xNode, yNode, 0);
+
+        auto notNode = std::make_shared<ExpressionNode>(NOT, lessThan, 0);
+
+        auto assign = std::make_shared<AssignmentNode>(xNode2, yNode2, 0);
+
+        auto stmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>({assign}));
+
+        auto whileNode = std::make_shared<WhileNode>(notNode, stmtList, 0);
+
+        std::vector<std::shared_ptr<StatementNode>> children1{whileNode};
+
+        auto procStmtList = std::make_shared<StatementListNode>(children1);
+
+        auto procedure = std::make_shared<ProcedureNode>("a", procStmtList);
+        std::vector<std::shared_ptr<ProcedureNode>> childrenProg{procedure};
+        auto ProgNode = ProgramNode(childrenProg);
+
+        auto result = ast.buildAST(inputTokenArray);
+        REQUIRE(ProgNode == *(result.get()));
     }
 }
