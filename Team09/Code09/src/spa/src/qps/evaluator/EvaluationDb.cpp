@@ -19,9 +19,9 @@ std::unordered_set<StmtNum> EvaluationDb::getStmts(const Synonym& syn) {
     std::unordered_set<Stmt> allStmts{};
 
     if (syn.getType() == DesignEntityType::STMT) {
-        allStmts = reader->getStmts();
+        allStmts = reader.getStmts();
     } else {
-        allStmts = reader->getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
+        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
     }
 
     std::unordered_set<StmtNum> result{};

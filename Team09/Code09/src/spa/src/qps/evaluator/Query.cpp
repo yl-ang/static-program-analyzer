@@ -13,8 +13,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     }
 
     const std::shared_ptr tableManager{std::make_shared<TableManager>()};
-    const std::shared_ptr sharedPkb{std::make_shared<PKBFacadeReader>(pkb)};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{sharedPkb, tableManager})};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{pkb, tableManager})};
 
     if (!evaluateBooleanClauses(pkb, evalDb)) {
         return getEmptyResult();

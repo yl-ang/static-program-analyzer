@@ -75,6 +75,11 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship with 1 synonym") {
         pfw.setFollowsStore(followsStoreEntries);
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}};
+
+        pfw.setStmts(stmts);
+
         // Select s such that FollowsT(s, 3)
         FollowsStarTester{pfr, stmtSyn, std::make_shared<Integer>("3")}
             .testSynonyms({*stmtSyn})
@@ -99,6 +104,11 @@ TEST_CASE("SuchThatClause evaluate for follows* relationship with 1 synonym") {
                                                                     std::pair<int, int>{2, 3}};
         pfw.setFollowsStore(followsStoreEntries);
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
+
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}};
+
+        pfw.setStmts(stmts);
 
         // Select s such that FollowsT(1, s)
         FollowsStarTester{pfr, std::make_shared<Integer>("1"), stmtSyn}
