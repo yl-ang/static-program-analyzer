@@ -221,3 +221,7 @@ bool PKBFacadeReader::hasIfPattern(StmtNum stmtNum, const std::string &arg) {
 bool PKBFacadeReader::hasWhilePattern(StmtNum stmtNum, const std::string &arg) {
     return pkbReference->whilePatternStore->hasWhilePattern(stmtNum, arg);
 }
+
+std::unordered_map<StmtNum, std::unordered_set<StmtNum>> PKBFacadeReader::getNextStarMap() {
+    return pkbReference->nextStore->getNextStarMap();
+}

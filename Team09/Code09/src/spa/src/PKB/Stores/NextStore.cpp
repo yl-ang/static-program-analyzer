@@ -101,3 +101,9 @@ std::unordered_set<StmtNum> NextStore::computeNextStar(
 
     return result;
 }
+
+std::unordered_map<StmtNum, std::unordered_set<StmtNum>> NextStore::getNextStarMap() {
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> closureMap = nexterMap;
+    TransitiveClosureUtility<StmtNum>::computeTransitiveClosure(&closureMap);
+    return closureMap;
+}
