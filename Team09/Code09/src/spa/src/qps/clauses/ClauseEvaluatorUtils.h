@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 
-#include "pkb/PKBClient/PKBFacadeReader.h"
+#include "PKB/PKBClient/PKBFacadeReader.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/relationships/Relationship.h"
 

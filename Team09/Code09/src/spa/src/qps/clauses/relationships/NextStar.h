@@ -31,8 +31,7 @@ private:
         return reader.getNexteeStar(nexter);
     }
 
-    ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader,
-                                                const std::shared_ptr<EvaluationDb>& evalDb) override {
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) override {
         Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
         Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
 

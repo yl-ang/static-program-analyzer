@@ -1,7 +1,7 @@
 #pragma once
 
+#include "PKB/PKBClient/PKBFacadeReader.h"
 #include "TableManager.h"
-#include "pkb/PKBClient/PKBFacadeReader.h"
 #include "qps/clauseArguments/Synonym.h"
 
 class ClauseResult;
@@ -14,6 +14,7 @@ public:
     std::shared_ptr<TableManager> tableManager;
 
     EvaluationDb() = default;
+
     EvaluationDb(const PKBFacadeReader& reader, const std::shared_ptr<TableManager>& tm)
         : reader(reader), tableManager(tm) {}
 
