@@ -9,6 +9,9 @@ TEST_CASE("Benchmark AST building (if-then-else)") {
 
     int counter = 0;
     std::vector<Token> inputTokenArray = {
+        Token(LEXICAL_TOKEN_TYPE::PROCEDURE, "procedure", 0),
+        Token(LEXICAL_TOKEN_TYPE::NAME, "a", 0),
+        Token(LEXICAL_TOKEN_TYPE::OPEN_CURLY_BRACE, "{", 0),
         Token(LEXICAL_TOKEN_TYPE::IF, "if", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
         Token(LEXICAL_TOKEN_TYPE::OPEN_BRACKET, "(", 0),
@@ -39,6 +42,7 @@ TEST_CASE("Benchmark AST building (if-then-else)") {
         Token(LEXICAL_TOKEN_TYPE::NAME, "b", 0),
         Token(LEXICAL_TOKEN_TYPE::SEMICOLON, ";", 1),
         Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 1),
+        Token(LEXICAL_TOKEN_TYPE::CLOSE_CURLY_BRACE, "}", 0),
     };
 
     BENCHMARK("Building queue") {
@@ -50,10 +54,6 @@ TEST_CASE("Benchmark AST building (if-then-else)") {
     };
 
     BENCHMARK("If-then-else") {
-        std::queue<Token> queue;
-        for (auto token : inputTokenArray) {
-            queue.push(token);
-        }
-        return ast.buildIfAST(queue);
+        return ast.buildAST(inputTokenArray);
     };
 }
