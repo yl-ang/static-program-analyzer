@@ -7,6 +7,6 @@
 
 struct Pattern {
     Pattern() = default;
-    virtual ClauseResult evaluate(PKBFacadeReader&) = 0;
+    virtual ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) = 0;
     virtual bool validateArguments() = 0;
 };

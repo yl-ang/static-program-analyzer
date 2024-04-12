@@ -24,11 +24,11 @@ private:
     AffectsSet generateAffectsRelation(PKBFacadeReader&);
     void generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader);
     void generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
-    
+
     bool isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader);
     bool intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader);
     bool isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& reader);
-    
+
     bool checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument);
     bool checkAssign(std::shared_ptr<Synonym> synonym);
     static bool hasCommonValue(const std::unordered_set<Variable>&, const std::unordered_set<Variable>&);
@@ -36,16 +36,17 @@ private:
     template <typename Func>
     friend void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader);
     static void handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                    StatementType& stmtType, PKBFacadeReader& reader,
-                                    std::vector<StmtNum>& stack, std::unordered_set<StmtNum>& visited);
+                                          StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                                          std::unordered_set<StmtNum>& visited);
     template <typename Func>
     friend void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader);
     static void handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                   StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
-                                   std::unordered_set<StmtNum>& visited);
+                                          StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& stack,
+                                          std::unordered_set<StmtNum>& visited);
+
 public:
     Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected);
 
-    ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

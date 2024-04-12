@@ -4,28 +4,28 @@
 
 WithClause::WithClause(std::shared_ptr<ClauseArgument> l, std::shared_ptr<ClauseArgument> r) : lhs(l), rhs(r) {}
 
-ClauseResult WithClause::evaluate(PKBFacadeReader& pkb) {
+ClauseResult WithClause::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (isBooleanResult()) {
         return evaluateValueEquality();
     }
 
     if (lhs->isSynonym() && rhs->isSynonym()) {
-        return evaluateBothSynonyms(pkb);
+        return evaluateBothSynonyms(reader, evalDb);
     }
 
-    return evaluateOneSynonym(pkb);
+    return evaluateOneSynonym(reader, evalDb);
 }
 
 ClauseResult WithClause::evaluateValueEquality() const {
     return lhs->getValue() == rhs->getValue();
 }
 
-ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb) const {
+ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(lhs->isSynonym() ? lhs : rhs);
     auto other = lhs->isSynonym() ? rhs : lhs;
 
     // collect all possbile values of synonym
-    std::vector<std::string> synonymValues = SynonymValuesRetriever::retrieve(pkb, syn);
+    std::vector<std::string> synonymValues = SynonymValuesRetriever::retrieve(pkb, syn, evalDb);
 
     // compare attribute values of synonym values collected with non-synonym argument
     std::vector<std::string> validSynonymValues{};
@@ -39,13 +39,13 @@ ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb) const {
     return {syn.getWithoutAttribute(), validSynonymValues};
 }
 
-ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb) const {
+ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     Synonym lhsSyn = *std::dynamic_pointer_cast<Synonym>(lhs);
     Synonym rhsSyn = *std::dynamic_pointer_cast<Synonym>(rhs);
 
     // collect all possbile values of both synonyms
-    std::vector<std::string> lhsValues = SynonymValuesRetriever::retrieve(pkb, lhsSyn);
-    std::vector<std::string> rhsValues = SynonymValuesRetriever::retrieve(pkb, rhsSyn);
+    std::vector<std::string> lhsValues = SynonymValuesRetriever::retrieve(pkb, lhsSyn, evalDb);
+    std::vector<std::string> rhsValues = SynonymValuesRetriever::retrieve(pkb, rhsSyn, evalDb);
 
     std::unordered_map<std::string, std::vector<std::string>> rhsAttributesMap{};
     for (std::string rhsValue : rhsValues) {

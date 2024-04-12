@@ -3,9 +3,9 @@
 PatternClause::PatternClause(std::shared_ptr<ClauseArgument> syn, std::vector<std::shared_ptr<ClauseArgument>> args)
     : synonym(syn), arguments(args) {}
 
-ClauseResult PatternClause::evaluate(PKBFacadeReader& reader) {
+ClauseResult PatternClause::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     std::shared_ptr<Pattern> evaluator = getPattern();
-    return evaluator->evaluate(reader);
+    return evaluator->evaluate(reader, evalDb);
 }
 
 std::shared_ptr<Pattern> PatternClause::getPattern() {

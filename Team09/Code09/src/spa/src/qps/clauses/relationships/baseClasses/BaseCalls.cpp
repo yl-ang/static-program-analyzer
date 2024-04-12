@@ -23,59 +23,57 @@ bool BaseCalls::isSimpleResult() const {
     return !caller->isSynonym() && !callee->isSynonym();
 }
 
-ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader) {
-    if (callee->isSynonym() && caller->isSynonym()) {
-        return evaluateBothSynonyms(reader);
+ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
+    if (isSimpleResult()) {
+        return {hasCallRelationship(reader)};
     }
 
-    if (callee->isSynonym()) {
-        return evaluateCalleeSynonym(reader);
+    if (callee->isWildcard() || caller->isWildcard()) {
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
-    if (caller->isSynonym()) {
-        return evaluateCallerSynonym(reader);
+    if (callee->isLiteral() || caller->isLiteral()) {
+        return evaluateSynonymLiteral(reader, evalDb);
     }
 
-    return {hasCallRelationship(reader)};
+    return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseCalls::evaluateCalleeSynonym(PKBFacadeReader& reader) {
-    std::unordered_set<Procedure> callers{};
-    if (caller->isWildcard()) {
-        callers = reader.getProcedures();
-    } else {
-        callers.insert(caller->getValue());
+ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(callee->isSynonym() ? callee : caller);
+
+    auto potentialResults = evalDb.getProcedures(syn);
+    SynonymValues result{};
+
+    for (const auto& procName : potentialResults) {
+        auto otherProcNames = callee->isSynonym() ? reader.getCaller(procName) : reader.getCallee(procName);
+        if (!otherProcNames.empty()) {
+            result.push_back(procName);
+        }
     }
 
-    SynonymValues values{};
-    for (Procedure callerProc : callers) {
-        const std::unordered_set<std::string>& callees = getCallee(reader, callerProc);
-        values.insert(values.end(), callees.begin(), callees.end());
-    }
-
-    Synonym syn = *std::dynamic_pointer_cast<Synonym>(callee);
-    return {syn, values};
+    return {syn, result};
 }
 
-ClauseResult BaseCalls::evaluateCallerSynonym(PKBFacadeReader& reader) {
-    std::unordered_set<Procedure> callees{};
-    if (callee->isWildcard()) {
-        callees = reader.getProcedures();
-    } else {
-        callees.insert(callee->getValue());
+ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, EvaluationDb& evalDb) {
+    bool calleeIsSynonym = callee->isSynonym();
+    Synonym syn = *std::dynamic_pointer_cast<Synonym>(calleeIsSynonym ? callee : caller);
+
+    auto potentialResults = evalDb.getProcedures(syn);
+    SynonymValues result{};
+
+    // Get all caller/callee of the literal, the opposite of whichever the literal is.
+    auto allResults = calleeIsSynonym ? reader.getCallee(caller->getValue()) : reader.getCaller(callee->getValue());
+    for (auto procName : potentialResults) {
+        if (allResults.find(procName) != allResults.end()) {
+            result.push_back(procName);
+        }
     }
 
-    SynonymValues values{};
-    for (Procedure calleeProc : callees) {
-        const std::unordered_set<std::string>& callers = getCaller(reader, calleeProc);
-        values.insert(values.end(), callers.begin(), callers.end());
-    }
-
-    Synonym syn = *std::dynamic_pointer_cast<Synonym>(caller);
-    return {syn, values};
+    return {syn, result};
 }
 
-ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym callerSyn = *std::dynamic_pointer_cast<Synonym>(caller);
     Synonym calleeSyn = *std::dynamic_pointer_cast<Synonym>(callee);
 
@@ -86,11 +84,31 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader) {
 
     SynonymValues callerValues{};
     SynonymValues calleeValues{};
-    for (Procedure callerProc : reader.getProcedures()) {
-        const auto& callees = getCallee(reader, callerProc);
-        for (const auto& calleeProc : callees) {
-            callerValues.push_back(callerProc);
-            calleeValues.push_back(calleeProc);
+
+    auto allCallerProcs = evalDb.getProcedures(callerSyn);
+    auto allCalleeProcs = evalDb.getProcedures(calleeSyn);
+
+    if (allCallerProcs.size() < allCalleeProcs.size()) {
+        for (const Procedure& callerProc : allCallerProcs) {
+            for (const auto& calleeProc : getCallee(reader, callerProc)) {
+                if (allCalleeProcs.find(calleeProc) == allCalleeProcs.end()) {
+                    continue;
+                }
+
+                callerValues.push_back(callerProc);
+                calleeValues.push_back(calleeProc);
+            }
+        }
+    } else {
+        for (const Procedure& calleeProc : allCalleeProcs) {
+            for (const auto& callerProc : getCaller(reader, calleeProc)) {
+                if (allCallerProcs.find(callerProc) == allCallerProcs.end()) {
+                    continue;
+                }
+
+                callerValues.push_back(callerProc);
+                calleeValues.push_back(calleeProc);
+            }
         }
     }
 

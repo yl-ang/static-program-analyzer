@@ -12,9 +12,9 @@ protected:
 private:
     bool isSimpleResult() const;
 
-    ClauseResult evaluateCalleeSynonym(PKBFacadeReader&);
-    ClauseResult evaluateCallerSynonym(PKBFacadeReader&);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, EvaluationDb&);
+    ClauseResult evaluateSynonymLiteral(PKBFacadeReader&, EvaluationDb&);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb&);
 
     virtual bool hasCallRelationship(PKBFacadeReader&) = 0;
     virtual ProcedureSet getCallee(PKBFacadeReader&, const Procedure&) = 0;
@@ -23,6 +23,6 @@ private:
 public:
     BaseCalls(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
-    ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

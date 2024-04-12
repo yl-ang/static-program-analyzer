@@ -23,48 +23,33 @@ bool BaseParent::validateArguments() {
     return true;
 }
 
-ClauseResult BaseParent::evaluate(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (isSimpleResult()) {
         return {hasParentRelationship(reader)};
     }
 
     if ((parent->isInteger() && child->isSynonym()) || (parent->isSynonym() && child->isInteger())) {
-        return evaluateSynonymInteger(reader);
+        return evaluateSynonymInteger(reader, evalDb);
     }
 
     if ((parent->isWildcard() && child->isSynonym()) || (parent->isSynonym() && child->isWildcard())) {
-        return evaluateSynonymWildcard(reader);
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
-    return evaluateBothSynonyms(reader);
+    return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool parentIsSynonym = parent->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
 
-    std::unordered_set<Stmt> allStmts{};
-    if (syn.getType() == DesignEntityType::STMT) {
-        allStmts = reader.getStmts();
-    } else {
-        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-    }
+    auto allStmts = evalDb.getStmts(syn);
 
     std::unordered_set<StmtNum> uniqueValues{};
-    for (Stmt stmt : allStmts) {
-        StmtNum stmtNum = stmt.stmtNum;
-        if (parentIsSynonym) {
-            // If stmt has children, then this is a parent/grandparent
-            std::unordered_set<StmtNum> children = getChildren(reader, stmtNum);
-            if (!children.empty()) {
-                uniqueValues.insert(stmtNum);
-            }
-        } else {
-            // If stmt has parent, then this is a child/grandchild
-            std::unordered_set<StmtNum> parents = getParents(reader, stmtNum);
-            if (!parents.empty()) {
-                uniqueValues.insert(stmtNum);
-            }
+    for (StmtNum stmtNum : allStmts) {
+        auto otherResults = parentIsSynonym ? getChildren(reader, stmtNum) : getParents(reader, stmtNum);
+        if (!otherResults.empty()) {
+            uniqueValues.insert(stmtNum);
         }
     }
 
@@ -76,7 +61,7 @@ ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     return {syn, values};
 }
 
-ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool parentIsSynonym = parent->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
     StmtNum stmtNum = std::stoi(parentIsSynonym ? child->getValue() : parent->getValue());
@@ -89,24 +74,17 @@ ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
     }
 
     SynonymValues values{};
-    if (syn.getType() == DesignEntityType::STMT) {
-        for (StmtNum stmt : stmtNums) {
-            values.push_back(std::to_string(stmt));
-        }
-    } else {
-        StatementType synonymType = DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()];
-        for (StmtNum stmt : stmtNums) {
-            std::optional<Stmt> stmtOpt = reader.getStatementByStmtNum(stmt);
-            if (stmtOpt.has_value() && stmtOpt.value().type == synonymType) {
-                values.push_back(std::to_string(stmt));
-            }
+    auto potentialResults = evalDb.getStmts(syn);
+    for (auto potentialResult : evalDb.getStmts(syn)) {
+        if (stmtNums.find(potentialResult) != stmtNums.end()) {
+            values.push_back(std::to_string(potentialResult));
         }
     }
 
     return {syn, values};
 }
 
-ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym parentSyn = *std::dynamic_pointer_cast<Synonym>(parent);
     Synonym childSyn = *std::dynamic_pointer_cast<Synonym>(child);
 
@@ -118,21 +96,14 @@ ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader) {
     SynonymValues parentValues{};
     SynonymValues childValues{};
 
-    for (const Stmt& parent : reader.getStmts()) {
-        if (parentSyn.getType() != DesignEntityType::STMT &&
-            DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[parentSyn.getType()] != parent.type) {
-            continue;
-        }
+    auto potentialChildrenValues = evalDb.getStmts(childSyn);
 
-        StmtNum parentStmtNum = parent.stmtNum;
+    for (const StmtNum& parentStmtNum : evalDb.getStmts(parentSyn)) {
         std::unordered_set<StmtNum> children = getChildren(reader, parentStmtNum);
-        for (StmtNum child : children) {
-            std::optional<Stmt> childStmtOpt = reader.getStatementByStmtNum(child);
-            if (childSyn.getType() == DesignEntityType::STMT ||
-                (childStmtOpt.has_value() &&
-                 childStmtOpt.value().type == DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[childSyn.getType()])) {
+        for (const StmtNum& childStmtNum : children) {
+            if (potentialChildrenValues.find(childStmtNum) != potentialChildrenValues.end()) {
                 parentValues.push_back(std::to_string(parentStmtNum));
-                childValues.push_back(std::to_string(child));
+                childValues.push_back(std::to_string(childStmtNum));
             }
         }
     }

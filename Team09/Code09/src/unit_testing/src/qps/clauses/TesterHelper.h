@@ -17,8 +17,8 @@ public:  // NOLINT
         auto stc = std::make_shared<SuchThatClause>(rsType, firstArg, secondArg);
         stc->setNegation(isNegation);
         auto sharedTm{std::make_shared<TableManager>()};
-        auto sharedEvalDb{std::make_shared<EvaluationDb>(pkb, sharedTm)};
-        result = stc->runEvaluation(pkb, sharedEvalDb);
+        EvaluationDb evalDb{pkb, sharedTm};
+        result = stc->runEvaluation(pkb, evalDb);
     }
 
     void testBoolean(bool expected) {

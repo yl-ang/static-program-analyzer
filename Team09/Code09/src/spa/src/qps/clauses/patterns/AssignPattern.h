@@ -11,11 +11,11 @@ private:
     std::shared_ptr<ClauseArgument> assignSyn;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
-    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
-    ClauseResult evaluateNoArgsSyns(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&, EvaluationDb& evalDb);
+    ClauseResult evaluateNoArgsSyns(PKBFacadeReader&, EvaluationDb& evalDb);
 
 public:
     AssignPattern(std::shared_ptr<ClauseArgument> assignSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
-    ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

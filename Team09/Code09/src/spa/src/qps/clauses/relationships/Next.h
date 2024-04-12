@@ -29,7 +29,7 @@ private:
         return reader.getNextee(nexter);
     }
 
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) override {
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) override {
         Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
         Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
 
@@ -37,8 +37,8 @@ private:
 
         SynonymValues currentSynValues{}, nextSynValues{};
 
-        const std::unordered_set existingCurrentSynStmtNums{evalDb->getStmts(currentSyn)};
-        const std::unordered_set existingNexterStmtNums{evalDb->getStmts(nextSyn)};
+        const std::unordered_set existingCurrentSynStmtNums{evalDb.getStmts(currentSyn)};
+        const std::unordered_set existingNexterStmtNums{evalDb.getStmts(nextSyn)};
 
         currentSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
         nextSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());

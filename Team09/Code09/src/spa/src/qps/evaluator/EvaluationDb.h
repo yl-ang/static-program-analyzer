@@ -18,5 +18,8 @@ public:
     EvaluationDb(const PKBFacadeReader& reader, const std::shared_ptr<TableManager>& tm)
         : reader(reader), tableManager(tm) {}
 
-    std::unordered_set<StmtNum> getStmts(const Synonym& syn);
+    std::unordered_set<StmtNum> getStmts(const Synonym& syn) const;
+    std::unordered_set<Variable> getVariables(const Synonym& syn) const;
+    std::unordered_set<Constant> getConstants(const Synonym& syn) const;
+    std::unordered_set<Procedure> getProcedures(const Synonym& syn) const;
 };

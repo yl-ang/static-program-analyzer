@@ -23,9 +23,9 @@ bool Uses::validateArguments() {
     return true;
 }
 
-ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
+ClauseResult Uses::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (user->isSynonym() && var->isSynonym()) {
-        return evaluateBothSynonyms(reader);
+        return evaluateBothSynonyms(reader, evalDb);
     }
 
     if (user->isSynonym()) {
@@ -49,14 +49,14 @@ ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
                 : reader.hasStatementVariableUseRelationship(*user, *var)};
 }
 
-ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym userSyn = *std::dynamic_pointer_cast<Synonym>(user);
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues userValues{};
     SynonymValues varValues{};
 
-    for (Variable var : reader.getVariables()) {
+    for (const Variable& var : evalDb.getVariables(varSyn)) {
         if (userSyn.getType() == DesignEntityType::PROCEDURE) {
             std::unordered_set<Procedure> procs = reader.getUsesProceduresByVariable(var);
             for (Procedure proc : procs) {

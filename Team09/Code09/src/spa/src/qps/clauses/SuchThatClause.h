@@ -13,8 +13,7 @@ private:
     std::optional<std::shared_ptr<Relationship>> relationship;
 
 protected:
-    ClauseResult evaluate(PKBFacadeReader&) override;
-    ClauseResult evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) override;
+    ClauseResult evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) override;
 
 public:
     SuchThatClause(const RelationshipType&, std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);

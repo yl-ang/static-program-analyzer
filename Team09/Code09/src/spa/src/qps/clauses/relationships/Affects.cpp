@@ -11,7 +11,7 @@ bool Affects::validateArguments() {
 
 /**
  * Various checks below
-*/
+ */
 bool Affects::checkSynonym(std::shared_ptr<ClauseArgument> clauseArgument) {
     if (clauseArgument->isSynonym()) {
         std::shared_ptr<Synonym> s = std::dynamic_pointer_cast<Synonym>(clauseArgument);
@@ -29,8 +29,7 @@ bool Affects::checkAssign(std::shared_ptr<Synonym> synonym) {
     return (sType == DesignEntityType::ASSIGN || sType == DesignEntityType::STMT);
 }
 
-bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
-                            const std::unordered_set<Variable>& set2) {
+bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1, const std::unordered_set<Variable>& set2) {
     for (const auto value : set1) {
         if (set2.find(value) != set2.end()) {
             return true;  // A common value is found
@@ -39,10 +38,10 @@ bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1,
     return false;  // No common value found
 }
 
-ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
+ClauseResult Affects::evaluate(PKBFacadeReader& reader, EvaluationDb&) {
     /**
      * Returns TRUE/FALSE
-    */
+     */
     if (affector->isInteger() && affected->isInteger()) {
         return evaluateBothIntegers(reader);
     }
@@ -55,7 +54,7 @@ ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
 
     /**
      * Returns either s1, s2, or both
-    */
+     */
     if ((affector->isInteger() && affected->isSynonym()) || (affector->isSynonym() && affected->isInteger())) {
         return evaluateSynonymInteger(reader);
     }
@@ -79,8 +78,8 @@ AffectsSet Affects::generateAffectsRelation(PKBFacadeReader& reader) {
 
 // Helper Affected function (2)
 void Affects::handleCommonAffectedLogic(StmtNum& stmtNum, std::unordered_set<Variable>& usesVariable,
-                                        StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
+                                        StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& queue,
+                                        std::unordered_set<StmtNum>& visited) {
     // if modified, skip rest of loop
     if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
@@ -111,9 +110,9 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
         // get the immendiate set of next of affectedStmtNum
         auto startingSet = reader.getNextee(affectedStmtNum);
         /**
-         * For each statement stmt in startingSet, this line adds stmt to the back of the queue using emplace_back(). 
+         * For each statement stmt in startingSet, this line adds stmt to the back of the queue using emplace_back().
          * emplace_back() is a function that constructs an object in-place at the end of the container.
-        */
+         */
         for (auto stmt : startingSet) {
             queue.emplace_back(stmt);
         }
@@ -133,8 +132,7 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
             // get statement type of statement
             std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
             if (!stmt.has_value()) {
-                throw Exception(
-                    "Not supposed to happen. Check to return empty value/ false.");
+                throw Exception("Not supposed to happen. Check to return empty value/ false.");
             }
             StatementType stmtType = stmt->type;
 
@@ -152,33 +150,36 @@ void processAffected(Func func, StmtNum affectedStmtNum, PKBFacadeReader reader)
 // Used for BOOLEAN Affected
 bool Affects::isAffectsfromAffected(StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     bool result = false;
-    processAffected([&](std::unordered_set<Variable>& usesVariable,
-                        std::unordered_set<Variable>& curModifiesVariables,
-                        StmtNum& stmtNum, StatementType stmtType) {
-        result = result || (stmtType == StatementType::ASSIGN && hasCommonValue(usesVariable, curModifiesVariables));
-        return;
-    }, affectedStmtNum, reader);
+    processAffected(
+        [&](std::unordered_set<Variable>& usesVariable, std::unordered_set<Variable>& curModifiesVariables,
+            StmtNum& stmtNum, StatementType stmtType) {
+            result =
+                result || (stmtType == StatementType::ASSIGN && hasCommonValue(usesVariable, curModifiesVariables));
+            return;
+        },
+        affectedStmtNum, reader);
     return result;
 }
 
 // Used for Synonym Affected
 void Affects::generateAffectsfromAffected(AffectsSet& result, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
-    processAffected([&](std::unordered_set<Variable>& usesVariable,
-                        std::unordered_set<Variable>& curModifiesVariables,
-                        StmtNum& stmtNum, StatementType stmtType) {
-        if (hasCommonValue(usesVariable, curModifiesVariables)) {
-            if (stmtType == StatementType::ASSIGN) {
-                result.insert({stmtNum, affectedStmtNum});
+    processAffected(
+        [&](std::unordered_set<Variable>& usesVariable, std::unordered_set<Variable>& curModifiesVariables,
+            StmtNum& stmtNum, StatementType stmtType) {
+            if (hasCommonValue(usesVariable, curModifiesVariables)) {
+                if (stmtType == StatementType::ASSIGN) {
+                    result.insert({stmtNum, affectedStmtNum});
+                }
+                return;
             }
-            return;
-        }
-    }, affectedStmtNum, reader);
+        },
+        affectedStmtNum, reader);
 }
 
 // Helper Affector function (2)
 void Affects::handleCommonAffectorLogic(StmtNum& stmtNum, std::unordered_set<Variable>& modifiedVariables,
-                                        StatementType& stmtType, PKBFacadeReader& reader,
-                                        std::vector<StmtNum>& queue, std::unordered_set<StmtNum>& visited) {
+                                        StatementType& stmtType, PKBFacadeReader& reader, std::vector<StmtNum>& queue,
+                                        std::unordered_set<StmtNum>& visited) {
     // if modified, skip rest of loop
     if (stmtType == StatementType::ASSIGN || stmtType == StatementType::READ || stmtType == StatementType::CALL) {
         auto curModifiesVariables = reader.getModifiesVariablesByStatement(stmtNum);
@@ -224,8 +225,7 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
         // get statement type of statement
         std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
         if (!stmt.has_value()) {
-            throw Exception(
-                "Not supposed to happen. Check to return empty value/ false.");
+            throw Exception("Not supposed to happen. Check to return empty value/ false.");
         }
         StatementType stmtType = stmt.value().type;
 
@@ -241,20 +241,18 @@ void processAffects(Func func, StmtNum affectorStmtNum, PKBFacadeReader reader) 
 // Used for BOOLEAN Affector
 bool Affects::isAffectsfromAffector(StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
     bool result = false;
-    processAffects([&](std::unordered_set<Variable>& modifiedVariables,
-                        std::unordered_set<Variable>& curUsedVariables,
-                        StmtNum& stmtNum) {
-            result = result || hasCommonValue(modifiedVariables, curUsedVariables);
-        }, affectorStmtNum, reader);
+    processAffects([&](std::unordered_set<Variable>& modifiedVariables, std::unordered_set<Variable>& curUsedVariables,
+                       StmtNum& stmtNum) { result = result || hasCommonValue(modifiedVariables, curUsedVariables); },
+                   affectorStmtNum, reader);
     return result;
 }
 
 // Used for Integer/Integer Affector
 bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affectedStmtNum, PKBFacadeReader& reader) {
     bool result = false;
-    processAffects([&](std::unordered_set<Variable>& modifiedVariables,
-                        std::unordered_set<Variable>& curUsedVariables,
-                        StmtNum& stmtNum) {
+    processAffects(
+        [&](std::unordered_set<Variable>& modifiedVariables, std::unordered_set<Variable>& curUsedVariables,
+            StmtNum& stmtNum) {
             result = result || (hasCommonValue(modifiedVariables, curUsedVariables) && (stmtNum == affectedStmtNum));
         },
         affectorStmtNum, reader);
@@ -263,9 +261,9 @@ bool Affects::intAffectsfromAffector(StmtNum& affectorStmtNum, StmtNum& affected
 
 // Used for Synonym Affector
 void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorStmtNum, PKBFacadeReader& reader) {
-    processAffects([&](std::unordered_set<Variable>& modifiedVariables,
-                        std::unordered_set<Variable>& curUsedVariables,
-                        StmtNum& stmtNum) {
+    processAffects(
+        [&](std::unordered_set<Variable>& modifiedVariables, std::unordered_set<Variable>& curUsedVariables,
+            StmtNum& stmtNum) {
             if (hasCommonValue(modifiedVariables, curUsedVariables)) {
                 result.insert({affectorStmtNum, stmtNum});
             }
@@ -275,7 +273,7 @@ void Affects::generateAffectsfromAffector(AffectsSet& result, StmtNum& affectorS
 
 /**
  * Actual Evaluation functions begin here:
-*/
+ */
 
 ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     bool affectorIsInteger = affector->isInteger();
@@ -291,7 +289,7 @@ ClauseResult Affects::evaluateWildcardInteger(PKBFacadeReader& reader) {
     // wildcard is affected
     if (affectorIsInteger) {
         return isAffectsfromAffector(stmtNum, reader);
-    // wildcard is affector
+        // wildcard is affector
     } else {
         return isAffectsfromAffected(stmtNum, reader);
     }
@@ -307,8 +305,7 @@ ClauseResult Affects::evaluateBothIntegers(PKBFacadeReader& reader) {
     std::optional<Stmt> affectorStmt = reader.getStatementByStmtNum(affectorStmtNum);
     std::optional<Stmt> affectedStmt = reader.getStatementByStmtNum(affectedStmtNum);
 
-    if (affectorStmt.has_value() && affectedStmt.has_value() &&
-        (affectorStmt.value().type == StatementType::ASSIGN) &&
+    if (affectorStmt.has_value() && affectedStmt.has_value() && (affectorStmt.value().type == StatementType::ASSIGN) &&
         (affectedStmt.value().type == StatementType::ASSIGN)) {
         return intAffectsfromAffector(affectorStmtNum, affectedStmtNum, reader);
     }
@@ -324,7 +321,7 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     if (checkAssign(syn)) {
         AffectsSet resultSet = generateAffectsRelation(reader);
 
-        for (std::pair<StmtNum, StmtNum> result: resultSet) {
+        for (std::pair<StmtNum, StmtNum> result : resultSet) {
             if (affectorIsSynonym) {
                 stmtNumValues.insert(result.first);
             } else {
@@ -354,7 +351,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
     }
     std::optional<Stmt> stmt = reader.getStatementByStmtNum(stmtNum);
     if (!stmt.has_value() || stmt.value().type != StatementType::ASSIGN) {
-        return  {*syn, {}};
+        return {*syn, {}};
     }
     AffectsSet resultSet;
     // synonym is affected
@@ -365,7 +362,7 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
                 stmtNumValues.insert(pair.second);
             }
         }
-    // synonym is affector
+        // synonym is affector
     } else {
         generateAffectsfromAffected(resultSet, stmtNum, reader);
         for (const auto& pair : resultSet) {
@@ -394,7 +391,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
         return {headers, {{}, {}}};
     }
     AffectsSet resultSet = generateAffectsRelation(reader);
-    for (std::pair<StmtNum, StmtNum> result: resultSet) {
+    for (std::pair<StmtNum, StmtNum> result : resultSet) {
         // account for if affectorSyn is same syn as affectedSyn
         if (*affectorSyn == *affectedSyn) {
             if (result.first == result.second) {
