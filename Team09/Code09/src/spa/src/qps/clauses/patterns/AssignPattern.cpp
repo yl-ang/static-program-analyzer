@@ -4,7 +4,7 @@ AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
                              std::vector<std::shared_ptr<ClauseArgument>> args)
     : assignSyn(assignSyn), arguments(args) {}
 
-ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader) {
+ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>&) {
     if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else {

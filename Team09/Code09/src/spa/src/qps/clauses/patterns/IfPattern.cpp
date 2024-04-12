@@ -3,7 +3,7 @@
 IfPattern::IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
     : ifSyn(ifSyn), arguments(args) {}
 
-ClauseResult IfPattern::evaluate(PKBFacadeReader& reader) {
+ClauseResult IfPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>&) {
     if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else if (arguments[0]->isLiteral()) {

@@ -3,7 +3,7 @@
 WhilePattern::WhilePattern(std::shared_ptr<ClauseArgument> whileSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
     : whileSyn(whileSyn), arguments(args) {}
 
-ClauseResult WhilePattern::evaluate(PKBFacadeReader& reader) {
+ClauseResult WhilePattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>&) {
     if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader);
     } else if (arguments[0]->isLiteral()) {

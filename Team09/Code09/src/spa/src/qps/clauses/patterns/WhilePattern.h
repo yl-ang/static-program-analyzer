@@ -16,6 +16,6 @@ private:
 
 public:
     WhilePattern(std::shared_ptr<ClauseArgument> whileSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
-    ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
     bool validateArguments() override;
 };
