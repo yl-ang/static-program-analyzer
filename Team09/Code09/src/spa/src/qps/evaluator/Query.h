@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include "EvaluationDb.h"
 #include "PKB/PKBClient/PKBFacadeReader.h"
 #include "QueryDb.h"
 #include "Table.h"
@@ -31,11 +32,12 @@ private:
     std::vector<std::shared_ptr<PatternClause>> patternClauses;
     std::vector<std::shared_ptr<WithClause>> withClauses;
 
-    static void evaluateAndJoinClauses(const TableManager& tm, QueryDb&, PKBFacadeReader& pkb);
+    static void evaluateAndJoinClauses(TableManager& tm, QueryDb&, PKBFacadeReader& pkb,
+                                       const std::shared_ptr<EvaluationDb>&);
     static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
     static Synonym headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym);
 
-    bool evaluateBooleanClauses(PKBFacadeReader&) const;
+    bool evaluateBooleanClauses(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb) const;
     void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
     void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;

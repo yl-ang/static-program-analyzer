@@ -12,39 +12,41 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         return {QPSConstants::TRUE_STRING};
     }
 
-    if (!evaluateBooleanClauses(pkb)) {
+    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{pkb, tableManager})};
+
+    if (!evaluateBooleanClauses(pkb, evalDb)) {
         return getEmptyResult();
     }
 
-    const TableManager tableManager{};
-
     if (!getNonBooleanClauses().empty()) {
-        QueryDb db{getNonBooleanClauses()};
-        db.loadClausesWithEntities(this->selectEntities);
-        if (evaluateAndJoinClauses(tableManager, db, pkb); tableManager.isEmpty()) {
+        QueryDb queryDb{getNonBooleanClauses()};
+        queryDb.loadClausesWithEntities(this->selectEntities);
+        if (evaluateAndJoinClauses(*tableManager, queryDb, pkb, evalDb); tableManager->isEmpty()) {
             return getEmptyResult();
         }
 
-        while (db.loadNewGroup()) {
-            const TableManager nonConnectedTableManager{};
-            if (evaluateAndJoinClauses(nonConnectedTableManager, db, pkb); nonConnectedTableManager.isEmpty()) {
+        while (queryDb.loadNewGroup()) {
+            TableManager nonConnectedTableManager{};
+            if (evaluateAndJoinClauses(nonConnectedTableManager, queryDb, pkb, evalDb);
+                nonConnectedTableManager.isEmpty()) {
                 return getEmptyResult();
             }
         }
     }
 
-    if (buildAndJoinSelectTable(tableManager, pkb); tableManager.isEmpty()) {
+    if (buildAndJoinSelectTable(*tableManager, pkb); tableManager->isEmpty()) {
         // There are no results to select at all. Return empty result.
         return getEmptyResult();
     }
 
     if (isSelectBoolean()) {
-        return tableManager.isEmpty() ? std::vector{QPSConstants::FALSE_STRING}
-                                      : std::vector{QPSConstants::TRUE_STRING};
+        return tableManager->isEmpty() ? std::vector{QPSConstants::FALSE_STRING}
+                                       : std::vector{QPSConstants::TRUE_STRING};
     }
 
-    projectAttributes(tableManager, pkb);
-    return tableManager.extractResults(selectEntities);
+    projectAttributes(*tableManager, pkb);
+    return tableManager->extractResults(selectEntities);
 }
 
 void Query::projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const {
@@ -88,23 +90,25 @@ std::vector<std::string> Query::getEmptyResult() const {
     return this->isSelectBoolean() ? std::vector{QPSConstants::FALSE_STRING} : std::vector<std::string>{};
 }
 
-void Query::evaluateAndJoinClauses(const TableManager& tm, QueryDb& db, PKBFacadeReader& pkb) {
+void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReader& pkb,
+                                   const std::shared_ptr<EvaluationDb>& evalDb) {
     OptionalQueryClause next = db.next();
     while (next.has_value() && !tm.isEmpty()) {
-        ClauseResult res = next->get()->runEvaluation(pkb);
+        auto clause = next->get();
+        ClauseResult res = clause->runEvaluation(pkb, evalDb);
         tm.join(res);
         next = db.next();
     }
 }
 
-bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb) const {
+bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>& evalDb) const {
     for (auto stc : suchThatClauses) {
-        if (stc->isBooleanResult() && !stc->runEvaluation(pkb).getBoolean()) {
+        if (stc->isBooleanResult() && !stc->runEvaluation(pkb, evalDb).getBoolean()) {
             return false;
         }
     }
     for (auto wc : withClauses) {
-        if (wc->isBooleanResult() && !wc->runEvaluation(pkb).getBoolean()) {
+        if (wc->isBooleanResult() && !wc->runEvaluation(pkb, evalDb).getBoolean()) {
             return false;
         }
     }

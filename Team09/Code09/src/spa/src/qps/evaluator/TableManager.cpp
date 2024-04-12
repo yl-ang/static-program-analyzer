@@ -164,3 +164,11 @@ std::string TableManager::buildTuple(const std::vector<Synonym>& synonyms, const
 
     return resultTuple;
 }
+
+bool TableManager::hasHeader(const Synonym& synonym) const {
+    return this->result.containsHeader(synonym);
+}
+
+std::unordered_set<std::string> TableManager::getColumn(const Synonym& synonym) const {
+    return this->result.getColumn(synonym);
+}

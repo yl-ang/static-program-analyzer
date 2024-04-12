@@ -14,6 +14,7 @@ private:
 
 protected:
     ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) override;
 
 public:
     SuchThatClause(const RelationshipType&, std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);

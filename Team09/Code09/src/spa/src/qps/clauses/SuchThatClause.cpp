@@ -1,9 +1,5 @@
 #include "SuchThatClause.h"
 
-#include <iostream>
-
-#include "qps/exceptions/Exception.h"
-
 SuchThatClause::SuchThatClause(const RelationshipType& t, std::shared_ptr<ClauseArgument> f,
                                std::shared_ptr<ClauseArgument> s)
     : type(t), firstArg(f), secondArg(s) {}
@@ -38,6 +34,11 @@ std::vector<Synonym> SuchThatClause::getSynonyms() const {
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
     auto relationship = getRelationship();
     return relationship->evaluate(reader);
+}
+
+ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+    auto relationship = getRelationship();
+    return relationship->evaluate(reader, evalDb);
 }
 
 std::shared_ptr<Relationship> SuchThatClause::getRelationship() {

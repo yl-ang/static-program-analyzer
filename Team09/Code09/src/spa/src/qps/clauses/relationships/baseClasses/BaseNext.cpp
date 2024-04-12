@@ -1,5 +1,7 @@
 #include "BaseNext.h"
 
+#include <queue>
+
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauses/ClauseEvaluatorUtils.h"
 
@@ -29,6 +31,10 @@ bool BaseNext::validateArguments() {
 }
 
 ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
+    return {false};
+}
+
+ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isSimpleResult()) {
         return {hasNextRelationship(reader)};
     }
@@ -41,7 +47,7 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
         return evaluateSynonymInteger(reader);
     }
 
-    return evaluateBothSynonyms(reader);
+    return evaluateBothSynonyms(reader, evalDb);
 }
 
 ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
@@ -93,44 +99,4 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
     }
 
     return {syn, ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)};
-}
-
-ClauseResult BaseNext::evaluateBothSynonyms(PKBFacadeReader& reader) {
-    Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
-    Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
-
-    std::vector<Synonym> synonyms{currentSyn, nextSyn};
-
-    SynonymValues currentSynValues{}, nextSynValues{};
-
-    const std::unordered_set<Stmt>& allStmts =
-        currentSyn.getType() != DesignEntityType::STMT
-            ? reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[currentSyn.getType()])
-            : reader.getStmts();
-
-    for (const Stmt& currStmt : allStmts) {
-        std::unordered_set<StmtNum> nexters = getNexters(reader, currStmt.stmtNum);
-        if (nexters.empty()) {
-            continue;
-        }
-
-        if (currentSyn == nextSyn) {
-            if (nexters.find(currStmt.stmtNum) != nexters.end()) {
-                currentSynValues.push_back(std::to_string(currStmt.stmtNum));
-                nextSynValues.push_back(std::to_string(currStmt.stmtNum));
-            }
-
-            continue;
-        }
-        std::vector nexterStmts = ClauseEvaluatorUtils::filterStatementsByType(reader, nextSyn.getType(), nexters);
-
-        nextSynValues.reserve(nextSynValues.size() + nexterStmts.size());
-        nextSynValues.insert(nextSynValues.end(), nexterStmts.begin(), nexterStmts.end());
-
-        currentSynValues.reserve(currentSynValues.size() + nexterStmts.size());
-        currentSynValues.insert(currentSynValues.end(), nexterStmts.size(), std::to_string(currStmt.stmtNum));
-    }
-
-    std::vector<SynonymValues> synonymValues{currentSynValues, nextSynValues};
-    return {synonyms, synonymValues};
 }

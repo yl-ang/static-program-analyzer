@@ -18,6 +18,7 @@ public:
     std::unordered_set<StmtNum> getNextee(StmtNum nexter);
     std::unordered_set<StmtNum> getNexterStar(StmtNum nextee);
     std::unordered_set<StmtNum> getNexteeStar(StmtNum nexter);
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> getNextStarMap();
     bool hasNextRelationship(StmtNum s1, StmtNum s2);
     bool hasNextRelationship(ClauseArgument& arg1, ClauseArgument& arg2);
     bool hasNextStarRelationship(StmtNum s1, StmtNum s2);

@@ -167,7 +167,7 @@ std::unordered_set<StmtNum> PKBFacadeReader::getNexteeStar(StmtNum nexter) {
 }
 
 bool PKBFacadeReader::hasNextStarRelationship(StmtNum s1, StmtNum s2) {
-    return pkbReference->nextStore->hasNextRelationship(s1, s2);
+    return pkbReference->nextStore->hasNextStarRelationship(s1, s2);
 }
 
 bool PKBFacadeReader::hasNextStarRelationship(ClauseArgument &arg1, ClauseArgument &arg2) {
@@ -220,4 +220,8 @@ bool PKBFacadeReader::hasIfPattern(StmtNum stmtNum, const std::string &arg) {
 
 bool PKBFacadeReader::hasWhilePattern(StmtNum stmtNum, const std::string &arg) {
     return pkbReference->whilePatternStore->hasWhilePattern(stmtNum, arg);
+}
+
+std::unordered_map<StmtNum, std::unordered_set<StmtNum>> PKBFacadeReader::getNextStarMap() {
+    return pkbReference->nextStore->getNextStarMap();
 }
