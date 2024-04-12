@@ -11,8 +11,8 @@ private:
     std::shared_ptr<ClauseArgument> assignSyn;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
-    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
-    ClauseResult evaluateNoArgsSyns(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateNoArgsSyns(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
 
 public:
     AssignPattern(std::shared_ptr<ClauseArgument> assignSyn, std::vector<std::shared_ptr<ClauseArgument>> args);

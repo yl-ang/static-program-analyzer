@@ -4,11 +4,11 @@ AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
                              std::vector<std::shared_ptr<ClauseArgument>> args)
     : assignSyn(assignSyn), arguments(args) {}
 
-ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>&) {
+ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (arguments[0]->isSynonym()) {
-        return evaluateFirstArgSyn(reader);
+        return evaluateFirstArgSyn(reader, evalDb);
     } else {
-        return evaluateNoArgsSyns(reader);
+        return evaluateNoArgsSyns(reader, evalDb);
     }
 }
 
@@ -22,12 +22,12 @@ bool AssignPattern::validateArguments() {
     return true;
 }
 
-ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
+ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
     Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);  // This is 100% variable
 
-    std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
-    std::unordered_set<Variable> allVars = reader.getVariables();
+    std::unordered_set<StmtNum> assignStmts = evalDb->getStmts(aSyn);
+    std::unordered_set<Variable> allVars = evalDb->getVariables(fSyn);
 
     std::vector<std::string> stmtNumbers = {};
     std::vector<std::string> synValues = {};
@@ -43,17 +43,17 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     }
 
     bool hasPattern;
-    for (Stmt stmt : assignStmts) {
-        for (Variable var : allVars) {
+    for (const StmtNum& stmtNum : assignStmts) {
+        for (const Variable& var : allVars) {
             if (isPartial) {
-                hasPattern = reader.hasPartialPattern(stmt.stmtNum, var, secondString);
+                hasPattern = reader.hasPartialPattern(stmtNum, var, secondString);
             } else {
-                hasPattern = reader.hasExactPattern(stmt.stmtNum, var, secondString);
+                hasPattern = reader.hasExactPattern(stmtNum, var, secondString);
             }
 
             if (hasPattern) {
                 // keep track of syn and stmt
-                stmtNumbers.push_back(std::to_string(stmt.stmtNum));
+                stmtNumbers.push_back(std::to_string(stmtNum));
                 synValues.push_back(var);
                 // no two variables can be on the lhs
                 break;
@@ -70,14 +70,14 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader) {
     return {returnSyn, returnSynValues};
 }
 
-ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader) {
+ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
-    std::unordered_set<Stmt> assignStmts = reader.getStatementsByType(StatementType::ASSIGN);
+    std::unordered_set<StmtNum> assignStmts = evalDb->getStmts(aSyn);
     std::vector<std::string> stmtNumbers = {};
 
     if (arguments[0]->isWildcard() && arguments[1]->isWildcard()) {
-        for (Stmt stmt : assignStmts) {
-            stmtNumbers.push_back(std::to_string(stmt.stmtNum));
+        for (const StmtNum& stmtNum : assignStmts) {
+            stmtNumbers.push_back(std::to_string(stmtNum));
         }
         return {aSyn, stmtNumbers};
     }
@@ -94,15 +94,15 @@ ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader) {
     }
 
     bool hasPattern;
-    for (Stmt stmt : assignStmts) {
+    for (const StmtNum& stmtNum : assignStmts) {
         if (isPartial) {
-            hasPattern = reader.hasPartialPattern(stmt.stmtNum, firstString, secondString);
+            hasPattern = reader.hasPartialPattern(stmtNum, firstString, secondString);
         } else {
-            hasPattern = reader.hasExactPattern(stmt.stmtNum, firstString, secondString);
+            hasPattern = reader.hasExactPattern(stmtNum, firstString, secondString);
         }
 
         if (hasPattern) {
-            stmtNumbers.push_back(std::to_string(stmt.stmtNum));
+            stmtNumbers.push_back(std::to_string(stmtNum));
         }
     }
 

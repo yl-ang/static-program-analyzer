@@ -10,9 +10,9 @@ private:
     std::shared_ptr<ClauseArgument> ifSyn;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
-    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&);
-    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&);
-    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&);
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
 
 public:
     IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
