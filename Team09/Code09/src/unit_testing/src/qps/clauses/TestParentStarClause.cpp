@@ -74,6 +74,11 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
         pfw.setParentStore(parentStoreEntries);
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
 
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+
+        pfw.setStmts(stmts);
+
         // Select s such that ParentT(s, 2)
         ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("2")}
             .testSynonyms({*stmtSyn})
@@ -94,6 +99,11 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
                                                                    std::pair<int, int>{2, 3}};
         pfw.setParentStore(parentStoreEntries);
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
+
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+
+        pfw.setStmts(stmts);
 
         // Select s such that ParentT(1, s)
         ParentStarTester{pfr, std::make_shared<Integer>("1"), stmtSyn}

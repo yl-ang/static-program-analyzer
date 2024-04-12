@@ -21,6 +21,9 @@ TEST_CASE("Assign Pattern evaluate") {
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
 
+    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
+    EvaluationDb evalDb{reader, tableManager};
+
     /*
      * procedure test {
      *   read y;
@@ -49,9 +52,6 @@ TEST_CASE("Assign Pattern evaluate") {
     std::shared_ptr<Synonym> assignSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a");
 
     std::shared_ptr<Literal> literal = std::make_shared<Literal>("1");
-
-    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
 
     SECTION("Test Wildcard and Wildcard") {
         std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
@@ -169,7 +169,7 @@ TEST_CASE("While Pattern evaluate") {
     PKBFacadeReader reader{pkb};
 
     const std::shared_ptr tableManager{std::make_shared<TableManager>()};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
+    EvaluationDb evalDb{reader, tableManager};
 
     /*
      * procedure test {
@@ -264,7 +264,7 @@ TEST_CASE("If Pattern evaluate") {
     PKBFacadeReader reader{pkb};
 
     const std::shared_ptr tableManager{std::make_shared<TableManager>()};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
+    EvaluationDb evalDb{reader, tableManager};
 
     /*
      * procedure test {
