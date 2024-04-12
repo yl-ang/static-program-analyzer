@@ -24,6 +24,10 @@ bool Uses::validateArguments() {
 }
 
 ClauseResult Uses::evaluate(PKBFacadeReader& reader) {
+    return {false};
+}
+
+ClauseResult Uses::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (user->isSynonym() && var->isSynonym()) {
         return evaluateBothSynonyms(reader);
     }

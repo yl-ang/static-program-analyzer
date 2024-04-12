@@ -27,5 +27,6 @@ public:
     Modifies(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluate(PKBFacadeReader&) override;
+    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
     bool validateArguments() override;
 };
