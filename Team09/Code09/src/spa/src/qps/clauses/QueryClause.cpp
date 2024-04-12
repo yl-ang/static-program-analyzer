@@ -29,7 +29,7 @@ ClauseResult QueryClause::runEvaluation(PKBFacadeReader& pkb, const std::shared_
         seen.insert(rowValuesToString(row));
     }
 
-    std::vector<RowValues> allRowValues{SynonymValuesRetriever::retrieve(pkb, result.getSynonyms())};
+    std::vector<RowValues> allRowValues{SynonymValuesRetriever::retrieve(pkb, result.getSynonyms(), evalDb)};
     std::vector<RowValues> negatedResults{};
 
     for (RowValues& row : allRowValues) {

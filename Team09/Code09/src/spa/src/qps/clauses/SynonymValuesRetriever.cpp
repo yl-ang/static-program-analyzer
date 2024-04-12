@@ -2,11 +2,12 @@
 
 #include "qps/clauseArguments/Synonym.h"
 
-std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms) {
+std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
+                                                        const std::shared_ptr<EvaluationDb>& evalDb) {
     std::vector<RowValues> unjoinedSets{};
 
     for (Synonym synonym : synonyms) {
-        RowValues synonymValues = getSynonymValues(pkb, synonym);
+        RowValues synonymValues = getSynonymValues(pkb, synonym, evalDb);
         unjoinedSets.push_back(synonymValues);
     }
 
@@ -15,12 +16,14 @@ std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, st
     return joinedResults;
 }
 
-RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym) {
-    return getSynonymValues(pkb, synonym);
+RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym,
+                                           const std::shared_ptr<EvaluationDb>& evalDb) {
+    return getSynonymValues(pkb, synonym, evalDb);
 }
 
-ClauseResult SynonymValuesRetriever::retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms) {
-    std::vector<RowValues> rows = retrieve(pkb, synonyms);
+ClauseResult SynonymValuesRetriever::retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
+                                                            const std::shared_ptr<EvaluationDb>& evalDb) {
+    std::vector<RowValues> rows = retrieve(pkb, synonyms, evalDb);
     std::vector<SynonymValues> columns = ClauseEvaluatorUtils::transpose(rows);
     return {synonyms, columns};
 }
@@ -51,38 +54,35 @@ std::vector<RowValues> SynonymValuesRetriever::cartesianProduct(const std::vecto
     return result;
 }
 
-std::vector<std::string> SynonymValuesRetriever::getSynonymValues(PKBFacadeReader& pkb, Synonym synonym) {
+std::vector<std::string> SynonymValuesRetriever::getSynonymValues(PKBFacadeReader& pkb, Synonym synonym,
+                                                                  const std::shared_ptr<EvaluationDb>& evalDb) {
     std::vector<std::string> col{};
 
     switch (synonym.getType()) {
     case DesignEntityType::VARIABLE:
-        for (std::string var : pkb.getVariables()) {
+        for (std::string var : evalDb->getVariables(synonym)) {
             col.push_back(var);
         }
         break;
     case DesignEntityType::CONSTANT:
-        for (std::string con : pkb.getConstants()) {
+        for (std::string con : evalDb->getConstants(synonym)) {
             col.push_back(con);
         }
         break;
     case DesignEntityType::PROCEDURE:
-        for (std::string prod : pkb.getProcedures()) {
+        for (std::string prod : evalDb->getProcedures(synonym)) {
             col.push_back(prod);
         }
         break;
     case DesignEntityType::STMT:
-        for (Stmt stmt : pkb.getStmts()) {
-            col.push_back(std::to_string(stmt.stmtNum));
-        }
-        break;
     case DesignEntityType::READ:
     case DesignEntityType::ASSIGN:
     case DesignEntityType::CALL:
     case DesignEntityType::PRINT:
     case DesignEntityType::WHILE:
     case DesignEntityType::IF:
-        for (Stmt stmt : pkb.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[synonym.getType()])) {
-            col.push_back(std::to_string(stmt.stmtNum));
+        for (const StmtNum& stmtNum : evalDb->getStmts(synonym)) {
+            col.push_back(std::to_string(stmtNum));
         }
         break;
     case DesignEntityType::UNKNOWN:

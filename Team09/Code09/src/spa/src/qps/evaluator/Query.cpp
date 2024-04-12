@@ -35,7 +35,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
         }
     }
 
-    if (buildAndJoinSelectTable(*tableManager, pkb); tableManager->isEmpty()) {
+    if (buildAndJoinSelectTable(*tableManager, pkb, evalDb); tableManager->isEmpty()) {
         // There are no results to select at all. Return empty result.
         return getEmptyResult();
     }
@@ -138,7 +138,8 @@ std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
     return nonBooleanClauses;
 }
 
-void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb) const {
+void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb,
+                                    const std::shared_ptr<EvaluationDb>& evalDb) const {
     if (isSelectBoolean())
         return;
 
@@ -154,7 +155,8 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb
     }
 
     if (!selectEntitiesWithoutAttributes.empty()) {
-        const ClauseResult cr{SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes)};
+        const ClauseResult cr{
+            SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes, evalDb)};
         tm.join(cr);
     }
 }

@@ -19,8 +19,8 @@ private:
     WithType determineWithType(std::shared_ptr<ClauseArgument>);
 
     ClauseResult evaluateValueEquality() const;
-    ClauseResult evaluateOneSynonym(PKBFacadeReader& pkb) const;
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader& pkb) const;
+    ClauseResult evaluateOneSynonym(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>&) const;
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>&) const;
 
 public:
     WithClause(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);

@@ -18,9 +18,9 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult evaluateModifierSynonym(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult variablesModifedByStatement(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult variablesModifiedByProcedure(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateModifierSynonym(PKBFacadeReader&);
+    ClauseResult variablesModifedByStatement(PKBFacadeReader&);
+    ClauseResult variablesModifiedByProcedure(PKBFacadeReader& reader);
     ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
 
 public:

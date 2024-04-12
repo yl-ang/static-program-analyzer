@@ -39,7 +39,7 @@ private:
 
     bool evaluateBooleanClauses(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb) const;
     void projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const;
-    void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&) const;
+    void buildAndJoinSelectTable(const TableManager&, PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) const;
     std::vector<QueryClausePtr> getNonBooleanClauses() const;
 
     // Getters and checkers

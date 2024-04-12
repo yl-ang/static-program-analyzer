@@ -56,7 +56,7 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shar
     SynonymValues userValues{};
     SynonymValues varValues{};
 
-    for (Variable var : reader.getVariables()) {
+    for (const Variable& var : evalDb->getVariables(varSyn)) {
         if (userSyn.getType() == DesignEntityType::PROCEDURE) {
             std::unordered_set<Procedure> procs = reader.getUsesProceduresByVariable(var);
             for (Procedure proc : procs) {
