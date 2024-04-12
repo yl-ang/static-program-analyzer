@@ -68,3 +68,30 @@ std::shared_ptr<PatternTreeNode> PatternTreeNode::deserializeHelper(std::istring
     root->right = deserializeHelper(in);
     return root;
 }
+
+bool PatternTreeNode::isEqual(const std::shared_ptr<PatternTreeNode>& tree1,
+                              const std::shared_ptr<PatternTreeNode>& tree2) {
+    if (tree1 == nullptr && tree2 == nullptr)
+        return true;
+    if (tree1 == nullptr || tree2 == nullptr)
+        return false;
+    if (tree1->value == tree2->value)
+        return isEqual(tree1->left, tree2->left) && isEqual(tree1->right, tree2->right);
+    return false;
+}
+
+bool PatternTreeNode::isPartiallyEqual(const std::shared_ptr<PatternTreeNode>& tree1,
+                                       const std::shared_ptr<PatternTreeNode>& tree2) {
+    if (tree1 == nullptr)
+        return false;
+    if (isEqual(tree1, tree2))
+        return true;
+    return isPartiallyEqual(tree1->left, tree2) || isPartiallyEqual(tree1->right, tree2);
+}
+
+void PatternTreeNode::setLeft(std::shared_ptr<PatternTreeNode> left) {
+    this->left = left;
+}
+void PatternTreeNode::setRight(std::shared_ptr<PatternTreeNode> right) {
+    this->right = right;
+}

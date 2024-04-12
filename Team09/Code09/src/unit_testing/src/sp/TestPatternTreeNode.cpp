@@ -11,8 +11,8 @@ TEST_CASE("PatternTreeNode tests") {
         auto expected = std::make_shared<PatternTreeNode>("add");
         auto left = std::make_shared<PatternTreeNode>("x");
         auto right = std::make_shared<PatternTreeNode>("1");
-        expected->left = left;
-        expected->right = right;
+        expected->setLeft(left);
+        expected->setRight(right);
 
         auto result = PatternTreeNode::buildTreeFromString(input);
         REQUIRE(PatternTreeNode::isEqual(expected, result));
@@ -22,8 +22,8 @@ TEST_CASE("PatternTreeNode tests") {
         auto root = std::make_shared<PatternTreeNode>("add");
         auto left = std::make_shared<PatternTreeNode>("x");
         auto right = std::make_shared<PatternTreeNode>("1");
-        root->left = left;
-        root->right = right;
+        root->setLeft(left);
+        root->setRight(right);
         auto result = PatternTreeNode::serialiseToString(root);
         auto expected = "add x # # 1 # # ";
         REQUIRE(result == expected);
@@ -33,8 +33,8 @@ TEST_CASE("PatternTreeNode tests") {
         auto root = std::make_shared<PatternTreeNode>("sub");
         auto left = std::make_shared<PatternTreeNode>("x");
         auto right = std::make_shared<PatternTreeNode>("1");
-        root->left = left;
-        root->right = right;
+        root->setLeft(left);
+        root->setRight(right);
         auto result = PatternTreeNode::deserializeToNode("sub x # # 1 # # ");
         REQUIRE(PatternTreeNode::isEqual(result, root));
     }
@@ -43,8 +43,8 @@ TEST_CASE("PatternTreeNode tests") {
         auto root = std::make_shared<PatternTreeNode>("sub");
         auto left = std::make_shared<PatternTreeNode>("x");
         auto right = std::make_shared<PatternTreeNode>("1");
-        root->left = left;
-        root->right = right;
+        root->setLeft(left);
+        root->setRight(right);
         auto result = PatternTreeNode::deserializeToNode(PatternTreeNode::serialiseToString(root));
         REQUIRE(PatternTreeNode::isEqual(result, root));
     }
