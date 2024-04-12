@@ -13,7 +13,7 @@ protected:
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
     std::optional<std::shared_ptr<Pattern>> pattern;
-    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
 
 public:
     PatternClause(std::shared_ptr<ClauseArgument>, std::vector<std::shared_ptr<ClauseArgument>>);

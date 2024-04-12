@@ -23,7 +23,7 @@ bool BaseCalls::isSimpleResult() const {
     return !caller->isSynonym() && !callee->isSynonym();
 }
 
-ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (isSimpleResult()) {
         return {hasCallRelationship(reader)};
     }
@@ -39,10 +39,10 @@ ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader, const std::shared_ptr<
     return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(callee->isSynonym() ? callee : caller);
 
-    auto potentialResults = evalDb->getProcedures(syn);
+    auto potentialResults = evalDb.getProcedures(syn);
     SynonymValues result{};
 
     for (const auto& procName : potentialResults) {
@@ -55,11 +55,11 @@ ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, const s
     return {syn, result};
 }
 
-ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool calleeIsSynonym = callee->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(calleeIsSynonym ? callee : caller);
 
-    auto potentialResults = evalDb->getProcedures(syn);
+    auto potentialResults = evalDb.getProcedures(syn);
     SynonymValues result{};
 
     // Get all caller/callee of the literal, the opposite of whichever the literal is.
@@ -73,7 +73,7 @@ ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, const st
     return {syn, result};
 }
 
-ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym callerSyn = *std::dynamic_pointer_cast<Synonym>(caller);
     Synonym calleeSyn = *std::dynamic_pointer_cast<Synonym>(callee);
 
@@ -85,8 +85,8 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, const std:
     SynonymValues callerValues{};
     SynonymValues calleeValues{};
 
-    auto allCallerProcs = evalDb->getProcedures(callerSyn);
-    auto allCalleeProcs = evalDb->getProcedures(calleeSyn);
+    auto allCallerProcs = evalDb.getProcedures(callerSyn);
+    auto allCalleeProcs = evalDb.getProcedures(calleeSyn);
 
     if (allCallerProcs.size() < allCalleeProcs.size()) {
         for (const Procedure& callerProc : allCallerProcs) {

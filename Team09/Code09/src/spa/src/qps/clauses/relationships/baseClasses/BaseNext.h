@@ -15,7 +15,7 @@ private:
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
     ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
 
-    virtual ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) = 0;
+    virtual ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb&) = 0;
     virtual bool hasNextRelationship(PKBFacadeReader&) = 0;
     virtual bool hasNextRelationship(PKBFacadeReader&, const StmtNum&, const StmtNum&) = 0;
     virtual StmtSet getNexters(PKBFacadeReader&, const StmtNum&) = 0;
@@ -24,6 +24,6 @@ private:
 public:
     BaseNext(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
-    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

@@ -18,14 +18,14 @@ private:
      */
     bool isSimpleResult() const;
 
-    ClauseResult evaluateUserSynonym(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult variablesUsedByProcedure(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult variablesUsedByStatement(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateUserSynonym(PKBFacadeReader&);
+    ClauseResult variablesUsedByProcedure(PKBFacadeReader&);
+    ClauseResult variablesUsedByStatement(PKBFacadeReader&);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb& evalDb);
 
 public:
     Uses(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
-    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

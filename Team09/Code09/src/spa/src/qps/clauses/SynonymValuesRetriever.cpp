@@ -3,7 +3,7 @@
 #include "qps/clauseArguments/Synonym.h"
 
 std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
-                                                        const std::shared_ptr<EvaluationDb>& evalDb) {
+                                                        EvaluationDb& evalDb) {
     std::vector<RowValues> unjoinedSets{};
 
     for (Synonym synonym : synonyms) {
@@ -16,13 +16,12 @@ std::vector<RowValues> SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, st
     return joinedResults;
 }
 
-RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym,
-                                           const std::shared_ptr<EvaluationDb>& evalDb) {
+RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym, EvaluationDb& evalDb) {
     return getSynonymValues(pkb, synonym, evalDb);
 }
 
 ClauseResult SynonymValuesRetriever::retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
-                                                            const std::shared_ptr<EvaluationDb>& evalDb) {
+                                                            EvaluationDb& evalDb) {
     std::vector<RowValues> rows = retrieve(pkb, synonyms, evalDb);
     std::vector<SynonymValues> columns = ClauseEvaluatorUtils::transpose(rows);
     return {synonyms, columns};
@@ -55,22 +54,22 @@ std::vector<RowValues> SynonymValuesRetriever::cartesianProduct(const std::vecto
 }
 
 std::vector<std::string> SynonymValuesRetriever::getSynonymValues(PKBFacadeReader& pkb, Synonym synonym,
-                                                                  const std::shared_ptr<EvaluationDb>& evalDb) {
+                                                                  EvaluationDb& evalDb) {
     std::vector<std::string> col{};
 
     switch (synonym.getType()) {
     case DesignEntityType::VARIABLE:
-        for (std::string var : evalDb->getVariables(synonym)) {
+        for (std::string var : evalDb.getVariables(synonym)) {
             col.push_back(var);
         }
         break;
     case DesignEntityType::CONSTANT:
-        for (std::string con : evalDb->getConstants(synonym)) {
+        for (std::string con : evalDb.getConstants(synonym)) {
             col.push_back(con);
         }
         break;
     case DesignEntityType::PROCEDURE:
-        for (std::string prod : evalDb->getProcedures(synonym)) {
+        for (std::string prod : evalDb.getProcedures(synonym)) {
             col.push_back(prod);
         }
         break;
@@ -81,7 +80,7 @@ std::vector<std::string> SynonymValuesRetriever::getSynonymValues(PKBFacadeReade
     case DesignEntityType::PRINT:
     case DesignEntityType::WHILE:
     case DesignEntityType::IF:
-        for (const StmtNum& stmtNum : evalDb->getStmts(synonym)) {
+        for (const StmtNum& stmtNum : evalDb.getStmts(synonym)) {
             col.push_back(std::to_string(stmtNum));
         }
         break;

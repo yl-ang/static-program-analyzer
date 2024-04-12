@@ -21,11 +21,11 @@ private:
     ClauseResult evaluateModifierSynonym(PKBFacadeReader&);
     ClauseResult variablesModifedByStatement(PKBFacadeReader&);
     ClauseResult variablesModifiedByProcedure(PKBFacadeReader& reader);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb& evalDb);
 
 public:
     Modifies(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
 
-    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

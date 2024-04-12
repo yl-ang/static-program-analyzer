@@ -3,7 +3,7 @@
 IfPattern::IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args)
     : ifSyn(ifSyn), arguments(args) {}
 
-ClauseResult IfPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult IfPattern::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader, evalDb);
     } else if (arguments[0]->isLiteral()) {
@@ -23,12 +23,12 @@ bool IfPattern::validateArguments() {
     return true;
 }
 
-ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
     Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);
 
-    std::unordered_set<StmtNum> ifStmts = evalDb->getStmts(iSyn);
-    std::unordered_set<Variable> allVars = evalDb->getVariables(fSyn);
+    std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
+    std::unordered_set<Variable> allVars = evalDb.getVariables(fSyn);
 
     std::vector<std::string> stmtNumbers = {};
     std::vector<std::string> synValues = {};
@@ -48,10 +48,10 @@ ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, const std::
     return {returnSyn, returnSynValues};
 }
 
-ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
 
-    std::unordered_set<StmtNum> ifStmts = evalDb->getStmts(iSyn);
+    std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
 
     std::vector<std::string> stmtNumbers = {};
 
@@ -64,10 +64,10 @@ ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, const s
     return {iSyn, stmtNumbers};
 }
 
-ClauseResult IfPattern::evaluateFirstArgWildcard(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult IfPattern::evaluateFirstArgWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym iSyn = *std::dynamic_pointer_cast<Synonym>(ifSyn);
 
-    std::unordered_set<StmtNum> ifStmts = evalDb->getStmts(iSyn);
+    std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
     std::unordered_set<Variable> allVars = reader.getVariables();
 
     std::vector<std::string> stmtNumbers = {};

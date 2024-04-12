@@ -12,7 +12,7 @@ std::string QueryClause::rowValuesToString(const RowValues& row) {
     return str;
 }
 
-ClauseResult QueryClause::runEvaluation(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult QueryClause::runEvaluation(PKBFacadeReader& pkb, EvaluationDb& evalDb) {
     ClauseResult result = evaluate(pkb, evalDb);
     if (!negate) {
         return result;

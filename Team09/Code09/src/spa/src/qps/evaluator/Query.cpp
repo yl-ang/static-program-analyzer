@@ -13,7 +13,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     }
 
     const std::shared_ptr tableManager{std::make_shared<TableManager>()};
-    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{pkb, tableManager})};
+    EvaluationDb evalDb{pkb, tableManager};
 
     if (!evaluateBooleanClauses(pkb, evalDb)) {
         return getEmptyResult();
@@ -90,8 +90,7 @@ std::vector<std::string> Query::getEmptyResult() const {
     return this->isSelectBoolean() ? std::vector{QPSConstants::FALSE_STRING} : std::vector<std::string>{};
 }
 
-void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReader& pkb,
-                                   const std::shared_ptr<EvaluationDb>& evalDb) {
+void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReader& pkb, EvaluationDb& evalDb) {
     OptionalQueryClause next = db.next();
     while (next.has_value() && !tm.isEmpty()) {
         auto clause = next->get();
@@ -101,7 +100,7 @@ void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReade
     }
 }
 
-bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>& evalDb) const {
+bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     for (auto stc : suchThatClauses) {
         if (stc->isBooleanResult() && !stc->runEvaluation(pkb, evalDb).getBoolean()) {
             return false;
@@ -138,8 +137,7 @@ std::vector<QueryClausePtr> Query::getNonBooleanClauses() const {
     return nonBooleanClauses;
 }
 
-void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb,
-                                    const std::shared_ptr<EvaluationDb>& evalDb) const {
+void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     if (isSelectBoolean())
         return;
 

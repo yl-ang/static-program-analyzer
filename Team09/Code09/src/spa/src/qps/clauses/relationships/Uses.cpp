@@ -23,24 +23,24 @@ bool Uses::validateArguments() {
     return true;
 }
 
-ClauseResult Uses::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Uses::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (user->isSynonym() && var->isSynonym()) {
         return evaluateBothSynonyms(reader, evalDb);
     }
 
     if (user->isSynonym()) {
-        return evaluateUserSynonym(reader, evalDb);
+        return evaluateUserSynonym(reader);
     }
 
     if (var->isSynonym()) {
         // Integer, Synonym
         if (user->isInteger()) {
-            return variablesUsedByStatement(reader, evalDb);
+            return variablesUsedByStatement(reader);
         }
 
         // Wildcard, Synonym
         if (user->isLiteral()) {
-            return variablesUsedByProcedure(reader, evalDb);
+            return variablesUsedByProcedure(reader);
         }
     }
 
@@ -49,14 +49,14 @@ ClauseResult Uses::evaluate(PKBFacadeReader& reader, const std::shared_ptr<Evalu
                 : reader.hasStatementVariableUseRelationship(*user, *var)};
 }
 
-ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym userSyn = *std::dynamic_pointer_cast<Synonym>(user);
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues userValues{};
     SynonymValues varValues{};
 
-    for (const Variable& var : evalDb->getVariables(varSyn)) {
+    for (const Variable& var : evalDb.getVariables(varSyn)) {
         if (userSyn.getType() == DesignEntityType::PROCEDURE) {
             std::unordered_set<Procedure> procs = reader.getUsesProceduresByVariable(var);
             for (Procedure proc : procs) {
@@ -79,7 +79,7 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shar
     return {headers, values};
 }
 
-ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
     Synonym userSyn = *std::dynamic_pointer_cast<Synonym>(this->user);
 
     std::unordered_set<Variable> vars{};
@@ -113,7 +113,7 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader, const std::share
     return {userSyn, values};
 }
 
-ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues values{};
@@ -123,7 +123,7 @@ ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader, const std::
     return {varSyn, values};
 }
 
-ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues values{};

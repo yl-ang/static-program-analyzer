@@ -4,7 +4,7 @@
 
 WithClause::WithClause(std::shared_ptr<ClauseArgument> l, std::shared_ptr<ClauseArgument> r) : lhs(l), rhs(r) {}
 
-ClauseResult WithClause::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult WithClause::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (isBooleanResult()) {
         return evaluateValueEquality();
     }
@@ -20,7 +20,7 @@ ClauseResult WithClause::evaluateValueEquality() const {
     return lhs->getValue() == rhs->getValue();
 }
 
-ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>& evalDb) const {
+ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(lhs->isSynonym() ? lhs : rhs);
     auto other = lhs->isSynonym() ? rhs : lhs;
 
@@ -39,7 +39,7 @@ ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb, const std::sha
     return {syn.getWithoutAttribute(), validSynonymValues};
 }
 
-ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb, const std::shared_ptr<EvaluationDb>& evalDb) const {
+ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     Synonym lhsSyn = *std::dynamic_pointer_cast<Synonym>(lhs);
     Synonym rhsSyn = *std::dynamic_pointer_cast<Synonym>(rhs);
 

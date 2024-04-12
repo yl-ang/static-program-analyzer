@@ -31,6 +31,6 @@ static std::unordered_map<DesignEntityType, StatementType> DESIGN_ENTITY_TYPE_TO
 class Relationship {
 public:
     virtual ~Relationship(){};
-    virtual ClauseResult evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) = 0;
+    virtual ClauseResult evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) = 0;
     virtual bool validateArguments() = 0;
 };

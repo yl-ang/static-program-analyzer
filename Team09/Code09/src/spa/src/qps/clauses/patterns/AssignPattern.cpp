@@ -4,7 +4,7 @@ AssignPattern::AssignPattern(std::shared_ptr<ClauseArgument> assignSyn,
                              std::vector<std::shared_ptr<ClauseArgument>> args)
     : assignSyn(assignSyn), arguments(args) {}
 
-ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult AssignPattern::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (arguments[0]->isSynonym()) {
         return evaluateFirstArgSyn(reader, evalDb);
     } else {
@@ -22,12 +22,12 @@ bool AssignPattern::validateArguments() {
     return true;
 }
 
-ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
     Synonym fSyn = *std::dynamic_pointer_cast<Synonym>(arguments[0]);  // This is 100% variable
 
-    std::unordered_set<StmtNum> assignStmts = evalDb->getStmts(aSyn);
-    std::unordered_set<Variable> allVars = evalDb->getVariables(fSyn);
+    std::unordered_set<StmtNum> assignStmts = evalDb.getStmts(aSyn);
+    std::unordered_set<Variable> allVars = evalDb.getVariables(fSyn);
 
     std::vector<std::string> stmtNumbers = {};
     std::vector<std::string> synValues = {};
@@ -70,9 +70,9 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, const s
     return {returnSyn, returnSynValues};
 }
 
-ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
-    std::unordered_set<StmtNum> assignStmts = evalDb->getStmts(aSyn);
+    std::unordered_set<StmtNum> assignStmts = evalDb.getStmts(aSyn);
     std::vector<std::string> stmtNumbers = {};
 
     if (arguments[0]->isWildcard() && arguments[1]->isWildcard()) {

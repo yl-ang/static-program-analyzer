@@ -24,7 +24,7 @@ bool Modifies::validateArguments() {
     return true;
 }
 
-ClauseResult Modifies::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Modifies::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     if (modifier->isSynonym() && var->isSynonym()) {
         return evaluateBothSynonyms(reader, evalDb);
     }
@@ -50,7 +50,7 @@ ClauseResult Modifies::evaluate(PKBFacadeReader& reader, const std::shared_ptr<E
                 : reader.hasStatementVariableModifiesRelationship(*modifier, *var)};
 }
 
-ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
+ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym modifierSyn = *std::dynamic_pointer_cast<Synonym>(modifier);
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
@@ -59,7 +59,7 @@ ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader, const std::
 
     bool isProcedureModifier = modifierSyn.getType() == DesignEntityType::PROCEDURE;
 
-    for (Variable var : evalDb->getVariables(varSyn)) {
+    for (Variable var : evalDb.getVariables(varSyn)) {
         if (isProcedureModifier) {
             std::unordered_set<Procedure> procs = reader.getModifiesProceduresByVariable(var);
             for (const Procedure& proc : procs) {

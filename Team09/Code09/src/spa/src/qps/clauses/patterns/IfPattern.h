@@ -10,12 +10,12 @@ private:
     std::shared_ptr<ClauseArgument> ifSyn;
     std::vector<std::shared_ptr<ClauseArgument>> arguments;
 
-    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
-    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateFirstArgSyn(PKBFacadeReader&, EvaluationDb& evalDb);
+    ClauseResult evaluateFirstArgLiteral(PKBFacadeReader&, EvaluationDb& evalDb);
+    ClauseResult evaluateFirstArgWildcard(PKBFacadeReader&, EvaluationDb& evalDb);
 
 public:
     IfPattern(std::shared_ptr<ClauseArgument> ifSyn, std::vector<std::shared_ptr<ClauseArgument>> args);
-    ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
+    ClauseResult evaluate(PKBFacadeReader&, EvaluationDb&) override;
     bool validateArguments() override;
 };

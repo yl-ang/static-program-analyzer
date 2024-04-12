@@ -9,14 +9,11 @@ using RowValues = std::vector<std::string>;
 
 class SynonymValuesRetriever {
 public:
-    static RowValues retrieve(PKBFacadeReader& pkb, Synonym synonym, const std::shared_ptr<EvaluationDb>&);
-    static std::vector<RowValues> retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
-                                           const std::shared_ptr<EvaluationDb>&);
-    static ClauseResult retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
-                                               const std::shared_ptr<EvaluationDb>&);
+    static RowValues retrieve(PKBFacadeReader& pkb, Synonym synonym, EvaluationDb&);
+    static std::vector<RowValues> retrieve(PKBFacadeReader& pkb, std::vector<Synonym> synonyms, EvaluationDb&);
+    static ClauseResult retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms, EvaluationDb&);
 
 private:
     static std::vector<RowValues> cartesianProduct(const std::vector<RowValues>& values);
-    static std::vector<std::string> getSynonymValues(PKBFacadeReader& pkb, Synonym synonym,
-                                                     const std::shared_ptr<EvaluationDb>&);
+    static std::vector<std::string> getSynonymValues(PKBFacadeReader& pkb, Synonym synonym, EvaluationDb&);
 };
