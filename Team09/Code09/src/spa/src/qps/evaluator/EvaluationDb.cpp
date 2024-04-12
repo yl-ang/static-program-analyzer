@@ -4,8 +4,6 @@
 
 std::unordered_set<StmtNum> EvaluationDb::getStmts(const Synonym& syn) {
     // Check if in cache
-    SynonymName value = syn.getValue();
-
     if (tableManager->hasHeader(syn)) {
         std::unordered_set<StmtNum> stmtNums{};
         stmtNums.reserve(tableManager->getColumn(syn).size());
@@ -30,4 +28,17 @@ std::unordered_set<StmtNum> EvaluationDb::getStmts(const Synonym& syn) {
     }
 
     return result;
+}
+
+std::unordered_set<Procedure> EvaluationDb::getProcedures(const Synonym& syn) {
+    if (tableManager->hasHeader(syn)) {
+        std::unordered_set<Procedure> procedures{};
+        procedures.reserve(tableManager->getColumn(syn).size());
+        for (const std::string& value : tableManager->getColumn(syn)) {
+            procedures.insert(value);
+        }
+        return procedures;
+    }
+
+    return reader.getProcedures();
 }

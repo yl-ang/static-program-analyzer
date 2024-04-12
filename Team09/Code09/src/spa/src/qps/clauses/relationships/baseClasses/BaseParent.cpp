@@ -29,17 +29,17 @@ ClauseResult BaseParent::evaluate(PKBFacadeReader& reader, const std::shared_ptr
     }
 
     if ((parent->isInteger() && child->isSynonym()) || (parent->isSynonym() && child->isInteger())) {
-        return evaluateSynonymInteger(reader);
+        return evaluateSynonymInteger(reader, evalDb);
     }
 
     if ((parent->isWildcard() && child->isSynonym()) || (parent->isSynonym() && child->isWildcard())) {
-        return evaluateSynonymWildcard(reader);
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
-    return evaluateBothSynonyms(reader);
+    return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     bool parentIsSynonym = parent->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
 
@@ -76,7 +76,7 @@ ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader) {
     return {syn, values};
 }
 
-ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     bool parentIsSynonym = parent->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(parentIsSynonym ? parent : child);
     StmtNum stmtNum = std::stoi(parentIsSynonym ? child->getValue() : parent->getValue());
@@ -106,7 +106,7 @@ ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader) {
     return {syn, values};
 }
 
-ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym parentSyn = *std::dynamic_pointer_cast<Synonym>(parent);
     Synonym childSyn = *std::dynamic_pointer_cast<Synonym>(child);
 

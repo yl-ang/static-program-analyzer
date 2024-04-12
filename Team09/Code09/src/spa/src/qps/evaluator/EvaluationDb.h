@@ -19,4 +19,5 @@ public:
         : reader(reader), tableManager(tm) {}
 
     std::unordered_set<StmtNum> getStmts(const Synonym& syn);
+    std::unordered_set<Procedure> getProcedures(const Synonym& syn);
 };

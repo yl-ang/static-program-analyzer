@@ -12,9 +12,9 @@ protected:
 private:
     bool isSimpleResult() const;
 
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateBothSynonyms(PKBFacadeReader&);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateSynonymInteger(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
+    ClauseResult evaluateBothSynonyms(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>& evalDb);
 
     virtual bool hasParentRelationship(PKBFacadeReader&) = 0;
     virtual StmtSet getParents(PKBFacadeReader&, const StmtNum&) = 0;

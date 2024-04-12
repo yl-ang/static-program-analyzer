@@ -26,22 +26,22 @@ bool Modifies::validateArguments() {
 
 ClauseResult Modifies::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (modifier->isSynonym() && var->isSynonym()) {
-        return evaluateBothSynonyms(reader);
+        return evaluateBothSynonyms(reader, evalDb);
     }
 
     if (modifier->isSynonym()) {
-        return evaluateModifierSynonym(reader);
+        return evaluateModifierSynonym(reader, evalDb);
     }
 
     if (var->isSynonym()) {
         // Integer, Synonym
         if (modifier->isInteger()) {
-            return variablesModifedByStatement(reader);
+            return variablesModifedByStatement(reader, evalDb);
         }
 
         // Literal, Synonym
         if (modifier->isLiteral()) {
-            return variablesModifiedByProcedure(reader);
+            return variablesModifiedByProcedure(reader, evalDb);
         }
     }
 
@@ -50,7 +50,7 @@ ClauseResult Modifies::evaluate(PKBFacadeReader& reader, const std::shared_ptr<E
                 : reader.hasStatementVariableModifiesRelationship(*modifier, *var)};
 }
 
-ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader) {
+ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym modifierSyn = *std::dynamic_pointer_cast<Synonym>(modifier);
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
@@ -80,7 +80,7 @@ ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader) {
     return {headers, values};
 }
 
-ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
+ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym modifierSyn = *std::dynamic_pointer_cast<Synonym>(modifier);
 
     std::unordered_set<Variable> vars{};
@@ -113,7 +113,8 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
     return {modifierSyn, values};
 }
 
-ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
+ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader,
+                                                    const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues values{};
@@ -124,7 +125,8 @@ ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
     return {varSyn, values};
 }
 
-ClauseResult Modifies::variablesModifedByStatement(PKBFacadeReader& reader) {
+ClauseResult Modifies::variablesModifedByStatement(PKBFacadeReader& reader,
+                                                   const std::shared_ptr<EvaluationDb>& evalDb) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
     SynonymValues values{};
