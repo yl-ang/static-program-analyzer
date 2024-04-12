@@ -47,7 +47,6 @@ private:
 public:
     Affects(std::shared_ptr<ClauseArgument> affector, std::shared_ptr<ClauseArgument> affected);
 
-    ClauseResult evaluate(PKBFacadeReader&) override;
     ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
     bool validateArguments() override;
 };

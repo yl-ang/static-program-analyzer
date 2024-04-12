@@ -23,10 +23,6 @@ bool BaseCalls::isSimpleResult() const {
     return !caller->isSynonym() && !callee->isSynonym();
 }
 
-ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader) {
-    return {false};
-}
-
 ClauseResult BaseCalls::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (callee->isSynonym() && caller->isSynonym()) {
         return evaluateBothSynonyms(reader);

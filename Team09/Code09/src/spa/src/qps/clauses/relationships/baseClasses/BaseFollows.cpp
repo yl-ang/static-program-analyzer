@@ -23,10 +23,6 @@ bool BaseFollows::validateArguments() {
     return true;
 }
 
-ClauseResult BaseFollows::evaluate(PKBFacadeReader& reader) {
-    return {false};
-}
-
 ClauseResult BaseFollows::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isSimpleResult()) {
         return {hasFollowRelationship(reader)};

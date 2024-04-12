@@ -11,8 +11,7 @@ private:
     bool negate = false;
 
 protected:
-    virtual ClauseResult evaluate(PKBFacadeReader&) = 0;
-    virtual ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&);
+    virtual ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) = 0;
 
 public:
     virtual ~QueryClause() {}

@@ -38,10 +38,6 @@ bool Affects::hasCommonValue(const std::unordered_set<Variable>& set1, const std
     return false;  // No common value found
 }
 
-ClauseResult Affects::evaluate(PKBFacadeReader& reader) {
-    return {false};
-}
-
 ClauseResult Affects::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     /**
      * Returns TRUE/FALSE

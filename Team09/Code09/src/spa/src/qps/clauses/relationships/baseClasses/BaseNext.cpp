@@ -30,10 +30,6 @@ bool BaseNext::validateArguments() {
     return true;
 }
 
-ClauseResult BaseNext::evaluate(PKBFacadeReader& reader) {
-    return {false};
-}
-
 ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isSimpleResult()) {
         return {hasNextRelationship(reader)};

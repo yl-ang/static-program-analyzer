@@ -23,10 +23,6 @@ bool BaseParent::validateArguments() {
     return true;
 }
 
-ClauseResult BaseParent::evaluate(PKBFacadeReader& reader) {
-    return {false};
-}
-
 ClauseResult BaseParent::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isSimpleResult()) {
         return {hasParentRelationship(reader)};

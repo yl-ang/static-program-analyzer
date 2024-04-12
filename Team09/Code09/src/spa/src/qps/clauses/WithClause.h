@@ -25,7 +25,6 @@ private:
 public:
     WithClause(std::shared_ptr<ClauseArgument>, std::shared_ptr<ClauseArgument>);
     bool equals(const QueryClause& other) const override;
-    ClauseResult evaluate(PKBFacadeReader&) override;
     ClauseResult evaluate(PKBFacadeReader&, const std::shared_ptr<EvaluationDb>&) override;
     bool isBooleanResult() const override;
     bool containsSynonym(const Synonym&) const override;

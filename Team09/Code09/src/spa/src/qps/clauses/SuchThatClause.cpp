@@ -31,11 +31,6 @@ std::vector<Synonym> SuchThatClause::getSynonyms() const {
     return synonyms;
 }
 
-ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader) {
-    auto relationship = getRelationship();
-    return relationship->evaluate(reader);
-}
-
 ClauseResult SuchThatClause::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     auto relationship = getRelationship();
     return relationship->evaluate(reader, evalDb);

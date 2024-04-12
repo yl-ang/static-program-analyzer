@@ -49,11 +49,15 @@ TEST_CASE("Assign Pattern evaluate") {
     std::shared_ptr<Synonym> assignSyn = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "a");
 
     std::shared_ptr<Literal> literal = std::make_shared<Literal>("1");
+
+    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
+
     SECTION("Test Wildcard and Wildcard") {
         std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
         PatternClause pc = PatternClause(assignSyn, {wildcard, wildcard});
-        ClauseResult result = pc.runEvaluation(reader);
+        ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
@@ -67,21 +71,21 @@ TEST_CASE("Assign Pattern evaluate") {
         std::shared_ptr<ExpressionSpec> literalExp_False = std::make_shared<ExpressionSpec>("_\"1\"_");
 
         PatternClause pc = PatternClause(assignSyn, {wildcard, varExp});
-        ClauseResult result = pc.runEvaluation(reader);
+        ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}});
 
         PatternClause pc2 = PatternClause(assignSyn, {wildcard, literalExp});
-        result = pc2.runEvaluation(reader);
+        result = pc2.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
         REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"3", "4"}));
 
         PatternClause pc3 = PatternClause(assignSyn, {wildcard, literalExp_False});
-        result = pc3.runEvaluation(reader);
+        result = pc3.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
@@ -93,7 +97,7 @@ TEST_CASE("Assign Pattern evaluate") {
         std::shared_ptr<Wildcard> wildcard = std::make_shared<Wildcard>();
 
         PatternClause pc = PatternClause(assignSyn, {variableSyn, wildcard});
-        ClauseResult result = pc.runEvaluation(reader);
+        ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
@@ -108,14 +112,14 @@ TEST_CASE("Assign Pattern evaluate") {
         std::shared_ptr<ExpressionSpec> literalExp_False = std::make_shared<ExpressionSpec>("_\"1\"_");
 
         PatternClause pc = PatternClause(assignSyn, {variableSyn, varExp});
-        ClauseResult result = pc.runEvaluation(reader);
+        ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         std::vector<SynonymValues> synValues = result.getAllSynonymValues();
         REQUIRE(synValues == std::vector<SynonymValues>{{"2"}, {"x"}});
 
         PatternClause pc2 = PatternClause(assignSyn, {variableSyn, literalExp});
-        result = pc2.runEvaluation(reader);
+        result = pc2.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
@@ -123,7 +127,7 @@ TEST_CASE("Assign Pattern evaluate") {
         REQUIRE_EQUAL_VECTORS(synValues[1], std::vector<std::string>({"x", "x"}));
 
         PatternClause pc3 = PatternClause(assignSyn, {variableSyn, literalExp_False});
-        result = pc3.runEvaluation(reader);
+        result = pc3.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
@@ -163,6 +167,9 @@ TEST_CASE("While Pattern evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
+
+    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
 
     /*
      * procedure test {
@@ -204,7 +211,7 @@ TEST_CASE("While Pattern evaluate") {
 
     SECTION("While(Variable, _)") {
         PatternClause whilePattern = {whileSyn, {varSyn, wildcard}};
-        ClauseResult clauseResult = whilePattern.runEvaluation(reader);
+        ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn, *varSyn});
@@ -214,7 +221,7 @@ TEST_CASE("While Pattern evaluate") {
 
     SECTION("While(\"x\", _)") {
         PatternClause whilePattern = {whileSyn, {literalValue, wildcard}};
-        ClauseResult clauseResult = whilePattern.runEvaluation(reader);
+        ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
@@ -224,7 +231,7 @@ TEST_CASE("While Pattern evaluate") {
     SECTION("While(Literal not in store, _)") {
         std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("l");
         PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
-        ClauseResult clauseResult = whilePattern.runEvaluation(reader);
+        ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
@@ -234,7 +241,7 @@ TEST_CASE("While Pattern evaluate") {
     SECTION("While(Literal in store not in condition, _)") {
         std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("s");
         PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
-        ClauseResult clauseResult = whilePattern.runEvaluation(reader);
+        ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
@@ -243,7 +250,7 @@ TEST_CASE("While Pattern evaluate") {
 
     SECTION("While(_, _)") {
         PatternClause whilePattern = {whileSyn, {wildcard, wildcard}};
-        ClauseResult clauseResult = whilePattern.runEvaluation(reader);
+        ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
@@ -255,6 +262,9 @@ TEST_CASE("If Pattern evaluate") {
     PKB pkb{};
     PKBFacadeWriter writer{pkb};
     PKBFacadeReader reader{pkb};
+
+    const std::shared_ptr tableManager{std::make_shared<TableManager>()};
+    const std::shared_ptr evalDb{std::make_shared<EvaluationDb>(EvaluationDb{reader, tableManager})};
 
     /*
      * procedure test {
@@ -302,7 +312,7 @@ TEST_CASE("If Pattern evaluate") {
 
     SECTION("If(Variable, _)") {
         PatternClause ifPattern = {ifSyn, {varSyn, wildcard, wildcard}};
-        ClauseResult clauseResult = ifPattern.runEvaluation(reader);
+        ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn, *varSyn});
@@ -312,7 +322,7 @@ TEST_CASE("If Pattern evaluate") {
 
     SECTION("If(\"y\", _)") {
         PatternClause ifPattern = {ifSyn, {literalValue, wildcard, wildcard}};
-        ClauseResult clauseResult = ifPattern.runEvaluation(reader);
+        ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
@@ -322,7 +332,7 @@ TEST_CASE("If Pattern evaluate") {
     SECTION("If(Literal not in store, _)") {
         std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("l");
         PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
-        ClauseResult clauseResult = ifPattern.runEvaluation(reader);
+        ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
@@ -332,7 +342,7 @@ TEST_CASE("If Pattern evaluate") {
     SECTION("If(Literal in store not in condition, _)") {
         std::shared_ptr<Literal> notInStoreLiteral = std::make_shared<Literal>("abc");
         PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
-        ClauseResult clauseResult = ifPattern.runEvaluation(reader);
+        ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
@@ -341,7 +351,7 @@ TEST_CASE("If Pattern evaluate") {
 
     SECTION("If(_, _)") {
         PatternClause ifPattern = {ifSyn, {wildcard, wildcard, wildcard}};
-        ClauseResult clauseResult = ifPattern.runEvaluation(reader);
+        ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
         std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});

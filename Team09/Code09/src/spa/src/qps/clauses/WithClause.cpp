@@ -4,10 +4,6 @@
 
 WithClause::WithClause(std::shared_ptr<ClauseArgument> l, std::shared_ptr<ClauseArgument> r) : lhs(l), rhs(r) {}
 
-ClauseResult WithClause::evaluate(PKBFacadeReader& pkb) {
-    return {false};
-}
-
 ClauseResult WithClause::evaluate(PKBFacadeReader& reader, const std::shared_ptr<EvaluationDb>& evalDb) {
     if (isBooleanResult()) {
         return evaluateValueEquality();
