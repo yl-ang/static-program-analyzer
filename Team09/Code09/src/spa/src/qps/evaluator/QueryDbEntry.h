@@ -15,6 +15,11 @@ struct QueryDbEntry {
         return clause->equals(*other.clause);
     }
 
+    bool operator<(const QueryDbEntry& other) const {
+        // Change to '>' for min heap, assuming smaller values are higher priority
+        return clause->getSynonyms().size() > other.clause->getSynonyms().size();
+    }
+
     struct HashFunction {
         std::size_t operator()(const QueryDbEntry& other) const {
             std::vector<std::string> synonymNames{};

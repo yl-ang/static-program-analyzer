@@ -21,12 +21,14 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
 
     if (!getNonBooleanClauses().empty()) {
         QueryDb queryDb{getNonBooleanClauses()};
-        queryDb.loadClausesWithEntities(this->selectEntities);
-        if (evaluateAndJoinClauses(*tableManager, queryDb, pkb, evalDb); tableManager->isEmpty()) {
-            return getEmptyResult();
+        for (auto entity : selectEntities) {
+            queryDb.loadClausesWithEntity(entity);
+            if (evaluateAndJoinClauses(*tableManager, queryDb, pkb, evalDb); tableManager->isEmpty()) {
+                return getEmptyResult();
+            }
         }
 
-        while (queryDb.loadNewGroup()) {
+        while (queryDb.loadNextGroup()) {
             TableManager nonConnectedTableManager{};
             if (evaluateAndJoinClauses(nonConnectedTableManager, queryDb, pkb, evalDb);
                 nonConnectedTableManager.isEmpty()) {
