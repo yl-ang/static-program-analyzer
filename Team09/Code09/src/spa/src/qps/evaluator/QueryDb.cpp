@@ -37,15 +37,13 @@ QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
     }
 }
 
-void QueryDb::loadClausesWithEntities(std::vector<Synonym> synonyms) {
-    for (const Synonym& syn : synonyms) {
-        for (ID id : synonymToClauseListMap[syn.getName()]) {
-            queue.push(id);
-        }
+void QueryDb::loadClausesWithEntity(Synonym syn) {
+    for (ID id : synonymToClauseListMap[syn.getName()]) {
+        queue.push(idToEntryMap[id]);
     }
 }
 
-bool QueryDb::loadNewGroup() {
+bool QueryDb::loadNextGroup() {
     for (const SynonymName& synName : synonymsToEvaluate) {
         auto clauseIds = synonymToClauseListMap[synName];
         if (clauseIds.empty()) {
@@ -53,7 +51,7 @@ bool QueryDb::loadNewGroup() {
         }
 
         for (ID id : clauseIds) {
-            queue.push(id);
+            queue.push(idToEntryMap[id]);
         }
         return true;
     }
@@ -65,19 +63,19 @@ OptionalQueryClause QueryDb::next() {
         return std::nullopt;
     }
 
-    ID nextEntryId{};
+    QueryDbEntry nextEntry{};
     do {
-        nextEntryId = queue.front();
+        nextEntry = queue.top();
         queue.pop();
-    } while (seen.find(nextEntryId) != seen.end() && !queue.empty());
+    } while (seen.find(nextEntry.id) != seen.end() && !queue.empty());
 
-    if (seen.find(nextEntryId) != seen.end() && queue.empty()) {
+    if (seen.find(nextEntry.id) != seen.end() && queue.empty()) {
         return std::nullopt;
     }
 
-    setTraversed(nextEntryId);
-    addNeighboursToQueue(nextEntryId);
-    return idToEntryMap[nextEntryId].clause;
+    setTraversed(nextEntry.id);
+    addNeighboursToQueue(nextEntry.id);
+    return nextEntry.clause;
 }
 
 void QueryDb::setTraversed(ID id) {
@@ -89,7 +87,7 @@ void QueryDb::setTraversed(ID id) {
 
 void QueryDb::addNeighboursToQueue(ID id) {
     for (ID connectedId : adjList[id]) {
-        queue.push(connectedId);
+        queue.push(idToEntryMap[connectedId]);
     }
     // Prevent adding clauses multiple times into the evaluate queue.
     adjList[id].clear();

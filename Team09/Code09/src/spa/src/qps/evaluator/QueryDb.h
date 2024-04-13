@@ -11,7 +11,7 @@
 struct QueryDbEntry;
 
 using SynonymName = std::string;
-using EvaluationQueue = std::queue<ID>;
+using EvaluationQueue = std::priority_queue<QueryDbEntry>;
 using OptionalQueryClause = std::optional<std::shared_ptr<QueryClause>>;
 using AdjacencyList = std::unordered_map<ID, std::unordered_set<ID>>;
 using ClauseCache = std::unordered_set<QueryDbEntry, QueryDbEntry::HashFunction>;
@@ -30,7 +30,7 @@ class QueryDb {
 public:
     QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses);
 
-    void loadClausesWithEntities(std::vector<Synonym> synonyms);
-    bool loadNewGroup();
+    void loadClausesWithEntity(Synonym syn);
+    bool loadNextGroup();
     OptionalQueryClause next();
 };

@@ -32,7 +32,8 @@ TEST_CASE("Query Db") {
 
     QueryDb db{{clause_c_x, clause_c, clause_unconnected}};
 
-    db.loadClausesWithEntities({*arg_c, *arg_x});
+    db.loadClausesWithEntity(*arg_c);
+    db.loadClausesWithEntity(*arg_x);
     auto firstPop = db.next();
     REQUIRE(firstPop.has_value());
     auto secondPop = db.next();
@@ -40,7 +41,7 @@ TEST_CASE("Query Db") {
     auto thirdPop = db.next();
     REQUIRE_FALSE(thirdPop.has_value());
 
-    db.loadNewGroup();
+    db.loadNextGroup();
     REQUIRE(db.next().has_value());
     REQUIRE_FALSE(db.next().has_value());
 }
