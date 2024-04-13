@@ -21,7 +21,7 @@ class QueryDb {
     std::unordered_map<SynonymName, std::vector<ID>> synonymToClauseListMap;
     AdjacencyList adjList;
     std::unordered_set<ID> seen;
-    std::unordered_set<SynonymName> synonymsToEvaluate;
+    std::unordered_map<SynonymName, int> synonymsEvaluationCount;
     EvaluationQueue queue;
 
 public:
@@ -30,4 +30,5 @@ public:
     void loadClausesWithEntity(SynonymName syn);
     bool loadNextGroup();
     OptionalQueryClause next();
+    std::unordered_map<SynonymValue, int> getSynonymsEvaluationCount();
 };

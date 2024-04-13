@@ -5,17 +5,18 @@
 
 #include "qps/exceptions/evaluator/QPSTableManagerError.h"
 
-void TableManager::join(const ClauseResult& cr) const {
-    this->join(clauseResultToTable(cr));
+void TableManager::join(const ClauseResult& cr, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
+    this->join(clauseResultToTable(cr), synonymsToRetain);
 }
 
-void TableManager::joinAll(const std::vector<Table>& tables) const {
+void TableManager::joinAll(const std::vector<Table>& tables,
+                           const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     for (const Table& table : tables) {
-        this->join(table);
+        this->join(table, synonymsToRetain);
     }
 }
 
-void TableManager::join(const Table& other) const {
+void TableManager::join(const Table& other, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     if (this->result.isSentinelTable() || other.isSentinelTable()) {
         return this->joinSentinelTable(other);
     }
@@ -24,20 +25,24 @@ void TableManager::join(const Table& other) const {
         return this->joinEmptyTable(other);
     }
 
-    const std::vector newHeaders{mergeHeaders(other)};
+    const std::vector newHeaders{mergeHeaders(other, synonymsToRetain)};
+    std::unordered_set<SynonymValue> newHeadersNames{};
+    for (auto header : newHeaders) {
+        newHeadersNames.insert(header.getName());
+    }
+
     const std::vector commonHeaders{getCommonHeaders(other)};
     const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders)};
 
     std::vector<Row> newRows{};
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
-    Row newRow{};
+
     for (Row& row : other.getRows()) {
-        newRow = row;
         std::string commonValueString{buildTuple(commonHeaders, row)};
 
         if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
             for (const Row& otherRow : it->second) {
-                combineRows(newRow, otherRow);
+                Row newRow{combineRows(newHeadersNames, row, otherRow)};
                 newRows.push_back(newRow);
             }
         }
@@ -53,7 +58,7 @@ void TableManager::joinSentinelTable(const Table& other) const {
 }
 
 void TableManager::joinEmptyTable(const Table& other) const {
-    const std::vector newHeaders{mergeHeaders(other)};
+    const std::vector newHeaders{mergeHeaders(other, {})};
     const std::vector<Row> emptyRows{};
     this->result = Table{newHeaders, emptyRows};
 }
@@ -69,10 +74,20 @@ std::unordered_map<std::string, std::vector<Row>> TableManager::getCommonValueSt
     return commonValueStringToRowMap;
 }
 
-void TableManager::combineRows(Row& targetRow, const Row& sourceRow) {
-    for (const auto& pair : sourceRow) {
-        targetRow[pair.first] = pair.second;
+Row TableManager::combineRows(const std::unordered_set<SynonymValue>& headers, const Row& firstRow,
+                              const Row& secondRow) {
+    Row newRow{};
+    for (const auto& pair : firstRow) {
+        if (headers.find(pair.first) != headers.end()) {
+            newRow[pair.first] = pair.second;
+        }
     }
+    for (const auto& pair : secondRow) {
+        if (headers.find(pair.first) != headers.end()) {
+            newRow[pair.first] = pair.second;
+        }
+    }
+    return newRow;
 }
 
 std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
@@ -88,19 +103,24 @@ std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     return commonHeaders;
 }
 
-std::vector<Synonym> TableManager::mergeHeaders(const Table& other) const {
+std::vector<Synonym> TableManager::mergeHeaders(const Table& other,
+                                                const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     std::vector<Synonym> newHeaders{};
     std::unordered_set<SynonymValue> seen{};
 
     for (Synonym header : this->result.getHeaders()) {
-        if (seen.find(header.getValue()) == seen.end()) {
+        const bool shouldRetain = synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool isNotSeen = seen.find(header.getValue()) == seen.end();
+        if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
             seen.insert(header.getValue());
         }
     }
 
     for (Synonym header : other.getHeaders()) {
-        if (seen.find(header.getValue()) == seen.end()) {
+        const bool shouldRetain = synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool isNotSeen = seen.find(header.getValue()) == seen.end();
+        if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
             seen.insert(header.getValue());
         }
