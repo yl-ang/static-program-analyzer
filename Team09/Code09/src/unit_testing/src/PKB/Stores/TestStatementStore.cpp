@@ -1,5 +1,5 @@
-#include "PKB/Stores/StatementStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/StatementStore.h"
 
 TEST_CASE("StatementStore tests", "[StatementStore]") {
     // Test case 1: Test getStatements

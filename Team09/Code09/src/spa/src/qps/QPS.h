@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "PKB/PKBClient/PKBFacadeReader.h"
 #include "QpsTokenizer.h"
 #include "parser/PQLParser.h"
+#include "pkb/PKBClient/PKBFacadeReader.h"
 #include "validator/Validator.h"
 
 class QPS {

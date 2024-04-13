@@ -1,7 +1,7 @@
-#include "PKB/PKBClient/PKBFacadeReader.h"
-#include "PKB/PKBClient/PKBFacadeWriter.h"
 #include "catch.hpp"
 #include "pkb/PKB.h"
+#include "pkb/PKBClient/PKBFacadeReader.h"
+#include "pkb/PKBClient/PKBFacadeWriter.h"
 #include "qps/QPS.h"
 #include "sp/Utils.h"
 

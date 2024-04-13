@@ -1,7 +1,7 @@
 #include <functional>
 
-#include "PKB/Stores/AssignPatternStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/AssignPatternStore.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauseArguments/Wildcard.h"
 

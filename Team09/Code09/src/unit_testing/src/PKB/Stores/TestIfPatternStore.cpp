@@ -1,7 +1,7 @@
 #include <functional>
 
-#include "PKB/Stores/IfPatternStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/IfPatternStore.h"
 
 TEST_CASE("IfPatternStore - All Tests") {
     IfPatternStore ifPatternStore;

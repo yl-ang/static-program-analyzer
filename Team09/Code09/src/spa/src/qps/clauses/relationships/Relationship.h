@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "PKB/PKBClient/PKBFacadeReader.h"
-#include "PKB/Utils/DataTypes.h"
+#include "pkb/PKBClient/PKBFacadeReader.h"
+#include "pkb/Utils/DataTypes.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"
 #include "qps/evaluator/EvaluationDb.h"

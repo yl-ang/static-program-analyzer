@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "PKB/Utils/DataTypes.h"
+#include "pkb/Utils/DataTypes.h"
 
 void IfPatternStore::setIfPatternStore(std::unordered_set<std::pair<StmtNum, std::string>> ifPatternPairs) {
     for (const auto& pattern : ifPatternPairs) {

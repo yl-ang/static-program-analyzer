@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "PKB/Utils/DataTypes.h"
+#include "pkb/Utils/DataTypes.h"
 void AssignPatternStore::initialiseStore(
     std::function<bool(std::string, std::string)> exactMatchFP,
     std::function<bool(std::string, std::string)> partialMatchFP,

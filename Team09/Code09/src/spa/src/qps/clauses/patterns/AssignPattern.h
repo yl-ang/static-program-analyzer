@@ -1,4 +1,4 @@
-#include <PKB/PKBClient/PKBFacadeReader.h>
+#include <pkb/PKBClient/PKBFacadeReader.h>
 #include <qps/GrammarUtils.h>
 #include <qps/clauses/QueryClause.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PKB/PKBClient/PKBFacadeReader.h>
+#include <pkb/PKBClient/PKBFacadeReader.h>
 
 #include "ClauseResult.h"
 #include "SynonymValuesRetriever.h"

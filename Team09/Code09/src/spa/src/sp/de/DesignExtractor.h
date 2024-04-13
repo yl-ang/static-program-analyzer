@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <utility>
 
-#include "././PKB/PKBClient/PKBFacadeWriter.h"
+#include "././pkb/PKBClient/PKBFacadeWriter.h"
 #include "CallsExtractor.h"
 #include "EntityExtractor.h"
 #include "FollowsExtractor.h"

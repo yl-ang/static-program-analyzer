@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "PKB/Utils/DataTypes.h"
-#include "PKB/Utils/TransitiveClosureUtility.h"
+#include "pkb/Utils/DataTypes.h"
+#include "pkb/Utils/TransitiveClosureUtility.h"
 
 class FollowsStore {
 public:

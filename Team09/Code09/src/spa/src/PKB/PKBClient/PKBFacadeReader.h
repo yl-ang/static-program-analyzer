@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "PKB/PKB.h"
+#include "pkb/PKB.h"
 
 class PKBFacadeReader {
 public:

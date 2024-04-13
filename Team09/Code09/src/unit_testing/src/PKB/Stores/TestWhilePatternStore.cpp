@@ -1,7 +1,7 @@
 #include <functional>
 
-#include "PKB/Stores/WhilePatternStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/WhilePatternStore.h"
 
 TEST_CASE("WhilePatternStore - All Tests") {
     WhilePatternStore whilePatternStore;

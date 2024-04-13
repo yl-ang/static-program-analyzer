@@ -1,5 +1,5 @@
-#include "PKB/Stores/EntityStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/EntityStore.h"
 
 // ai-gen start(gpt, 1, e)
 // prompt:

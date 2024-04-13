@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "././PKB/PKBClient/PKBFacadeWriter.h"
+#include "././pkb/PKBClient/PKBFacadeWriter.h"
 #include "sp/ast/grammar_nodes/statements/StatementListNode.h"
 
 class CFG {

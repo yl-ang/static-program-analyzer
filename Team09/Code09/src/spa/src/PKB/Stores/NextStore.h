@@ -7,8 +7,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "PKB/Utils/DataTypes.h"
-#include "PKB/Utils/TransitiveClosureUtility.h"
+#include "pkb/Utils/DataTypes.h"
+#include "pkb/Utils/TransitiveClosureUtility.h"
 
 class NextStore {
 public:
