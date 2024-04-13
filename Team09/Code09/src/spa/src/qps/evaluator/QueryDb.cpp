@@ -23,14 +23,13 @@ QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
         idToEntryMap[thisId] = newEntry;
 
         for (const Synonym& synonym : clause->getSynonyms()) {
+            synonymsEvaluationCount[synonym.getName()] += 1;
             synonymToClauseListMap[synonym.getName()].push_back(thisId);
         }
     }
 
     for (const QueryDbEntry& entry : entries) {
         for (Synonym syn : entry.clause->getSynonyms()) {
-            synonymsToEvaluate.insert(syn.getName());
-
             for (ID id : synonymToClauseListMap[syn.getName()]) {
                 adjList[entry.id].insert(id);
                 adjList[id].insert(entry.id);
@@ -67,8 +66,12 @@ void QueryDb::loadClausesWithEntity(SynonymValue synName) {
 }
 
 bool QueryDb::loadNextGroup() {
-    for (const SynonymName& synName : synonymsToEvaluate) {
-        loadClausesWithEntity(synName);
+    for (const auto& pair : synonymsEvaluationCount) {
+        if (pair.second <= 0) {
+            continue;
+        }
+
+        loadClausesWithEntity(pair.first);
         if (!queue.empty()) {
             return true;
         }
@@ -85,9 +88,14 @@ OptionalQueryClause QueryDb::next() {
     queue.pop();
 
     std::cout << "New clause being nexted" << std::endl;
-    for (auto syn : nextEntry.clause->getSynonyms()) {
+    for (const auto& syn : nextEntry.clause->getSynonyms()) {
         std::cout << "header: " << syn.getName() << std::endl;
+        synonymsEvaluationCount[syn.getName()] -= 1;
     }
 
     return nextEntry.clause;
+}
+
+std::unordered_map<SynonymValue, int> QueryDb::getSynonymsEvaluationCount() {
+    return this->synonymsEvaluationCount;
 }
