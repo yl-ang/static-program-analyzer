@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <utility>
 
-#include "PKB/Utils/DataTypes.h"
+#include "pkb/Utils/DataTypes.h"
 
 class AssignPatternStore {
 public:

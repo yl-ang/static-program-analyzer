@@ -1,5 +1,5 @@
-#include "PKB/Stores/ParentStore.h"
 #include "catch.hpp"
+#include "pkb/Stores/ParentStore.h"
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauseArguments/Wildcard.h"
 

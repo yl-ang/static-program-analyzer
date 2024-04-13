@@ -3,8 +3,8 @@
 #include <unordered_set>
 #include <utility>
 
-#include "../../PKB/PKBClient/PKBFacadeWriter.h"
-#include "../../PKB/utils/DataTypes.h"
+#include "../../pkb/PKBClient/PKBFacadeWriter.h"
+#include "../../pkb/utils/DataTypes.h"
 #include "AstVisitor.h"
 
 class AbstractionExtractor : public AstVisitor {

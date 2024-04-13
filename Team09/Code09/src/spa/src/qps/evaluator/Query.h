@@ -3,10 +3,10 @@
 #include <unordered_set>
 
 #include "EvaluationDb.h"
-#include "PKB/PKBClient/PKBFacadeReader.h"
 #include "QueryDb.h"
 #include "Table.h"
 #include "TableManager.h"
+#include "pkb/PKBClient/PKBFacadeReader.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/PatternClause.h"
 #include "qps/clauses/SuchThatClause.h"

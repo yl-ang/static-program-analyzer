@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "PKB/PKBClient/PKBFacadeReader.h"
+#include "pkb/PKBClient/PKBFacadeReader.h"
 #include "qps/clauses/ClauseResult.h"
 
 struct Pattern {

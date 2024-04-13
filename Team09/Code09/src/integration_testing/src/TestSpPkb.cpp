@@ -1,10 +1,10 @@
 #include <filesystem>
 #include <unordered_set>
 
-#include "PKB/PKB.h"
-#include "PKB/Utils/DataTypes.h"
 #include "Spa.h"
 #include "catch.hpp"
+#include "pkb/PKB.h"
+#include "pkb/Utils/DataTypes.h"
 #include "qps/clauseArguments/Integer.h"
 #include "qps/clauseArguments/Literal.h"
 

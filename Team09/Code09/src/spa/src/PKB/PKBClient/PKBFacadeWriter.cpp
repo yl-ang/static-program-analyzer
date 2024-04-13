@@ -1,6 +1,6 @@
 #include "PKBFacadeWriter.h"
 
-#include "PKB/PKB.h"
+#include "pkb/PKB.h"
 
 PKBFacadeWriter::PKBFacadeWriter(PKB &pkbReference) {
     this->pkbReference = &pkbReference;

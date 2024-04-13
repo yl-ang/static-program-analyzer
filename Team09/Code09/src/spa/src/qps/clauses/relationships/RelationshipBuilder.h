@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 
+#include "Affects.h"
 #include "Calls.h"
 #include "CallsStar.h"
 #include "Follows.h"
@@ -9,12 +10,11 @@
 #include "Modifies.h"
 #include "Next.h"
 #include "NextStar.h"
-#include "Affects.h"
-#include "PKB/Utils/DataTypes.h"
 #include "Parent.h"
 #include "ParentStar.h"
 #include "Relationship.h"
 #include "Uses.h"
+#include "pkb/Utils/DataTypes.h"
 #include "qps/QPSConstants.h"
 #include "qps/clauseArguments/Synonym.h"
 #include "qps/clauses/ClauseResult.h"

@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "PKB/Utils/DataTypes.h"
+#include "pkb/Utils/DataTypes.h"
 #include "qps/clauseArguments/ClauseArgument.h"
 #include "qps/clauseArguments/Literal.h"
 

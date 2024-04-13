@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 
-#include "PKB/PKBClient/PKBFacadeWriter.h"
 #include "SourceLoader.h"
+#include "pkb/PKBClient/PKBFacadeWriter.h"
 #include "sp/ast/Ast.h"
 #include "sp/de/DesignExtractor.h"
 #include "sp/tokenizer/SpTokenizer.h"

@@ -2,17 +2,17 @@
 
 #include <memory>
 
-#include "PKB/Stores/AssignPatternStore.h"
-#include "PKB/Stores/CallStore.h"
-#include "PKB/Stores/EntityStore.h"
-#include "PKB/Stores/FollowsStore.h"
-#include "PKB/Stores/IfPatternStore.h"
-#include "PKB/Stores/ModifiesStore.h"
-#include "PKB/Stores/NextStore.h"
-#include "PKB/Stores/ParentStore.h"
-#include "PKB/Stores/StatementStore.h"
-#include "PKB/Stores/UsesStore.h"
-#include "PKB/Stores/WhilePatternStore.h"
+#include "pkb/Stores/AssignPatternStore.h"
+#include "pkb/Stores/CallStore.h"
+#include "pkb/Stores/EntityStore.h"
+#include "pkb/Stores/FollowsStore.h"
+#include "pkb/Stores/IfPatternStore.h"
+#include "pkb/Stores/ModifiesStore.h"
+#include "pkb/Stores/NextStore.h"
+#include "pkb/Stores/ParentStore.h"
+#include "pkb/Stores/StatementStore.h"
+#include "pkb/Stores/UsesStore.h"
+#include "pkb/Stores/WhilePatternStore.h"
 
 class PKB {
 public:

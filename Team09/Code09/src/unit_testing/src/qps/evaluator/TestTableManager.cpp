@@ -1,8 +1,8 @@
 #include <algorithm>
 
-#include "PKB/PKB.h"
-#include "PKB/PKBClient/PKBFacadeWriter.h"
 #include "catch.hpp"
+#include "pkb/PKB.h"
+#include "pkb/PKBClient/PKBFacadeWriter.h"
 #include "qps/evaluator/TableManager.h"
 
 // helper functions
