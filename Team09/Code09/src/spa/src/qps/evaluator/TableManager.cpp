@@ -30,12 +30,13 @@ void TableManager::join(const Table& other) const {
 
     std::vector<Row> newRows{};
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
+    Row newRow{};
     for (Row& row : other.getRows()) {
+        newRow = row;
         std::string commonValueString{buildTuple(commonHeaders, row)};
 
         if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
             for (const Row& otherRow : it->second) {
-                Row newRow{row};
                 combineRows(newRow, otherRow);
                 newRows.push_back(newRow);
             }
