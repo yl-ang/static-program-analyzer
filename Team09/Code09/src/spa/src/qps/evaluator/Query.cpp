@@ -22,7 +22,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (!getNonBooleanClauses().empty()) {
         QueryDb queryDb{getNonBooleanClauses()};
         for (auto entity : selectEntities) {
-            queryDb.loadClausesWithEntity(entity);
+            queryDb.loadClausesWithEntity(entity.getName());
             if (evaluateAndJoinClauses(*tableManager, queryDb, pkb, evalDb); tableManager->isEmpty()) {
                 return getEmptyResult();
             }

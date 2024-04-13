@@ -1,5 +1,7 @@
 #include "QueryDb.h"
 
+#include <iostream>
+
 QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
     adjList.reserve(clauses.size());
     synonymToClauseListMap.reserve(clauses.size());
@@ -37,23 +39,39 @@ QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
     }
 }
 
-void QueryDb::loadClausesWithEntity(Synonym syn) {
-    for (ID id : synonymToClauseListMap[syn.getName()]) {
+void QueryDb::loadClausesWithEntity(SynonymValue synName) {
+    std::unordered_set<ID> idsToLoad{};
+    std::stack<ID> toTraverse{};
+    for (ID id : synonymToClauseListMap[synName]) {
+        toTraverse.push(id);
+    }
+
+    while (!toTraverse.empty()) {
+        auto currId = toTraverse.top();
+        toTraverse.pop();
+        if (seen.find(currId) != seen.end()) {
+            continue;
+        }
+
+        seen.insert(currId);
+        idsToLoad.insert(currId);
+        for (auto neighbour : adjList[currId]) {
+            toTraverse.push(neighbour);
+        }
+        adjList[currId].clear();
+    }
+
+    for (ID id : idsToLoad) {
         queue.push(idToEntryMap[id]);
     }
 }
 
 bool QueryDb::loadNextGroup() {
     for (const SynonymName& synName : synonymsToEvaluate) {
-        auto clauseIds = synonymToClauseListMap[synName];
-        if (clauseIds.empty()) {
-            continue;
+        loadClausesWithEntity(synName);
+        if (!queue.empty()) {
+            return true;
         }
-
-        for (ID id : clauseIds) {
-            queue.push(idToEntryMap[id]);
-        }
-        return true;
     }
     return false;
 }
@@ -63,32 +81,13 @@ OptionalQueryClause QueryDb::next() {
         return std::nullopt;
     }
 
-    QueryDbEntry nextEntry{};
-    do {
-        nextEntry = queue.top();
-        queue.pop();
-    } while (seen.find(nextEntry.id) != seen.end() && !queue.empty());
+    auto nextEntry = queue.front();
+    queue.pop();
 
-    if (seen.find(nextEntry.id) != seen.end() && queue.empty()) {
-        return std::nullopt;
+    std::cout << "New clause being nexted" << std::endl;
+    for (auto syn : nextEntry.clause->getSynonyms()) {
+        std::cout << "header: " << syn.getName() << std::endl;
     }
 
-    setTraversed(nextEntry.id);
-    addNeighboursToQueue(nextEntry.id);
     return nextEntry.clause;
-}
-
-void QueryDb::setTraversed(ID id) {
-    seen.insert(id);
-    for (Synonym syn : idToEntryMap[id].clause->getSynonyms()) {
-        synonymsToEvaluate.erase(syn.getName());
-    }
-}
-
-void QueryDb::addNeighboursToQueue(ID id) {
-    for (ID connectedId : adjList[id]) {
-        queue.push(idToEntryMap[connectedId]);
-    }
-    // Prevent adding clauses multiple times into the evaluate queue.
-    adjList[id].clear();
 }
