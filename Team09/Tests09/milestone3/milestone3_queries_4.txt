@@ -1,0 +1,175 @@
+1 - Follows* : if condition followed by statement after
+procedure p;
+Select p such that Follows*(12, 21)
+none
+5000
+2 - Follows : statement in while
+procedure p;
+Select p such that Follows(63, 72)
+none
+5000
+3 - Follows* : second layer, in while cont stmt (stmt -> stmt -> stmt)
+procedure p;
+Select p such that Follows*(50, 52)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+4 - ParentStar
+procedure p; if ifThenElseConditional; while whileCondtion;
+Select p such that Parent*(ifThenElseConditional, whileCondtion)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+5 - Uses : statement in nested whiles
+procedure p;
+Select p such that Uses(31, "whileWhileC")
+none
+5000
+6 - Follows* : if then while
+procedure p;
+Select p such that Follows*(12, 31)
+none
+5000
+7 - Modifies : if condition in proc followed by statement after
+procedure p;
+Select p such that Modifies("nestedProcedureWithSuperLongName", "ifElseA")
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+8 - Follows* : while followed by statement in proc
+procedure p;
+Select p such that Follows*(31, 70)
+none
+5000
+9 - ParentStar: parent of whiles
+procedure p; while w1; while w2;
+Select p such that Parent*(w1, w2)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+10 - Parent :  statement in while nested if
+procedure p;
+Select p such that Parent(23, 25)
+none
+5000
+11 - Follows : child statement in if
+procedure p;
+Select p such that Follows(12, 25)
+none
+5000
+12 - Modifies : statement in while nested if
+procedure p;
+Select p such that Modifies("nestedProcedureWithSuperLongName", "ifWhileA")
+none
+5000
+13 - Modifies : nested whiles
+procedure p;
+Select p such that Modifies(31, "whileWhileA")
+none
+5000
+14 - Follows : if conditional then statement
+procedure p;
+Select p such that Follows(12, 45)
+none
+5000
+15 - Modifies : nested if
+procedure p;
+Select p such that Modifies(12, "ifIfA")
+none
+5000
+16 - Modifies : procedure, in if
+procedure p;
+Select p such that Modifies("nestedProcedureWithSuperLongName", "elsaFromFrozenIsAlsoElseA")
+none
+5000
+17 - Follows : while in if
+procedure p;
+Select p such that Follows(75, 95)
+none
+5000
+18 - Follows* : while in if
+procedure p;
+Select p such that Follows*(32, 35)
+none
+5000
+19 - Follows* : while then if
+procedure p;
+Select p such that Follows*(86, 95)
+none
+5000
+20 - Uses : statement in if
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "ifB")
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+21 - Follows : statement then if
+procedure p;
+Select p such that Follows(4, 12)
+none
+5000
+22 - Modifies : nested ifThenElseConditional
+procedure p;
+Select p such that Modifies(12, "ifElseA")
+none
+5000
+23 - ParentStar : if condition followed by statement after
+procedure p;
+Select p such that Parent*(12, 16)
+none
+5000
+24 - Follows : statement followed by while
+procedure p;
+Select p such that Follows(48, 31)
+none
+5000
+25 - Uses : nested if uses
+procedure p;
+Select p such that Uses(12, "ifIfifififififiifB")
+none
+5000
+26 - Uses : if statement
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "elseC")
+none
+5000
+27 - Parent : statements in while
+procedure p;
+Select p such that Parent(31, 65)
+none
+5000
+28 - Follows* : statement then if
+procedure p;
+Select p such that Follows*(7, 12)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+29 - Parent :
+procedure p;
+Select p such that Parent(12, 12)
+none
+5000
+30 - Uses : procedure in if
+procedure p;
+Select p such that Uses("nestedProcedureWithSuperLongName", "ifElseCSoundslikeifelsiewhoiselsie")
+none
+5000
+31 - Parent : while in if
+procedure p;
+Select p such that Parent(12, 25)
+none
+5000
+32 - Follows* : then block contains while
+procedure p;
+Select p such that Follows*(21, 29)
+none
+5000
+33 - Follows
+procedure p; while whileCondtion; if ifThenElseConditional;
+Select p such that Follows(whileCondtion, ifThenElseConditional)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000
+34 - Parent : nested whiles
+procedure p;
+Select p such that Parent(60, 70)
+none
+5000
+35 - Follows : prcoedure with whiles
+procedure p; while whileCondtion; if ifThenElseConditional;
+Select p such that Follows(ifThenElseConditional, whileCondtion)
+whileC4, whileC3, C3, whileElseC, whileC2, whileC, whileIfC, C2, elseC, ifWhileC, ifElseC, ifC4, whileWhileC, ifC2, ifC, ifC3, ifIfC, CommaCommaGiveMeAComa, nestedProcedureWithSuperLongName
+5000

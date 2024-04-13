@@ -1,0 +1,271 @@
+  procedure nestedProcedureWithSuperLongName {
+    print ALPHAalphaAlpha;
+    read BetaBETABata;
+    call CommaCommaGiveMeAComa;
+    ALPHAalphaAlpha = BetaBETABata % CommaCommaGiveMeAComa;
+    if (((1 % ALPHAalphaAlpha) / 2 > 3) && (1 + BetaBETABata + 3 + D == 10)) then {
+      print ifA;
+      read ifB;
+      call ifC;
+      ifA = ((ifB % ifC));
+
+           call ifC;
+      ifA = ((ifB % ifC));     call ifC;
+      ifA = ((ifB % ifC));     call ifC;
+      ifA = ((ifB % ifC));     call ifC;
+      ifA = ((ifB % ifC));
+          read BetaBETABata;
+    call CommaCommaGiveMeAComa;
+      if ((!((1 % ALPHAalphaAlpha) / 2 * 2 > 3 + 0)) && (!(1 + BetaBETABata + ((3 + D)) == 10))) then {
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+        read ifIfB;
+        call ifIfC;
+        ifIfA = ifIfB % ifIfC;
+      } else {
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+        call ifElseC;
+        ifElseA = ifElseB % ifElseC;
+      }
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      call ifC2;
+      ifA2 = ((ifB2 % ifC2)) * 2;
+      while ((!((1 % ALPHAalphaAlpha) / 2 * 2 > 3 + 0)) && (((!(1 + BetaBETABata + 3 + D == 10)) && (x <= 2)) || (!(!(!(3/4/2/1 != ((222) * 32))))))) {
+        print ifWhileA;
+        call ifWhileC;
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      }
+      call ifC3;
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      ifA3 = ifB3 % ifC3;
+      if ((((!(!((1 % ALPHAalphaAlpha) / 2 * 2 > 3 + 0))) && (!(!(1 % BetaBETABata + 3 - D == 10)))) || (!(!(3/4/2/1 != ((222) * 32))))) || (x == 2)) then {
+              whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;print ifIfContainerStmt;
+      } else {
+        print ifElseContainerStmt;      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      }
+      while (x == 2 + 3 + 3 + 4) {
+        print ifWhileContainerStmt;
+      }
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      ifA4 = ifB4 % ifC4;
+      call ifC4;
+    } else {
+      print elseA;
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      call elseC;
+    }
+    print Atimes2ISStill2lah;
+    call C2;
+    read B2;
+    Atimes2ISStill2lah = B2 % C2;
+    while (x >2  + 3) {
+      print whileA;
+      read whileB;
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      whileA = whileB % whileC;
+      while (!(x == 2)) {
+        print whileWhileA;
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+        whileWhileA = whileWhileB % whileWhileC;
+      }
+      read whileB2;
+      print whileA2;
+      call whileC2;
+      whileA2 = whileB2 % whileC2;
+            whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      if ((ALPHAalphaAlpha > BetaBETABata) && (CommaCommaGiveMeAComa > d)) then {
+        print whileIfA;
+        read whileIfB;
+
+        whileIfA = whileIfB % whileIfC;
+      } else {
+        print whileElseA;
+
+        whileElseA = whileElseB % whileElseC;
+      }
+      call whileC3;
+      read whileB3;
+      print whileA3;
+      whileA3 = whileB3 % whileC3;
+      while (x == (((2)))) {
+        print whileWhileContainerStmt;
+      }
+      if ((((x))) <= (((((3)))))) then {
+        print whileIfContainerStmt;
+              whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      } else {
+        print whileElseContainerStmt;
+              whileA4 = whileB4 % whileC4;
+      read whileB4;
+      call whileC4;
+      print whileA4;
+      }
+      whileA4 = whileB4 % whileC4;
+      read whileB4;
+
+    }
+    print A3;
+    A3 = B3 % C3;
+    call C3;
+    read B3;
+    A4 = A4;
+  }
+
+procedure CommaCommaGiveMeAComa {
+	read CommaCommaGiveMeAComa;
+	    read B3;
+    A4 = A4;
+}
+
+procedure ifC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+}
+
+procedure ifIfC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+		read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+	read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+}
+
+procedure ifElseC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+	read CommaCommaGiveMeAComa;
+		read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+}
+
+procedure ifC2 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+		read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+						read CommaCommaGiveMeAComa;
+	    read BetaBETABata;
+}
+
+procedure ifWhileC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure ifC3 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure ifC4 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure elseC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure C2 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileWhileC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileC2 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileIfC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileElseC {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileC3 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure whileC4 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}
+
+procedure C3 {
+    read B3;
+    A4 = A4;
+	read CommaCommaGiveMeAComa;
+}

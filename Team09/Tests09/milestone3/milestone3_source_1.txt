@@ -1,0 +1,31 @@
+procedure main {
+  x = 2 - 3 /  102;
+  print y0;
+  appleWithAVeryLongNameThatShouldStillBeStoredIGuess = 2 - 3 /  5 - 6;
+  x = 2 - 3 /  appleWithAVeryLongNameThatShouldStillBeStoredIGuess - 1024/7;
+  if (y0 > 1020) then {
+    appleWithAVeryLongNameThatShouldStillBeStoredIGuess = 2 - 3 /  appleWithAVeryLongNameThatShouldStillBeStoredIGuess / 2;
+    y0 = 2 - 3 /  y0 - appleWithAVeryLongNameThatShouldStillBeStoredIGuess * 4; }
+  else {
+    appleWithAVeryLongNameThatShouldStillBeStoredIGuess = 2 - 3 /  appleWithAVeryLongNameThatShouldStillBeStoredIGuess;
+     }
+  x102ga = 2 - 3 /  8 - 1024 / 102 * 102102;
+  while (y0 < 50) {
+    x102ga = 2 - 3 /  x102ga - x;
+    y0 = 2 - 3 /  y0 - x102ga;
+     }
+  z = 2 - 3 /  10225 - x * x102ga;
+  print z;
+
+    while (y0 > 50) {
+        y0 = 2 - 3 /  y0 - x102ga;
+    x102ga = 2 - 3 /  x102ga - x;
+    x102ga = 23 /  x102ga - x;
+     }
+
+
+
+
+
+
+  }

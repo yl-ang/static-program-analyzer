@@ -29,6 +29,10 @@ http://localhost:8003/)
 4. Open your browser and goto each localhost endpoints to view output (http://localhost:8001/, http://localhost:8002/,
    http://localhost:8003/)
 
+
+### Folders
+- tests_dev contains tests in development (i.e queries)
+
 ### Potential Issues
 1. Mac users, if autotester binary not found, please locate the autotester binary (copy the path), and 
 update the AUTOTESTER_BINARY variable in "run_autotester.sh" file to point to the correct path.

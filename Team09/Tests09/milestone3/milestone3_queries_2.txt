@@ -1,0 +1,150 @@
+1 - Uses: print that uses q
+print printStatement;
+Select printStatement such that Uses(printStatement, "q")
+none
+5000
+2 - Uses: assign that uses c
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "c")
+25, 24, 23, 20, 18, 13, 10, 8, 19, 11, 22, 21, 9, 6, 1, 5, 7, 15, 3
+5000
+3 - Uses: read that uses  assignmentStatement
+variable variableName; read if;
+Select variableName such that Uses(if, " assignmentStatement")
+none
+5000
+4 - Modifies: assign that uses c
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "c")
+2
+5000
+5 - Modifies: read that uses w
+read read;
+Select  assignmentStatement such that Modifies(read, "w")
+SemanticError
+5000
+6 - Modifies: read that modifies
+read readstatement;
+Select  readstatement such that Modifies( readstatement, _)
+46, 45, 40, 43, 35, 29, 31, 44, 38, 32, 30, 42, 27, 28
+5000
+7 - Modifies: read that uses variableName
+read read;
+Select  assignmentStatement such that Modifies(read, "variableName")
+SemanticError
+5000
+8 - Uses: assign that uses beta
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "beta")
+11, 22, 17, 1
+5000
+9 - Uses: assign that uses alpha
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "alpha")
+16, 22, 1
+5000
+10 - Uses: variables used by if
+variable variableName; if while;
+Select variableName such that Uses(while, variableName)
+u, p, s, r, w, q
+5000
+11 - Uses: print that uses  readstatement
+print printStatement;
+Select printStatement such that Uses(printStatement, " readstatement")
+none
+5000
+12 - Uses: read that uses variables
+variable variableName; read if;
+Select variableName such that Uses(if, variableName)
+none
+5000
+13 - Modifies: assign that uses b
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "b")
+1
+5000
+14 - Modifies: assign that uses alpha
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "alpha")
+none
+5000
+15 - Uses: statement num that uses  assignmentStatement
+variable variableName; read if;
+Select variableName such that Uses(15, " assignmentStatement")
+none
+5000
+16 - Uses: print that uses p
+print printStatement;
+Select printStatement such that Uses(printStatement, "p")
+none
+5000
+17 - Uses: assign that uses b
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "b")
+25, 24, 23, 19, 20, 18, 17, 16, 22, 21, 2, 14, 9, 5, 7, 12, 13, 10, 8, 4, 3
+5000
+18 - Modifies: read that uses b
+read read;
+Select  assignmentStatement such that Modifies(read, "b")
+SemanticError
+5000
+19 - Uses: print that uses s
+print printStatement;
+Select printStatement such that Uses(printStatement, "s")
+none
+5000
+20 - Uses: assign that uses gamma
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, "gamma")
+22, 17, 11, 2
+5000
+21 - Modifies: read that uses x
+read read;
+Select  assignmentStatement such that Modifies(read, "x")
+SemanticError
+5000
+22 - Modifies: read that uses  assignmentStatement
+read read;
+Select  assignmentStatement such that Modifies(read, " assignmentStatement")
+SemanticError
+5000
+23 - Modifies: assign that uses beta
+assign assignmentStatement;
+Select  assignmentStatement such that Modifies( assignmentStatement, "beta")
+none
+5000
+24 - Uses: assign that uses  assignmentStatement
+assign assignmentStatement;
+Select  assignmentStatement such that Uses( assignmentStatement, " assignmentStatement")
+none
+5000
+25 - Modifies: variables modified by read
+variable variableName; read readstatement;
+Select variableName such that Modifies( readstatement, variableName)
+z, y, d, x, b, e, k, v, i, a, t
+5000
+26 - Uses: print that uses
+print printStatement;
+Select printStatement such that Uses(printStatement, _)
+37, 39, 36, 41, 34
+5000
+27 - Uses: variables used by print
+variable variableName; print printStatement;
+Select variableName such that Uses(printStatement, variableName)
+u, w
+5000
+28 - Uses: variables used by assign
+variable variableName; assign assignmentStatement;
+Select variableName such that Uses( assignmentStatement, variableName)
+u, p, o, phi, chi, k, tau, sigma, j, rho, i, omicron, nu, mu, a, upsilon, b, eta, c, r, omega, e, l, lambda, kappa, beta, g, m, epsilon, delta, pi, gamma, theta, s, iota, psi, f, alpha, zeta, d, xi, h, n, q, t
+5000
+29 - Uses: print that uses u
+print printStatement;
+Select printStatement such that Uses(printStatement, "u")
+37, 41
+5000
+30 - Uses: variables used by while
+variable variableName; while if;
+Select variableName such that Uses(if, variableName)
+p, w, d, a, b, s, u, c, r, q
+5000

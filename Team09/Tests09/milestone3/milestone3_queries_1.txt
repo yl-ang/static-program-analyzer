@@ -1,0 +1,195 @@
+1 - Pattern query: invalid LHS
+assign a;
+Select a pattern a(1, _)
+SyntaxError
+5000
+2 - Pattern query: var, var
+assign x;
+Select x pattern x("y0", _"x1ga"_)
+none
+5000
+3 - Pattern query: var, var
+assign x;
+Select x pattern x("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
+8, 6
+5000
+4 - Pattern query:  var, var
+assign x;
+Select x pattern x("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _"6"_)
+3
+5000
+5 -Pattern query:  var, var
+assign x;
+Select x pattern x("y0", _"4"_)
+7
+5000
+6 - Pattern query: var, var
+assign x;
+Select x pattern x("x", _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
+4
+5000
+7 - Pattern query: var, var
+assign x;
+Select x pattern x("y0", _"y0"_)
+16, 12, 7
+5000
+8 - Pattern query: var, var
+assign a;
+Select a pattern a("x", _"2"_)
+4, 1
+5000
+9 - Pattern query: var, var
+assign a;
+Select a pattern a("z", _"x1ga"_)
+none
+5000
+10 - Pattern query: wildcard, wildcard
+assign a;
+Select a pattern a(_, _)
+18, 4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
+5000
+11 - Pattern query: var, var
+assign x;
+Select x pattern x("y0", _"apple"_)
+none
+5000
+12 - Pattern query: var, var
+assign a;
+Select a pattern a("z", _"125"_)
+none
+5000
+13 - Pattern query: non-existent LHS
+assign a;
+Select a pattern a("a", _)
+none
+5000
+14 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"125"_)
+none
+5000
+15 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"6"_)
+3
+5000
+16 - Pattern query: var, wildcard
+assign a;
+Select a pattern a("z", _)
+13
+5000
+17 - Pattern query: var, var
+assign x;
+Select x pattern x("x", _"5"_)
+none
+5000
+18 - Pattern query: var, var
+assign a;
+Select a pattern a("z", _"x"_)
+13
+5000
+19 - Pattern query: invalid LHS
+assign a;
+Select a pattern a(x, _"y"_)
+SemanticError
+5000
+20 - Pattern query: invalid RHS
+assign a;
+Select a pattern a(_, "x")
+none
+5000
+21 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"2"_)
+4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
+5000
+22 - Pattern query: non-existent RHS
+assign a;
+Select a pattern a("x", _"y1"_)
+none
+5000
+23 - Pattern query: var, wildcard
+assign a;
+Select a pattern a("x102ga", _)
+18, 17, 9, 11
+5000
+24 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
+4, 8, 7, 6
+5000
+25 - Pattern query: var, wildcard
+assign a;
+Select a pattern a("y0", _)
+16, 12, 7
+5000
+26 - Pattern query: var, var
+assign x;
+Select x pattern x("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _"5"_)
+3
+5000
+27 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"10225"_)
+13
+5000
+28 - Pattern query: wildcard, var
+assign a4g;
+Select a4g pattern a4g(_, _"102"_)
+9, 1
+5000
+29 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"3"_)
+4, 12, 13, 8, 16, 9, 11, 6, 7, 17, 3, 1
+5000
+30 - Pattern query: var, var
+assign x;
+Select x pattern x("x",  _"3"_)
+4, 1
+5000
+31 - Pattern query: invalid RHS
+assign a;
+Select a pattern a(_, _""_)
+SyntaxError
+5000
+32 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"x"_)
+18, 17, 13, 11
+5000
+33 - Pattern query: var, wildcard
+assign a;
+Select a pattern a("appleWithAVeryLongNameThatShouldStillBeStoredIGuess", _)
+6, 8, 3
+5000
+34 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"appleWithAVeryLongNameThatShouldStillBeStoredIGuess"_)
+4, 8, 7, 6
+5000
+35 - Pattern query:  wildcard, var
+assign a;
+Select a pattern a(_, _"5"_)
+3
+5000
+36 - Pattern query: invalid RHS
+assign a;
+Select a pattern a(_, _"x+1"_)
+none
+5000
+37 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"6"_)
+3
+5000
+38 - Pattern query: wildcard, var
+assign a;
+Select a pattern a(_, _"x1ga"_)
+none
+5000
+39 - Pattern query: var, wildcard
+assign a;
+Select a pattern a("x", _)
+4, 1
+5000
