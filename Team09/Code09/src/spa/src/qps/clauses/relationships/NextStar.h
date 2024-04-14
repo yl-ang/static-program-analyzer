@@ -24,16 +24,25 @@ private:
     }
 
     StmtSet getNexters(PKBFacadeReader& reader, const StmtNum& nextee) override {
-        return reader.getNexterStar(nextee);
+        auto starMap = getNextStarMap(reader);
+        if (starMap.find(nextee) == starMap.end()) {
+            return {};
+        }
+        return starMap[nextee];
     }
 
     StmtSet getNextees(PKBFacadeReader& reader, const StmtNum& nexter) override {
-        return reader.getNexteeStar(nexter);
+        auto starMap = getNextStarMap(reader);
+        StmtSet results{};
+        for (const auto& pair : starMap) {
+            if (pair.second.find(nexter) != pair.second.end()) {
+                results.insert(pair.first);
+            }
+        }
+        return results;
     }
 
-    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> getNextStarMap(PKBFacadeReader& reader,
-                                                                            std::unordered_set<StmtNum> nexteeStmts,
-                                                                            std::unordered_set<StmtNum> nexterStmts) {
+    std::unordered_map<StmtNum, std::unordered_set<StmtNum>> getNextStarMap(PKBFacadeReader& reader) {
         std::unordered_map<StmtNum, std::unordered_set<StmtNum>> adjList{};
 
         for (const auto& nextee : reader.getStmts()) {
@@ -45,9 +54,6 @@ private:
         std::unordered_map<StmtNum, std::unordered_set<StmtNum>> nextStarMap{};
         for (const auto& pair : adjList) {
             // If this stmt num is not a potential nextee stmt, we ignore it.
-            if (nexteeStmts.find(pair.first) == nexteeStmts.end()) {
-                continue;
-            }
 
             std::queue<StmtNum> q{};
             for (const auto& nexter : pair.second) {
@@ -64,10 +70,7 @@ private:
                 }
                 seen.insert(currNexterStar);
 
-                // Only add this nexter star if it is a potential nexter stmt
-                if (nexterStmts.find(currNexterStar) != nexterStmts.end()) {
-                    nexterStars.insert(currNexterStar);
-                }
+                nexterStars.insert(currNexterStar);
 
                 // Add all its values to the queue, regardless of whether this is a valid next star.
                 // We know for a fact that the current stmtnum is a next star, just that it might not be a result we
@@ -92,7 +95,7 @@ private:
 
         results.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
 
-        for (const auto& pair : getNextStarMap(reader, existingCurrentSynStmtNums, existingNexterStmtNums)) {
+        for (const auto& pair : getNextStarMap(reader)) {
             for (const StmtNum& nexter : pair.second) {
                 if (currentSyn == nextSyn && pair.first != nexter) {
                     continue;
