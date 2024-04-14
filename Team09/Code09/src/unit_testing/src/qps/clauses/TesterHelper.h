@@ -44,10 +44,10 @@ public:  // NOLINT
         }
 
         std::unordered_set<std::string> entries{};
-        for (int i = 0; i < allSynonymValues[0].size(); i++) {
+        for (const auto& row : allSynonymValues) {
             std::string entry = "";
-            for (int j = 0; j < allSynonymValues.size(); j++) {
-                entry += allSynonymValues[j][i] + ",";
+            for (const auto& syn : result.getSynonyms()) {
+                entry += row.at(syn.getName());
             }
             auto it = entries.find(entry);
             if (it == entries.end()) {
