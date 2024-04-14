@@ -36,7 +36,7 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isWildcard()) || (currentStmt->isWildcard() && nextStmt->isSynonym())) {
-        return evaluateSynonymWildcard(reader);
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isInteger()) || (currentStmt->isInteger() && nextStmt->isSynonym())) {
