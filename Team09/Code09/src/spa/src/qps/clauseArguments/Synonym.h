@@ -36,6 +36,13 @@ private:
     std::string name;
     SynonymAttributeType attrType{SynonymAttributeType::NONE};
 
+    inline static const std::unordered_map<std::string, DesignEntityType> STRING_TO_TYPE_MAP = {
+        {QPSConstants::VARIABLE, DesignEntityType::VARIABLE},   {QPSConstants::CONSTANT, DesignEntityType::CONSTANT},
+        {QPSConstants::PROCEDURE, DesignEntityType::PROCEDURE}, {QPSConstants::STMT, DesignEntityType::STMT},
+        {QPSConstants::READ, DesignEntityType::READ},           {QPSConstants::CALL, DesignEntityType::CALL},
+        {QPSConstants::WHILE, DesignEntityType::WHILE},         {QPSConstants::IF, DesignEntityType::IF},
+        {QPSConstants::ASSIGN, DesignEntityType::ASSIGN},       {QPSConstants::PRINT, DesignEntityType::PRINT}};
+
 public:
     Synonym(const DesignEntityType& t, const std::string& n);
     Synonym(const DesignEntityType& t, const std::string& n, const SynonymAttributeType& a);
@@ -49,7 +56,6 @@ public:
     std::string getName() const;
     std::string getValue() const override;
     std::optional<SynonymAttributeType> getAttr() const;
-    static std::string entityTypeToString(DesignEntityType);
     bool updateType(SynonymStore* synonyms);
     bool operator==(const ClauseArgument& other) const override;
     bool validateAttribute() const;
