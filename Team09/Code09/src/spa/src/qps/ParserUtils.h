@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "QPSConstants.h"
-#include "QPSRegexes.h"
 #include "qps/exceptions/QPSSyntaxError.h"
 
 std::string replaceAllExtraWhitespaces(const std::string& str);
