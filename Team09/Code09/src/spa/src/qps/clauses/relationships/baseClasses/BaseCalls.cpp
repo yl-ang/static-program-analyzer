@@ -46,7 +46,7 @@ ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, Evaluat
     SynonymValues result{};
 
     for (const auto& procName : potentialResults) {
-        auto otherProcNames = callee->isSynonym() ? reader.getCaller(procName) : reader.getCallee(procName);
+        auto otherProcNames = callee->isSynonym() ? getCaller(reader, procName) : getCallee(reader, procName);
         if (!otherProcNames.empty()) {
             result.push_back(procName);
         }
@@ -63,7 +63,7 @@ ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, Evaluati
     SynonymValues result{};
 
     // Get all caller/callee of the literal, the opposite of whichever the literal is.
-    auto allResults = calleeIsSynonym ? reader.getCallee(caller->getValue()) : reader.getCaller(callee->getValue());
+    auto allResults = calleeIsSynonym ? getCallee(reader, caller->getValue()) : getCaller(reader, callee->getValue());
     for (auto procName : potentialResults) {
         if (allResults.find(procName) != allResults.end()) {
             result.push_back(procName);
