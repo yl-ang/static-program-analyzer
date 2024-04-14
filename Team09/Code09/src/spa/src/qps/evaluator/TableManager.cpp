@@ -48,6 +48,7 @@ void TableManager::join(Table& other, const std::unordered_set<SynonymValue>& sy
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
 
     Row newRow{};
+    std::unordered_set<std::string> existingRowsString{};
     for (Row& row : this->result.getRows()) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
         newRow = row;
@@ -57,7 +58,9 @@ void TableManager::join(Table& other, const std::unordered_set<SynonymValue>& sy
             commonHeaders.empty() || itMap != commonValueStringToRowMap.end()) {
             for (const Row& otherRow : itMap->second) {
                 combineRows(newHeadersNames, newRow, otherRow);
-                newRows.push_back(newRow);
+                if (existingRowsString.find(buildTuple(newHeaders, newRow)) == existingRowsString.end()) {
+                    newRows.push_back(newRow);
+                }
             }
         }
     }
