@@ -22,6 +22,10 @@ void TableManager::joinAll(const std::vector<Table>& tables,
     }
 }
 
+void TableManager::joinAll(const std::vector<Table>& tables) const {
+    joinAll(tables, {});
+}
+
 void TableManager::join(Table& other) const {
     this->join(other, {});
 }
@@ -159,7 +163,9 @@ Table TableManager::clauseResultToTable(const ClauseResult& result) {
     if (result.isBoolean()) {
         throw QPSTableManagerError();
     }
-    return Table{result.getSynonyms(), result.getAllSynonymValues()};
+    auto headers = result.getSynonyms();
+    auto rows = result.getAllSynonymValues();
+    return Table{headers, rows};
 }
 
 bool TableManager::isEmpty() const {
