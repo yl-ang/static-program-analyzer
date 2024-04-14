@@ -48,7 +48,9 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     }
 
     projectAttributes(*tableManager, pkb);
-    return tableManager->extractResults(selectEntities);
+    auto res = tableManager->extractResults(selectEntities);
+
+    return res;
 }
 
 void Query::projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const {
@@ -96,8 +98,8 @@ void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReade
     OptionalQueryClause next = db.next();
     while (next.has_value() && !tm.isEmpty()) {
         auto clause = next->get();
-        ClauseResult res = clause->runEvaluation(pkb, evalDb);
 
+        ClauseResult res = clause->runEvaluation(pkb, evalDb);
         tm.join(res, getSynonymsResultsToRetain(db));
         next = db.next();
     }
