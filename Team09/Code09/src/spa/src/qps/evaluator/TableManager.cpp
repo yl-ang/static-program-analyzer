@@ -136,7 +136,8 @@ std::vector<Synonym> TableManager::mergeHeaders(const Table& other,
     std::unordered_set<SynonymValue> seen{};
 
     for (Synonym header : this->result.getHeaders()) {
-        const bool shouldRetain = synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool shouldRetain =
+            synonymsToRetain.empty() || synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
         const bool isNotSeen = seen.find(header.getValue()) == seen.end();
         if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
@@ -145,7 +146,8 @@ std::vector<Synonym> TableManager::mergeHeaders(const Table& other,
     }
 
     for (Synonym header : other.getHeaders()) {
-        const bool shouldRetain = synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool shouldRetain =
+            synonymsToRetain.empty() || synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
         const bool isNotSeen = seen.find(header.getValue()) == seen.end();
         if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
