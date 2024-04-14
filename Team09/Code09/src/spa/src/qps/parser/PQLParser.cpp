@@ -50,13 +50,13 @@ PQLParser::parseClauses(const std::vector<std::string>& clauseList) {
     std::vector<std::shared_ptr<WithClause>> withClauses;
 
     for (std::string clauseString : clauseList) {
-        if (std::regex_match(clauseString, QPSRegexes::SELECT_CLAUSE)) {
+        if (std::regex_match(clauseString, std::regex(QPSConstants::SELECT_CLAUSE))) {
             selectEntities = PQLParser::parseSelectClause(clauseString);
-        } else if (std::regex_match(clauseString, QPSRegexes::SUCHTHAT_CLAUSE)) {
+        } else if (std::regex_match(clauseString, std::regex(QPSConstants::SUCHTHAT_CLAUSE))) {
             suchThatClauses.push_back(PQLParser::parseSuchThatClauses(clauseString));
-        } else if (std::regex_match(clauseString, QPSRegexes::PATTERN_CLAUSE)) {
+        } else if (std::regex_match(clauseString, std::regex(QPSConstants::PATTERN_CLAUSE))) {
             patternClauses.push_back(PQLParser::parsePatternClauses(clauseString));
-        } else if (std::regex_match(clauseString, QPSRegexes::WITH_CLAUSE)) {
+        } else if (std::regex_match(clauseString, std::regex(QPSConstants::WITH_CLAUSE))) {
             withClauses.push_back(PQLParser::parseWithClauses(clauseString));
         } else {
             throw QPSSyntaxError();
@@ -69,15 +69,15 @@ void PQLParser::modifyClauseList(std::vector<std::string>& clauseList) {
     std::string currClauseType;
     int selectCounter = 0;
     for (size_t i = 0; i < clauseList.size(); i++) {
-        if (std::regex_match(clauseList[i], QPSRegexes::SELECT_CLAUSE)) {
+        if (std::regex_match(clauseList[i], std::regex(QPSConstants::SELECT_CLAUSE))) {
             selectCounter++;
-        } else if (std::regex_match(clauseList[i], QPSRegexes::SUCHTHAT_CLAUSE)) {
+        } else if (std::regex_match(clauseList[i], std::regex(QPSConstants::SUCHTHAT_CLAUSE))) {
             currClauseType = QPSConstants::SUCH_THAT;
-        } else if (std::regex_match(clauseList[i], QPSRegexes::PATTERN_CLAUSE)) {
+        } else if (std::regex_match(clauseList[i], std::regex(QPSConstants::PATTERN_CLAUSE))) {
             currClauseType = QPSConstants::PATTERN;
-        } else if (std::regex_match(clauseList[i], QPSRegexes::WITH_CLAUSE)) {
+        } else if (std::regex_match(clauseList[i], std::regex(QPSConstants::WITH_CLAUSE))) {
             currClauseType = QPSConstants::WITH;
-        } else if (std::regex_match(clauseList[i], QPSRegexes::AND_CLAUSE)) {
+        } else if (std::regex_match(clauseList[i], std::regex(QPSConstants::AND_CLAUSE))) {
             clauseList[i].replace(0, 3, currClauseType);
         } else {
             throw QPSSyntaxError();
@@ -140,7 +140,7 @@ SynonymStore PQLParser::parseQueryEntities(std::vector<std::string> unparsedEnti
 
 std::shared_ptr<SelectEntContainer> PQLParser::parseSelectClause(std::string clauseString) {
     std::smatch match;
-    if (std::regex_search(clauseString, match, QPSRegexes::SELECT_CLAUSE)) {
+    if (std::regex_search(clauseString, match, std::regex(QPSConstants::SELECT_CLAUSE))) {
         std::string selectEntity = match[1];
 
         // if BOOLEAN, since we have no idea if it is a variable or not now, will

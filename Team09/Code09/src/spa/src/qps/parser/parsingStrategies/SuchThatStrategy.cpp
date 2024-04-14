@@ -2,7 +2,7 @@
 
 std::shared_ptr<QueryClause> SuchThatStrategy::execute(std::string str) const {
     std::smatch argMatch;
-    if (std::regex_search(str, argMatch, QPSRegexes::SUCHTHAT_ARGS)) {
+    if (std::regex_search(str, argMatch, std::regex(QPSConstants::SUCHTHAT_ARGS))) {
         if (argMatch.suffix().matched) {
             throw QPSSyntaxError();
         }
