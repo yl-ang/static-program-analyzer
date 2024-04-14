@@ -24,11 +24,53 @@ private:
     }
 
     StmtSet getNexters(PKBFacadeReader& reader, const StmtNum& nextee) override {
-        return reader.getNexterStar(nextee);
+        auto nexters = reader.getNexter(nextee);
+        StmtSet nexterStars{};
+        std::stack<StmtNum> stack{};
+
+        for (const auto& nexter : nexters) {
+            stack.push(nexter);
+        }
+
+        while (!stack.empty()) {
+            auto currNexter = stack.top();
+            stack.pop();
+            if (nexterStars.find(currNexter) != nexterStars.end()) {
+                continue;
+            }
+
+            nexterStars.insert(currNexter);
+            for (const auto& nexter : reader.getNexter(currNexter)) {
+                stack.push(nexter);
+            }
+        }
+
+        return nexters;
     }
 
     StmtSet getNextees(PKBFacadeReader& reader, const StmtNum& nexter) override {
-        return reader.getNexteeStar(nexter);
+        auto nextees = reader.getNextee(nexter);
+        StmtSet nexteeStars{};
+        std::stack<StmtNum> stack{};
+
+        for (const auto& nextee : nextees) {
+            stack.push(nextee);
+        }
+
+        while (!stack.empty()) {
+            auto currNextee = stack.top();
+            stack.pop();
+            if (nexteeStars.find(currNextee) != nexteeStars.end()) {
+                continue;
+            }
+
+            nexteeStars.insert(currNextee);
+            for (const auto& nexter : reader.getNexter(currNextee)) {
+                stack.push(nexter);
+            }
+        }
+
+        return nextees;
     }
 
     std::unordered_map<StmtNum, std::unordered_set<StmtNum>> getNextStarMap(PKBFacadeReader& reader,
