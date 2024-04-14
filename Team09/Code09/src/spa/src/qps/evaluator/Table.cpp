@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "qps/clauses/ClauseResult.h"
+#include "qps/exceptions/evaluator/QPSUnequalColHeaderError.h"
 #include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
 Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : headers(headers) {
@@ -30,12 +32,15 @@ Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : he
     }
 }
 
-Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(headers), rows(rows) {
+Table::Table(std::vector<Synonym>& headers, std::vector<Row>& rows)
+    : headers(std::move(headers)), rows(std::move(rows)) {
+    /*
     for (const Row& row : rows) {
         if (row.size() != headers.size()) {
             throw QPSUnequalColHeaderError();
         }
     }
+    */
 }
 
 bool Table::containsHeader(const Synonym& qe) const {

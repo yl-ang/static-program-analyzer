@@ -30,22 +30,19 @@ ClauseResult IfPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, EvaluationD
     std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
     std::unordered_set<Variable> allVars = evalDb.getVariables(fSyn);
 
-    std::vector<std::string> stmtNumbers = {};
-    std::vector<std::string> synValues = {};
+    std::vector<Row> results{};
 
     for (const StmtNum& stmtNum : ifStmts) {
         for (const Variable& var : allVars) {
             if (reader.hasIfPattern(stmtNum, var)) {
                 // keep track of syn and stmt
-                stmtNumbers.push_back(std::to_string(stmtNum));
-                synValues.push_back(var);
+                results.push_back(Row{{iSyn.getName(), std::to_string(stmtNum)}, {fSyn.getName(), var}});
             }
         }
     }
 
     std::vector<Synonym> returnSyn = {iSyn, fSyn};
-    std::vector<SynonymValues> returnSynValues = {stmtNumbers, synValues};
-    return {returnSyn, returnSynValues};
+    return {returnSyn, results};
 }
 
 ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, EvaluationDb& evalDb) {
@@ -53,11 +50,11 @@ ClauseResult IfPattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, Evaluat
 
     std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
 
-    std::vector<std::string> stmtNumbers = {};
+    std::vector<Row> stmtNumbers = {};
 
     for (const StmtNum& stmtNum : ifStmts) {
         if (reader.hasIfPattern(stmtNum, arguments[0]->getValue())) {
-            stmtNumbers.push_back(std::to_string(stmtNum));
+            stmtNumbers.push_back(Row{{iSyn.getName(), std::to_string(stmtNum)}});
         }
     }
 
@@ -70,12 +67,12 @@ ClauseResult IfPattern::evaluateFirstArgWildcard(PKBFacadeReader& reader, Evalua
     std::unordered_set<StmtNum> ifStmts = evalDb.getStmts(iSyn);
     std::unordered_set<Variable> allVars = reader.getVariables();
 
-    std::vector<std::string> stmtNumbers = {};
+    std::vector<Row> stmtNumbers = {};
 
     for (const StmtNum& stmtNum : ifStmts) {
         for (const Variable& var : allVars) {
             if (reader.hasIfPattern(stmtNum, var)) {
-                stmtNumbers.push_back(std::to_string(stmtNum));
+                stmtNumbers.push_back(Row{{iSyn.getName(), std::to_string(stmtNum)}});
             }
         }
     }

@@ -36,31 +36,24 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isWildcard()) || (currentStmt->isWildcard() && nextStmt->isSynonym())) {
-        return evaluateSynonymWildcard(reader);
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isInteger()) || (currentStmt->isInteger() && nextStmt->isSynonym())) {
-        return evaluateSynonymInteger(reader);
+        return evaluateSynonymInteger(reader, evalDb);
     }
 
     return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool currentStmtIsSynonym = currentStmt->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
 
-    std::unordered_set<Stmt> allStmts{};
+    std::unordered_set<StmtNum> allStmts{evalDb.getStmts(syn)};
 
-    if (syn.getType() == DesignEntityType::STMT) {
-        allStmts = reader.getStmts();
-    } else {
-        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-    }
-
-    SynonymValues values{};
-    for (Stmt stmt : allStmts) {
-        StmtNum stmtNum = stmt.stmtNum;
+    std::vector<Row> values{};
+    for (const StmtNum& stmtNum : allStmts) {
         std::unordered_set<StmtNum> stmtNums;
         if (currentStmtIsSynonym) {
             // Check that this stmt has nexter
@@ -71,14 +64,14 @@ ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
         }
 
         if (!stmtNums.empty()) {
-            values.push_back(std::to_string(stmtNum));
+            values.push_back(Row{{syn.getName(), std::to_string(stmtNum)}});
         }
     }
 
     return {syn, values};
 }
 
-ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
+ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool currentStmtIsSynonym = currentStmt->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
     StmtNum stmtNum = std::stoi(currentStmtIsSynonym ? this->nextStmt->getValue() : this->currentStmt->getValue());
@@ -94,5 +87,14 @@ ClauseResult BaseNext::evaluateSynonymInteger(PKBFacadeReader& reader) {
         return {syn, {}};
     }
 
-    return {syn, ClauseEvaluatorUtils::filterStatementsByType(reader, syn.getType(), synonymStmtNums)};
+    auto potentialResults = evalDb.getStmts(syn);
+    std::vector<Row> results{};
+
+    for (const auto& stmtNum : synonymStmtNums) {
+        if (potentialResults.find(stmtNum) != potentialResults.end()) {
+            results.push_back(Row{{syn.getName(), std::to_string(stmtNum)}});
+        }
+    }
+
+    return {syn, results};
 }

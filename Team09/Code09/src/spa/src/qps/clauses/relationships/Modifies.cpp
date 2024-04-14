@@ -57,28 +57,26 @@ ClauseResult Modifies::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationD
     SynonymValues modifierValues{};
     SynonymValues varValues{};
 
+    std::vector<Row> values{};
+
     bool isProcedureModifier = modifierSyn.getType() == DesignEntityType::PROCEDURE;
 
     for (Variable var : evalDb.getVariables(varSyn)) {
         if (isProcedureModifier) {
             std::unordered_set<Procedure> procs = reader.getModifiesProceduresByVariable(var);
             for (const Procedure& proc : procs) {
-                modifierValues.push_back(proc);
-                varValues.push_back(var);
+                values.push_back(Row{{modifierSyn.getName(), proc}, {varSyn.getName(), var}});
             }
         } else {
             std::vector<std::string> modifierStmts = ClauseEvaluatorUtils::filterStatementsByType(
                 reader, modifierSyn.getType(), reader.getModifiesStatementsByVariable(var));
-            modifierValues.reserve(modifierValues.size() + modifierStmts.size());
-            modifierValues.insert(modifierValues.end(), modifierStmts.begin(), modifierStmts.end());
-
-            varValues.reserve(varValues.size() + modifierStmts.size());
-            varValues.insert(varValues.end(), modifierStmts.size(), var);
+            for (const std::string& stmt : modifierStmts) {
+                values.push_back(Row{{modifierSyn.getName(), stmt}, {varSyn.getName(), var}});
+            }
         }
     }
 
     std::vector<Synonym> headers = {modifierSyn, varSyn};
-    std::vector<SynonymValues> values = {modifierValues, varValues};
     return {headers, values};
 }
 
@@ -92,24 +90,25 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
         vars.insert(var->getValue());
     }
 
-    SynonymValues values{};
+    std::vector<Row> values{};
     if (modifierSyn.getType() == DesignEntityType::PROCEDURE) {
-        for (Variable var : vars) {
+        for (const Variable& var : vars) {
             auto procs = reader.getModifiesProceduresByVariable(var);
             for (Procedure proc : procs) {
-                values.push_back(proc);
+                values.push_back(Row{{modifierSyn.getName(), proc}});
             }
         }
     } else {
         std::unordered_set<StmtNum> allStmts{};
-        for (Variable var : vars) {
+        for (const Variable& var : vars) {
             std::unordered_set<StmtNum> stmts = reader.getModifiesStatementsByVariable(var);
             allStmts.insert(stmts.begin(), stmts.end());
         }
         std::vector<std::string> stmts =
             ClauseEvaluatorUtils::filterStatementsByType(reader, modifierSyn.getType(), allStmts);
-        values.reserve(stmts.size());
-        values.insert(values.end(), stmts.begin(), stmts.end());
+        for (const auto& stmt : stmts) {
+            values.push_back(Row{{modifierSyn.getName(), stmt}});
+        }
     }
 
     return {modifierSyn, values};
@@ -118,9 +117,9 @@ ClauseResult Modifies::evaluateModifierSynonym(PKBFacadeReader& reader) {
 ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
-    SynonymValues values{};
-    for (Variable currVar : reader.getModifiesVariablesByProcedure(modifier->getValue())) {
-        values.push_back(currVar);
+    std::vector<Row> values{};
+    for (const Variable& currVar : reader.getModifiesVariablesByProcedure(modifier->getValue())) {
+        values.push_back(Row{{varSyn.getName(), currVar}});
     }
 
     return {varSyn, values};
@@ -129,9 +128,9 @@ ClauseResult Modifies::variablesModifiedByProcedure(PKBFacadeReader& reader) {
 ClauseResult Modifies::variablesModifedByStatement(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
-    SynonymValues values{};
-    for (Variable currVar : reader.getModifiesVariablesByStatement(std::stoi(modifier->getValue()))) {
-        values.push_back(currVar);
+    std::vector<Row> values{};
+    for (const Variable& currVar : reader.getModifiesVariablesByStatement(std::stoi(modifier->getValue()))) {
+        values.push_back(Row{{varSyn.getName(), currVar}});
     }
 
     return {varSyn, values};

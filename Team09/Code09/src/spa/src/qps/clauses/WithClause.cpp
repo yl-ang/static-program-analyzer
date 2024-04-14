@@ -28,10 +28,10 @@ ClauseResult WithClause::evaluateOneSynonym(PKBFacadeReader& pkb, EvaluationDb& 
     std::vector<std::string> synonymValues = SynonymValuesRetriever::retrieve(pkb, syn, evalDb);
 
     // compare attribute values of synonym values collected with non-synonym argument
-    std::vector<std::string> validSynonymValues{};
+    std::vector<Row> validSynonymValues{};
     for (const auto& synonymValue : synonymValues) {
         if (AttributeCollector::collect(pkb, syn, synonymValue) == other->getValue()) {
-            validSynonymValues.push_back(synonymValue);
+            validSynonymValues.push_back(Row{{syn.getName(), synonymValue}});
         }
     }
 
@@ -52,8 +52,7 @@ ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb, EvaluationDb
         rhsAttributesMap[AttributeCollector::collect(pkb, rhsSyn, rhsValue)].push_back(rhsValue);
     }
 
-    std::vector<std::string> validLhsValues{};
-    std::vector<std::string> validRhsValues{};
+    std::vector<Row> results{};
     for (std::string lhsValue : lhsValues) {
         auto lhsAttribute = AttributeCollector::collect(pkb, lhsSyn, lhsValue);
 
@@ -62,12 +61,11 @@ ClauseResult WithClause::evaluateBothSynonyms(PKBFacadeReader& pkb, EvaluationDb
         }
 
         for (std::string rhsValue : rhsAttributesMap[lhsAttribute]) {
-            validLhsValues.push_back(lhsValue);
-            validRhsValues.push_back(rhsValue);
+            results.push_back(Row{{lhsSyn.getName(), lhsValue}, {rhsSyn.getName(), rhsValue}});
         }
     }
 
-    return {{lhsSyn.getWithoutAttribute(), rhsSyn.getWithoutAttribute()}, {validLhsValues, validRhsValues}};
+    return {{lhsSyn.getWithoutAttribute(), rhsSyn.getWithoutAttribute()}, results};
 }
 
 bool WithClause::equals(const QueryClause& other) const {

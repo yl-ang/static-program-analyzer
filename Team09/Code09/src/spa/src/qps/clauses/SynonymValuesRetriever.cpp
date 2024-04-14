@@ -23,8 +23,17 @@ RowValues SynonymValuesRetriever::retrieve(PKBFacadeReader& pkb, Synonym synonym
 ClauseResult SynonymValuesRetriever::retrieveAsClauseResult(PKBFacadeReader& pkb, std::vector<Synonym> synonyms,
                                                             EvaluationDb& evalDb) {
     std::vector<RowValues> rows = retrieve(pkb, synonyms, evalDb);
-    std::vector<SynonymValues> columns = ClauseEvaluatorUtils::transpose(rows);
-    return {synonyms, columns};
+
+    std::vector<Row> result{};
+    for (const RowValues& row : rows) {
+        Row newRow{};
+        for (size_t i = 0; i < synonyms.size(); ++i) {
+            newRow[synonyms[i].getName()] = row[i];
+        }
+        result.push_back(newRow);
+    }
+
+    return {synonyms, result};
 }
 
 std::vector<RowValues> SynonymValuesRetriever::cartesianProduct(const std::vector<RowValues>& values) {

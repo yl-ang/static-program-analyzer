@@ -7,9 +7,6 @@
 #include <vector>
 
 #include "qps/clauseArguments/Synonym.h"
-#include "qps/clauses/ClauseResult.h"
-#include "qps/exceptions/evaluator/QPSUnequalColHeaderError.h"
-#include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
 using SynonymValue = std::string;
 using ColumnData = std::vector<std::string>;
@@ -56,7 +53,7 @@ public:
      * @param headers the headers of the table
      * @param rows the rows of the table
      */
-    Table(std::vector<Synonym>, std::vector<Row>);
+    Table(std::vector<Synonym>& headers, std::vector<Row>& rows);
 
     /**
      * Returns the headers of the table.
