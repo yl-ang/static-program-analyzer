@@ -49,8 +49,9 @@ public:  // NOLINT
                 }
             }
         }
-        for (auto pair : map) {
-            std::sort(pair.second.end(), pair.second.begin());
+
+        for (auto& pair : map) {
+            std::sort(pair.second.begin(), pair.second.end());
         }
 
         REQUIRE(map.size() == expectedValues.size());
@@ -73,10 +74,15 @@ public:  // NOLINT
             }
         }
 
-        for (int i = 0; i < expectedValues[0].size(); i++) {
+        for (auto& ev : expectedValues) {
+            std::sort(ev.begin(), ev.end());
+        }
+
+        for (int i = 0; i < expectedValues.size(); i++) {
             std::string entry = "";
-            for (int j = 0; j < expectedValues.size(); j++) {
-                entry += expectedValues[j][i] + ",";
+            // std::sort(expectedValues[i].begin(), expectedValues[i].end());
+            for (int j = 0; j < expectedValues[0].size(); j++) {
+                entry += expectedValues[i][j] + ",";
             }
             auto it = entries.find(entry);
             if (it == entries.end()) {
