@@ -36,7 +36,7 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isWildcard()) || (currentStmt->isWildcard() && nextStmt->isSynonym())) {
-        return evaluateSynonymWildcard(reader);
+        return evaluateSynonymWildcard(reader, evalDb);
     }
 
     if ((currentStmt->isSynonym() && nextStmt->isInteger()) || (currentStmt->isInteger() && nextStmt->isSynonym())) {
@@ -46,28 +46,21 @@ ClauseResult BaseNext::evaluate(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     return evaluateBothSynonyms(reader, evalDb);
 }
 
-ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader) {
+ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     bool currentStmtIsSynonym = currentStmt->isSynonym();
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(currentStmtIsSynonym ? this->currentStmt : this->nextStmt);
 
-    std::unordered_set<Stmt> allStmts{};
-
-    if (syn.getType() == DesignEntityType::STMT) {
-        allStmts = reader.getStmts();
-    } else {
-        allStmts = reader.getStatementsByType(DESIGN_ENTITY_TYPE_TO_STMT_TYPE_MAP[syn.getType()]);
-    }
+    auto allStmts = evalDb.getStmts(syn);
 
     SynonymValues values{};
-    for (Stmt stmt : allStmts) {
-        StmtNum stmtNum = stmt.stmtNum;
+    for (const StmtNum& stmtNum : allStmts) {
         std::unordered_set<StmtNum> stmtNums;
         if (currentStmtIsSynonym) {
             // Check that this stmt has nexter
-            stmtNums = reader.getNexter(stmtNum);
+            stmtNums = getNexters(reader, stmtNum);
         } else {
             // Check that this stmt has nextee
-            stmtNums = reader.getNextee(stmtNum);
+            stmtNums = getNextees(reader, stmtNum);
         }
 
         if (!stmtNums.empty()) {

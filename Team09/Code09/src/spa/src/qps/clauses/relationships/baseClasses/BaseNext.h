@@ -13,7 +13,7 @@ private:
     bool isSimpleResult() const;
 
     ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, EvaluationDb&);
 
     virtual ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb&) = 0;
     virtual bool hasNextRelationship(PKBFacadeReader&) = 0;
