@@ -100,4 +100,4 @@ ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, Evaluati
     }
 
     return {aSyn, stmtNumbers};
-};
+}
