@@ -175,7 +175,7 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb
             SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes, evalDb)};
 
         std::unordered_set<SynonymValue> selectEntitiesSet{};
-        for (auto entity : selectEntities) {
+        for (const auto& entity : selectEntities) {
             selectEntitiesSet.insert(entity.getName());
         }
         tm.join(cr, selectEntitiesSet);

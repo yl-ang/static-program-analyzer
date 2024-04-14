@@ -1,31 +1,23 @@
 #include "TableManager.h"
 
 #include <algorithm>
-#include <chrono>
-#include <iostream>
 #include <unordered_set>
 
 #include "qps/exceptions/evaluator/QPSTableManagerError.h"
 
 void TableManager::join(const ClauseResult& cr, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
-    auto start = std::chrono::high_resolution_clock::now();
     auto table = clauseResultToTable(cr);
-    auto end = std::chrono::high_resolution_clock::now();
-    // Calculate the duration
-    std::chrono::duration<double> duration = end - start;
-    // Output the duration
-    std::cout << "Clause Result to Table time: " << duration.count() << " seconds" << std::endl;
     this->join(table, synonymsToRetain);
 }
 
 void TableManager::joinAll(const std::vector<Table>& tables,
                            const std::unordered_set<SynonymValue>& synonymsToRetain) const {
-    for (const Table& table : tables) {
+    for (Table table : tables) {
         this->join(table, synonymsToRetain);
     }
 }
 
-void TableManager::join(const Table& other, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
+void TableManager::join(Table& other, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     if (this->result.isSentinelTable() || other.isSentinelTable()) {
         return this->joinSentinelTable(other);
     }
@@ -36,29 +28,33 @@ void TableManager::join(const Table& other, const std::unordered_set<SynonymValu
 
     std::vector newHeaders{mergeHeaders(other, synonymsToRetain)};
     std::unordered_set<SynonymValue> newHeadersNames{};
-    for (auto header : newHeaders) {
+    for (const auto& header : newHeaders) {
         newHeadersNames.insert(header.getName());
     }
 
     const std::vector commonHeaders{getCommonHeaders(other)};
-    const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders)};
+    const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders, other.getRows())};
 
     std::vector<Row> newRows{};
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
 
-    for (Row& row : other.getRows()) {
+    Row newRow{};
+    for (Row& row : this->result.getRows()) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
+        newRow = row;
 
-        if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
-            for (const Row& otherRow : it->second) {
-                Row newRow{combineRows(newHeadersNames, row, otherRow)};
+        if (auto itMap = commonValueStringToRowMap.find(commonValueString);
+            // If common headers are empty, there is no inner join to do. just do a cartesian product.
+            commonHeaders.empty() || itMap != commonValueStringToRowMap.end()) {
+            for (const Row& otherRow : itMap->second) {
+                combineRows(newHeadersNames, newRow, otherRow);
                 newRows.push_back(newRow);
             }
         }
     }
 
     this->result = Table{newHeaders, newRows};
-};
+}
 
 void TableManager::joinSentinelTable(const Table& other) const {
     if (this->result.isSentinelTable()) {
@@ -73,30 +69,35 @@ void TableManager::joinEmptyTable(const Table& other) const {
 }
 
 std::unordered_map<std::string, std::vector<Row>> TableManager::getCommonValueStringToRowMap(
-    const std::vector<Synonym>& commonHeaders) const {
+    const std::vector<Synonym>& commonHeaders, const std::vector<Row>& rows) const {
     std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
-    commonValueStringToRowMap.reserve(this->result.getRows().size());
-    for (Row row : this->result.getRows()) {
+    commonValueStringToRowMap.reserve(rows.size());
+    for (Row row : rows) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
         commonValueStringToRowMap[commonValueString].push_back(std::move(row));
     }
     return commonValueStringToRowMap;
 }
 
-Row TableManager::combineRows(const std::unordered_set<SynonymValue>& headers, const Row& firstRow,
-                              const Row& secondRow) {
-    Row newRow{};
+void TableManager::combineRows(const std::unordered_set<SynonymValue>& headers, Row& firstRow, const Row& secondRow) {
+    // delete from the original row whose headers are not in the set of wanted headers
+    std::vector<SynonymValue> synonymColumnsToDelete{};
     for (const auto& pair : firstRow) {
-        if (headers.find(pair.first) != headers.end()) {
-            newRow[pair.first] = pair.second;
+        if (headers.find(pair.first) == headers.end()) {
+            synonymColumnsToDelete.push_back(pair.first);
         }
     }
+
+    for (const auto& synValue : synonymColumnsToDelete) {
+        firstRow.erase(synValue);
+    }
+
+    // Insert into the original row from the second row whose headers are wanted
     for (const auto& pair : secondRow) {
         if (headers.find(pair.first) != headers.end()) {
-            newRow[pair.first] = pair.second;
+            firstRow[pair.first] = pair.second;
         }
     }
-    return newRow;
 }
 
 std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
