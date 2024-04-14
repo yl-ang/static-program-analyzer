@@ -50,7 +50,8 @@ public:  // NOLINT
             }
         }
         for (auto pair : map) {
-            std::sort(pair.second.end(), pair.second.begin());
+            std::sort(pair.second.begin(), pair.second.end());
+            std::reverse(pair.second.begin(), pair.second.end());
         }
 
         REQUIRE(map.size() == expectedValues.size());

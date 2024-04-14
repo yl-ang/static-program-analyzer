@@ -88,10 +88,10 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
             .testSynonyms({*stmtSyn})
             .testSynonymValues({{"1", "2"}});
         // Select s such that ParentT(s, 1)
-        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that ParentT(s, 5), out of bounds
-        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("ParentT(Integer, Synonym)") {
@@ -114,10 +114,10 @@ TEST_CASE("SuchThatClause evaluate for parent* relationship with 1 synonym") {
             .testSynonyms({*stmtSyn})
             .testSynonymValues({{"3"}});
         // Select s such that ParentT(3, s)
-        ParentStarTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that ParentT(5, s), out of bounds
-        ParentStarTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ParentStarTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("ParentT(Synonym, Wildcard)") {
