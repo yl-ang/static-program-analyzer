@@ -423,6 +423,6 @@ TEST_CASE("SuchThatClause evaluate for affects relationship with both synonym") 
         std::shared_ptr<Synonym> stmtSyn1 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s1");
         std::shared_ptr<Synonym> stmtSyn2 = std::make_shared<Synonym>(DesignEntityType::ASSIGN, "s2");
 
-        AffectsTester{pfr, stmtSyn1, stmtSyn2}.testSynonyms({*stmtSyn1, *stmtSyn2}).testSynonymValues({{}, {}});
+        AffectsTester{pfr, stmtSyn1, stmtSyn2}.testSynonyms({*stmtSyn1, *stmtSyn2}).testSynonymValues({});
     }
 }

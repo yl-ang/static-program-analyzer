@@ -54,8 +54,10 @@ TEST_CASE("SuchThatClause evaluate for Next relationship with 1 synonym") {
         pfw.setNextStore(nextStoreEntries);
 
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
+        // Next(s, 2) --> 1
+        // Next(s, 1) --> none
         NextTester{pfr, stmtSyn, std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
-        NextTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        NextTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Next(Integer, Synonym)") {
@@ -64,7 +66,7 @@ TEST_CASE("SuchThatClause evaluate for Next relationship with 1 synonym") {
 
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
         NextTester{pfr, std::make_shared<Integer>("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
-        NextTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        NextTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Next(Synonym, Wildcard)") {

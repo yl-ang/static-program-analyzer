@@ -78,10 +78,10 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
         // Select s such that Follows(s, 2)
         FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
         // Select s such that Follows(s, 1)
-        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that Follows(s, 5), out of bounds
-        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, stmtSyn, std::make_shared<Integer>("5")}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Follows(Integer, Synonym)") {
@@ -97,10 +97,10 @@ TEST_CASE("SuchThatClause evaluate for follows relationship with 1 synonym") {
         // Select s such that Follows(1, s)
         FollowsTester{pfr, std::make_shared<Integer>("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});
         // Select s such that Follows(2, s)
-        FollowsTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that Follows(5, s), out of bounds
-        FollowsTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        FollowsTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Follows(Synonym, Wildcard)") {
