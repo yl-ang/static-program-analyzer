@@ -95,17 +95,19 @@ struct QPSConstants {
     inline static const std::string SUCHTHAT_CLAUSE = "\\s*such\\s+that\\s+(?:not )?(\\w+\\*?\\s*\\(.*?\\))\\s*";
 
     // Pattern Clause
-    inline static const std::string PATTERN_CLAUSE ="\\s*pattern\\s+(?:not )?(\\w+\\s*\\(.*?\\))\\s*";
+    inline static const std::string PATTERN_CLAUSE = "\\s*pattern\\s+(?:not )?(\\w+\\s*\\(.*?\\))\\s*";
 
     // With Clause
     inline static const std::string WITH_CLAUSE =
-        "\\s*with\\ (?:not )?(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*";
+        "\\s*with\\ (?:not "
+        ")?(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*";
 
     // And Clause
     // and{letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
-    inline static const std::string AND_CLAUSE = 
-    "\\s*and\\s+(?:not\\s+)?((\\w+\\*?)\\s*\\((.*?)\\)|(\\w+\\.\\w+(?:#)?|\"\\w+\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?"
-        "|\"\\w+\"|\\w+))\\s*";
+    inline static const std::string AND_CLAUSE =
+        "\\s*and\\s+(?:not\\s+)?((\\w+\\*?)\\s*\\((.*?)\\)|(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*=\\s*(\\w+\\."
+        "\\w+(?:#)?"
+        "|\"\\s*\\w+\\s*\"|\\w+))\\s*";
 
     // {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
     inline static const std::string SUCHTHAT_ARGS = "\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*";
