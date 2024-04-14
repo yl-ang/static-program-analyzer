@@ -72,10 +72,11 @@ std::unordered_map<std::string, std::vector<Row>> TableManager::getCommonValueSt
     const std::vector<Synonym>& commonHeaders, const std::vector<Row>& rows) const {
     std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
     commonValueStringToRowMap.reserve(rows.size());
-    for (Row row : rows) {
+    for (const Row& row : rows) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
-        commonValueStringToRowMap[commonValueString].push_back(std::move(row));
+        commonValueStringToRowMap[std::move(commonValueString)].push_back(row);
     }
+
     return commonValueStringToRowMap;
 }
 
