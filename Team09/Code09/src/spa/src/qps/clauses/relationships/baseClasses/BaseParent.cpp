@@ -53,9 +53,9 @@ ClauseResult BaseParent::evaluateSynonymWildcard(PKBFacadeReader& reader, Evalua
         }
     }
 
-    SynonymValues values{};
+    std::vector<Row> values{};
     for (const int& value : uniqueValues) {
-        values.push_back(std::to_string(value));
+        values.push_back(Row{{syn.getName(), std::to_string(value)}});
     }
 
     return {syn, values};
@@ -73,11 +73,11 @@ ClauseResult BaseParent::evaluateSynonymInteger(PKBFacadeReader& reader, Evaluat
         stmtNums = getChildren(reader, stmtNum);
     }
 
-    SynonymValues values{};
+    std::vector<Row> values{};
     auto potentialResults = evalDb.getStmts(syn);
     for (auto potentialResult : evalDb.getStmts(syn)) {
         if (stmtNums.find(potentialResult) != stmtNums.end()) {
-            values.push_back(std::to_string(potentialResult));
+            values.push_back(Row{{syn.getName(), std::to_string(potentialResult)}});
         }
     }
 
@@ -93,8 +93,7 @@ ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader, Evaluatio
         return {synonyms, {}};
     }
 
-    SynonymValues parentValues{};
-    SynonymValues childValues{};
+    std::vector<Row> values{};
 
     auto potentialChildrenValues = evalDb.getStmts(childSyn);
 
@@ -102,15 +101,13 @@ ClauseResult BaseParent::evaluateBothSynonyms(PKBFacadeReader& reader, Evaluatio
         std::unordered_set<StmtNum> children = getChildren(reader, parentStmtNum);
         for (const StmtNum& childStmtNum : children) {
             if (potentialChildrenValues.find(childStmtNum) != potentialChildrenValues.end()) {
-                parentValues.push_back(std::to_string(parentStmtNum));
-                childValues.push_back(std::to_string(childStmtNum));
+                values.push_back(Row{{parentSyn.getName(), std::to_string(parentStmtNum)},
+                                     {childSyn.getName(), std::to_string(childStmtNum)}});
             }
         }
     }
 
-    std::vector<SynonymValues> synonymValues{parentValues, childValues};
-
-    return {synonyms, synonymValues};
+    return {synonyms, values};
 }
 
 bool BaseParent::isSimpleResult() const {

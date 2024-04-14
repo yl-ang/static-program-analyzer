@@ -1,12 +1,21 @@
 #include "TableManager.h"
 
 #include <algorithm>
+#include <chrono>
+#include <iostream>
 #include <unordered_set>
 
 #include "qps/exceptions/evaluator/QPSTableManagerError.h"
 
 void TableManager::join(const ClauseResult& cr, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
-    this->join(clauseResultToTable(cr), synonymsToRetain);
+    auto start = std::chrono::high_resolution_clock::now();
+    auto table = clauseResultToTable(cr);
+    auto end = std::chrono::high_resolution_clock::now();
+    // Calculate the duration
+    std::chrono::duration<double> duration = end - start;
+    // Output the duration
+    std::cout << "Clause Result to Table time: " << duration.count() << " seconds" << std::endl;
+    this->join(table, synonymsToRetain);
 }
 
 void TableManager::joinAll(const std::vector<Table>& tables,
@@ -25,7 +34,7 @@ void TableManager::join(const Table& other, const std::unordered_set<SynonymValu
         return this->joinEmptyTable(other);
     }
 
-    const std::vector newHeaders{mergeHeaders(other, synonymsToRetain)};
+    std::vector newHeaders{mergeHeaders(other, synonymsToRetain)};
     std::unordered_set<SynonymValue> newHeadersNames{};
     for (auto header : newHeaders) {
         newHeadersNames.insert(header.getName());
@@ -49,7 +58,7 @@ void TableManager::join(const Table& other, const std::unordered_set<SynonymValu
     }
 
     this->result = Table{newHeaders, newRows};
-}
+};
 
 void TableManager::joinSentinelTable(const Table& other) const {
     if (this->result.isSentinelTable()) {
@@ -58,8 +67,8 @@ void TableManager::joinSentinelTable(const Table& other) const {
 }
 
 void TableManager::joinEmptyTable(const Table& other) const {
-    const std::vector newHeaders{mergeHeaders(other, {})};
-    const std::vector<Row> emptyRows{};
+    std::vector newHeaders{mergeHeaders(other, {})};
+    std::vector<Row> emptyRows{};
     this->result = Table{newHeaders, emptyRows};
 }
 

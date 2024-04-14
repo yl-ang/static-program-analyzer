@@ -29,8 +29,7 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, Evaluat
     std::unordered_set<StmtNum> assignStmts = evalDb.getStmts(aSyn);
     std::unordered_set<Variable> allVars = evalDb.getVariables(fSyn);
 
-    std::vector<std::string> stmtNumbers = {};
-    std::vector<std::string> synValues = {};
+    std::vector<Row> results{};
 
     std::string secondString = arguments[1]->getValue();
     bool isPartial = false;
@@ -53,31 +52,25 @@ ClauseResult AssignPattern::evaluateFirstArgSyn(PKBFacadeReader& reader, Evaluat
 
             if (hasPattern) {
                 // keep track of syn and stmt
-                stmtNumbers.push_back(std::to_string(stmtNum));
-                synValues.push_back(var);
+                results.push_back(Row{{aSyn.getName(), std::to_string(stmtNum)}, {fSyn.getName(), var}});
                 // no two variables can be on the lhs
                 break;
             }
         }
     }
 
-    if (stmtNumbers.size() != synValues.size()) {
-        throw Exception("Unequal size of the 2 lists.");
-    }
-
     std::vector<Synonym> returnSyn = {aSyn, fSyn};
-    std::vector<SynonymValues> returnSynValues = {stmtNumbers, synValues};
-    return {returnSyn, returnSynValues};
+    return {returnSyn, results};
 }
 
 ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, EvaluationDb& evalDb) {
     Synonym aSyn = *std::dynamic_pointer_cast<Synonym>(assignSyn);
     std::unordered_set<StmtNum> assignStmts = evalDb.getStmts(aSyn);
-    std::vector<std::string> stmtNumbers = {};
+    std::vector<Row> stmtNumbers = {};
 
     if (arguments[0]->isWildcard() && arguments[1]->isWildcard()) {
         for (const StmtNum& stmtNum : assignStmts) {
-            stmtNumbers.push_back(std::to_string(stmtNum));
+            stmtNumbers.push_back(Row{{aSyn.getName(), std::to_string(stmtNum)}});
         }
         return {aSyn, stmtNumbers};
     }
@@ -102,9 +95,9 @@ ClauseResult AssignPattern::evaluateNoArgsSyns(PKBFacadeReader& reader, Evaluati
         }
 
         if (hasPattern) {
-            stmtNumbers.push_back(std::to_string(stmtNum));
+            stmtNumbers.push_back(Row{{aSyn.getName(), std::to_string(stmtNum)}});
         }
     }
 
     return {aSyn, stmtNumbers};
-}
+};

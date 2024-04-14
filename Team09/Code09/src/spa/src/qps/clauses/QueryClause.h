@@ -22,6 +22,6 @@ public:
     virtual bool validateArguments(SynonymStore* store) = 0;
 
     void setNegation(bool n);
-    std::string rowValuesToString(const RowValues& row);
+    std::string rowValuesToString(const std::vector<Synonym>& synonyms, const Row& row);
     ClauseResult runEvaluation(PKBFacadeReader& pkb, EvaluationDb& evalDb);
 };
