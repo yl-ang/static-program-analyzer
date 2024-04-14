@@ -32,8 +32,8 @@ TEST_CASE("Query Db") {
 
     QueryDb db{{clause_c_x, clause_c, clause_unconnected}};
 
-    db.loadClausesWithEntity(*arg_c);
-    db.loadClausesWithEntity(*arg_x);
+    db.loadClausesWithEntity(arg_c->getName());
+    db.loadClausesWithEntity(arg_x->getName());
     auto firstPop = db.next();
     REQUIRE(firstPop.has_value());
     auto secondPop = db.next();

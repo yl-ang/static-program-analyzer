@@ -1,7 +1,5 @@
 #include "QueryDb.h"
 
-#include <iostream>
-
 QueryDb::QueryDb(const std::vector<std::shared_ptr<QueryClause>>& clauses) {
     adjList.reserve(clauses.size());
     synonymToClauseListMap.reserve(clauses.size());
@@ -87,9 +85,7 @@ OptionalQueryClause QueryDb::next() {
     auto nextEntry = queue.front();
     queue.pop();
 
-    std::cout << "New clause being nexted" << std::endl;
     for (const auto& syn : nextEntry.clause->getSynonyms()) {
-        std::cout << "header: " << syn.getName() << std::endl;
         synonymsEvaluationCount[syn.getName()] -= 1;
     }
 

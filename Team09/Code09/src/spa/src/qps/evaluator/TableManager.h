@@ -14,6 +14,8 @@ public:
     bool isEmpty() const;
     bool containsHeader(const Synonym& header) const;
     Table getTable() const;
+    void join(const ClauseResult& cr) const;
+    void join(Table& other) const;
     void join(Table& result, const std::unordered_set<SynonymValue>& synonymsToRetain) const;
     void join(const ClauseResult& result, const std::unordered_set<SynonymValue>& synonymsToRetain) const;
     void joinAll(const std::vector<Table>& tables, const std::unordered_set<SynonymValue>& synonymsToRetain) const;

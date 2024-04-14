@@ -5,6 +5,11 @@
 
 #include "qps/exceptions/evaluator/QPSTableManagerError.h"
 
+void TableManager::join(const ClauseResult& cr) const {
+    auto table = clauseResultToTable(cr);
+    this->join(table, {});
+}
+
 void TableManager::join(const ClauseResult& cr, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     auto table = clauseResultToTable(cr);
     this->join(table, synonymsToRetain);
@@ -15,6 +20,10 @@ void TableManager::joinAll(const std::vector<Table>& tables,
     for (Table table : tables) {
         this->join(table, synonymsToRetain);
     }
+}
+
+void TableManager::join(Table& other) const {
+    this->join(other, {});
 }
 
 void TableManager::join(Table& other, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
