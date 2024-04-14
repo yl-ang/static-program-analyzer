@@ -59,7 +59,7 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with 1 synonym") {
         NextStarTester{pfr, stmtSyn, std::make_shared<Integer>("2")}
             .testSynonyms({*stmtSyn})
             .testSynonymValues({{"1"}});
-        NextStarTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        NextStarTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Next(Integer, Synonym)") {
@@ -70,7 +70,7 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with 1 synonym") {
         NextStarTester{pfr, std::make_shared<Integer>("1"), stmtSyn}
             .testSynonyms({*stmtSyn})
             .testSynonymValues({{"2"}});
-        NextStarTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        NextStarTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Next(Synonym, Wildcard)") {

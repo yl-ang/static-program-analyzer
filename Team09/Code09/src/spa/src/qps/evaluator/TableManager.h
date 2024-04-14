@@ -19,6 +19,8 @@ public:
     void join(Table& result, const std::unordered_set<SynonymValue>& synonymsToRetain) const;
     void join(const ClauseResult& result, const std::unordered_set<SynonymValue>& synonymsToRetain) const;
     void joinAll(const std::vector<Table>& tables, const std::unordered_set<SynonymValue>& synonymsToRetain) const;
+    void joinAll(const std::vector<Table>& tables) const;
+
     void projectAttributes(const std::vector<Synonym>&, const HeaderMatcher&, const ValueTransformer&) const;
     std::vector<std::string> extractResults(const std::vector<Synonym>& synonyms) const;
     bool hasHeader(const Synonym& synonym) const;

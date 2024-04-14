@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "catch.hpp"
 #include "pkb/PKBClient/PKBFacadeReader.h"
 #include "qps/clauseArguments/Wildcard.h"
@@ -36,18 +38,32 @@ public:  // NOLINT
         REQUIRE(!result.isBoolean());
 
         auto allSynonymValues = result.getAllSynonymValues();
+        std::unordered_map<std::string, std::vector<std::string>> map = {};
 
-        REQUIRE(allSynonymValues.size() == expectedValues.size());
+        for (auto valueResult : allSynonymValues) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
+        for (auto pair : map) {
+            std::sort(pair.second.end(), pair.second.begin());
+        }
+
+        REQUIRE(map.size() == expectedValues.size());
 
         if (allSynonymValues.size() == 0) {
             return *this;
         }
 
         std::unordered_set<std::string> entries{};
-        for (const auto& row : allSynonymValues) {
+        for (const auto& row : map) {
             std::string entry = "";
-            for (const auto& syn : result.getSynonyms()) {
-                entry += row.at(syn.getName());
+            for (const auto& syn : row.second) {
+                entry += syn + ",";
             }
             auto it = entries.find(entry);
             if (it == entries.end()) {
