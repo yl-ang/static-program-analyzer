@@ -53,16 +53,24 @@ TEST_CASE("SuchThatClause evaluate for Next relationship with 1 synonym") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setNextStore(nextStoreEntries);
 
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
+
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
         // Next(s, 2) --> 1
-        // Next(s, 1) --> none
         NextTester{pfr, stmtSyn, std::make_shared<Integer>("2")}.testSynonyms({*stmtSyn}).testSynonymValues({{"1"}});
+        // Next(s, 1) --> none
         NextTester{pfr, stmtSyn, std::make_shared<Integer>("1")}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Next(Integer, Synonym)") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setNextStore(nextStoreEntries);
+
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
 
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
         NextTester{pfr, std::make_shared<Integer>("1"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"2"}});

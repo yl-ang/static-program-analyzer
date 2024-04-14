@@ -12,6 +12,10 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with no synonyms") 
     SECTION("Next(Integer, Integer)") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}, std::pair<int, int>{2, 3}};
         pfw.setNextStore(nextStoreEntries);
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
+
         NextStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("2")}.testBoolean(true);
         NextStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Integer>("3")}.testBoolean(true);
         NextStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Integer>("1")}.testBoolean(false);
@@ -27,6 +31,11 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with no synonyms") 
     SECTION("Next(Integer, Wildcard)") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}, std::pair<int, int>{2, 3}};
         pfw.setNextStore(nextStoreEntries);
+
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
+
         NextStarTester{pfr, std::make_shared<Integer>("1"), std::make_shared<Wildcard>()}.testBoolean(true);
         NextStarTester{pfr, std::make_shared<Integer>("2"), std::make_shared<Wildcard>()}.testBoolean(true);
         NextStarTester{pfr, std::make_shared<Integer>("3"), std::make_shared<Wildcard>()}.testBoolean(false);
@@ -55,6 +64,10 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with 1 synonym") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setNextStore(nextStoreEntries);
 
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
+
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
         NextStarTester{pfr, stmtSyn, std::make_shared<Integer>("2")}
             .testSynonyms({*stmtSyn})
@@ -65,6 +78,10 @@ TEST_CASE("SuchThatClause evaluate for NextStar relationship with 1 synonym") {
     SECTION("Next(Integer, Synonym)") {
         std::unordered_set<std::pair<int, int>> nextStoreEntries{std::pair<int, int>{1, 2}};
         pfw.setNextStore(nextStoreEntries);
+
+        std::unordered_set<Stmt> stmts = {Stmt{StatementType::ASSIGN, 1}, Stmt{StatementType::ASSIGN, 2},
+                                          Stmt{StatementType::ASSIGN, 3}, Stmt{StatementType::ASSIGN, 4}};
+        pfw.setStmts(stmts);
 
         std::shared_ptr<Synonym> stmtSyn = std::make_shared<Synonym>(DesignEntityType::STMT, "s");
         NextStarTester{pfr, std::make_shared<Integer>("1"), stmtSyn}
