@@ -55,12 +55,14 @@ ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader, Evaluati
     SynonymValues values{};
     for (const StmtNum& stmtNum : allStmts) {
         std::unordered_set<StmtNum> stmtNums;
+        // Even for next*, we only bother checking if it has a nexter/nextee.
+        // if it doesnt, then it cannot have nexterT/nexteeT
         if (currentStmtIsSynonym) {
-            // Check that this stmt has nexter
-            stmtNums = getNexters(reader, stmtNum);
+            // Check that this stmt has nexter.
+            stmtNums = reader.getNexter(stmtNum);
         } else {
             // Check that this stmt has nextee
-            stmtNums = getNextees(reader, stmtNum);
+            stmtNums = reader.getNextee(stmtNum);
         }
 
         if (!stmtNums.empty()) {
