@@ -4,7 +4,6 @@
 #include "UnparsedClause.h"
 #include "qps/GrammarUtils.h"
 #include "qps/ParserUtils.h"
-#include "qps/QPSRegexes.h"
 #include "qps/clauses/QueryClause.h"
 #include "qps/clauses/WithClause.h"
 #include "qps/evaluator/Query.h"

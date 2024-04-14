@@ -57,10 +57,10 @@ ClauseResult BaseNext::evaluateSynonymWildcard(PKBFacadeReader& reader, Evaluati
         std::unordered_set<StmtNum> stmtNums;
         if (currentStmtIsSynonym) {
             // Check that this stmt has nexter
-            stmtNums = reader.getNexter(stmtNum);
+            stmtNums = getNexters(reader, stmtNum);
         } else {
             // Check that this stmt has nextee
-            stmtNums = reader.getNextee(stmtNum);
+            stmtNums = getNextees(reader, stmtNum);
         }
 
         if (!stmtNums.empty()) {

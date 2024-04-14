@@ -67,4 +67,54 @@ struct QPSConstants {
     inline static const std::string INTEGER_CLAUSE_TYPE = "Integer";
     inline static const std::string LITERAL_CLAUSE_TYPE = "Literal";
     inline static const std::string WILDCARD_CLAUSE_TYPE = "Wildcard";
+
+    /**
+     * Select Clause
+     *
+     * Select{>=1 whitespaces}{capturing group}
+     * - works for BOOLEAN, single, tuple return
+     * - works for word, word.word, and angle-brackets
+     */
+    /**
+     * Capturing group format:
+     * =======================
+     * (\\w+|\\w+\\.\\w+|\\<.*?\\>): Captures either:
+     * \w+\.\w+(?:#)?: One or more word characters followed by a dot and then one or more word characters followed by an
+     *   optional '#' (for .stmt#), or
+     * \w+: One or more word characters (letters, digits, or underscores), or
+     * \\<.*?\\>: A word enclosed in angle brackets.
+     *
+     * Note that \w+\.\w+ must come before \w+, since \w+ is a subset of \w+\.\w+ and will terminate prematurely once
+     * matched.
+     */
+    inline static const std::string SELECT_CLAUSE = "\\s*Select\\s+(\\w+\\.\\w+(?:#)?|\\w+|\\<.*?\\>)\\s*";
+
+    // Such That Clause
+    // {>=1 whitespaces}such{>=1 whitespaces}that{>=1 whitespaces}{capturing group}
+    // capturing group format -> {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
+    inline static const std::string SUCHTHAT_CLAUSE = "\\s*such\\s+that\\s+(?:not )?(\\w+\\*?\\s*\\(.*?\\))\\s*";
+
+    // Pattern Clause
+    inline static const std::string PATTERN_CLAUSE = "\\s*pattern\\s+(?:not )?(\\w+\\s*\\(.*?\\))\\s*";
+
+    // With Clause
+    inline static const std::string WITH_CLAUSE =
+        "\\s*with\\ (?:not "
+        ")?(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*=\\s*(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*";
+
+    // And Clause
+    // and{letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
+    inline static const std::string AND_CLAUSE =
+        "\\s*and\\s+(?:not\\s+)?((\\w+\\*?)\\s*\\((.*?)\\)|(\\w+\\.\\w+(?:#)?|\"\\s*\\w+\\s*\"|\\w+)\\s*=\\s*(\\w+\\."
+        "\\w+(?:#)?"
+        "|\"\\s*\\w+\\s*\"|\\w+))\\s*";
+
+    // {letters/digits}{optional *}{>=0 whitespaces}{bracketed non-greedy}
+    inline static const std::string SUCHTHAT_ARGS = "\\s*(\\w+\\*?)\\s*\\((.*?)\\)\\s*";
+
+    // {letters/digits}{>=0 whitespaces}{bracketed non-greedy}
+    inline static const std::string PATTERN_ARGS = "\\s*(\\w+)\\s*\\((.*?)\\)\\s*";
+
+    // <{capturing group}>
+    inline static const std::string TUPLE = "^<([^<>]*)>$";
 };

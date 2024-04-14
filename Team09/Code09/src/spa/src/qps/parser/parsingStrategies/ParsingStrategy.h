@@ -5,7 +5,6 @@
 
 #include "../../GrammarUtils.h"
 #include "../../ParserUtils.h"
-#include "../../QPSRegexes.h"
 #include "../../clauses/QueryClause.h"
 #include "../../exceptions/Exception.h"
 #include "qps/clauseArguments/ClauseArgument.h"

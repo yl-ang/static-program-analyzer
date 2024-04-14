@@ -77,9 +77,11 @@ std::string trim(const std::string& str) {
 // str = "such that Follows(1, 2) pattern a("_", "_")"
 // return {0, 24}
 std::vector<std::string> getAllClauses(const std::string& str) {
-    std::vector<std::regex> clausePatterns = {QPSRegexes::SELECT_CLAUSE, QPSRegexes::SUCHTHAT_CLAUSE,
-                                              QPSRegexes::PATTERN_CLAUSE, QPSRegexes::WITH_CLAUSE,
-                                              QPSRegexes::AND_CLAUSE};
+    std::vector<std::regex> clausePatterns = {std::regex(QPSConstants::SELECT_CLAUSE),
+                                              std::regex(QPSConstants::SUCHTHAT_CLAUSE),
+                                              std::regex(QPSConstants::PATTERN_CLAUSE),
+                                              std::regex(QPSConstants::WITH_CLAUSE),
+                                              std::regex(QPSConstants::AND_CLAUSE)};
 
     std::vector<size_t> allClausesIndices = {};
     for (const auto& pattern : clausePatterns) {
