@@ -387,7 +387,7 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     std::vector<Row> values{};
 
     if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
-        return {headers, {{}, {}}};
+        return {headers, {}};
     }
     AffectsSet resultSet = generateAffectsRelation(reader);
     for (std::pair<StmtNum, StmtNum> result : resultSet) {
