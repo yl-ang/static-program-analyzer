@@ -148,8 +148,8 @@ bool isFactor(const std::string& str) {
     }
 
     bool startsAndEndsWithBrackets = std::regex_match(str, std::regex("^\\(.*\\)$"));
-    std::string expr = trim(trimmedString.substr(1, trimmedString.size() - 2));
     if (startsAndEndsWithBrackets) {
+        std::string expr = trim(trimmedString.substr(1, trimmedString.size() - 2));
         return isExpr(expr);
     }
     return false;

@@ -225,3 +225,9 @@ TEST_CASE("isElem") {
         REQUIRE_FALSE(isElem("10"));
     }
 }
+
+TEST_CASE("isQuotedIdent") {
+    SECTION("Empty Quotes") {
+        REQUIRE_FALSE(isEntRef("\""));
+    }
+}
