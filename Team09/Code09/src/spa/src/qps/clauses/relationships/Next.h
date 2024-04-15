@@ -33,15 +33,12 @@ private:
         Synonym currentSyn = *std::dynamic_pointer_cast<Synonym>(currentStmt);
         Synonym nextSyn = *std::dynamic_pointer_cast<Synonym>(nextStmt);
 
-        std::vector<Synonym> synonyms{currentSyn, nextSyn};
-
-        SynonymValues currentSynValues{}, nextSynValues{};
+        std::vector<Row> results{};
 
         const std::unordered_set existingCurrentSynStmtNums{evalDb.getStmts(currentSyn)};
         const std::unordered_set existingNexterStmtNums{evalDb.getStmts(nextSyn)};
 
-        currentSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
-        nextSynValues.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
+        results.reserve(existingCurrentSynStmtNums.size() * existingNexterStmtNums.size());
 
         for (const StmtNum& nextee : existingCurrentSynStmtNums) {
             for (const StmtNum& nexter : existingNexterStmtNums) {
@@ -50,13 +47,15 @@ private:
                 }
 
                 if (hasNextRelationship(reader, nextee, nexter)) {
-                    currentSynValues.push_back(std::to_string(nextee));
-                    nextSynValues.push_back(std::to_string(nexter));
+                    results.push_back(Row{{currentSyn.getName(), std::to_string(nextee)},
+                                          {nextSyn.getName(), std::to_string(nexter)}});
                 }
             }
         }
 
-        std::vector<SynonymValues> synonymValues{currentSynValues, nextSynValues};
-        return {synonyms, synonymValues};
+        std::vector<Synonym> synonyms =
+            currentSyn == nextSyn ? std::vector{currentSyn} : std::vector{currentSyn, nextSyn};
+
+        return {synonyms, results};
     }
 };

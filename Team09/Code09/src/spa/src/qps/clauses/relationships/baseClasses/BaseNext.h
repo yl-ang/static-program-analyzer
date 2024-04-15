@@ -12,8 +12,8 @@ protected:
 private:
     bool isSimpleResult() const;
 
-    ClauseResult evaluateSynonymInteger(PKBFacadeReader&);
-    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&, EvaluationDb&);
+    ClauseResult evaluateSynonymInteger(PKBFacadeReader&, EvaluationDb& evalDb);
+    ClauseResult evaluateSynonymWildcard(PKBFacadeReader&);
 
     virtual ClauseResult evaluateBothSynonyms(PKBFacadeReader&, EvaluationDb&) = 0;
     virtual bool hasNextRelationship(PKBFacadeReader&) = 0;

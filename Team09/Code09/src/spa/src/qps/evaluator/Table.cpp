@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "qps/clauses/ClauseResult.h"
+#include "qps/exceptions/evaluator/QPSUnequalColHeaderError.h"
 #include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
 Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : headers(headers) {
@@ -30,12 +32,15 @@ Table::Table(std::vector<Synonym> headers, std::vector<ColumnData> columns) : he
     }
 }
 
-Table::Table(std::vector<Synonym> headers, std::vector<Row> rows) : headers(headers), rows(rows) {
+Table::Table(std::vector<Synonym>& headers, std::vector<Row>& rows)
+    : headers(std::move(headers)), rows(std::move(rows)) {
+    /*
     for (const Row& row : rows) {
         if (row.size() != headers.size()) {
             throw QPSUnequalColHeaderError();
         }
     }
+    */
 }
 
 bool Table::containsHeader(const Synonym& qe) const {
@@ -64,12 +69,16 @@ int Table::getHeaderIndex(const Synonym& qe) const {
     return -1;
 }
 
-std::vector<Row> Table::getRows() const {
+std::vector<Row>& Table::getRows() {
     return rows;
 }
 
 std::vector<Synonym> Table::getHeaders() const {
     return headers;
+}
+
+void Table::setHeaders(const std::vector<Synonym>& newHeaders) const {
+    this->headers = newHeaders;
 }
 
 void Table::projectNewColumn(std::vector<Synonym> newHeaders, const HeaderMatcher& matchTargetHeader,
@@ -124,10 +133,10 @@ bool Table::operator==(const Table& other) const {
     return true;
 }
 
-std::unordered_set<SynonymValue> Table::getColumn(const Synonym& synonym) const {
+std::unordered_set<SynonymValue> Table::getColumn(const Synonym& synonym) {
     std::unordered_set<SynonymValue> result{};
 
-    for (Row row : getRows()) {
+    for (const Row& row : getRows()) {
         result.insert(row.at(synonym.getValue()));
     }
 

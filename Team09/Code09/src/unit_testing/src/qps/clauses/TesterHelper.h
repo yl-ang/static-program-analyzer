@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "catch.hpp"
 #include "pkb/PKBClient/PKBFacadeReader.h"
 #include "qps/clauseArguments/Wildcard.h"
@@ -36,18 +38,33 @@ public:  // NOLINT
         REQUIRE(!result.isBoolean());
 
         auto allSynonymValues = result.getAllSynonymValues();
+        std::unordered_map<std::string, std::vector<std::string>> map = {};
 
-        REQUIRE(allSynonymValues.size() == expectedValues.size());
+        for (auto valueResult : allSynonymValues) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
+
+        for (auto& pair : map) {
+            std::sort(pair.second.begin(), pair.second.end());
+        }
+
+        REQUIRE(map.size() == expectedValues.size());
 
         if (allSynonymValues.size() == 0) {
             return *this;
         }
 
         std::unordered_set<std::string> entries{};
-        for (int i = 0; i < allSynonymValues[0].size(); i++) {
+        for (const auto& row : map) {
             std::string entry = "";
-            for (int j = 0; j < allSynonymValues.size(); j++) {
-                entry += allSynonymValues[j][i] + ",";
+            for (const auto& syn : row.second) {
+                entry += syn + ",";
             }
             auto it = entries.find(entry);
             if (it == entries.end()) {
@@ -57,10 +74,15 @@ public:  // NOLINT
             }
         }
 
-        for (int i = 0; i < expectedValues[0].size(); i++) {
+        for (auto& ev : expectedValues) {
+            std::sort(ev.begin(), ev.end());
+        }
+
+        for (int i = 0; i < expectedValues.size(); i++) {
             std::string entry = "";
-            for (int j = 0; j < expectedValues.size(); j++) {
-                entry += expectedValues[j][i] + ",";
+            // std::sort(expectedValues[i].begin(), expectedValues[i].end());
+            for (int j = 0; j < expectedValues[0].size(); j++) {
+                entry += expectedValues[i][j] + ",";
             }
             auto it = entries.find(entry);
             if (it == entries.end()) {

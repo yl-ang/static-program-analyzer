@@ -330,9 +330,9 @@ ClauseResult Affects::evaluateSynonymWildcard(PKBFacadeReader& reader) {
         }
     }
 
-    SynonymValues values;
+    std::vector<Row> values;
     for (int stmtNumValue : stmtNumValues) {
-        values.push_back(std::to_string(stmtNumValue));
+        values.push_back(Row{{syn->getName(), std::to_string(stmtNumValue)}});
     }
 
     return {*syn, values};
@@ -372,9 +372,9 @@ ClauseResult Affects::evaluateSynonymInteger(PKBFacadeReader& reader) {
         }
     }
 
-    SynonymValues values;
+    std::vector<Row> values;
     for (int stmtNumValue : stmtNumValues) {
-        values.push_back(std::to_string(stmtNumValue));
+        values.push_back(Row{{syn->getName(), std::to_string(stmtNumValue)}});
     }
     return {*syn, values};
 }
@@ -384,27 +384,25 @@ ClauseResult Affects::evaluateBothSynonyms(PKBFacadeReader& reader) {
     std::shared_ptr<Synonym> affectedSyn = std::dynamic_pointer_cast<Synonym>(affected);
     std::vector<Synonym> headers = {*affectorSyn, *affectedSyn};
 
-    SynonymValues affectorValues;
-    SynonymValues affectedValues;
+    std::vector<Row> values{};
 
     if (!checkAssign(affectorSyn) || !checkAssign(affectedSyn)) {
-        return {headers, {{}, {}}};
+        return {headers, {}};
     }
     AffectsSet resultSet = generateAffectsRelation(reader);
     for (std::pair<StmtNum, StmtNum> result : resultSet) {
         // account for if affectorSyn is same syn as affectedSyn
         if (*affectorSyn == *affectedSyn) {
             if (result.first == result.second) {
-                affectorValues.push_back(std::to_string(result.first));
-                affectedValues.push_back(std::to_string(result.second));
+                values.push_back(Row{{affectorSyn->getName(), std::to_string(result.first)},
+                                     {affectedSyn->getName(), std::to_string(result.second)}});
             }
         } else {
-            affectorValues.push_back(std::to_string(result.first));
-            affectedValues.push_back(std::to_string(result.second));
+            values.push_back(Row{{affectorSyn->getName(), std::to_string(result.first)},
+                                 {affectedSyn->getName(), std::to_string(result.second)}});
         }
     }
 
-    std::vector<SynonymValues> values = {affectorValues, affectedValues};
     return {headers, values};
 }
 

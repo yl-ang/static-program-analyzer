@@ -7,9 +7,6 @@
 #include <vector>
 
 #include "qps/clauseArguments/Synonym.h"
-#include "qps/clauses/ClauseResult.h"
-#include "qps/exceptions/evaluator/QPSUnequalColHeaderError.h"
-#include "qps/exceptions/evaluator/QPSUnequalRowColError.h"
 
 using SynonymValue = std::string;
 using ColumnData = std::vector<std::string>;
@@ -31,7 +28,7 @@ private:
      * other table.
      */
     bool isSentinel = false;
-    std::vector<Synonym> headers;
+    mutable std::vector<Synonym> headers;
     std::vector<Row> rows;
 
     /**
@@ -56,13 +53,15 @@ public:
      * @param headers the headers of the table
      * @param rows the rows of the table
      */
-    Table(std::vector<Synonym>, std::vector<Row>);
+    Table(std::vector<Synonym>& headers, std::vector<Row>& rows);
 
     /**
      * Returns the headers of the table.
      * @return the headers of the table
      */
     std::vector<Synonym> getHeaders() const;
+
+    void setHeaders(const std::vector<Synonym>& newHeaders) const;
 
     /**
      * Returns true if the rows of the table is empty, but it has some header.
@@ -74,7 +73,7 @@ public:
      * \brief Returns rows
      * \return this rows
      */
-    std::vector<Row> getRows() const;
+    std::vector<Row>& getRows();
 
     /**
      * \brief Synonyms are subset of headers
@@ -97,7 +96,7 @@ public:
      */
     void projectNewColumn(std::vector<Synonym>, const HeaderMatcher&, const ValueTransformer&);
 
-    std::unordered_set<SynonymValue> getColumn(const Synonym& synonym) const;
+    std::unordered_set<SynonymValue> getColumn(const Synonym& synonym);
 
     bool isSentinelTable() const;
     bool operator==(const Table&) const;

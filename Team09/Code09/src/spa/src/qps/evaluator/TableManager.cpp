@@ -6,16 +6,31 @@
 #include "qps/exceptions/evaluator/QPSTableManagerError.h"
 
 void TableManager::join(const ClauseResult& cr) const {
-    this->join(clauseResultToTable(cr));
+    auto table = clauseResultToTable(cr);
+    this->join(table, {});
 }
 
-void TableManager::joinAll(const std::vector<Table>& tables) const {
-    for (const Table& table : tables) {
-        this->join(table);
+void TableManager::join(const ClauseResult& cr, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
+    auto table = clauseResultToTable(cr);
+    this->join(table, synonymsToRetain);
+}
+
+void TableManager::joinAll(const std::vector<Table>& tables,
+                           const std::unordered_set<SynonymValue>& synonymsToRetain) const {
+    for (Table table : tables) {
+        this->join(table, synonymsToRetain);
     }
 }
 
-void TableManager::join(const Table& other) const {
+void TableManager::joinAll(const std::vector<Table>& tables) const {
+    joinAll(tables, {});
+}
+
+void TableManager::join(Table& other) const {
+    this->join(other, {});
+}
+
+void TableManager::join(Table& other, const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     if (this->result.isSentinelTable() || other.isSentinelTable()) {
         return this->joinSentinelTable(other);
     }
@@ -24,20 +39,32 @@ void TableManager::join(const Table& other) const {
         return this->joinEmptyTable(other);
     }
 
-    const std::vector newHeaders{mergeHeaders(other)};
+    std::vector newHeaders{mergeHeaders(other, synonymsToRetain)};
+    std::unordered_set<SynonymValue> newHeadersNames{};
+    for (const auto& header : newHeaders) {
+        newHeadersNames.insert(header.getName());
+    }
+
     const std::vector commonHeaders{getCommonHeaders(other)};
-    const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders)};
+    const std::unordered_map commonValueStringToRowMap{getCommonValueStringToRowMap(commonHeaders, other.getRows())};
 
     std::vector<Row> newRows{};
     newRows.reserve(commonValueStringToRowMap.size() * other.getRows().size());
-    for (Row& row : other.getRows()) {
-        std::string commonValueString{buildTuple(commonHeaders, row)};
 
-        if (auto it = commonValueStringToRowMap.find(commonValueString); it != commonValueStringToRowMap.end()) {
-            for (const Row& otherRow : it->second) {
-                Row newRow{row};
-                combineRows(newRow, otherRow);
-                newRows.push_back(newRow);
+    Row newRow{};
+    std::unordered_set<std::string> existingRowsString{};
+    for (Row& row : this->result.getRows()) {
+        std::string commonValueString{buildTuple(commonHeaders, row)};
+        newRow = row;
+
+        if (auto itMap = commonValueStringToRowMap.find(commonValueString);
+            // If common headers are empty, there is no inner join to do. just do a cartesian product.
+            commonHeaders.empty() || itMap != commonValueStringToRowMap.end()) {
+            for (const Row& otherRow : itMap->second) {
+                combineRows(newHeadersNames, newRow, otherRow);
+                if (existingRowsString.find(buildTuple(newHeaders, newRow)) == existingRowsString.end()) {
+                    newRows.push_back(newRow);
+                }
             }
         }
     }
@@ -52,25 +79,41 @@ void TableManager::joinSentinelTable(const Table& other) const {
 }
 
 void TableManager::joinEmptyTable(const Table& other) const {
-    const std::vector newHeaders{mergeHeaders(other)};
-    const std::vector<Row> emptyRows{};
+    std::vector newHeaders{mergeHeaders(other, {})};
+    std::vector<Row> emptyRows{};
     this->result = Table{newHeaders, emptyRows};
 }
 
 std::unordered_map<std::string, std::vector<Row>> TableManager::getCommonValueStringToRowMap(
-    const std::vector<Synonym>& commonHeaders) const {
+    const std::vector<Synonym>& commonHeaders, const std::vector<Row>& rows) const {
     std::unordered_map<std::string, std::vector<Row>> commonValueStringToRowMap{};
-    commonValueStringToRowMap.reserve(this->result.getRows().size());
-    for (Row row : this->result.getRows()) {
+    commonValueStringToRowMap.reserve(rows.size());
+    for (const Row& row : rows) {
         std::string commonValueString{buildTuple(commonHeaders, row)};
-        commonValueStringToRowMap[commonValueString].push_back(std::move(row));
+        commonValueStringToRowMap[std::move(commonValueString)].push_back(row);
     }
+
     return commonValueStringToRowMap;
 }
 
-void TableManager::combineRows(Row& targetRow, const Row& sourceRow) {
-    for (const auto& pair : sourceRow) {
-        targetRow[pair.first] = pair.second;
+void TableManager::combineRows(const std::unordered_set<SynonymValue>& headers, Row& firstRow, const Row& secondRow) {
+    // delete from the original row whose headers are not in the set of wanted headers
+    std::vector<SynonymValue> synonymColumnsToDelete{};
+    for (const auto& pair : firstRow) {
+        if (headers.find(pair.first) == headers.end()) {
+            synonymColumnsToDelete.push_back(pair.first);
+        }
+    }
+
+    for (const auto& synValue : synonymColumnsToDelete) {
+        firstRow.erase(synValue);
+    }
+
+    // Insert into the original row from the second row whose headers are wanted
+    for (const auto& pair : secondRow) {
+        if (headers.find(pair.first) != headers.end()) {
+            firstRow[pair.first] = pair.second;
+        }
     }
 }
 
@@ -87,19 +130,26 @@ std::vector<Synonym> TableManager::getCommonHeaders(const Table& other) const {
     return commonHeaders;
 }
 
-std::vector<Synonym> TableManager::mergeHeaders(const Table& other) const {
+std::vector<Synonym> TableManager::mergeHeaders(const Table& other,
+                                                const std::unordered_set<SynonymValue>& synonymsToRetain) const {
     std::vector<Synonym> newHeaders{};
     std::unordered_set<SynonymValue> seen{};
 
     for (Synonym header : this->result.getHeaders()) {
-        if (seen.find(header.getValue()) == seen.end()) {
+        const bool shouldRetain =
+            synonymsToRetain.empty() || synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool isNotSeen = seen.find(header.getValue()) == seen.end();
+        if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
             seen.insert(header.getValue());
         }
     }
 
     for (Synonym header : other.getHeaders()) {
-        if (seen.find(header.getValue()) == seen.end()) {
+        const bool shouldRetain =
+            synonymsToRetain.empty() || synonymsToRetain.find(header.getName()) != synonymsToRetain.end();
+        const bool isNotSeen = seen.find(header.getValue()) == seen.end();
+        if (isNotSeen && shouldRetain) {
             newHeaders.push_back(header);
             seen.insert(header.getValue());
         }
@@ -115,7 +165,9 @@ Table TableManager::clauseResultToTable(const ClauseResult& result) {
     if (result.isBoolean()) {
         throw QPSTableManagerError();
     }
-    return Table{result.getSynonyms(), result.getAllSynonymValues()};
+    auto headers = result.getSynonyms();
+    auto rows = result.getAllSynonymValues();
+    return Table{headers, rows};
 }
 
 bool TableManager::isEmpty() const {

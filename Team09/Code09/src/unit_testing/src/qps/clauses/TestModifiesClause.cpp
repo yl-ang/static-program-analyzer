@@ -65,7 +65,7 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
             .testSynonymValues({{"2", "3"}});
 
         // Select s such that Modifies(s, "z"), non-existent
-        ModifiesTester{pfr, stmtSyn, std::make_shared<Literal>("z")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ModifiesTester{pfr, stmtSyn, std::make_shared<Literal>("z")}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         std::shared_ptr<Synonym> readStmtSyn = std::make_shared<Synonym>(DesignEntityType::READ, "s1");
         // Select s such that Modifies(s, "x")
@@ -94,10 +94,10 @@ TEST_CASE("SuchThatClause evaluate for Modifies relationship with 1 synonym") {
             .testSynonyms({*stmtSyn})
             .testSynonymValues({{"y"}});
         // Select s such that Modifies(3, s)
-        ModifiesTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ModifiesTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that Modifies(5, s), out of bounds
-        ModifiesTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        ModifiesTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Modifies(Synonym, Wildcard)") {

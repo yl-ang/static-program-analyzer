@@ -63,7 +63,7 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
             .testSynonymValues({{"2", "3"}});
 
         // Select s such that Uses(s, "z"), non-existent
-        UsesTester{pfr, stmtSyn, std::make_shared<Literal>("z")}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        UsesTester{pfr, stmtSyn, std::make_shared<Literal>("z")}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         std::shared_ptr<Synonym> readStmtSyn = std::make_shared<Synonym>(DesignEntityType::READ, "s1");
         // Select s such that Uses(s, "x")
@@ -90,10 +90,10 @@ TEST_CASE("SuchThatClause evaluate for Uses relationship with 1 synonym") {
         // Select s such that Uses(2, s)
         UsesTester{pfr, std::make_shared<Integer>("2"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{"y"}});
         // Select s such that Uses(3, s)
-        UsesTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        UsesTester{pfr, std::make_shared<Integer>("3"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
 
         // Select s such that Uses(5, s), out of bounds
-        UsesTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({{}});
+        UsesTester{pfr, std::make_shared<Integer>("5"), stmtSyn}.testSynonyms({*stmtSyn}).testSynonymValues({});
     }
 
     SECTION("Uses(Synonym, Wildcard)") {

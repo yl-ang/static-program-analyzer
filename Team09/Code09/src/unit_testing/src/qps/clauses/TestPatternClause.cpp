@@ -1,9 +1,11 @@
 #include <algorithm>
+#include <iostream>
 
 #include "catch.hpp"
 #include "pkb/PKBClient/PKBFacadeWriter.h"
 #include "qps/clauseArguments/Wildcard.h"
 #include "qps/clauses/PatternClause.h"
+#include "qps/evaluator/Table.h"
 #include "sp/Utils.h"
 
 bool equalVector(std::vector<std::string> vec1, std::vector<std::string> vec2) {
@@ -60,8 +62,15 @@ TEST_CASE("Assign Pattern evaluate") {
         ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
-        std::vector<SynonymValues> synValues = result.getAllSynonymValues();
-        REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"2", "3", "4"}));
+        auto synValues = result.getAllSynonymValues();
+        std::vector<std::string> keys = {};
+
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                keys.push_back(pair.second);
+            }
+        }
+        REQUIRE_EQUAL_VECTORS(keys, std::vector<std::string>({"2", "3", "4"}));
     }
 
     SECTION("Test Wildcard and ExpressionSpec") {
@@ -74,22 +83,36 @@ TEST_CASE("Assign Pattern evaluate") {
         ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
-        std::vector<SynonymValues> synValues = result.getAllSynonymValues();
-        REQUIRE(synValues == std::vector<SynonymValues>{{"2"}});
+        auto synValues = result.getAllSynonymValues();
+        std::vector<SynonymValues> keys = {};
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                auto value = SynonymValues{pair.second};
+                keys.push_back(value);
+            }
+        }
+        REQUIRE(keys == std::vector<SynonymValues>{{"2"}});
 
         PatternClause pc2 = PatternClause(assignSyn, {wildcard, literalExp});
         result = pc2.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
-        REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"3", "4"}));
+        std::vector<std::string> vectString = {};
+
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                vectString.push_back(pair.second);
+            }
+        }
+        REQUIRE_EQUAL_VECTORS(vectString, std::vector<std::string>({"3", "4"}));
 
         PatternClause pc3 = PatternClause(assignSyn, {wildcard, literalExp_False});
         result = pc3.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn});
         synValues = result.getAllSynonymValues();
-        REQUIRE(synValues == std::vector<SynonymValues>{{}});
+        REQUIRE(synValues == std::vector<Row>{});
     }
 
     SECTION("Test Synonym and Wildcard") {
@@ -100,9 +123,20 @@ TEST_CASE("Assign Pattern evaluate") {
         ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
-        std::vector<SynonymValues> synValues = result.getAllSynonymValues();
-        REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"2", "3", "4"}));
-        REQUIRE_EQUAL_VECTORS(synValues[1], std::vector<std::string>({"x", "x", "x"}));
+        auto synValues = result.getAllSynonymValues();
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
+        REQUIRE_EQUAL_VECTORS(map["a"], std::vector<std::string>({"2", "3", "4"}));
+        REQUIRE_EQUAL_VECTORS(map["v"], std::vector<std::string>({"x", "x", "x"}));
     }
 
     SECTION("Test Synonym and ExpressionSpec") {
@@ -115,23 +149,44 @@ TEST_CASE("Assign Pattern evaluate") {
         ClauseResult result = pc.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
-        std::vector<SynonymValues> synValues = result.getAllSynonymValues();
-        REQUIRE(synValues == std::vector<SynonymValues>{{"2"}, {"x"}});
+        auto synValues = result.getAllSynonymValues();
+        std::vector<SynonymValues> keys = {};
+
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                auto value = SynonymValues{pair.second};
+                keys.push_back(value);
+            }
+        }
+        REQUIRE(keys == std::vector<SynonymValues>{{"2"}, {"x"}});
 
         PatternClause pc2 = PatternClause(assignSyn, {variableSyn, literalExp});
         result = pc2.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
-        REQUIRE_EQUAL_VECTORS(synValues[0], std::vector<std::string>({"4", "3"}));
-        REQUIRE_EQUAL_VECTORS(synValues[1], std::vector<std::string>({"x", "x"}));
+        keys.clear();
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto synValue : synValues) {
+            for (auto pair : synValue) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
+        REQUIRE_EQUAL_VECTORS(map["a"], std::vector<std::string>({"4", "3"}));
+        REQUIRE_EQUAL_VECTORS(map["v"], std::vector<std::string>({"x", "x"}));
 
         PatternClause pc3 = PatternClause(assignSyn, {variableSyn, literalExp_False});
         result = pc3.runEvaluation(reader, evalDb);
         REQUIRE_FALSE(result.isBoolean());
         REQUIRE(result.getSynonyms() == std::vector<Synonym>{*assignSyn, *variableSyn});
         synValues = result.getAllSynonymValues();
-        REQUIRE(synValues == std::vector<SynonymValues>{{}, {}});
+
+        REQUIRE(synValues == std::vector<Row>{});
     }
 }
 
@@ -213,19 +268,43 @@ TEST_CASE("While Pattern evaluate") {
         PatternClause whilePattern = {whileSyn, {varSyn, wildcard}};
         ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn, *varSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], allWhileStmtsWithVariables);
-        REQUIRE_EQUAL_VECTORS(valueResults[1], allVarsInWhile);
+        REQUIRE_EQUAL_VECTORS(map["w"], allWhileStmtsWithVariables);
+        REQUIRE_EQUAL_VECTORS(map["v"], allVarsInWhile);
     }
 
     SECTION("While(\"x\", _)") {
         PatternClause whilePattern = {whileSyn, {literalValue, wildcard}};
         ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+        std::vector<std::vector<std::string>> vectString = {};
+
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {"3"});
+        REQUIRE_EQUAL_VECTORS(map["w"], {"3"});
     }
 
     SECTION("While(Literal not in store, _)") {
@@ -233,9 +312,10 @@ TEST_CASE("While Pattern evaluate") {
         PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
         ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {});
+        REQUIRE(valueResults.empty());
     }
 
     SECTION("While(Literal in store not in condition, _)") {
@@ -243,18 +323,31 @@ TEST_CASE("While Pattern evaluate") {
         PatternClause whilePattern = {whileSyn, {notInStoreLiteral, wildcard}};
         ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {});
+        REQUIRE(valueResults.empty());
     }
 
     SECTION("While(_, _)") {
         PatternClause whilePattern = {whileSyn, {wildcard, wildcard}};
         ClauseResult clauseResult = whilePattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
+
         REQUIRE(synResults == std::vector<Synonym>{*whileSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {allWhileStmtsWithVariables});
+        REQUIRE_EQUAL_VECTORS(map["w"], allWhileStmtsWithVariables);
     }
 }
 
@@ -314,19 +407,45 @@ TEST_CASE("If Pattern evaluate") {
         PatternClause ifPattern = {ifSyn, {varSyn, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+        std::vector<std::vector<std::string>> vectString = {};
+
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn, *varSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], allIfStmtsWithVariables);
-        REQUIRE_EQUAL_VECTORS(valueResults[1], allVarsInIf);
+        REQUIRE_EQUAL_VECTORS(map["ii"], allIfStmtsWithVariables);
+        REQUIRE_EQUAL_VECTORS(map["v"], allVarsInIf);
     }
 
     SECTION("If(\"y\", _)") {
         PatternClause ifPattern = {ifSyn, {literalValue, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+        std::vector<std::vector<std::string>> vectString = {};
+
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], std::vector<std::string>({"5", "6"}));
+        REQUIRE_EQUAL_VECTORS(map["ii"], std::vector<std::string>({"5", "6"}));
     }
 
     SECTION("If(Literal not in store, _)") {
@@ -334,9 +453,10 @@ TEST_CASE("If Pattern evaluate") {
         PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {});
+        REQUIRE(valueResults.empty());
     }
 
     SECTION("If(Literal in store not in condition, _)") {
@@ -344,17 +464,29 @@ TEST_CASE("If Pattern evaluate") {
         PatternClause ifPattern = {ifSyn, {notInStoreLiteral, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {});
+        REQUIRE(valueResults.empty());
     }
 
     SECTION("If(_, _)") {
         PatternClause ifPattern = {ifSyn, {wildcard, wildcard, wildcard}};
         ClauseResult clauseResult = ifPattern.runEvaluation(reader, evalDb);
         std::vector<Synonym> synResults = clauseResult.getSynonyms();
-        std::vector<SynonymValues> valueResults = clauseResult.getAllSynonymValues();
+        auto valueResults = clauseResult.getAllSynonymValues();
+        std::unordered_map<std::string, std::vector<std::string>> map;
+
+        for (auto valueResult : valueResults) {
+            for (auto pair : valueResult) {
+                if (map.find(pair.first) != map.end()) {
+                    map[pair.first].push_back(pair.second);
+                } else {
+                    map[pair.first] = {pair.second};
+                }
+            }
+        }
         REQUIRE(synResults == std::vector<Synonym>{*ifSyn});
-        REQUIRE_EQUAL_VECTORS(valueResults[0], {allIfStmtsWithVariables});
+        REQUIRE_EQUAL_VECTORS(map["ii"], allIfStmtsWithVariables);
     }
 }

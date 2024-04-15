@@ -30,22 +30,19 @@ ClauseResult WhilePattern::evaluateFirstArgSyn(PKBFacadeReader& reader, Evaluati
     std::unordered_set<StmtNum> whileStmts = evalDb.getStmts(wSyn);
     std::unordered_set<Variable> allVars = evalDb.getVariables(fSyn);
 
-    std::vector<std::string> stmtNumbers = {};
-    std::vector<std::string> synValues = {};
+    std::vector<Row> results{};
 
     for (const StmtNum& stmtNum : whileStmts) {
         for (Variable var : allVars) {
             if (reader.hasWhilePattern(stmtNum, var)) {
                 // keep track of syn and stmt
-                stmtNumbers.push_back(std::to_string(stmtNum));
-                synValues.push_back(var);
+                results.push_back(Row{{wSyn.getName(), std::to_string(stmtNum)}, {fSyn.getName(), var}});
             }
         }
     }
 
     std::vector<Synonym> returnSyn = {wSyn, fSyn};
-    std::vector<SynonymValues> returnSynValues = {stmtNumbers, synValues};
-    return {returnSyn, returnSynValues};
+    return {returnSyn, results};
 }
 
 ClauseResult WhilePattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, EvaluationDb& evalDb) {
@@ -53,11 +50,11 @@ ClauseResult WhilePattern::evaluateFirstArgLiteral(PKBFacadeReader& reader, Eval
 
     std::unordered_set<StmtNum> whileStmts = evalDb.getStmts(wSyn);
 
-    std::vector<std::string> stmtNumbers = {};
+    std::vector<Row> stmtNumbers = {};
 
     for (const StmtNum& stmtNum : whileStmts) {
         if (reader.hasWhilePattern(stmtNum, arguments[0]->getValue())) {
-            stmtNumbers.push_back(std::to_string(stmtNum));
+            stmtNumbers.push_back(Row{{wSyn.getName(), std::to_string(stmtNum)}});
         }
     }
 
@@ -70,12 +67,12 @@ ClauseResult WhilePattern::evaluateFirstArgWildcard(PKBFacadeReader& reader, Eva
     std::unordered_set<StmtNum> whileStmts = evalDb.getStmts(wSyn);
     std::unordered_set<Variable> allVars = reader.getVariables();
 
-    std::vector<std::string> stmtNumbers = {};
+    std::vector<Row> stmtNumbers = {};
 
     for (const StmtNum& stmtNum : whileStmts) {
         for (Variable var : allVars) {
             if (reader.hasWhilePattern(stmtNum, var)) {
-                stmtNumbers.push_back(std::to_string(stmtNum));
+                stmtNumbers.push_back(Row{{wSyn.getName(), std::to_string(stmtNum)}});
             }
         }
     }

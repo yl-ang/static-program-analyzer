@@ -22,7 +22,7 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     if (!getNonBooleanClauses().empty()) {
         QueryDb queryDb{getNonBooleanClauses()};
         for (auto entity : selectEntities) {
-            queryDb.loadClausesWithEntity(entity);
+            queryDb.loadClausesWithEntity(entity.getName());
             if (evaluateAndJoinClauses(*tableManager, queryDb, pkb, evalDb); tableManager->isEmpty()) {
                 return getEmptyResult();
             }
@@ -48,7 +48,9 @@ std::vector<std::string> Query::evaluate(PKBFacadeReader& pkb) const {
     }
 
     projectAttributes(*tableManager, pkb);
-    return tableManager->extractResults(selectEntities);
+    auto res = tableManager->extractResults(selectEntities);
+
+    return res;
 }
 
 void Query::projectAttributes(const TableManager& tm, PKBFacadeReader& pkb) const {
@@ -92,14 +94,30 @@ std::vector<std::string> Query::getEmptyResult() const {
     return this->isSelectBoolean() ? std::vector{QPSConstants::FALSE_STRING} : std::vector<std::string>{};
 }
 
-void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReader& pkb, EvaluationDb& evalDb) {
+void Query::evaluateAndJoinClauses(TableManager& tm, QueryDb& db, PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
     OptionalQueryClause next = db.next();
     while (next.has_value() && !tm.isEmpty()) {
         auto clause = next->get();
+
         ClauseResult res = clause->runEvaluation(pkb, evalDb);
-        tm.join(res);
+        tm.join(res, getSynonymsResultsToRetain(db));
         next = db.next();
     }
+}
+
+std::unordered_set<SynonymValue> Query::getSynonymsResultsToRetain(QueryDb& queryDb) const {
+    auto evaluationCount = queryDb.getSynonymsEvaluationCount();
+    std::unordered_set<SynonymValue> shouldEvaluate{};
+    for (auto pair : evaluationCount) {
+        if (pair.second > 0) {
+            shouldEvaluate.insert(pair.first);
+        }
+    }
+    for (auto entity : selectEntities) {
+        // Always retain select entities results.
+        shouldEvaluate.insert(entity.getName());
+    }
+    return shouldEvaluate;
 }
 
 bool Query::evaluateBooleanClauses(PKBFacadeReader& pkb, EvaluationDb& evalDb) const {
@@ -157,6 +175,11 @@ void Query::buildAndJoinSelectTable(const TableManager& tm, PKBFacadeReader& pkb
     if (!selectEntitiesWithoutAttributes.empty()) {
         const ClauseResult cr{
             SynonymValuesRetriever::retrieveAsClauseResult(pkb, selectEntitiesWithoutAttributes, evalDb)};
-        tm.join(cr);
+
+        std::unordered_set<SynonymValue> selectEntitiesSet{};
+        for (const auto& entity : selectEntities) {
+            selectEntitiesSet.insert(entity.getName());
+        }
+        tm.join(cr, selectEntitiesSet);
     }
 }

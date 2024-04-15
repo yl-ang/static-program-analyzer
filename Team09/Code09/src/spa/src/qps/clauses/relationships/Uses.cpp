@@ -53,29 +53,25 @@ ClauseResult Uses::evaluateBothSynonyms(PKBFacadeReader& reader, EvaluationDb& e
     Synonym userSyn = *std::dynamic_pointer_cast<Synonym>(user);
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
-    SynonymValues userValues{};
-    SynonymValues varValues{};
+    std::vector<Row> values{};
 
     for (const Variable& var : evalDb.getVariables(varSyn)) {
         if (userSyn.getType() == DesignEntityType::PROCEDURE) {
             std::unordered_set<Procedure> procs = reader.getUsesProceduresByVariable(var);
             for (Procedure proc : procs) {
-                userValues.push_back(proc);
-                varValues.push_back(var);
+                values.push_back(Row{{userSyn.getName(), proc}, {varSyn.getName(), var}});
             }
         } else {
             std::vector<std::string> userStmts = ClauseEvaluatorUtils::filterStatementsByType(
                 reader, userSyn.getType(), reader.getUsesStatementsByVariable(var));
-            userValues.reserve(userValues.size() + userStmts.size());
-            userValues.insert(userValues.end(), userStmts.begin(), userStmts.end());
 
-            varValues.reserve(varValues.size() + userStmts.size());
-            varValues.insert(varValues.end(), userStmts.size(), var);
+            for (const auto& stmt : userStmts) {
+                values.push_back(Row{{userSyn.getName(), stmt}, {varSyn.getName(), var}});
+            }
         }
     }
 
     std::vector<Synonym> headers = {userSyn, varSyn};
-    std::vector<SynonymValues> values = {userValues, varValues};
     return {headers, values};
 }
 
@@ -89,25 +85,26 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
         vars.insert(this->var->getValue());
     }
 
-    SynonymValues values{};
+    std::vector<Row> values{};
     if (userSyn.getType() == DesignEntityType::PROCEDURE) {
         for (Variable var : vars) {
             std::unordered_set<Procedure> users = reader.getUsesProceduresByVariable(var);
-            values.reserve(users.size());
-            values.insert(values.end(), users.begin(), users.end());
+            for (const auto& proc : users) {
+                values.push_back(Row{{userSyn.getName(), proc}});
+            }
         }
     } else {
         std::unordered_set<StmtNum> allStmts{};
-        for (Variable var : vars) {
+        for (const Variable& var : vars) {
             std::unordered_set<StmtNum> users = reader.getUsesStatementsByVariable(var);
-            allStmts.reserve(users.size());
             allStmts.insert(users.begin(), users.end());
         }
 
         std::vector<std::string> stmts =
             ClauseEvaluatorUtils::filterStatementsByType(reader, userSyn.getType(), allStmts);
-        values.reserve(stmts.size());
-        values.insert(values.end(), stmts.begin(), stmts.end());
+        for (const auto& stmt : stmts) {
+            values.push_back(Row{{userSyn.getName(), stmt}});
+        }
     }
 
     return {userSyn, values};
@@ -116,9 +113,9 @@ ClauseResult Uses::evaluateUserSynonym(PKBFacadeReader& reader) {
 ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
-    SynonymValues values{};
-    for (Variable var : reader.getUsesVariablesByProcedure(user->getValue())) {
-        values.push_back(var);
+    std::vector<Row> values{};
+    for (const Variable& var : reader.getUsesVariablesByProcedure(user->getValue())) {
+        values.push_back(Row{{varSyn.getName(), var}});
     }
     return {varSyn, values};
 }
@@ -126,9 +123,9 @@ ClauseResult Uses::variablesUsedByProcedure(PKBFacadeReader& reader) {
 ClauseResult Uses::variablesUsedByStatement(PKBFacadeReader& reader) {
     Synonym varSyn = *std::dynamic_pointer_cast<Synonym>(var);
 
-    SynonymValues values{};
+    std::vector<Row> values{};
     for (Variable currVar : reader.getUsesVariablesByStatement(std::stoi(user->getValue()))) {
-        values.push_back(currVar);
+        values.push_back(Row{{varSyn.getName(), currVar}});
     }
 
     return {varSyn, values};

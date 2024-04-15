@@ -7,10 +7,11 @@
 #include <vector>
 
 #include "qps/clauseArguments/Synonym.h"
+#include "qps/evaluator/Table.h"
 
 using SynonymKey = std::string;
 using SynonymValues = std::vector<std::string>;
-using ComplexResult = std::pair<std::vector<Synonym>, std::vector<SynonymValues>>;
+using ComplexResult = std::pair<std::vector<Synonym>, std::vector<Row>>;
 
 class ClauseResult {
 private:
@@ -18,12 +19,12 @@ private:
 
 public:
     ClauseResult(bool);
-    ClauseResult(std::vector<Synonym>, std::vector<SynonymValues>);
-    ClauseResult(Synonym, SynonymValues);
+    ClauseResult(const std::vector<Synonym>&, const std::vector<Row>&);
+    ClauseResult(const Synonym&, const std::vector<Row>&);
 
     bool isBoolean() const;
     bool getBoolean() const;
     std::vector<Synonym> getSynonyms() const;
-    std::vector<SynonymValues> getAllSynonymValues() const;
+    std::vector<Row> getAllSynonymValues() const;
     bool isEmpty() const;
 };

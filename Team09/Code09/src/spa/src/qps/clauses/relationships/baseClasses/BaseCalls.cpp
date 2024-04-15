@@ -43,12 +43,12 @@ ClauseResult BaseCalls::evaluateSynonymWildcard(PKBFacadeReader& reader, Evaluat
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(callee->isSynonym() ? callee : caller);
 
     auto potentialResults = evalDb.getProcedures(syn);
-    SynonymValues result{};
+    std::vector<Row> result{};
 
     for (const auto& procName : potentialResults) {
         auto otherProcNames = callee->isSynonym() ? getCaller(reader, procName) : getCallee(reader, procName);
         if (!otherProcNames.empty()) {
-            result.push_back(procName);
+            result.push_back(Row{{syn.getName(), procName}});
         }
     }
 
@@ -60,13 +60,13 @@ ClauseResult BaseCalls::evaluateSynonymLiteral(PKBFacadeReader& reader, Evaluati
     Synonym syn = *std::dynamic_pointer_cast<Synonym>(calleeIsSynonym ? callee : caller);
 
     auto potentialResults = evalDb.getProcedures(syn);
-    SynonymValues result{};
+    std::vector<Row> result{};
 
     // Get all caller/callee of the literal, the opposite of whichever the literal is.
     auto allResults = calleeIsSynonym ? getCallee(reader, caller->getValue()) : getCaller(reader, callee->getValue());
     for (auto procName : potentialResults) {
         if (allResults.find(procName) != allResults.end()) {
-            result.push_back(procName);
+            result.push_back(Row{{syn.getName(), procName}});
         }
     }
 
@@ -82,8 +82,7 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, Evaluation
         return {synonyms, {}};
     }
 
-    SynonymValues callerValues{};
-    SynonymValues calleeValues{};
+    std::vector<Row> rows{};
 
     auto allCallerProcs = evalDb.getProcedures(callerSyn);
     auto allCalleeProcs = evalDb.getProcedures(calleeSyn);
@@ -95,8 +94,7 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, Evaluation
                     continue;
                 }
 
-                callerValues.push_back(callerProc);
-                calleeValues.push_back(calleeProc);
+                rows.push_back(Row{{callerSyn.getName(), callerProc}, {calleeSyn.getName(), calleeProc}});
             }
         }
     } else {
@@ -106,12 +104,10 @@ ClauseResult BaseCalls::evaluateBothSynonyms(PKBFacadeReader& reader, Evaluation
                     continue;
                 }
 
-                callerValues.push_back(callerProc);
-                calleeValues.push_back(calleeProc);
+                rows.push_back(Row{{callerSyn.getName(), callerProc}, {calleeSyn.getName(), calleeProc}});
             }
         }
     }
 
-    std::vector values = {callerValues, calleeValues};
-    return {synonyms, values};
+    return {synonyms, rows};
 }

@@ -32,7 +32,7 @@ private:
     std::vector<std::shared_ptr<PatternClause>> patternClauses;
     std::vector<std::shared_ptr<WithClause>> withClauses;
 
-    static void evaluateAndJoinClauses(TableManager& tm, QueryDb&, PKBFacadeReader& pkb, EvaluationDb&);
+    void evaluateAndJoinClauses(TableManager& tm, QueryDb&, PKBFacadeReader& pkb, EvaluationDb&) const;
     static ValueTransformer projectSynonymAttributesTransformer(PKBFacadeReader& pkb);
     static Synonym headerMatcher(const std::vector<Synonym>& synonyms, Synonym newSynonym);
 
@@ -45,4 +45,5 @@ private:
     bool hasNoClauses() const;
     bool isSelectBoolean() const;
     std::vector<std::string> getEmptyResult() const;
+    std::unordered_set<SynonymValue> getSynonymsResultsToRetain(QueryDb& queryDb) const;
 };

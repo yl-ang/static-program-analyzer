@@ -1,12 +1,11 @@
 #include "ClauseResult.h"
 
 ClauseResult::ClauseResult(bool booleanResult) : result(booleanResult) {}
-ClauseResult::ClauseResult(std::vector<Synonym> synonyms, std::vector<SynonymValues> synonymValues)
+ClauseResult::ClauseResult(const std::vector<Synonym>& synonyms, const std::vector<Row>& synonymValues)
     : result(std::make_pair(synonyms, synonymValues)) {}
-ClauseResult::ClauseResult(Synonym synonym, SynonymValues values) {
+ClauseResult::ClauseResult(const Synonym& synonym, const std::vector<Row>& rows) {
     std::vector<Synonym> synonyms = {synonym};
-    std::vector<SynonymValues> synonymValues = {values};
-    result = std::make_pair(synonyms, synonymValues);
+    result = std::make_pair(synonyms, rows);
 }
 
 bool ClauseResult::isBoolean() const {
@@ -21,7 +20,7 @@ std::vector<Synonym> ClauseResult::getSynonyms() const {
     return std::get<ComplexResult>(result).first;
 }
 
-std::vector<SynonymValues> ClauseResult::getAllSynonymValues() const {
+std::vector<Row> ClauseResult::getAllSynonymValues() const {
     return std::get<ComplexResult>(result).second;
 }
 
